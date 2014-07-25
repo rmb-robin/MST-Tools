@@ -43,7 +43,7 @@ public class Props {
             // get location of jar file
             String path = Props.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
             path = (new File(path)).getParentFile().getPath() + PROP_FILE;
-            logger.info("props path: {}", path);
+            //logger.info("props path: {}", path);
 
             is = new FileInputStream(path);
             

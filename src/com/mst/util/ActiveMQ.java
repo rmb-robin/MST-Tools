@@ -41,7 +41,7 @@ public class ActiveMQ {
 
 	public boolean publishMessage(String qName, String payload) {
 		boolean ret = true;
-		
+
 		try {
 	        Destination destination = session.createQueue(qName);
 	        MessageProducer producer = session.createProducer(destination);
@@ -49,10 +49,12 @@ public class ActiveMQ {
 	        TextMessage message = session.createTextMessage(payload);
 			producer.send(message);
 
+			//logger.info("Published message to AcitveMQ queue: {}", payload);
+			
 		} catch(Exception e) {
 			ret = false;
 			logger.error("Error publishing message to AcitveMQ queue. {}", e);
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		
 		return ret;

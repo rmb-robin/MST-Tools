@@ -121,6 +121,7 @@ public class POSTagger {
 			writeToFile(sb.toString());
 
 			String pyList = Utils.execCmd(CMD).trim();
+			
 			String[] pyArray = pyList.split("<>");
 			
 			for(int i=0; i < pyArray.length; i++) {
@@ -244,7 +245,7 @@ public class POSTagger {
 		return ret;
 	}
 	
-	public String getNPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> taggedWordList) {
+	public String getNPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> taggedWordList, boolean annotate) {
 		StringBuilder sb = new StringBuilder();
 		boolean showOpenBracket = true;
 		
@@ -252,27 +253,33 @@ public class POSTagger {
 			// TODO KW comes after HEAD?
 			// TODO assign OBJ to NP-annotated
 			for(int i=0; i < taggedWordList.size(); i++) {
-				String prefix = "/";
-				
-				if(taggedWordList.get(i).nounPhraseModifier() && showOpenBracket){
-					sb.append("{");
-					showOpenBracket = false;
-				}
-				sb.append(taggedWordList.get(i).getToken());
-				
-				if(keyword != null && taggedWordList.get(i).getToken().matches(keyword.concat("(.*)"))) {
-					sb.append(prefix).append("KW");
-					prefix = "+";
-				}
-				
-				if(extractionTerm != null && taggedWordList.get(i).getToken().matches(extractionTerm)) {
-					sb.append(prefix).append("EXT");
-					prefix = "+";
-				}
-				
-				if(taggedWordList.get(i).nounPhraseHead()) {
-					sb.append(prefix).append("HEAD}");
-					showOpenBracket = true;
+				if(annotate) {
+					String prefix = "/";
+					
+					if(taggedWordList.get(i).nounPhraseModifier() && showOpenBracket) {
+						sb.append("{");
+						showOpenBracket = false;
+					}
+					
+					sb.append(taggedWordList.get(i).getToken());
+					
+					if(keyword != null && taggedWordList.get(i).getToken().matches(keyword.concat("(.*)"))) {
+						sb.append(prefix).append("KW");
+						prefix = "+";
+					}
+					
+					if(extractionTerm != null && taggedWordList.get(i).getToken().matches(extractionTerm)) {
+						sb.append(prefix).append("EXT");
+						prefix = "+";
+					}
+					
+					if(taggedWordList.get(i).nounPhraseHead()) {
+						sb.append(prefix).append("HEAD}");
+						showOpenBracket = true;
+					}
+				} else {
+					// pass annotate == false to return the sentence with no markup
+					sb.append(taggedWordList.get(i).getToken());
 				}
 				
 				if(i < taggedWordList.size()-1 
@@ -288,12 +295,12 @@ public class POSTagger {
 		return sb.toString();
 	}
 	
-	public String getNPAnnotatedSentence(String keyword, String extractionTerm) throws Exception {
+	public String getNPAnnotatedSentence(String keyword, String extractionTerm, boolean annotate) throws Exception {
 		if(taggedWordList == null) {
 			throw new Exception("Please execute tagSentence() before attempting to getNPAnnotatedSentence().");
 		}
 		
-		return getNPAnnotatedSentence(keyword, extractionTerm, taggedWordList);
+		return getNPAnnotatedSentence(keyword, extractionTerm, taggedWordList, annotate);
 	}
 	
 	public String getPPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> taggedWordList) {

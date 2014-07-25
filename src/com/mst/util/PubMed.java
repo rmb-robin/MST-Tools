@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
@@ -16,6 +15,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
+import com.google.common.base.Joiner;
 import com.google.gson.Gson;
 import com.mst.model.PubMedArticle;
 import com.mst.model.PubMedArticle.AbstractText;
@@ -35,19 +35,25 @@ public class PubMed {
     private final int MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR);
     private int MAX_ARTICLES_PER_ITERATION = 200;;
     private int MAX_ARTICLES_TOTAL = 10000;;
-    private final String FILE_OUTPUT_DIR = "/Users/scottdaugherty/Documents/MedicalSearchTech/test_data/1_paragraph/";
+    //private final String FILE_OUTPUT_DIR = "/Users/scottdaugherty/Documents/MedicalSearchTech/test_data/1_paragraph/";
     private String PMC_FULL_ARTICLE_URL = "http://www.pubmedcentral.nih.gov/oai/oai.cgi?verb=GetRecord&identifier=oai:pubmedcentral.nih.gov:%s&metadataPrefix=pmc";
-
+    private List<String> existingPMIDs = null;
+    
+    private ArrayList<String> deletePMIDs = new ArrayList<String>();
+    
     private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private ActiveMQ activeMQ = null;
 	private Gson gson = new Gson();
+	private MongoDB mongo = null;
 	
 	public PubMed() { 
 		PUBMED_TOOL = Props.getProperty("pubmed_tool", PUBMED_TOOL);
         PUBMED_EMAIL = Props.getProperty("pubmed_email", PUBMED_EMAIL);
         MAX_ARTICLES_PER_ITERATION = Integer.parseInt(Props.getProperty("pubmed_articles_per_iteration", String.valueOf(MAX_ARTICLES_PER_ITERATION)));
         MAX_ARTICLES_TOTAL = Integer.parseInt(Props.getProperty("pubmed_articles_total", String.valueOf(MAX_ARTICLES_TOTAL)));
+        activeMQ = new ActiveMQ();
+        mongo = new MongoDB();
 	}
 
 //	public void camelGetArticles(String json) {
@@ -59,13 +65,18 @@ public class PubMed {
 		getArticles(searchTerm, 0, 0, 0, 0, false, 0, false);
 	}
 	
-	public void getArticles(String searchTerm, int minYear, int maxYear, int articlesPerIteration, int articlesTotal, boolean exactMatch, int offset, boolean getFullArticleText) {
+	public void getArticles(String searchTerm, int minYear, int maxYear, int articlesPerIteration, int limit, boolean exactMatch, int offset, boolean getFullArticleText) {
 
 		int articlesProcessed = 0;
+		int countFromXML = limit;
 		articlesPerIteration = (articlesPerIteration > 0 ? Math.min(articlesPerIteration, MAX_ARTICLES_PER_ITERATION) : MAX_ARTICLES_PER_ITERATION);
-		articlesTotal = (articlesTotal > 0 ? Math.min(articlesTotal, MAX_ARTICLES_TOTAL) : MAX_ARTICLES_TOTAL);
+		limit = (limit > 0 ? Math.min(limit, MAX_ARTICLES_TOTAL) : MAX_ARTICLES_TOTAL);
 		minYear = (minYear >= MIN_YEAR && minYear <= MAX_YEAR ? minYear : MIN_YEAR);
 		maxYear = (maxYear >= MIN_YEAR && maxYear <= MAX_YEAR ? maxYear : MAX_YEAR);
+		
+		// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
+		existingPMIDs = mongo.getDistinctStringValues("article_id");
+//logger.info(existingPMIDs.toString());
 		
 		if(exactMatch)
             searchTerm = (new StringBuilder("\"")).append(searchTerm).append("\"").toString();
@@ -76,33 +87,35 @@ public class PubMed {
 		fullArticleList.setMaxYear(maxYear);
 		
 		// results in a max return count of ARTICLES_TOTAL + ARTICLES_PER_ITERATION
-		while(articlesProcessed < articlesTotal) {
+		while(articlesProcessed < limit && articlesProcessed < countFromXML) {
 			StringBuilder listUrl = new StringBuilder();
 			
 			listUrl.append("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed")
 			   	   .append("&term=").append(searchTerm)
 			       .append("&retmax=").append(articlesPerIteration)
-			       .append("&retstart=").append(articlesProcessed)
+			       .append("&retstart=").append(articlesProcessed + offset)
 			       .append("&mindate=").append(minYear)
 			       .append("&maxdate=").append(maxYear)
 			       .append("&tool=").append(PUBMED_TOOL)
 			       .append("&email=").append(PUBMED_EMAIL);
+//logger.info(listUrl.toString());
 
 			PubMedArticleList list = parseArticleIdListStax(getPubMedXML(listUrl.toString()));
 			
-			if(list != null) {
-				if(list.getIdList().size() == 0) {
-					break;
-				}
-				//System.out.println(list.getIdList());
+			if(list != null && list.getIdList().size() > 0) {
+				countFromXML = list.getCount();
+				//if(list.getIdList().size() == 0) { // removed this after adding existingPMID count check
+					//break; 
+				//}
+
 				StringBuilder detailUrl = new StringBuilder();
 				
 				detailUrl.append("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed")
 						 .append("&rettype=xml&retmode=text")
-						 .append("&id=").append(list.getIdList())
+						 .append("&id=").append(Joiner.on(",").join(list.getIdList()))
 						 .append("&tool=").append(PUBMED_TOOL)
 						 .append("&email=").append(PUBMED_EMAIL);
-	
+//logger.info(detailUrl.toString());	
 				List<PubMedArticle> articles = parseArticleAbstractStax(getPubMedXML(detailUrl.toString()));
 				
 				if(articles.size() == 0)
@@ -114,7 +127,7 @@ public class PubMed {
                                 for(PubMedArticle.ArticleId articleIdList : article.getArticleIdList()) {
                                     if(articleIdList.getIdType().equalsIgnoreCase("PMC")) {
                                         String url = String.format(PMC_FULL_ARTICLE_URL, articleIdList.getText().substring(3)); // strip "PMC" from ID 
-                                        String xml = parseArticleFullTextStax(getPubMedXML(url));
+                                        String xml = parseArticleFullTextStax(getPubMedXML(url), articleIdList.getText());
                                         if(xml != null) {
                                             article.setFullArticleText(xml);
                                             logger.info("getArticles(): Full text processed - PMID: {}; PMCID: {}", article.getPMID(), articleIdList.getText());
@@ -145,33 +158,13 @@ public class PubMed {
 		// this info will be used by the extract process to associate word tokens (db rows) with their originating search term
 		if(fullArticleList.getIdList().size() > 0) {
 			activeMQ.publishMessage(Q_PUBMED_AUDIT, gson.toJson(fullArticleList));
-			activeMQ.closeConnection();
 		}
+		
+		activeMQ.closeConnection();
+		logger.info("\"" + Joiner.on("\",\"").join(deletePMIDs) + "\"");
+		System.out.println(articlesProcessed);
 	}
-	
-	public PubMedArticleList getArticleList(String searchTerm, int minYear, int maxYear, int articleCount, int articleOffset) {
-		PubMedArticleList list = null;
-		StringBuilder listUrl = new StringBuilder();
 		
-		articleOffset = (articleOffset > 0 ? articleOffset : 0);
-		articleCount = (articleCount > 0 ? Math.min(articleCount, MAX_ARTICLES_PER_ITERATION) : MAX_ARTICLES_PER_ITERATION);
-		minYear = (minYear >= MIN_YEAR && minYear <= MAX_YEAR ? minYear : MIN_YEAR);
-		maxYear = (maxYear >= MIN_YEAR && maxYear <= MAX_YEAR ? maxYear : MAX_YEAR);
-		
-		listUrl.append("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed")
-		   	   .append("&term=").append(searchTerm)
-		       .append("&retmax=").append(articleCount)
-		       .append("&retstart=").append(articleOffset)
-		       .append("&mindate=").append(minYear)
-		       .append("&maxdate=").append(maxYear)
-		       .append("&tool=").append(PUBMED_TOOL)
-		       .append("&email=").append(PUBMED_EMAIL);
-
-		list = parseArticleIdListStax(getPubMedXML(listUrl.toString()));
-		
-		return list;
-	}
-	
 	private String getPubMedXML(String inUrl) {
 		String ret = null;
 		StringBuilder xml = new StringBuilder();
@@ -223,7 +216,8 @@ public class PubMed {
 	
 		if(xml != null) {
 			list = new PubMedArticleList();
-            StringBuilder articleIds = new StringBuilder();
+            //StringBuilder articleIds = new StringBuilder();
+            ArrayList<String> articleIds = new ArrayList<String>();
             String tagContent = null;
             
 			XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -245,8 +239,8 @@ public class PubMed {
 							break;
 		
 						case XMLStreamConstants.END_ELEMENT:
-							if(reader.getLocalName().equals("Id")) {
-								articleIds.append(tagContent).append(",");
+							if(reader.getLocalName().equals("Id") && !existingPMIDs.contains(tagContent)) {
+								articleIds.add(tagContent);
 								
 							} else if(reader.getLocalName().equals("Count") && processCount) { // multiple <Count> nodes in XML. possible issue here if order changes
 								list.setCount(Integer.parseInt(tagContent));
@@ -262,8 +256,8 @@ public class PubMed {
 					}
 				}
 			
-				if(articleIds.length() > 0)
-                    list.setIdList(new ArrayList(Arrays.asList(articleIds)));
+				if(articleIds.size() > 0)
+                    list.setIdList(articleIds);
 				
 			} catch(Exception e) {
 				logger.error("Error parsing PubMed PMID list XML: \n{} \n{}", xml, e);
@@ -272,18 +266,21 @@ public class PubMed {
 		return list;
 	}
 
-	private List<PubMedArticle> parseArticleAbstractStax(String xml) {	
+	public List<PubMedArticle> parseArticleAbstractStax(String xml) {	
 		List<PubMedArticle> articles = new ArrayList<PubMedArticle>();
 		List<PubMedArticle.AbstractText> abstracts = null;
 		List<PubMedArticle.ArticleId> articleIdList = null;
 		PubMedArticle pubMedArticle = null;
 		String tagContent = null, abstractLabel = null, abstractNlmCategory = null;
 		String articleIdType = null;
+		boolean processPMID = true;
 		
 		XMLInputFactory factory = XMLInputFactory.newInstance();
 		factory.setProperty("javax.xml.stream.isCoalescing", true); // ensures that tagContent won't be broken up into multiple pieces of XML (less-than symbol will cause this)
 		XMLStreamReader reader;
 
+		String tempPMID = "";
+		
 		try {
 			byte[] byteArray = xml.getBytes("UTF-8");
 			ByteArrayInputStream inputStream = new ByteArrayInputStream(byteArray);
@@ -319,7 +316,14 @@ public class PubMed {
 	
 					case XMLStreamConstants.END_ELEMENT:
 						if(reader.getLocalName().equals("PMID")) {
-							pubMedArticle.setPMID(tagContent);
+							//if(tagContent.equals("8391753")) {
+							//	System.out.println(xml);
+							//}
+							tempPMID = tagContent;
+							if(processPMID) {
+								pubMedArticle.setPMID(tagContent);
+								processPMID = false;  // some articles have tons of PMID tags. ignore all but the first
+							}
 							
 						} else if(reader.getLocalName().equals("AbstractText")) {
 							PubMedArticle.AbstractText abstractText = pubMedArticle.new AbstractText(abstractLabel, abstractNlmCategory, tagContent);
@@ -330,8 +334,13 @@ public class PubMed {
 							
 						} else if(reader.getLocalName().matches("PubmedArticle|PubmedBookArticle")) {
 							// occasionally pmids have no <Abstract> tag. avoid adding if this is the case.
-							if(pubMedArticle.getAbstractTextList().size() > 0)
+							if(pubMedArticle.getAbstractTextList() != null && pubMedArticle.getAbstractTextList().size() > 0)
 								articles.add(pubMedArticle);
+							if(!tempPMID.equals(pubMedArticle.getPMID())) {
+								logger.info("Delete: " + tempPMID + ", Keep: " + pubMedArticle.getPMID());
+								deletePMIDs.add(tempPMID);
+							}
+							processPMID = true;
 							
 						} else if(reader.getLocalName().equals("ArticleId")) {
 							articleIdList.add(pubMedArticle.new ArticleId(articleIdType, tagContent));
@@ -348,12 +357,13 @@ public class PubMed {
 			}
 		} catch(Exception e) {
 			logger.error("Error parsing PubMed article abstract XML: \n{} \n{}", xml, e);
+			//e.printStackTrace();
 		}
 
 		return articles;
 	}
 	
-	private String parseArticleFullTextStax(String xml) {
+	private String parseArticleFullTextStax(String xml, String PMCID) {
         String ret = null;
         
         if(xml != null) {
@@ -405,7 +415,7 @@ public class PubMed {
                 ret = paragraphs.toString();
             }
             catch(Exception e) {
-                logger.error("Error parsing PubMed full article XML: \n{}\n{}", xml, e);
+                logger.error("Error parsing PubMed full article XML. PMCID: {}\n{}\n{}", PMCID, xml, e);
             }
         }
         return ret;
@@ -425,6 +435,9 @@ public class PubMed {
 		
 		for(PubMedArticle article : articles) {
 			try {
+				existingPMIDs.add(article.getPMID());
+				logger.info(article.getPMID());
+				
 				Sentence sentence = new Sentence();
 				sentence.setArticleId(article.getPMID());
 				
@@ -444,6 +457,7 @@ public class PubMed {
 								
 			} catch(Exception e) {
 				logger.error("Error writing to JMS queue: {} \n{}", qName, e);
+				//e.printStackTrace();
 			}
         }
 		
@@ -494,4 +508,27 @@ public class PubMed {
 //	
 //		return retVal;
 //	}
+	
+//	public PubMedArticleList getArticleList(String searchTerm, int minYear, int maxYear, int articleCount, int articleOffset) {
+//	PubMedArticleList list = null;
+//	StringBuilder listUrl = new StringBuilder();
+//	
+//	articleOffset = (articleOffset > 0 ? articleOffset : 0);
+//	articleCount = (articleCount > 0 ? Math.min(articleCount, MAX_ARTICLES_PER_ITERATION) : MAX_ARTICLES_PER_ITERATION);
+//	minYear = (minYear >= MIN_YEAR && minYear <= MAX_YEAR ? minYear : MIN_YEAR);
+//	maxYear = (maxYear >= MIN_YEAR && maxYear <= MAX_YEAR ? maxYear : MAX_YEAR);
+//	
+//	listUrl.append("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed")
+//	   	   .append("&term=").append(searchTerm)
+//	       .append("&retmax=").append(articleCount)
+//	       .append("&retstart=").append(articleOffset)
+//	       .append("&mindate=").append(minYear)
+//	       .append("&maxdate=").append(maxYear)
+//	       .append("&tool=").append(PUBMED_TOOL)
+//	       .append("&email=").append(PUBMED_EMAIL);
+//
+//	list = parseArticleIdListStax(getPubMedXML(listUrl.toString()));
+//	
+//	return list;
+//}
 }

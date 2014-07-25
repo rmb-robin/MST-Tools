@@ -11,7 +11,8 @@ public class PubMedArticleList {
 	private int retStart;
 	private Date dateProcessed;
 	private Object tag;
-	ArrayList<String> idList = new ArrayList<String>();
+	private ArrayList<String> idList = new ArrayList<String>();
+	private String source;
 	
 	public PubMedArticleList() { }
 
@@ -23,6 +24,14 @@ public class PubMedArticleList {
 		this.searchTerm = searchTerm;
 	}
 
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+	
 	public Object getTag() {
 		return tag;
 	}

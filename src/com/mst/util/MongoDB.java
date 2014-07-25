@@ -30,7 +30,7 @@ public class MongoDB {
 	private MongoClient mongoClient = null;
 	private DB db = null;
 	private boolean auth;
-	private Gson gson = null;	
+	private Gson gson = null;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public MongoDB() {
@@ -122,7 +122,8 @@ public class MongoDB {
 				PubMedArticleList idList = gson.fromJson(json, PubMedArticleList.class);
 				DBCollection coll = db.getCollection("processed_article_camel_pubmed_audit");
 				
-				BasicDBObject doc = new BasicDBObject("search_term", idList.getSearchTerm()).
+				BasicDBObject doc = new BasicDBObject("source", idList.getSource()).
+						append("search_term", idList.getSearchTerm()).
 						append("min_year", idList.getMinYear()).
 						append("max_year", idList.getMaxYear()).
 						append("id_list", idList.getIdList()).
@@ -136,7 +137,106 @@ public class MongoDB {
 		return true;
 	}
 	
-	public ArrayList<Sentence> getAnnotatedSentences(List<String> articleIds, Integer sentenceId) {
+	public ArrayList<Sentence> getAnnotatedSentencesChunk(ArrayList<String> articleIds, int chunkSize) {
+		ArrayList<Sentence> sentenceList = new ArrayList<Sentence>();
+
+		if(articleIds == null)
+			return null;
+		
+		try {
+			if(auth) {
+				DBCollection coll = db.getCollection("processed_article_camel");
+				DBCursor cursor = null;
+				BasicDBObject query = null;
+				BasicDBObject fields = null;
+				int chunkCount = 0;
+				
+				fields = new BasicDBObject("_id", 0); // don't return ObjectId
+				
+				while(chunkCount < articleIds.size()) {
+					List<String> chunkList = articleIds.subList(chunkCount, chunkCount + chunkSize);
+					chunkCount += chunkList.size();
+					
+					query = new BasicDBObject("article_id", new BasicDBObject("$in", chunkList));
+	
+					cursor = coll.find(query, fields);	
+					cursor.sort(new BasicDBObject("article_id", 1).append("sentence_id", 1).append("position", 1));
+					
+					ArrayList<WordToken> wordList = new ArrayList<WordToken>();
+					Sentence sentence = null;
+	
+					int prevSentenceId = 1; // track when a sentence id changes
+					String prevArticleId = "";
+					boolean newSentence = true, firstRun = true;
+					BasicDBObject obj = null;
+	
+					while(cursor.hasNext()) {
+						obj = (BasicDBObject) cursor.next();
+						
+						if(firstRun) {
+							prevSentenceId = obj.getInt("sentence_id");
+							prevArticleId = obj.getString("article_id");
+							firstRun = false;
+						}
+						
+						int thisSentenceId = obj.getInt("sentence_id");
+						String thisArticleId = obj.getString("article_id");
+						
+						if(newSentence) {
+							sentence = new Sentence();
+							sentence.setArticleId(thisArticleId);
+							sentence.setDate(obj.getDate("process_date"));
+							sentence.setFullSentence(null);
+							sentence.setPosition(thisSentenceId);
+							newSentence = false;
+						}
+	
+						WordToken word = new WordToken(obj.getString("token"), obj.getString("normalized"), obj.getInt("position"));
+						word.setPOS(obj.getString("pos"));
+						word.setNounPhraseHead(obj.getBoolean("is_noun_phrase_head"));
+						word.setNounPhraseModifier(obj.getBoolean("is_noun_modifier"));
+						word.setPrepPhraseMember(obj.getBoolean("is_prep_phrase_member"));
+						word.setPrepPhraseObject(obj.getBoolean("is_prep_phrase_object"));
+	
+						BasicDBList dbList = (BasicDBList) obj.get("semantic_types");
+	
+						if(dbList != null) {
+							for(Object o : dbList) {
+								SemanticType st = gson.fromJson(o.toString(), SemanticType.class);
+								word.getSemanticTypeList().add(st);
+							}
+						}
+	
+						if(!thisArticleId.equals(prevArticleId) || thisSentenceId != prevSentenceId) { // TODO check also for article_id change to accomodate single sentences
+	
+							sentence.setWordList(wordList);
+							sentenceList.add(sentence);
+	
+							prevSentenceId = thisSentenceId;
+							prevArticleId = thisArticleId;
+	
+							wordList = new ArrayList<WordToken>();
+							newSentence = true;
+						}
+	
+						wordList.add(word);
+					}
+	
+					// add final entries
+					sentence.setWordList(wordList);
+					sentenceList.add(sentence);
+	
+					cursor.close();
+				}
+			}
+			
+		} catch(Exception e) {
+			logger.error("getAnnotatedSentences(): \n{}", e);
+		}
+		return sentenceList;
+	}
+	
+	public ArrayList<Sentence> getAnnotatedSentences(List<String> articleIds, int limit) {
 		ArrayList<Sentence> sentenceList = new ArrayList<Sentence>();
 
 		try {
@@ -148,15 +248,18 @@ public class MongoDB {
 
 				fields = new BasicDBObject("_id", 0);
 				
-				if(articleIds == null)
-					cursor = coll.find();
-				else {
+				//if(articleIds == null)
+				//	cursor = coll.find();
+				//else {
 					query = new BasicDBObject("article_id", new BasicDBObject("$in", articleIds));
-					if(sentenceId != null)
-						query.append("sentence_id", sentenceId);
+				//	if(sentenceId != null)
+				//		query.append("sentence_id", sentenceId);
 
+				if(limit == 0)	
 					cursor = coll.find(query, fields);
-				}
+				else
+					cursor = coll.find(query, fields).limit(limit);
+				//}
 
 				cursor.sort(new BasicDBObject("article_id", 1).append("sentence_id", 1).append("position", 1));
 				//query = new BasicDBObject("_id", new ObjectId("5255d10f0de1496494d31689"));
@@ -236,36 +339,137 @@ public class MongoDB {
 		return sentenceList;
 	}
 	
-	public PubMedArticleList getPubMedAuditByObjectId(String objectId) {
-		PubMedArticleList list = new PubMedArticleList();
+	public void cleanPMIDdupes() {
+		try {
+			if(auth) {
+				DBCollection coll = db.getCollection("processed_article_camel");
+				DBCursor cursor = null;
+				BasicDBObject query = null;
+				BasicDBObject fields = null;
+
+				fields = new BasicDBObject("_id", 0).append("article_id", 1).append("date_processed", 1);
+				
+				query = new BasicDBObject("sentence_id", 1).append("position", 1);
+
+				cursor = coll.find(query, fields);
+				cursor.sort(new BasicDBObject("article_id", 1));
+
+				String prevPMID = "";
+				BasicDBObject obj = null;
+
+				while(cursor.hasNext()) {
+					obj = (BasicDBObject) cursor.next();
+					
+					if(obj.getString("article_id").equalsIgnoreCase(prevPMID)) {
+						System.out.println("Delete: " + prevPMID + " / " + obj.getDate("date_processed"));
+						coll.remove(new BasicDBObject().append("article_id", prevPMID).append("date_processed", obj.getDate("date_processed")));
+					}
+					
+					prevPMID = obj.getString("article_id");
+				}
+				cursor.close();
+			}
+
+		} catch(Exception e) {
+			logger.error("cleanPMIDdupes(): \n{}", e);
+		}
+	}
+	
+	public List<String> getDistinctStringValues(String field) {
+		// TODO find a better data structure that supports sorting, binary search, and maintaining order upon insert
+		List<String> list = new ArrayList<String>();
+
+		try {
+			if(auth) {				
+				list = db.getCollection("processed_article_camel").distinct(field);
+			}
+
+		} catch(Exception e) {
+			logger.error("getDistinctField(): \n{}", e);
+		}
+		return list;
+	}
+	
+	public ArrayList<PubMedArticleList> getPubMedAuditByObjectId(List<String> objectIdsIn) {
+		ArrayList<PubMedArticleList> list = new ArrayList<PubMedArticleList>();
 
 		try {
 			if(auth) {
-				DBCollection coll = db.getCollection("processed_article_camel_pubmed_audit");
-				BasicDBObject query = new BasicDBObject("_id", new ObjectId(objectId));
-				DBCursor cursor = coll.find(query);
+				BasicDBList objectIds = new BasicDBList();
+				for(String id : objectIdsIn) {
+					objectIds.add(new ObjectId(id));
+				}
+				DBObject inClause = new BasicDBObject("$in", objectIds);
+				DBObject query = new BasicDBObject("_id", inClause);
+				//BasicDBObject query = new BasicDBObject("_id", new ObjectId(objectId));
+				DBCursor cursor = db.getCollection("processed_article_camel_pubmed_audit").find(query);
 				
-				if(cursor.hasNext()) {
+				while(cursor.hasNext()) {
+					
+					PubMedArticleList pmal = new PubMedArticleList();
+					
 					BasicDBObject obj = (BasicDBObject) cursor.next();
 					
-					list.setSearchTerm(obj.getString("search_term"));
-					list.setMinYear(obj.getInt("min_year"));
-					list.setMaxYear(obj.getInt("max_year"));
-					list.setDateProcessed(obj.getDate("date_processed"));
+					pmal.setSearchTerm(obj.getString("search_term"));
+					pmal.setMinYear(obj.getInt("min_year"));
+					pmal.setMaxYear(obj.getInt("max_year"));
+					pmal.setDateProcessed(obj.getDate("date_processed"));
 						
 					BasicDBList dbList = (BasicDBList) obj.get("id_list");
-					list.setCount(dbList.size());
+					pmal.setCount(dbList.size());
 						
 					for(Object o : dbList) {
-						list.getIdList().add(o.toString());
+						pmal.getIdList().add(o.toString());
 					}
 					
-					cursor.close();
+					list.add(pmal);
 				}
+				
+				cursor.close();
 			}
 
 		} catch(Exception e) {
 			logger.error("getPubMedAuditByObjectId(): \n{}", e);
+		}
+		return list;
+	}
+	
+	public ArrayList<PubMedArticleList> getPubMedAuditBySource(List<String> sources) {
+		ArrayList<PubMedArticleList> list = new ArrayList<PubMedArticleList>();
+
+		try {
+			if(auth) {
+				DBObject inClause = new BasicDBObject("$in", sources);
+				DBObject query = new BasicDBObject("source", inClause);
+				//BasicDBObject query = new BasicDBObject("_id", new ObjectId(objectId));
+				DBCursor cursor = db.getCollection("processed_article_camel_pubmed_audit").find(query);
+				
+				while(cursor.hasNext()) {
+					
+					PubMedArticleList pmal = new PubMedArticleList();
+					
+					BasicDBObject obj = (BasicDBObject) cursor.next();
+					
+					pmal.setSearchTerm(obj.getString("search_term"));
+					pmal.setMinYear(obj.getInt("min_year"));
+					pmal.setMaxYear(obj.getInt("max_year"));
+					pmal.setDateProcessed(obj.getDate("date_processed"));
+						
+					BasicDBList dbList = (BasicDBList) obj.get("id_list");
+					pmal.setCount(dbList.size());
+						
+					for(Object o : dbList) {
+						pmal.getIdList().add(o.toString());
+					}
+					
+					list.add(pmal);
+				}
+				
+				cursor.close();
+			}
+
+		} catch(Exception e) {
+			logger.error("getPubMedAuditBySource(): \n{}", e);
 		}
 		return list;
 	}
@@ -346,14 +550,14 @@ public class MongoDB {
 
 					if(sentenceId != oldSentenceId) {
 						oldSentenceId++;
-						csv.append(obj.get("article_id")).append(",").append(tagger.getNPAnnotatedSentence(null, null, wordList)).append(",");
+						csv.append(obj.get("article_id")).append(",").append(tagger.getNPAnnotatedSentence(null, null, wordList, true)).append(",");
 						csv.append(tagger.getPPAnnotatedSentence(null, null, wordList)).append("\n");
 						wordList = new ArrayList<WordToken>();
 					}
 
 					wordList.add(word);
 				}
-				csv.append(obj.get("article_id")).append(",").append(tagger.getNPAnnotatedSentence(null, null, wordList)).append(",");
+				csv.append(obj.get("article_id")).append(",").append(tagger.getNPAnnotatedSentence(null, null, wordList, true)).append(",");
 				csv.append(tagger.getPPAnnotatedSentence(null, null, wordList)).append("\n");
 
 				csvOut = csv.toString();

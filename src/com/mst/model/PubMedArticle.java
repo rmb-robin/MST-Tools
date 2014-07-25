@@ -5,7 +5,7 @@ import java.util.List;
 public class PubMedArticle {
 
 	private String PMID;
-	private String fullArticleText;
+	private String fullArticleText = null;
 	private List<AbstractText> abstractTextList;
     private List<ArticleId> articleIdList;
 	
