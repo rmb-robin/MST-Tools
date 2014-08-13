@@ -73,11 +73,10 @@ public class PubMed {
 		limit = (limit > 0 ? Math.min(limit, MAX_ARTICLES_TOTAL) : MAX_ARTICLES_TOTAL);
 		minYear = (minYear >= MIN_YEAR && minYear <= MAX_YEAR ? minYear : MIN_YEAR);
 		maxYear = (maxYear >= MIN_YEAR && maxYear <= MAX_YEAR ? maxYear : MAX_YEAR);
-		
+
 		// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
 		existingPMIDs = mongo.getDistinctStringValues("article_id");
-//logger.info(existingPMIDs.toString());
-		
+
 		if(exactMatch)
             searchTerm = (new StringBuilder("\"")).append(searchTerm).append("\"").toString();
 		
@@ -101,7 +100,7 @@ public class PubMed {
 //logger.info(listUrl.toString());
 
 			PubMedArticleList list = parseArticleIdListStax(getPubMedXML(listUrl.toString()));
-			
+//logger.info("list: " + list.getIdList().toString());			
 			if(list != null && list.getIdList().size() > 0) {
 				countFromXML = list.getCount();
 				//if(list.getIdList().size() == 0) { // removed this after adding existingPMID count check
@@ -153,7 +152,7 @@ public class PubMed {
 				articlesProcessed += articlesPerIteration; // possible issue with getPubMedXML for pmids or parsing the IDs that came back.
 			}
 		}
-		
+
 		// write article list, associated with pmid, to a queue for future insertion into mongodb
 		// this info will be used by the extract process to associate word tokens (db rows) with their originating search term
 		if(fullArticleList.getIdList().size() > 0) {
@@ -161,8 +160,8 @@ public class PubMed {
 		}
 		
 		activeMQ.closeConnection();
-		logger.info("\"" + Joiner.on("\",\"").join(deletePMIDs) + "\"");
-		System.out.println(articlesProcessed);
+		//logger.info("\"" + Joiner.on("\",\"").join(deletePMIDs) + "\"");
+		//System.out.println(articlesProcessed);
 	}
 		
 	private String getPubMedXML(String inUrl) {
@@ -337,7 +336,7 @@ public class PubMed {
 							if(pubMedArticle.getAbstractTextList() != null && pubMedArticle.getAbstractTextList().size() > 0)
 								articles.add(pubMedArticle);
 							if(!tempPMID.equals(pubMedArticle.getPMID())) {
-								logger.info("Delete: " + tempPMID + ", Keep: " + pubMedArticle.getPMID());
+								//logger.info("Delete: " + tempPMID + ", Keep: " + pubMedArticle.getPMID());
 								deletePMIDs.add(tempPMID);
 							}
 							processPMID = true;

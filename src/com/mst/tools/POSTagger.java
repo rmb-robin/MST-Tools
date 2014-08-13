@@ -303,49 +303,56 @@ public class POSTagger {
 		return getNPAnnotatedSentence(keyword, extractionTerm, taggedWordList, annotate);
 	}
 	
-	public String getPPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> taggedWordList) {
-		StringBuilder sb = new StringBuilder();
+	public String[] getPPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> taggedWordList) {
+		StringBuilder markup = new StringBuilder();
+		StringBuilder orig = new StringBuilder();
 		boolean showOpenBracket = true;
 		
 		try {
 			for(int i=0; i < taggedWordList.size(); i++) {
 				String prefix = "/";
 				
+				orig.append(taggedWordList.get(i).getToken());
+				
 				if(taggedWordList.get(i).isPrepPhraseMember() && showOpenBracket){
-					sb.append("[");
+					markup.append("[");
 					showOpenBracket = false;
 				}
-				sb.append(taggedWordList.get(i).getToken());
+				markup.append(taggedWordList.get(i).getToken());
 				
 				if(keyword != null && taggedWordList.get(i).getToken().matches(keyword.concat("(.*)"))) {
-					sb.append(prefix).append("KW");
+					markup.append(prefix).append("KW");
 					prefix = "+";
 				}
 				
 				if(extractionTerm != null && taggedWordList.get(i).getToken().matches(extractionTerm)) {
-					sb.append(prefix).append("EXT");
+					markup.append(prefix).append("EXT");
 					prefix = "+";
 				}
 				
 				if(taggedWordList.get(i).isPrepPhraseObject()) {
-					sb.append(prefix).append("OBJ");
+					markup.append(prefix).append("OBJ");
 					if(!taggedWordList.get(i).isPrepPhraseMember()) {
-						sb.append("]");
+						markup.append("]");
 						showOpenBracket = true;
 					}
 				}
-				if(i < taggedWordList.size()-1 && !taggedWordList.get(i+1).getToken().matches(PUNC))
-					sb.append(" ");
+				if(i < taggedWordList.size()-1 && !taggedWordList.get(i+1).getToken().matches(PUNC)) {
+					markup.append(" ");
+					orig.append(" ");
+				}
 			}
 		} catch(Exception e) {
 			logger.error("getPPAnnotatedSentence(): {}", e);
-			sb.append("*** Unable to build PP-annotated sentence. See error log for details. ***");
+			markup.append("*** Unable to build PP-annotated sentence. See error log for details. ***");
 		}
 
-		return sb.toString();
+		String[] ret = { markup.toString(), orig.toString() }; 
+		
+		return ret;
 	}
 	
-	public String getPPAnnotatedSentence(String keyword, String extractionTerm) throws Exception {
+	public String[] getPPAnnotatedSentence(String keyword, String extractionTerm) throws Exception {
 		if(taggedWordList == null) {
 			throw new Exception("Please execute tagSentence() before attempting to getPPAnnotatedSentence().");
 		}

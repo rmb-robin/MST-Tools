@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -19,6 +18,8 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.mst.model.PubMedArticleList;
 import com.mst.model.SemanticType;
 import com.mst.model.Sentence;
@@ -28,12 +29,15 @@ import com.mst.util.MongoDB;
 
 public class Extract {
 
-	private final String PREP_PHRASE_ST_CSV_HEADERS = "Article,Relationship,Prec. Term,Prec. Term ST,Prep Phrase Term,Prep Phrase Term ST,Prep Phrase,Sentence";
+	private final String PREP_PHRASE_ST_CSV_HEADERS = "Article,Relationship,Prep,Prec. Term,Prec. Term ST,Prep Phrase Term,Prep Phrase Term ST,Prep Phrase,Sentence";
 	private final String NOUN_PHRASE_CSV_HEADERS = "Noun Phrase,Annotated Sentence,Original Sentence";
+	private final String PREP_PHRASE_CSV_HEADERS = "Modified Term,Preposition,Terminal Phrase Term,Prep Phrase,Annotated Sentence,Original Sentence";
 	private final String NOUN_PHRASE_CSV_HEADERS_WHITELIST = "Keywords," + NOUN_PHRASE_CSV_HEADERS;
 	private final String dq = "\"";
 	private final String DELIM = ",";
 	private final String NEW_LINE = System.getProperty("line.separator");
+	//private final String PREPOSITIONS = "\"after\",\"although\",\"among\",\"as\",\"at\",\"before\",\"between\",\"by\",\"during\",\"for\",\"from\",\"in\",\"of\",\"on\",\"over\",\"per\",\"than\",\"that\",\"to\",\"while\",\"with\",\"within\",\"without\"";
+	private final String PREPOSITIONS = "after,although,among,as,at,before,between,by,during,for,from,in,of,on,over,per,than,that,to,while,with,within,without";
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -41,6 +45,8 @@ public class Extract {
 	private Map<String, Integer> modifierCounts = new HashMap<String, Integer>();
 	private Map<String, Integer> articleIdCounts = new HashMap<String, Integer>();
 	private Map<String, Integer> npAnnCounts = new HashMap<String, Integer>();
+	
+	private final int MAX_DISPLAY_ROWS = 100; // maximum # of output rows to return from chunk operations. Does not affect CSV output. Intended to cut down on memory use on the web side. 
 	
 	public enum NounPositionTypes {
 		ANYWHERE(1), HEAD(2), HEAD_MINUS_ONE(3), HEAD_MINUS_N(4);
@@ -68,12 +74,11 @@ public class Extract {
 
 	// extracts semantic type relationship between modifiers and terms of prep phrase
 	public ArrayList<String> extractPrepPhraseSTRelationship(ArrayList<Sentence> sentenceList, boolean showHeaderRow, ArrayList<String> semTypeBlacklist, 
-			ArrayList<String> wordBlacklist, ArrayList<String> semTypeWhitelist, ArrayList<String> wordWhitelist, int rowLimit) {
+			ArrayList<String> wordBlacklist, ArrayList<String> semTypeWhitelist, ArrayList<String> wordWhitelist, int rowLimit, boolean compareAllMetamapSTs) {
 		//TODO how to choose which sem type from subject word?
 		//TODO test verb, normal, begin, prep at EOL sentences
 		ArrayList<String> outputList = new ArrayList<String>();
 		POSTagger tagger = new POSTagger();
-		//int rowCount = 0;
 		
 		//String[] stArray = { "spco", "mnob", "popg", "food", "mobd", "hcpp", "inpr", "plnt" };
 		//String[] wordArray = { "patients" };
@@ -90,16 +95,13 @@ public class Extract {
 			}
 		}
 		
-		//if(showHeaderRow)
-		//	outputList.add(PREP_PHRASE_ST_CSV_HEADERS);
-		
 		for(Sentence sentence : sentenceList) {
 
 			ArrayList<WordToken> words = sentence.getWordList();
 			
 			for(int i=0; i < words.size(); i++) {
 				int precedingIdx = 0, prepStartOffset = 1;
-				String precedingToken = "", precedingSemType = "";
+				String precedingToken = "", precedingSemType = "", preposition = "";
 				boolean bContinue = false;
 				
 				// if the first word begins a prep phrase (no preceeding_token)
@@ -108,6 +110,7 @@ public class Extract {
 					prepStartOffset = 0;
 					precedingToken = "BEGIN";
 					precedingSemType = "begin";
+					preposition = "begin";
 					bContinue = true;
 				} else {
 					ArrayList<SemanticType> precedingSemTypeList = words.get(i).getSemanticTypeList();
@@ -137,6 +140,7 @@ public class Extract {
 				if(bContinue) {
 					StringBuilder prepPhrase = new StringBuilder();
 					
+					preposition = words.get(precedingIdx + prepStartOffset).getToken();
 					// build prep phrase fragment
 					for(int j = precedingIdx + prepStartOffset; j < words.size(); j++) {
 						prepPhrase.append(words.get(j).getToken()).append(" ");
@@ -163,15 +167,15 @@ public class Extract {
 							
 							// process word blacklist (exclusions)
 							if(buildCSVRow == true && wordBlacklist != null && wordBlacklist.size() > 0) {
-								if(wordBlacklist.contains(precedingToken) || wordBlacklist.contains(semType.getToken()))
+								if(wordBlacklist.contains(precedingToken) || wordBlacklist.contains(semType.getToken()) || wordBlacklist.contains(preposition))
 									buildCSVRow = false;
 							}
 							
-							// whitelists trump blacklists
+							// *** whitelists trump blacklists ***
 							
 							// word whitelist
 							if(wordWhitelist != null && wordWhitelist.size() > 0) {
-								if(!wordWhitelist.contains(precedingToken) && !wordWhitelist.contains(semType.getToken()))
+								if(!wordWhitelist.contains(precedingToken) && !wordWhitelist.contains(semType.getToken()) && !wordWhitelist.contains(preposition))
 									buildCSVRow = false;
 								else
 									buildCSVRow = true;
@@ -190,11 +194,16 @@ public class Extract {
 							}
 							
 							if(buildCSVRow) {
-								outputList.add(buildCSVRow(sentence.getArticleId(), precedingSemType, precedingToken, semType.getSemanticType(), semType.getToken(), prepPhrase.toString().trim(), tagger.getPPAnnotatedSentence(null, null, words)));
-								//rowCount++;
-								//if(rowLimit > 0 && rowCount >= rowLimit)
-								//	return outputList;
-								
+								if(compareAllMetamapSTs)
+									// build a report showing the ST of the preceeding token compared to the ST of every token returned from Metamap
+									outputList.add(buildCSVRow(sentence.getArticleId(), precedingSemType, precedingToken, semType.getSemanticType(), semType.getToken(), prepPhrase.toString().trim(), tagger.getPPAnnotatedSentence(null, null, words)[0], preposition));								
+								else {
+									if(words.get(j).isPrepPhraseObject() && !words.get(j).isPrepPhraseMember()) {
+										// build a report showing ONLY a single row for each prep object
+										outputList.add(buildCSVRow(sentence.getArticleId(), precedingSemType, precedingToken, semType.getSemanticType(), semType.getToken(), prepPhrase.toString().trim(), tagger.getPPAnnotatedSentence(null, null, words)[0], preposition));
+										break;
+									}
+								}
 							}
 						}
 						// as currently implemented, more than one token can be defined as a prep phrase OBJ
@@ -212,7 +221,7 @@ public class Extract {
 	}
 	
 	public ArrayList<String> extractPrepPhraseSTRelationshipChunked(ArrayList<String> objectIds, ArrayList<String> semTypeBlacklist, 
-			ArrayList<String> wordBlacklist, ArrayList<String> semTypeWhitelist, ArrayList<String> wordWhitelist, int limit, boolean writeToFile) {
+			ArrayList<String> wordBlacklist, ArrayList<String> semTypeWhitelist, ArrayList<String> wordWhitelist, int limit, String filePath, boolean compareAllMetamapSTs) {
 		
 		ArrayList<String> csvRows = new ArrayList<String>();
 		BufferedWriter bw = null;
@@ -220,6 +229,7 @@ public class Extract {
 		
 		int maxChunkSize = 25; // number of PMIDs to retrieve from Mongo per iteration
 		int chunkCount = 0; // total chunks processed
+		int rowCount = 0; // number of rows processed
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 				
@@ -241,9 +251,10 @@ public class Extract {
 			} else if(limit < maxChunkSize)
 				maxChunkSize = limit; // process limit supplied if less then max; however, limit can never exceed max
 			
-			if(writeToFile) {
-				File file = new File("st_relationship_" + sdf.format(new Date()) + ".csv");
-				if(!file.exists())
+			if(filePath != null) {
+				//File file = new File("st_relationship_" + sdf.format(new Date()) + ".csv");
+				File file = new File(filePath);
+				//if(!file.exists())
 					file.createNewFile();
 				
 				FileWriter fw = new FileWriter(file.getAbsoluteFile());
@@ -261,14 +272,17 @@ public class Extract {
 				chunkCount += chunkSize; //chunkList.size();
 				
 				ArrayList<Sentence> sentences = mongo.getAnnotatedSentences(chunkList, 0);
-				ArrayList<String> lines = extractPrepPhraseSTRelationship(sentences, false, semTypeBlacklist, wordBlacklist, semTypeWhitelist, wordWhitelist, 0);
+				ArrayList<String> lines = extractPrepPhraseSTRelationship(sentences, false, semTypeBlacklist, wordBlacklist, semTypeWhitelist, wordWhitelist, 0, compareAllMetamapSTs);
 				
 				for(String line : lines) {
+					rowCount++;
 					try {
-						if(writeToFile)
+						if(filePath != null) {
 							bw.write(line + NEW_LINE);
-						else
+						}
+						if(rowCount < MAX_DISPLAY_ROWS) {
 							csvRows.add(line);
+						}
 						
 					} catch(IOException e) {
 						logger.error("extractPrepPhraseSTRelationshipChunked(): Error writing to file or appending csvRows. \n{}", e);
@@ -291,7 +305,34 @@ public class Extract {
 		return csvRows;
 	}
 	
-	public ArrayList<String> extractNounPhrasesChunked(ArrayList<String> objectIds, ArrayList<String> wordWhitelist, NounPositionTypes position, int limit, boolean writeToFile) {
+	public ArrayList<ArrayList<String>> extractTokenCounts(ArrayList<String> objectIds) {
+		ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
+		MongoDB mongo = null;
+		
+		try {
+			mongo = new MongoDB();
+			
+			ArrayList<PubMedArticleList> auditList = (ArrayList<PubMedArticleList>) mongo.getPubMedAuditByObjectId(objectIds); // list to hold entries from processed_article_camel_pubmed_audit
+			ArrayList<String> pmidList = new ArrayList<String>();
+			
+			// combine pmid lists from all PubMedArticleLists
+			for(PubMedArticleList pmal : auditList)
+				for(String pmid : pmal.getIdList())
+					pmidList.add(pmid);
+			
+			ret = mongo.getDistinctTokenLists(pmidList);
+			
+		} catch(Exception e) {
+			logger.error("Extract:extractTokenCounts(): \n{}", e);
+		} finally {
+			if(mongo != null)
+				mongo.closeClient();
+		}
+		
+		return ret;
+	}
+	
+	public ArrayList<String> extractNounPhrasesChunked(ArrayList<String> objectIds, ArrayList<String> wordWhitelist, NounPositionTypes position, int limit, String filePath) {
 		
 		ArrayList<String> csvRows = new ArrayList<String>();
 		BufferedWriter bw = null;
@@ -299,6 +340,7 @@ public class Extract {
 		
 		int maxChunkSize = 25; // number of PMIDs to retrieve from Mongo per iteration
 		int chunkCount = 0; // total chunks processed
+		int rowCount = 0; // number of rows processed
 		String keywords = "", header = "";
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
@@ -333,9 +375,10 @@ public class Extract {
 				header = NOUN_PHRASE_CSV_HEADERS + NEW_LINE;
 			}
 			
-			if(writeToFile) {
-				File file = new File("np_annotated_" + sdf.format(new Date()) + ".csv");
-				if(!file.exists())
+			if(filePath != null) {
+				//File file = new File("np_annotated_" + sdf.format(new Date()) + ".csv");
+				File file = new File(filePath);
+				//if(!file.exists()) // comment this line to force overwrite
 					file.createNewFile();
 				
 				FileWriter fw = new FileWriter(file.getAbsoluteFile());
@@ -356,11 +399,14 @@ public class Extract {
 				ArrayList<String> lines = extractNounPhrases(sentences, false, wordWhitelist, position);
 				
 				for(String line : lines) {
+					rowCount++;
 					try {
-						if(writeToFile)
+						if(filePath != null) {
 							bw.write(keywords + line + NEW_LINE);
-						else
+						}
+						if(rowCount <= MAX_DISPLAY_ROWS) {
 							csvRows.add(keywords + line);
+						}
 						
 					} catch (IOException e) {
 						logger.error("extractNounPhrasesChunked(): Error writing to file or appending csvRows. \n{}", e);
@@ -376,7 +422,7 @@ public class Extract {
 				try {
 					bw.close();
 				} catch(IOException e) { 
-					logger.warn("Extract:extractNounPhrasesChunked(): Error closing BufferedReader:\n{}", e);
+					logger.warn("Extract:extractNounPhrasesChunked(): Error closing BufferedWriter:\n{}", e);
 				}
 		}
 		
@@ -393,6 +439,7 @@ public class Extract {
 		if(position == null)
 			position = NounPositionTypes.ANYWHERE;
 		
+		// TODO use wordlist object rather than parse the full sentence?
 		for(Sentence s : sentenceList) {
 			String origSentence = tagger.getNPAnnotatedSentence(null, null, s.getWordList(), false);
 			String annSentence = tagger.getNPAnnotatedSentence(null, null, s.getWordList(), true);
@@ -413,7 +460,7 @@ public class Extract {
 						buildCSVrow = false;
 						String[] nounPhraseArr = nounPhrase.split(" ");
 						
-						for(String word : wordWhitelist) {
+						for(String word : wordWhitelist) { //TODO possibly add && !buildCSVrow here and remove breaks from switch ifs
 							String wordRegex = "(?i)(.*)" + word + "(.*)";
 							
 							switch(position) {
@@ -472,6 +519,76 @@ public class Extract {
 		return outputList;
 	}
 	
+	public ArrayList<String> extractPrepPhrases(ArrayList<Sentence> sentenceList, boolean showHeaderRow, ArrayList<String> wordWhitelist) {
+		ArrayList<String> outputList = new ArrayList<String>();
+		POSTagger tagger = new POSTagger();
+		
+		ArrayList<String> knownPrepositions = Lists.newArrayList(Splitter.on(',').split(PREPOSITIONS));
+		
+		if(showHeaderRow)
+			outputList.add(PREP_PHRASE_CSV_HEADERS);
+		
+		for(Sentence s : sentenceList) {
+			for(int i=0; i < s.getWordList().size(); i++) {
+				StringBuilder csvRow = new StringBuilder();
+				StringBuilder prepPhrase = new StringBuilder();
+				WordToken word = s.getWordList().get(i);
+				
+				if(word.isPrepPhraseMember()) {
+					String modifiedTerm = i==0 ? word.getToken() : s.getWordList().get(i-1).getToken();
+					String preposition = word.getToken();
+					//StringBuilder finalTerm = new StringBuilder();
+					String finalTerm = "";
+					// search for end of prep phrase
+					for(int j=i; j < s.getWordList().size(); j++) {
+						prepPhrase.append(s.getWordList().get(j).getToken()).append(" "); // append to build prep phrase
+						//if(s.getWordList().get(j).isPrepPhraseObject())
+						//	finalTerm.append(s.getWordList().get(j).getToken()).append(" "); // build final term of prep phrase
+						
+						if(s.getWordList().get(j).isPrepPhraseMember() == false) {
+							//finalTerm.append(s.getWordList().get(j).getToken());
+							finalTerm = s.getWordList().get(j).getToken();
+							i = j;
+							break; // break when end of phrase found
+						}
+					}
+					String[] phrases = tagger.getPPAnnotatedSentence(null, null, s.getWordList());
+					csvRow.append(dq).append(modifiedTerm).append(dq).append(DELIM)
+							.append(dq).append(preposition).append(dq).append(DELIM)
+							.append(dq).append(finalTerm.toString().trim()).append(dq).append(DELIM)
+							.append(dq).append(prepPhrase.toString().trim()).append(dq).append(DELIM)
+							.append(dq).append(phrases[0]).append(dq).append(DELIM)
+							.append(dq).append(phrases[1]).append(dq);
+				
+					if(wordWhitelist != null && wordWhitelist.size() > 0) {
+						for(String whiteword : wordWhitelist) {
+							
+							// if whitelist word is a preposition, only compare to preposition string
+							// don't use wildcard regex for preposition match as we need it to be exact
+							if(knownPrepositions.contains(whiteword)) {
+								if(preposition.matches(whiteword)) {
+									outputList.add(csvRow.toString());
+									break;
+								}
+							} else {
+								String wordRegex = "(?i)(.*)" + whiteword + "(.*)";
+								
+								if(modifiedTerm.matches(wordRegex) || finalTerm.matches(wordRegex)) {
+									outputList.add(csvRow.toString());
+									break;
+								}
+							}
+						}
+					} else {
+						outputList.add(csvRow.toString());
+					}
+				}
+			}
+		}
+		
+		return outputList;
+	}
+	
 	private boolean listContainsRegex(ArrayList<String> list, String regex) {
 		boolean ret = false;
 		for(String s : list) {
@@ -484,13 +601,14 @@ public class Extract {
 		return ret;
 	}
 	
- 	private String buildCSVRow(String articleId, String precedingSemType, String precedingToken, String semType, String token, String prepPhrase, String ppAnnotated) {
+ 	private String buildCSVRow(String articleId, String precedingSemType, String precedingToken, String semType, String token, String prepPhrase, String ppAnnotated, String preposition) {
 		StringBuilder csvRow = new StringBuilder();
 		
 		String stGroup = precedingSemType + "-" + semType;
 		
 		csvRow.append(dq).append(articleId).append(dq).append(DELIM).
 		   append(dq).append(stGroup).append(dq).append(DELIM).
+		   append(dq).append(preposition).append(dq).append(DELIM).
 		   append(dq).append(precedingToken).append(dq).append(DELIM).
 		   append(dq).append(precedingSemType).append(dq).append(DELIM).
 		   append(dq).append(token).append(dq).append(DELIM).

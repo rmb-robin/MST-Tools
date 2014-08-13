@@ -1,12 +1,16 @@
 package com.mst.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.bson.BSONObject;
 import org.bson.types.ObjectId;
 
 import com.google.gson.Gson;
+import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -137,6 +141,153 @@ public class MongoDB {
 		return true;
 	}
 	
+	public ArrayList<ArrayList<String>> getDistinctTokenLists(ArrayList<String> articleIds) {
+		ArrayList<ArrayList<String>> ret = new ArrayList<ArrayList<String>>();
+		
+		String excludeDigitsRegex = "^(?!(\\d+)$)"; // all single and multiple digits
+		String excludePuncRegex = "^([^(\\p{P})\\+<>±≥\\^∼]+$)"; // punc and repeating punc. remove $ to restrict even more
+		String excludeNumberCharRegex = "^(?!(\\d[A-Za-z])$)^(?!([A-Za-z]\\d+)$)"; // ex. 5A and A5   these are gene codes, maybe?
+		StringBuilder finalRegex = new StringBuilder();
+		
+		// always exclude digits and punctuation
+		finalRegex.append(excludeDigitsRegex).append(excludePuncRegex);
+
+		try {
+			if(auth) {
+				DBCollection coll = db.getCollection("processed_article_camel");
+
+				DBObject query = new BasicDBObject("article_id", new BasicDBObject("$in", articleIds));
+				query.put("token", Pattern.compile(finalRegex.toString()));
+				
+				// all tokens (excluding punc and digits)
+				BasicDBList list = (BasicDBList) coll.distinct("token", query);
+				ret.add((ArrayList) list);
+				
+				// all tokens that have semantic types
+				query.put("semantic_types", new BasicDBObject("$ne", null));
+				list = (BasicDBList) coll.distinct("token", query);
+				ret.add((ArrayList) list);
+				
+				// all tokens that do not have a semantic type and allow num/char (ex. 5A)
+				query.removeField("semantic_types");
+				query.put("semantic_types", null);
+				list = (BasicDBList) coll.distinct("token", query);
+				ret.add((ArrayList) list);
+				
+				// all tokens that do not have a semantic type and DO NOT allow num/char
+				finalRegex.insert(0, excludeNumberCharRegex); // must come before other regexs to work properly
+				query.removeField("token");
+				query.put("token", Pattern.compile(finalRegex.toString()));
+				list = (BasicDBList) coll.distinct("token", query);
+
+				ret.add((ArrayList) list);
+			}	
+		} catch(Exception e) {
+			logger.error("getDistinctTokenLists(): \n{}", e);
+		}
+		return ret;
+	}
+	
+	public ArrayList<String> getAggregateTokenAndST() {
+		ArrayList<String> ret = new ArrayList<String>();
+		
+		try {
+			if(auth) {
+				/*
+				db.processed_article_camel.aggregate([
+				{ $match: { semantic_types: { $ne: null } } },
+				{ $group: { _id: { token: "$token", st: "$semantic_types" }, count: { $sum: 1 } } },
+				{ $sort: { count: -1 } }
+				])
+				*/
+				
+				DBCollection coll = db.getCollection("processed_article_camel");
+				//DBObject match = new BasicDBObject("$match", new BasicDBObject("semantic_types", new BasicDBObject("$ne", null)));
+				//DBObject match = new BasicDBObject("$match", new BasicDBObject("article_id", "24827542"));
+				
+				DBObject groupFields = new BasicDBObject("_id", new BasicDBObject("token", "$token")
+												 .append("st", "$semantic_types"));
+				groupFields.put("count", new BasicDBObject("$sum", 1));
+				DBObject group = new BasicDBObject("$group", groupFields);
+
+				DBObject sort = new BasicDBObject("$sort", new BasicDBObject("count", -1));
+
+				// run aggregation
+				List<DBObject> pipeline = Arrays.asList(group, sort);
+				AggregationOutput output = coll.aggregate(pipeline);
+				
+				String dq = "\"";
+				String delim = ",";
+				
+//				for(DBObject result : output.results()) {  
+//				    BSONObject bson = (BSONObject) result.get("_id");
+//				    
+//				    BasicDBList st = (BasicDBList) bson.get("st");
+//				    for(Object o : st) {
+//				    	BasicDBObject o2 = (BasicDBObject) o;
+//				    
+//				    	csv.append(dq).append(result.get("count")).append(dq).append(delim);
+//				    	csv.append(dq).append(o2.get("token")).append(dq).append(delim);
+//				    	csv.append(dq).append(o2.get("semanticType")).append(dq);
+//					    csv.append("\n");
+//					}
+//				}
+				
+				for(DBObject result : output.results()) {  
+				    BSONObject bson = (BSONObject) result.get("_id");
+				    String token = (String) bson.get("token");
+				    StringBuilder csv = new StringBuilder();
+				    
+				    csv.append(dq).append(result.get("count")).append(dq).append(delim);
+				    csv.append(dq).append(token).append(dq).append(delim);
+				    
+				    StringBuilder sbST = new StringBuilder();
+				    StringBuilder addlTokens = new StringBuilder();
+				    BasicDBList st = (BasicDBList) bson.get("st");
+				    
+				    if(st != null) {
+					    for(Object o : st) {
+					    	BasicDBObject o2 = (BasicDBObject) o;
+					    
+					    	String thisToken = (String) o2.get("token");
+					    	
+						    if(thisToken.equalsIgnoreCase(token)) {
+						    	sbST.append(o2.get("semanticType")).append(" / ");
+						    } else {
+						    	addlTokens.append(dq).append("x").append(dq).append(delim);
+						    	addlTokens.append(dq).append(thisToken).append(dq).append(delim);
+						    	addlTokens.append(dq).append(o2.get("semanticType")).append(dq).append("\n");
+						    }
+						}
+				    }
+				    
+				    if(sbST.length() == 0) {
+				    	// some tokens don't have any STs that match. e.g.: token: A2, sem type: imft/A2 B
+				    	csv.append(dq).append("").append(dq);
+				    	
+				    } else if(sbST.length() > 0) {
+				    	csv.append(dq).append(sbST.toString()).append(dq);
+				    }
+				    
+				    ret.add(csv.toString());
+				    
+				    if(addlTokens.length() > 0) {
+			    		//csv.append(addlTokens.toString());
+			    		ret.add(addlTokens.deleteCharAt(addlTokens.length()-1).toString()); // remove trailing \n
+				    }
+
+				}
+			}
+			
+			//System.out.println(csv.toString());	
+			
+		} catch(Exception e) {
+			logger.error("getAnnotatedSentences(): \n{}", e);
+			e.printStackTrace();
+		}
+		return ret;
+	}
+	
 	public ArrayList<Sentence> getAnnotatedSentencesChunk(ArrayList<String> articleIds, int chunkSize) {
 		ArrayList<Sentence> sentenceList = new ArrayList<Sentence>();
 
@@ -146,6 +297,7 @@ public class MongoDB {
 		try {
 			if(auth) {
 				DBCollection coll = db.getCollection("processed_article_camel");
+				
 				DBCursor cursor = null;
 				BasicDBObject query = null;
 				BasicDBObject fields = null;
