@@ -36,6 +36,7 @@ public class MongoDB {
 	private boolean auth;
 	private Gson gson = null;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private static List<String> existingPMIDs = null;
 	
 	public MongoDB() {
 		try {
@@ -46,6 +47,12 @@ public class MongoDB {
 			
 			gson = new Gson();
 			
+			// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
+			// this complements a similar bit of functionality in PubMed.java, which keeps track of existing PMIDs and those which it inserts
+			// to prevent dupes from getting into the pipeline. Must duplicate here to account for processing lag time (possibly many hours)
+			if(existingPMIDs == null) {
+				existingPMIDs = getDistinctStringValues("article_id");
+			}
 		} catch(Exception e) {
 			logger.error("Error establishing a connection to MongoDB. \n{}", e);
 		}
@@ -58,28 +65,31 @@ public class MongoDB {
 				DBCollection coll = db.getCollection("processed_article_camel");
 				
 				for(WordToken word : sentence.getWordList()) {
-					BasicDBObject doc = new BasicDBObject("article_id", sentence.getArticleId()).
-			                append("sentence_id", sentence.getPosition()).
-			                append("position", word.getPosition()).
-			                append("token", word.getToken()).
-			                append("normalized", word.getNormalizedForm()).
-			                append("pos", word.getPOS());
-			                if(word.nounPhraseModifier())
-			                	doc.append("is_noun_modifier", word.nounPhraseModifier());
-			                if(word.nounPhraseHead())
-			                	doc.append("is_noun_phrase_head", word.nounPhraseHead());
-			                if(word.isPrepPhraseMember())
-			                	doc.append("is_prep_phrase_member", word.isPrepPhraseMember());
-			                if(word.isPrepPhraseObject())
-			                	doc.append("is_prep_phrase_object", word.isPrepPhraseObject());
-			                if(word.getSemanticTypeList().size() > 0) {
-			                	DBObject semTypes = (DBObject) JSON.parse(gson.toJson(word.getSemanticTypeList()));
-			                	//System.out.println(gson.toJson(word.getSemanticTypeList()));
-			                	doc.append("semantic_types", semTypes);
-			                }
-			                doc.append("date_processed", sentence.getDate());
-			                
-					coll.insert(doc);		
+					if(!existingPMIDs.contains(sentence.getArticleId())) {
+						BasicDBObject doc = new BasicDBObject("article_id", sentence.getArticleId()).
+				                append("sentence_id", sentence.getPosition()).
+				                append("position", word.getPosition()).
+				                append("token", word.getToken()).
+				                append("normalized", word.getNormalizedForm()).
+				                append("pos", word.getPOS());
+				                if(word.nounPhraseModifier())
+				                	doc.append("is_noun_modifier", word.nounPhraseModifier());
+				                if(word.nounPhraseHead())
+				                	doc.append("is_noun_phrase_head", word.nounPhraseHead());
+				                if(word.isPrepPhraseMember())
+				                	doc.append("is_prep_phrase_member", word.isPrepPhraseMember());
+				                if(word.isPrepPhraseObject())
+				                	doc.append("is_prep_phrase_object", word.isPrepPhraseObject());
+				                if(word.getSemanticTypeList().size() > 0) {
+				                	DBObject semTypes = (DBObject) JSON.parse(gson.toJson(word.getSemanticTypeList()));
+				                	//System.out.println(gson.toJson(word.getSemanticTypeList()));
+				                	doc.append("semantic_types", semTypes);
+				                }
+				                doc.append("date_processed", sentence.getDate());
+				                
+						coll.insert(doc);
+						existingPMIDs.add(sentence.getArticleId());
+					}
 				}
 			} catch(Exception e) {
 				logger.error("insertTaggedSentence(): \n{}\n{}", json, e);

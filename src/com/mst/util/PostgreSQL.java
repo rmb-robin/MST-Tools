@@ -24,18 +24,38 @@ public class PostgreSQL {
 	private Connection con = null;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	public PostgreSQL() {
-		connect();
+	public PostgreSQL(String database) {
+		connect(database);
 	}
 	
-	public boolean connect() {
+	public boolean connect(String database) {
 		try {
-			con = DriverManager.getConnection(Props.getProperty("postres_host"), Props.getProperty("postres_user"), Props.getProperty("postres_pw"));
+			con = DriverManager.getConnection(Props.getProperty("postgres_host") + database, Props.getProperty("postgres_user"), Props.getProperty("postgres_pw"));
 			
 		} catch(SQLException e) {
 			logger.error("Error establishing a connection to PostgreSQL. \n{}", e);
 		}
 		return (con != null);
+	}
+	
+	public void close() {
+		try {
+			con.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean insertInto(String sql) {
+		try {
+			Statement st = con.createStatement();
+			st.executeUpdate(sql); 
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return true;
 	}
 	
 	public String metamapSemTypeOnly(String jsonSentence) {

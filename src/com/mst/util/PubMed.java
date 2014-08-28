@@ -75,6 +75,9 @@ public class PubMed {
 		maxYear = (maxYear >= MIN_YEAR && maxYear <= MAX_YEAR ? maxYear : MAX_YEAR);
 
 		// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
+		// This is also done in MongoDB.java to account for the lag time between adding a msg onto the queue and it getting inserted
+		// into the database (many hours in some cases).
+		// Do the check here in addition to MongoDB.java to prevent unnecessary parsing/processing in the Camel processes. 
 		existingPMIDs = mongo.getDistinctStringValues("article_id");
 
 		if(exactMatch)
