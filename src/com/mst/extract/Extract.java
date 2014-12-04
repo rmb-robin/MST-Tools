@@ -24,7 +24,9 @@ import com.mst.model.PubMedArticleList;
 import com.mst.model.SemanticType;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
+import com.mst.tools.NounHelper;
 import com.mst.tools.POSTagger;
+import com.mst.tools.PrepositionHelper;
 import com.mst.util.MongoDB;
 
 public class Extract {
@@ -78,7 +80,8 @@ public class Extract {
 		//TODO how to choose which sem type from subject word?
 		//TODO test verb, normal, begin, prep at EOL sentences
 		ArrayList<String> outputList = new ArrayList<String>();
-		POSTagger tagger = new POSTagger();
+		//POSTagger tagger = new POSTagger();
+		PrepositionHelper preps = new PrepositionHelper();
 		
 		//String[] stArray = { "spco", "mnob", "popg", "food", "mobd", "hcpp", "inpr", "plnt" };
 		//String[] wordArray = { "patients" };
@@ -196,11 +199,11 @@ public class Extract {
 							if(buildCSVRow) {
 								if(compareAllMetamapSTs)
 									// build a report showing the ST of the preceeding token compared to the ST of every token returned from Metamap
-									outputList.add(buildCSVRow(sentence.getArticleId(), precedingSemType, precedingToken, semType.getSemanticType(), semType.getToken(), prepPhrase.toString().trim(), tagger.getPPAnnotatedSentence(null, null, words)[0], preposition));								
+									outputList.add(buildCSVRow(sentence.getId(), precedingSemType, precedingToken, semType.getSemanticType(), semType.getToken(), prepPhrase.toString().trim(), preps.getPPAnnotatedSentence(null, null, words)[0], preposition));								
 								else {
 									if(words.get(j).isPrepPhraseObject() && !words.get(j).isPrepPhraseMember()) {
 										// build a report showing ONLY a single row for each prep object
-										outputList.add(buildCSVRow(sentence.getArticleId(), precedingSemType, precedingToken, semType.getSemanticType(), semType.getToken(), prepPhrase.toString().trim(), tagger.getPPAnnotatedSentence(null, null, words)[0], preposition));
+										outputList.add(buildCSVRow(sentence.getId(), precedingSemType, precedingToken, semType.getSemanticType(), semType.getToken(), prepPhrase.toString().trim(), preps.getPPAnnotatedSentence(null, null, words)[0], preposition));
 										break;
 									}
 								}
@@ -432,6 +435,7 @@ public class Extract {
 	public ArrayList<String> extractNounPhrases(ArrayList<Sentence> sentenceList, boolean showHeaderRow, ArrayList<String> wordWhitelist, NounPositionTypes position) {
 		ArrayList<String> outputList = new ArrayList<String>();
 		POSTagger tagger = new POSTagger();
+		NounHelper nouns = new NounHelper();
 		
 		if(showHeaderRow)
 			outputList.add(NOUN_PHRASE_CSV_HEADERS);
@@ -441,8 +445,8 @@ public class Extract {
 		
 		// TODO use wordlist object rather than parse the full sentence?
 		for(Sentence s : sentenceList) {
-			String origSentence = tagger.getNPAnnotatedSentence(null, null, s.getWordList(), false);
-			String annSentence = tagger.getNPAnnotatedSentence(null, null, s.getWordList(), true);
+			String origSentence = nouns.getNPAnnotatedSentence(null, null, s.getWordList(), false);
+			String annSentence = nouns.getNPAnnotatedSentence(null, null, s.getWordList(), true);
 					
 			int startPos = annSentence.indexOf("{");
 			
@@ -500,11 +504,11 @@ public class Extract {
 						csvRow.append(dq).append(nounPhrase).append(dq).append(DELIM).
 						append(dq).append(annSentence).append(dq).append(DELIM).
 						append(dq).append(origSentence).append(dq).append(DELIM).
-						append(dq).append(s.getArticleId()).append(dq);
+						append(dq).append(s.getId()).append(dq);
 					
 						outputList.add(csvRow.toString());
 						trackCounts(nounPhrase, npAnnCounts);
-						trackCounts(s.getArticleId(), articleIdCounts);
+						trackCounts(s.getId(), articleIdCounts);
 					}
 					
 					startPos = annSentence.indexOf("{", endPos);
@@ -521,7 +525,8 @@ public class Extract {
 	
 	public ArrayList<String> extractPrepPhrases(ArrayList<Sentence> sentenceList, boolean showHeaderRow, ArrayList<String> wordWhitelist) {
 		ArrayList<String> outputList = new ArrayList<String>();
-		POSTagger tagger = new POSTagger();
+		//POSTagger tagger = new POSTagger();
+		PrepositionHelper preps = new PrepositionHelper();
 		
 		ArrayList<String> knownPrepositions = Lists.newArrayList(Splitter.on(',').split(PREPOSITIONS));
 		
@@ -552,7 +557,7 @@ public class Extract {
 							break; // break when end of phrase found
 						}
 					}
-					String[] phrases = tagger.getPPAnnotatedSentence(null, null, s.getWordList());
+					String[] phrases = preps.getPPAnnotatedSentence(null, null, s.getWordList());
 					csvRow.append(dq).append(modifiedTerm).append(dq).append(DELIM)
 							.append(dq).append(preposition).append(dq).append(DELIM)
 							.append(dq).append(finalTerm.toString().trim()).append(dq).append(DELIM)

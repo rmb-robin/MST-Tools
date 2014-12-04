@@ -47,6 +47,66 @@ public class MetaMapWrapper {
         api = new MetaMapApiImpl(server);
     }
 	
+	public ArrayList<WordToken> getSemanticTypes(ArrayList<WordToken> words, String fullSentence) throws Exception {
+		//http://metamap.nlm.nih.gov/Docs/README_javaapi.html
+		List<String> args = new ArrayList<String>();
+	    args.add("-i");  // ignore word order, also --ignore_word_order
+	    
+	    if(restrictST != null) {
+	    	args.add("-J"); // restrict to semantic types, also --restrict_to_sts
+	    	args.add(restrictST);
+	    } else if(excludeST != null) {
+	    	args.add("-k"); // exclude semantic types, also --exclude_sts
+	    	args.add(excludeST);
+	    }
+	    api.setOptions(args);
+	    
+	    try {
+		    List<Result> resultList = api.processCitationsFromString(fullSentence);
+	
+		    api.resetOptions(); // MANDATORY otherwise the options remain "stuck" on the mmserver
+	   
+		    if(resultList == null || resultList.size() == 0) {
+		    	logger.error("No results from metamap. \n Full Sentence: {}", fullSentence);
+		    } else {
+			    for(Result result : resultList) {
+			    	for(Utterance utterance : result.getUtteranceList()) {
+			    		for(PCM pcm : utterance.getPCMList()) {
+			    			for(Ev ev : pcm.getCandidateList()) {
+			    				try {
+				    				List<Position> pos = ev.getPositionalInfo();
+				    				int begin = pos.get(0).getX();
+				    				int end = pos.get(pos.size() - 1).getX() + pos.get(pos.size() - 1).getY();
+				    				
+				    				String token = fullSentence.substring(begin, end);
+				    				
+			    					// loop through all instances of token in wordList
+			    					for(int index : findAllWordTokenIndices(words, token)) {
+			    						// add semantic type, if not already present
+			    						SemanticType newST = new SemanticType(ev.getSemanticTypes().get(0), token);
+			    						if(!words.get(index).getSemanticTypeList().contains(newST)) {
+			    							words.get(index).getSemanticTypeList().add(newST);
+			    						}
+			    					}
+
+			    				} catch(Exception e) {
+			    					logger.error("Error processing semantic type. {}", e);
+			    				}
+			    			}
+			    		}
+			    	}
+			    }
+		    }
+		    
+	    } catch(Exception e) {
+	    	logger.error("Error processing metamap. Full Sentence: {} \n {}", fullSentence, e);
+	    }
+	    // remove WordList to cut down on json clutter
+	    //sentence.setWordList(null);
+	    
+	    return words;
+	}
+	
 	public String processSentence(String json) throws Exception {
 		//http://metamap.nlm.nih.gov/Docs/README_javaapi.html
 		String ret = null;
@@ -70,7 +130,7 @@ public class MetaMapWrapper {
 		    //api.disconnect();
 	   
 		    if(resultList == null || resultList.size() == 0) {
-		    	logger.error("No results from metamap. \n PMID: {} \n Full Sentence: {}", sentence.getArticleId(), sentence.getFullSentence());
+		    	logger.error("No results from metamap. \n PMID: {} \n Full Sentence: {}", sentence.getId(), sentence.getFullSentence());
                 ret = null;
 		    } else {
 			    //int beginIndex = 0;
@@ -90,7 +150,7 @@ public class MetaMapWrapper {
 				    				int end = pos.get(pos.size() - 1).getX() + pos.get(pos.size() - 1).getY();
 			
 				    				token = sentence.getFullSentence().substring(begin, end);
-				    				
+System.out.println(token);
 				    				if(!preferredNamesToExclude.contains(ev.getPreferredName()) && !tokensToExclude.contains(token)) {
 				    					//metaMapList.add(new MetaMapToken(token, ev.getConceptId(), ev.getConceptName(), ev.getPreferredName(), ev.getSemanticTypes(), ev.getSources()));
 				    					// loop through all instances of token in wordList
@@ -103,7 +163,9 @@ public class MetaMapWrapper {
 				    					}
 				    				}
 			    				} catch(Exception e) {
-			    					logger.error("Error processing semantic type. \n PMID: {}; Sentence Id: {}; Token: {}", sentence.getArticleId(), sentence.getPosition(), token);
+			    					logger.error("Error processing semantic type. \n PMID: {}; Sentence Id: {}; Token: {}", sentence.getId(), sentence.getPosition(), token);
+			    					System.out.println("error with metamap ");
+			    					e.printStackTrace();
 			    				}
 			    			}
 			    		}
@@ -112,9 +174,10 @@ public class MetaMapWrapper {
 			    //System.out.println("result: " + resultCnt + "; utterance: " + utteranceCnt + "; pcm: " + pcmCnt + "; ev: " + evCnt);
 		    }
 		    ret = gson.toJson(sentence);
-		    
+		    //System.out.println(gson.toJson(sentence));
 	    } catch(Exception e) {
 	    	logger.error("Error processing metamap. JSON: {} \n {}", json, e);
+	    	//e.printStackTrace();
 	    }
 	    // remove WordList to cut down on json clutter
 	    //sentence.setWordList(null);
@@ -122,9 +185,14 @@ public class MetaMapWrapper {
 	    return ret;
 	}
 	
-	// The NIH metamap can return phrases related to the token being searched.	E.g. a token of 'sample' can return 'sample sizes'. 
-	// This function splits the string on a space and searches the list of tokens to find a match by the first word of the phrase.
-	// The result is that words and phrases are grouped together by the first token.
+	// The NIH metamap can group multiple tokens and return a single semantic type.
+	// E.g. "sample sizes" will return 'qnco' for the entire string, but also 'sbst,cnce' for "sample" and 'spco' for "sizes". 
+	// This function splits the string on a space and searches the list of tokens to find a match by the first word of the phrase,
+	// thus attaching the semantic types for both single words and phrases to the first token.
+	// 
+	// In code that uses the results of Metamap it is necessary to compare the current token to the token attribute of the SemanticType Object to avoid
+	// returning extraneous results, e.g. "right kidney" will return "right" as a 'bpoc' without this check. 
+	// See POSTagger.getAnnotatedMarkup() for an example.
 	private ArrayList<Integer> findAllWordTokenIndices(ArrayList<WordToken> tokens, String token) {
 		ArrayList<Integer> indices = new ArrayList<Integer>();
 		

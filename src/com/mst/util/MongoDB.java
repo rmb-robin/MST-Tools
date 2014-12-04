@@ -18,13 +18,19 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
 import com.mst.model.MetaMapToken;
 import com.mst.model.PubMedArticleList;
 import com.mst.model.SemanticType;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
+import com.mst.model.ontology.SemanticObject;
+import com.mst.model.ontology.SemanticObject.Rule;
+import com.mst.tools.NounHelper;
 import com.mst.tools.POSTagger;
+import com.mst.tools.PrepositionHelper;
+import com.sun.tools.javac.code.Source;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,35 +57,85 @@ public class MongoDB {
 			// this complements a similar bit of functionality in PubMed.java, which keeps track of existing PMIDs and those which it inserts
 			// to prevent dupes from getting into the pipeline. Must duplicate here to account for processing lag time (possibly many hours)
 			if(existingPMIDs == null) {
-				existingPMIDs = getDistinctStringValues("article_id");
+				// TODO get this out of the constructor
+				existingPMIDs = getDistinctStringValues("id");
 			}
 		} catch(Exception e) {
 			logger.error("Error establishing a connection to MongoDB. \n{}", e);
 		}
 	}
 	
+	public boolean insertJSON(String json, String collection) {
+		boolean ret = false;
+		//http://stackoverflow.com/questions/7724390/mongodbjava-parsing-json-via-com-mongodb-util-json-parse
+		try {
+			DBObject dbObject = (DBObject) JSON.parse(json);
+			//DBObject dbObject = (DBObject) JSON.parse("{'value':'scott','last_modified':{$date:'2014-09-08T13:43:10.264Z'}}");
+			DBCollection dbCollection = db.getCollection(collection);          
+			dbCollection.save(dbObject);
+			
+			ret = true;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
 	public String insertTaggedSentence(String json) {
 		if(auth) {
 			try {
 				Sentence sentence = gson.fromJson(json, Sentence.class);
-				DBCollection coll = db.getCollection("processed_article_camel");
+				boolean firstWord = true;
+				DBCollection processed = null;
+				DBCollection metadata = db.getCollection("processed_sentence_metadata");
 				
-				for(WordToken word : sentence.getWordList()) {
-					if(!existingPMIDs.contains(sentence.getArticleId())) {
-						BasicDBObject doc = new BasicDBObject("article_id", sentence.getArticleId()).
-				                append("sentence_id", sentence.getPosition()).
+				Constants.Source source = Constants.Source.valueOf(sentence.getSource());
+				processed = db.getCollection(source.getMongoCollection());
+					
+				// TODO checking for existence here is bad because it prevents multiple sentences with the same
+				// article_id from being inserted. Need a way to protect against the situation where multiple data loads
+				// have been kicked off that contain the same PMID and the processing lag can't catch the dupe ID.
+				//if(!existingPMIDs.contains(sentence.getArticleId())) {
+					for(WordToken word : sentence.getWordList()) {
+						BasicDBObject doc = new BasicDBObject("id", sentence.getId()).
+								append("source", sentence.getSource()).								
+								append("sentence_id", sentence.getPosition()).
 				                append("position", word.getPosition()).
 				                append("token", word.getToken()).
 				                append("normalized", word.getNormalizedForm()).
 				                append("pos", word.getPOS());
-				                if(word.nounPhraseModifier())
-				                	doc.append("is_noun_modifier", word.nounPhraseModifier());
-				                if(word.nounPhraseHead())
-				                	doc.append("is_noun_phrase_head", word.nounPhraseHead());
+						
+								if(sentence.getClientId() != null)
+									doc.append("client_id", sentence.getClientId());
+								if(sentence.getProcedureDate() != null)
+									doc.append("procedure_date", sentence.getProcedureDate());
+									
+				                if(word.isNounPhraseModifier())
+				                	doc.append("npMod", word.isNounPhraseModifier());
+				                if(word.isNounPhraseHead())
+				                	doc.append("npHead", word.isNounPhraseHead());
 				                if(word.isPrepPhraseMember())
-				                	doc.append("is_prep_phrase_member", word.isPrepPhraseMember());
+				                	doc.append("ppMember", word.isPrepPhraseMember());
 				                if(word.isPrepPhraseObject())
-				                	doc.append("is_prep_phrase_object", word.isPrepPhraseObject());
+				                	doc.append("ppObj", word.isPrepPhraseObject());
+				                if(word.isInfinitiveHead())
+				                	doc.append("infHead", true);
+				                if(word.isInfinitive())
+				                	doc.append("inf", true);
+				                if(word.isVerbOfBeing())
+				                	doc.append("vob", true);
+				                if(word.isVerbOfBeingSubject())
+				                	doc.append("vobSubj", true);
+				                if(word.isVerbOfBeingSubjectComplement())
+				                	doc.append("vobSubjC", true);
+				                if(word.isLinkingVerb())
+				                	doc.append("lv", true);
+				                if(word.isLinkingVerbSubject())
+				                	doc.append("lvSubj", true);
+				                if(word.isLinkingVerbSubjectComplement())
+				                	doc.append("lvSubjC", true);
+				                
 				                if(word.getSemanticTypeList().size() > 0) {
 				                	DBObject semTypes = (DBObject) JSON.parse(gson.toJson(word.getSemanticTypeList()));
 				                	//System.out.println(gson.toJson(word.getSemanticTypeList()));
@@ -87,12 +143,24 @@ public class MongoDB {
 				                }
 				                doc.append("date_processed", sentence.getDate());
 				                
-						coll.insert(doc);
-						existingPMIDs.add(sentence.getArticleId());
+				        processed.insert(doc);
+						
+						if(firstWord) {
+		                	System.out.println(gson.toJson(sentence.getMetadata()));		                	
+		                	DBObject dbObject = (DBObject) JSON.parse(gson.toJson(sentence.getMetadata()));
+		                	dbObject.put("id", sentence.getId());
+		                	dbObject.put("sentence_oid", doc.get("_id"));
+		        			metadata.save(dbObject);
+		                	System.out.println(dbObject.toString());
+		                	firstWord = false;
+		                }
+						
+						existingPMIDs.add(sentence.getId());
 					}
-				}
+				//}
 			} catch(Exception e) {
 				logger.error("insertTaggedSentence(): \n{}\n{}", json, e);
+				e.printStackTrace();
 			}
 		}
 		return "";
@@ -105,6 +173,52 @@ public class MongoDB {
 		}
 	}
 	
+	public ArrayList<SemanticObject> getSemanticObjects(String domain) {
+		ArrayList<SemanticObject> semanticObjects = new ArrayList<SemanticObject>();
+
+		try {
+			if(auth) {
+				DBCollection coll = db.getCollection("ontology_semantic");
+				DBCursor cursor = null;
+				BasicDBObject query = null;
+				BasicDBObject fields = new BasicDBObject("_id", 0); // don't return ObjectId;
+				Gson gson = new Gson();
+				
+				query = new BasicDBObject("domain", domain).append("concept", "Finding Site");
+				cursor = coll.find(query, fields);
+
+				while(cursor.hasNext()) {
+					BasicDBObject obj = (BasicDBObject) cursor.next();
+					System.out.println(obj.toString());
+					semanticObjects.add(gson.fromJson(obj.toString(), SemanticObject.class));
+//					SemanticObject so = new SemanticObject();
+//					
+//					so.concept = obj.getString("concept");
+//					so.category = obj.getString("category");
+//					so.domain = domain;
+//					
+//					BasicDBList rules = (BasicDBList) obj.get("rules");
+//
+//					if(rules != null) {
+//						for(BasicDBObject rule : rules.toArray(new BasicDBObject[0])) {
+//							Rule r = so.new Rule();
+//							r.type = rule.getString("type");
+//							r.target = rule.getString("target");
+//							r.position = rule.getInt("position");
+//							BasicDBList values = (BasicDBList) obj.get("values");
+//							//SemanticType st = gson.fromJson(o.toString(), SemanticType.class);
+//						}
+//					}
+				
+				}
+				cursor.close();
+			}
+		} catch(Exception e) {
+			logger.error("getAnnotatedSentences(): \n{}", e);
+		}
+		return semanticObjects;
+	}
+	
 	public String insertMetaMapData(String json) {
 		if(auth) {
 			try {
@@ -112,7 +226,7 @@ public class MongoDB {
 				DBCollection coll = db.getCollection("processed_article_camel_metamap");
 				
 				for(MetaMapToken meta : sentence.getMetaMapList()) {
-					BasicDBObject doc = new BasicDBObject("article_id", sentence.getArticleId()).
+					BasicDBObject doc = new BasicDBObject("id", sentence.getId()).
 			                append("sentence_id", sentence.getPosition()).
 			                append("value", meta.getValue()).
 			                append("concept_id", meta.getConceptID()).
@@ -134,9 +248,10 @@ public class MongoDB {
 		if(auth) {
 			try {
 				PubMedArticleList idList = gson.fromJson(json, PubMedArticleList.class);
-				DBCollection coll = db.getCollection("processed_article_camel_pubmed_audit");
+				DBCollection coll = db.getCollection("processed_article_camel_audit");
 				
 				BasicDBObject doc = new BasicDBObject("source", idList.getSource()).
+						//append("client_id", idList.getClientId()).
 						append("search_term", idList.getSearchTerm()).
 						append("min_year", idList.getMinYear()).
 						append("max_year", idList.getMaxYear()).
@@ -166,7 +281,7 @@ public class MongoDB {
 			if(auth) {
 				DBCollection coll = db.getCollection("processed_article_camel");
 
-				DBObject query = new BasicDBObject("article_id", new BasicDBObject("$in", articleIds));
+				DBObject query = new BasicDBObject("id", new BasicDBObject("$in", articleIds));
 				query.put("token", Pattern.compile(finalRegex.toString()));
 				
 				// all tokens (excluding punc and digits)
@@ -213,7 +328,7 @@ public class MongoDB {
 				
 				DBCollection coll = db.getCollection("processed_article_camel");
 				//DBObject match = new BasicDBObject("$match", new BasicDBObject("semantic_types", new BasicDBObject("$ne", null)));
-				//DBObject match = new BasicDBObject("$match", new BasicDBObject("article_id", "24827542"));
+				//DBObject match = new BasicDBObject("$match", new BasicDBObject("id", "24827542"));
 				
 				DBObject groupFields = new BasicDBObject("_id", new BasicDBObject("token", "$token")
 												 .append("st", "$semantic_types"));
@@ -314,15 +429,17 @@ public class MongoDB {
 				int chunkCount = 0;
 				
 				fields = new BasicDBObject("_id", 0); // don't return ObjectId
+				if(chunkSize > articleIds.size())
+					chunkSize = articleIds.size();
 				
 				while(chunkCount < articleIds.size()) {
 					List<String> chunkList = articleIds.subList(chunkCount, chunkCount + chunkSize);
 					chunkCount += chunkList.size();
 					
-					query = new BasicDBObject("article_id", new BasicDBObject("$in", chunkList));
+					query = new BasicDBObject("id", new BasicDBObject("$in", chunkList));
 	
 					cursor = coll.find(query, fields);	
-					cursor.sort(new BasicDBObject("article_id", 1).append("sentence_id", 1).append("position", 1));
+					cursor.sort(new BasicDBObject("id", 1).append("sentence_id", 1).append("position", 1));
 					
 					ArrayList<WordToken> wordList = new ArrayList<WordToken>();
 					Sentence sentence = null;
@@ -337,16 +454,16 @@ public class MongoDB {
 						
 						if(firstRun) {
 							prevSentenceId = obj.getInt("sentence_id");
-							prevArticleId = obj.getString("article_id");
+							prevArticleId = obj.getString("id");
 							firstRun = false;
 						}
 						
 						int thisSentenceId = obj.getInt("sentence_id");
-						String thisArticleId = obj.getString("article_id");
+						String thisArticleId = obj.getString("id");
 						
 						if(newSentence) {
 							sentence = new Sentence();
-							sentence.setArticleId(thisArticleId);
+							sentence.setId(thisArticleId);
 							sentence.setDate(obj.getDate("process_date"));
 							sentence.setFullSentence(null);
 							sentence.setPosition(thisSentenceId);
@@ -355,11 +472,19 @@ public class MongoDB {
 	
 						WordToken word = new WordToken(obj.getString("token"), obj.getString("normalized"), obj.getInt("position"));
 						word.setPOS(obj.getString("pos"));
-						word.setNounPhraseHead(obj.getBoolean("is_noun_phrase_head"));
-						word.setNounPhraseModifier(obj.getBoolean("is_noun_modifier"));
-						word.setPrepPhraseMember(obj.getBoolean("is_prep_phrase_member"));
-						word.setPrepPhraseObject(obj.getBoolean("is_prep_phrase_object"));
-	
+						word.setNounPhraseHead(obj.getBoolean("npHead"));
+						word.setNounPhraseModifier(obj.getBoolean("npMod"));
+						word.setPrepPhraseMember(obj.getBoolean("ppMember"));
+						word.setPrepPhraseObject(obj.getBoolean("ppObj"));
+						word.setInfinitiveHead(obj.getBoolean("infHead"));
+						word.setVerbOfBeing(obj.getBoolean("vob"));
+		                //word.isVerbOfBeingMember = obj.getBoolean("vobMember");
+		                word.setVerbOfBeingSubject(obj.getBoolean("vobSubj"));
+		                word.setVerbOfBeingSubjectComplement(obj.getBoolean("vobSubjC"));
+		                word.setLinkingVerb(obj.getBoolean("lv"));
+		                word.setLinkingVerbSubject(obj.getBoolean("lvSubj"));
+		                word.setLinkingVerbSubjectComplement(obj.getBoolean("lvSubjC"));	
+						
 						BasicDBList dbList = (BasicDBList) obj.get("semantic_types");
 	
 						if(dbList != null) {
@@ -393,12 +518,12 @@ public class MongoDB {
 			}
 			
 		} catch(Exception e) {
-			logger.error("getAnnotatedSentences(): \n{}", e);
+			logger.error("getAnnotatedSentencesChunk(): \n{}", e);
 		}
 		return sentenceList;
 	}
 	
-	public ArrayList<Sentence> getAnnotatedSentences(List<String> articleIds, int limit) {
+	public ArrayList<Sentence> getAnnotatedSentences(List<String> IDs, int limit) {
 		ArrayList<Sentence> sentenceList = new ArrayList<Sentence>();
 
 		try {
@@ -413,7 +538,7 @@ public class MongoDB {
 				//if(articleIds == null)
 				//	cursor = coll.find();
 				//else {
-					query = new BasicDBObject("article_id", new BasicDBObject("$in", articleIds));
+					query = new BasicDBObject("id", new BasicDBObject("$in", IDs));
 				//	if(sentenceId != null)
 				//		query.append("sentence_id", sentenceId);
 
@@ -423,7 +548,7 @@ public class MongoDB {
 					cursor = coll.find(query, fields).limit(limit);
 				//}
 
-				cursor.sort(new BasicDBObject("article_id", 1).append("sentence_id", 1).append("position", 1));
+				cursor.sort(new BasicDBObject("id", 1).append("sentence_id", 1).append("position", 1));
 				//query = new BasicDBObject("_id", new ObjectId("5255d10f0de1496494d31689"));
 				
 				ArrayList<WordToken> wordList = new ArrayList<WordToken>();
@@ -439,16 +564,16 @@ public class MongoDB {
 					
 					if(firstRun) {
 						prevSentenceId = obj.getInt("sentence_id");
-						prevArticleId = obj.getString("article_id");
+						prevArticleId = obj.getString("id");
 						firstRun = false;
 					}
 					
 					int thisSentenceId = obj.getInt("sentence_id");
-					String thisArticleId = obj.getString("article_id");
+					String thisId = obj.getString("id");
 					
 					if(newSentence) {
 						sentence = new Sentence();
-						sentence.setArticleId(thisArticleId);
+						sentence.setId(thisId);
 						sentence.setDate(obj.getDate("process_date"));
 						sentence.setFullSentence(null);
 						sentence.setPosition(thisSentenceId);
@@ -457,10 +582,10 @@ public class MongoDB {
 
 					WordToken word = new WordToken(obj.getString("token"), obj.getString("normalized"), obj.getInt("position"));
 					word.setPOS(obj.getString("pos"));
-					word.setNounPhraseHead(obj.getBoolean("is_noun_phrase_head"));
-					word.setNounPhraseModifier(obj.getBoolean("is_noun_modifier"));
-					word.setPrepPhraseMember(obj.getBoolean("is_prep_phrase_member"));
-					word.setPrepPhraseObject(obj.getBoolean("is_prep_phrase_object"));
+					word.setNounPhraseHead(obj.getBoolean("npHead"));
+					word.setNounPhraseModifier(obj.getBoolean("npMod"));
+					word.setPrepPhraseMember(obj.getBoolean("ppMember"));
+					word.setPrepPhraseObject(obj.getBoolean("ppObj"));
 
 					BasicDBList dbList = (BasicDBList) obj.get("semantic_types");
 
@@ -471,13 +596,13 @@ public class MongoDB {
 						}
 					}
 
-					if(!thisArticleId.equals(prevArticleId) || thisSentenceId != prevSentenceId) { // TODO check also for article_id change to accomodate single sentences
+					if(!thisId.equals(prevArticleId) || thisSentenceId != prevSentenceId) { // TODO check also for article_id change to accomodate single sentences
 
 						sentence.setWordList(wordList);
 						sentenceList.add(sentence);
 
 						prevSentenceId = thisSentenceId;
-						prevArticleId = thisArticleId;
+						prevArticleId = thisId;
 
 						wordList = new ArrayList<WordToken>();
 						newSentence = true;
@@ -509,12 +634,12 @@ public class MongoDB {
 				BasicDBObject query = null;
 				BasicDBObject fields = null;
 
-				fields = new BasicDBObject("_id", 0).append("article_id", 1).append("date_processed", 1);
+				fields = new BasicDBObject("_id", 0).append("id", 1).append("date_processed", 1);
 				
 				query = new BasicDBObject("sentence_id", 1).append("position", 1);
 
 				cursor = coll.find(query, fields);
-				cursor.sort(new BasicDBObject("article_id", 1));
+				cursor.sort(new BasicDBObject("id", 1));
 
 				String prevPMID = "";
 				BasicDBObject obj = null;
@@ -522,12 +647,12 @@ public class MongoDB {
 				while(cursor.hasNext()) {
 					obj = (BasicDBObject) cursor.next();
 					
-					if(obj.getString("article_id").equalsIgnoreCase(prevPMID)) {
+					if(obj.getString("id").equalsIgnoreCase(prevPMID)) {
 						System.out.println("Delete: " + prevPMID + " / " + obj.getDate("date_processed"));
-						coll.remove(new BasicDBObject().append("article_id", prevPMID).append("date_processed", obj.getDate("date_processed")));
+						coll.remove(new BasicDBObject().append("id", prevPMID).append("date_processed", obj.getDate("date_processed")));
 					}
 					
-					prevPMID = obj.getString("article_id");
+					prevPMID = obj.getString("id");
 				}
 				cursor.close();
 			}
@@ -674,17 +799,38 @@ public class MongoDB {
 		return list;
 	}
 	
+	//db.processed_article_camel_ct.find({article_id: "723E64BC-964B-4D70-8207-442B8CB86738"}).sort({sentence_id: 1, position: 1})
+	public List<String> getDistinctCTIDsByKeyword(List<String> keywords) {
+		List<String> articleIds = null;
+
+		try {
+			if(auth) {
+				DBObject inClause = new BasicDBObject("$in", keywords);
+				DBObject query = new BasicDBObject("token", inClause);
+
+				articleIds = db.getCollection("processed_article_camel_ct").distinct("id", query);
+			}
+
+		} catch(Exception e) {
+			logger.error("getDistinctCTIDsByKeyword(): \n{}", e);
+		}
+		return articleIds;
+	}
+	
+	
 	public String getAnnotatedAsCSV() {
 		String csvOut = "";
 		
 		try {
 			if(auth) {
 				POSTagger tagger = new POSTagger();
+				NounHelper nouns = new NounHelper();
+				PrepositionHelper preps = new PrepositionHelper();
 				DBCollection coll = db.getCollection("processed_article_scott");
 				BasicDBObject query = null;
 				BasicDBObject fields = null;
 
-				query = new BasicDBObject("article_id", "23899605");
+				query = new BasicDBObject("id", "23899605");
 				//query = new BasicDBObject("_id", new ObjectId("5255d10f0de1496494d31689"));
 				fields = new BasicDBObject("_id", 0);
 
@@ -705,22 +851,22 @@ public class MongoDB {
 					int sentenceId = obj.getInt("sentence_id");
 
 					WordToken word = new WordToken(obj.getString("token"), obj.getString("normalized"), obj.getInt("position"));
-					word.setNounPhraseHead(obj.getBoolean("is_noun_phrase_head"));
-					word.setNounPhraseModifier(obj.getBoolean("is_noun_modifier"));
-					word.setPrepPhraseMember(obj.getBoolean("is_prep_phrase_member"));
-					word.setPrepPhraseObject(obj.getBoolean("is_prep_phrase_object"));
+					word.setNounPhraseHead(obj.getBoolean("npHead"));
+					word.setNounPhraseModifier(obj.getBoolean("npMod"));
+					word.setPrepPhraseMember(obj.getBoolean("ppMember"));
+					word.setPrepPhraseObject(obj.getBoolean("ppObj"));
 
 					if(sentenceId != oldSentenceId) {
 						oldSentenceId++;
-						csv.append(obj.get("article_id")).append(",").append(tagger.getNPAnnotatedSentence(null, null, wordList, true)).append(",");
-						csv.append(tagger.getPPAnnotatedSentence(null, null, wordList)).append("\n");
+						csv.append(obj.get("id")).append(",").append(nouns.getNPAnnotatedSentence(null, null, wordList, true)).append(",");
+						csv.append(preps.getPPAnnotatedSentence(null, null, wordList)).append("\n");
 						wordList = new ArrayList<WordToken>();
 					}
 
 					wordList.add(word);
 				}
-				csv.append(obj.get("article_id")).append(",").append(tagger.getNPAnnotatedSentence(null, null, wordList, true)).append(",");
-				csv.append(tagger.getPPAnnotatedSentence(null, null, wordList)).append("\n");
+				csv.append(obj.get("id")).append(",").append(nouns.getNPAnnotatedSentence(null, null, wordList, true)).append(",");
+				csv.append(preps.getPPAnnotatedSentence(null, null, wordList)).append("\n");
 
 				csvOut = csv.toString();
 				//System.out.println(gson.toJson(wordList));

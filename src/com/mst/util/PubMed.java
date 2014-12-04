@@ -441,7 +441,7 @@ public class PubMed {
 				logger.info(article.getPMID());
 				
 				Sentence sentence = new Sentence();
-				sentence.setArticleId(article.getPMID());
+				sentence.setId(article.getPMID());
 				
 				if(article.getFullArticleText() == null) {
 					// concatenate full paragraph from individual <AbstractText> elements

@@ -8,10 +8,11 @@
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/twilio-java-sdk-3.4.4-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/slf4j-api-1.7.7.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/log4j-api-2.0-rc1.jar"/>
-	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/stanford-postagger.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/metamap-api-1.0.0.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/prologbeans-1.0.0.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/mongo-java-driver-2.12.0.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/guava-17.0.jar"/>
+	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/stanford-corenlp-3.4-models.jar"/>
+	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/stanford-corenlp-3.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

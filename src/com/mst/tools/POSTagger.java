@@ -5,62 +5,61 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.mst.model.PrepPhraseToken;
+import com.mst.model.SemanticType;
+import com.mst.model.TokenPosition;
 import com.mst.model.WordToken;
 import com.mst.tools.Tokenizer;
 import com.mst.util.Props;
+import com.mst.util.StanfordNLP;
 import com.mst.util.Utils;
 
-import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+//import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class POSTagger {
 
-	// !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-	private final String PUNC = "!|\"|#|\\$|%|&|'|\\(|\\)|\\*|\\+|,|-|\\.|/|:|;|<|=|>|\\?|@|\\[|\\\\|]|\\^|_|`|\\{|\\||}|~";
-	private final String PUNC_ALLOW_PARENS = "!|\"|#|\\$|%|&|'|\\)|\\*|\\+|,|-|\\.|/|:|;|<|=|>|\\?|@|\\[|\\\\|]|\\^|_|`|\\{|\\||}|~";
 	private String MAXENT_PATH = "";
 	private String PYTHON_INPUT_FILE = "";
 	private String CMD = "";
-
+	private int verbCount=0, prepCount=0, nounCount=0;
+	private List<TokenPosition> negation = new ArrayList<TokenPosition>();
+	private boolean beginsWithPreposition = false;
+	
 	//private HashMap<String, String> PennTreebankPOSTagest = new HashMap<String, String>();
 	private ArrayList<WordToken> taggedWordList = null;
 	
-	private MaxentTagger tagger = null;
+	//private MaxentTagger stanfordTagger = null;
+	private boolean useStanford = false;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	public POSTagger() {
-		loadTagset();
-		try {
-			MAXENT_PATH = Props.getProperty("maxent_path");
-			PYTHON_INPUT_FILE = MAXENT_PATH + "pyInput.txt";
-			CMD = "python " + MAXENT_PATH + "POSwrapper_rpc.py";
-			
-		} catch(Exception e) {
-			logger.error("POSTagger(): {}", e);
-		}
+		this(false);
 	}
 
-	public POSTagger(boolean loadStanford) {
-		//loadTagset();
+	public POSTagger(boolean useStanford) {
 		try {
-			MAXENT_PATH = Props.getProperty("maxent_path");
-			PYTHON_INPUT_FILE = MAXENT_PATH + "pyInput.txt";
-			CMD = "python " + MAXENT_PATH + "POSwrapper_rpc.py";
+			init();
 			
-			if(loadStanford) {
-				tagger = new MaxentTagger("/Users/scottdaugherty/Downloads/stanford-postagger-2014-06-16/models/english-left3words-distsim.tagger");
+			if(useStanford) {
+				this.useStanford = useStanford;
+				//stanfordTagger = new MaxentTagger(Props.getProperty("stanford_maxent_path"));
 			}
 			
 		} catch(Exception e) {
 			logger.error("POSTagger(): {}", e);
 		}
+	}
+	
+	private void init() {
+		MAXENT_PATH = Props.getProperty("maxent_path");
+		PYTHON_INPUT_FILE = MAXENT_PATH + "pyInput.txt";
+		CMD = "python " + MAXENT_PATH + "POSwrapper_rpc.py";
 	}
 	
 	public ArrayList<WordToken> identifyPartsOfSpeech(String input) {
@@ -72,63 +71,49 @@ public class POSTagger {
 		return identifyPartsOfSpeechLegacy(wordList);
 	}
 	
-	public boolean identifyPartsOfSpeechStanford(ArrayList<WordToken> wordList) {
-		boolean ret = true;
-		
-		try {
-			//MaxentTagger tagger = new MaxentTagger("/Users/scottdaugherty/Downloads/stanford-postagger-2014-06-16/models/english-bidirectional-distsim.tagger");
-			
-			StringBuilder sb = new StringBuilder();
-			
-			for(WordToken word : wordList) {
-				sb.append(word.getNormalizedForm());
-				sb.append(" ");
-			}
-			
-			String result = tagger.tagTokenizedString(sb.toString());
-			String[] tagged = result.split(" ");
-			
-			for(int i=0; i < wordList.size(); i++) {
-				String[] split = tagged[i].split("_");
-				if(wordList.get(i).getToken().matches(",|(|)"))
-					wordList.get(i).setPOS(wordList.get(i).getToken());
-				else
-					wordList.get(i).setPOS(split[split.length-1]);
-			}
-	
-			taggedWordList = wordList;
-			
-		} catch(Exception e) {
-			ret = false;
-			logger.error("identifyPartsOfSpeechStanford(): {}", e);
-		}
-		
-		return ret;
-	}
-	
 	public boolean identifyPartsOfSpeech(ArrayList<WordToken> wordList) {
 		boolean ret = true;
 		
 		try {
-			StringBuilder sb = new StringBuilder();
-			
-			// build a Python input string
-			for(WordToken word : wordList) {
-				sb.append(word.getNormalizedForm());
-				sb.append("<>");  // attempting to pick a delimiter that will never come across as a word
-			}
-			// write to a file for use as input by the python script
-			writeToFile(sb.toString());
-
-			String pyList = Utils.execCmd(CMD).trim();
-			
-			String[] pyArray = pyList.split("<>");
-			
-			for(int i=0; i < pyArray.length; i++) {
-				wordList.get(i).setPOS(pyArray[i]);
-			}
+			if(useStanford) {
+				StanfordNLP stanford = new StanfordNLP();
+				taggedWordList = stanford.identifyPartsOfSpeech(wordList);
 	
-			taggedWordList = wordList;
+			} else {
+				StringBuilder sb = new StringBuilder();
+				
+				// build a Python input string
+				for(WordToken word : wordList) {
+					sb.append(word.getNormalizedForm());
+					sb.append("<>");  // attempting to pick a delimiter that will never come across as a word
+				}
+				// write to a file for use as input by the python script
+				writeToFile(sb.toString());
+	
+				String pyList = Utils.execCmd(CMD).trim();
+				
+				String[] pyArray = pyList.split("<>");
+				
+				for(int i=0; i < pyArray.length; i++) {
+					wordList.get(i).setPOS(pyArray[i]);
+					if(pyArray[i].startsWith("VB"))
+						verbCount++;
+					else if(pyArray[i].startsWith("NN"))
+						nounCount++;
+					else if(pyArray[i].matches("IN|TO")) {
+						prepCount++;
+						if(i == 0) { // first word of sentence
+							beginsWithPreposition = true;
+						}
+					}
+					
+					if(wordList.get(i).matchesNegation()) {
+						negation.add(new TokenPosition(wordList.get(i).getToken(), i));
+					}
+				}
+		
+				taggedWordList = wordList;
+			}
 			
 		} catch(Exception e) {
 			ret = false;
@@ -137,390 +122,163 @@ public class POSTagger {
 		return ret;
 	}
 
-	public boolean identifyNounPhrases(ArrayList<WordToken> wordList) {
-		boolean ret = true;
-		if(taggedWordList == null) {
-			identifyPartsOfSpeech(wordList);
-		}
-		
-		int headIndex = 0;
-		try {
-			//TODO don't mark as head if surrounded by parens?
-			for(int i=taggedWordList.size()-1; i >= 0; i--) {
-				if(taggedWordList.get(i).getPOS().matches("NN|NNS")) {
-					if(headIndex == 0) {
-						headIndex = i;
-					} else {
-						taggedWordList.get(headIndex).setNounPhraseHead(true);
-						taggedWordList.get(i).setNounPhraseModifier(true);
-					}
-				} else if(taggedWordList.get(i).getPOS().matches("JJ|RB|" + PUNC)) {
-					if(headIndex > 0) {
-						taggedWordList.get(headIndex).setNounPhraseHead(true);
-						taggedWordList.get(i).setNounPhraseModifier(true);
-					}
-				} else {
-					headIndex = 0;
-				}
-			}
-		} catch(Exception e) {
-			ret = false;
-			logger.error("identifyNounPhrases() {}", e);
-		}
-		return ret;
-	}
-	
-	public boolean identifyPrepPhrases(ArrayList<WordToken> wordList) {
-		boolean ret = true;
-		
-		// TODO I suspect that there are some logic problems with this code (identifying OBJ, etc)
-		List<String> defaultPrepositionList = Arrays.asList("after","although","among","as","at","before","between","by","during",
-															"for","from","in","of","on","over","per","than","that","to","while",
-															"with","within","without");
-		if(taggedWordList == null) {
-			identifyPartsOfSpeech(wordList);
-		}
-		
-		try {
-			
-			List<Integer> comprisingTokenIndex = new ArrayList<Integer>();
-			
-			for(int i=0; i < taggedWordList.size(); i++) {
-				WordToken currentWord = taggedWordList.get(i);
-				
-				if(defaultPrepositionList.contains(currentWord.getToken().toLowerCase())) {
-					// loop through remaining words in the sentence
-					for(int j=i+1; j < taggedWordList.size(); j++) {
-						String nextWord = taggedWordList.get(j).getToken();
-						String nextPOS = taggedWordList.get(j).getPOS(); 
-						
-						if(nextPOS.matches("IN|TO|VB.*")) // break on preposition or verb
-							break;
-						else if(nextWord.equals(";")) // a semicolon always stops the phrase
-							break;
-						else if(nextWord.equals(",")) // a comma stops the phrase
-							// unless it is preceded and followed by an adjective
-							if(!(taggedWordList.get(j-1).getPOS().equals("JJ") && taggedWordList.get(j+1).getPOS().equals("JJ")))
-								break;
-						
-						// no breaks; add index of current word to list of comprising tokens
-						comprisingTokenIndex.add(j);
-						
-						// stop on a noun unless the following token is NOT a coordinating conjunction or other noun
-						// size() check to avoid OutOfBounds exception
-						if(nextPOS.matches("NN|NNS") && j < taggedWordList.size()-1 &&
-						    !taggedWordList.get(j+1).getPOS().matches("CC|NN|NNS"))
-							break;		
-					}
-	
-					if(comprisingTokenIndex.size() > 0) {
-						// prepend initial matched preposition
-						comprisingTokenIndex.add(0, i);
-						
-						// loop through list of indexes that make up the prep phrase
-						for(int j=0; j < comprisingTokenIndex.size(); j++) {
-							int index = comprisingTokenIndex.get(j);
-													
-							if(j == comprisingTokenIndex.size()-1) { // last item in list
-								do {
-									taggedWordList.get(index).setPrepPhraseObject(true);
-									index--;
-								} while(taggedWordList.get(index).getPOS().matches("CC|,|NN|NNS"));
-								
-							} else {
-								// set as prep phrase member (for grouping with brackets)
-								taggedWordList.get(index).setPrepPhraseMember(true);
-							}
-						}
-						
-						comprisingTokenIndex.clear();
-					}
-				}
-			}
-		} catch(Exception e) {
-			ret = false;
-			logger.error("identifyPrepPhrases(): {}", e);
-		}
-		
-		return ret;
-	}
-	
-	public String getNPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> taggedWordList, boolean annotate) {
-		StringBuilder sb = new StringBuilder();
-		boolean showOpenBracket = true;
-		
-		try {
-			// TODO KW comes after HEAD?
-			// TODO assign OBJ to NP-annotated
-			for(int i=0; i < taggedWordList.size(); i++) {
-				if(annotate) {
-					String prefix = "/";
-					
-					if(taggedWordList.get(i).nounPhraseModifier() && showOpenBracket) {
-						sb.append("{");
-						showOpenBracket = false;
-					}
-					
-					sb.append(taggedWordList.get(i).getToken());
-					
-					if(keyword != null && taggedWordList.get(i).getToken().matches(keyword.concat("(.*)"))) {
-						sb.append(prefix).append("KW");
-						prefix = "+";
-					}
-					
-					if(extractionTerm != null && taggedWordList.get(i).getToken().matches(extractionTerm)) {
-						sb.append(prefix).append("EXT");
-						prefix = "+";
-					}
-					
-					if(taggedWordList.get(i).nounPhraseHead()) {
-						sb.append(prefix).append("HEAD}");
-						showOpenBracket = true;
-					}
-				} else {
-					// pass annotate == false to return the sentence with no markup
-					sb.append(taggedWordList.get(i).getToken());
-				}
-				
-				if(i < taggedWordList.size()-1 
-						&& !taggedWordList.get(i+1).getToken().matches(PUNC_ALLOW_PARENS)
-						&& !taggedWordList.get(i).getToken().matches("\\("))
-					sb.append(" ");
-			}
-		} catch(Exception e) {
-			logger.error("getNPAnnotatedSentence(): {}", e);
-			sb.append("*** Unable to build NP-annotated sentence. See error log for details. ***");
-		}
-		
-		return sb.toString();
-	}
-	
-	public String getNPAnnotatedSentence(String keyword, String extractionTerm, boolean annotate) throws Exception {
-		if(taggedWordList == null) {
-			throw new Exception("Please execute tagSentence() before attempting to getNPAnnotatedSentence().");
-		}
-		
-		return getNPAnnotatedSentence(keyword, extractionTerm, taggedWordList, annotate);
-	}
-	
-	public String[] getPPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> taggedWordList) {
-		StringBuilder markup = new StringBuilder();
-		StringBuilder orig = new StringBuilder();
-		boolean showOpenBracket = true;
-		
-		try {
-			for(int i=0; i < taggedWordList.size(); i++) {
-				String prefix = "/";
-				
-				orig.append(taggedWordList.get(i).getToken());
-				
-				if(taggedWordList.get(i).isPrepPhraseMember() && showOpenBracket){
-					markup.append("[");
-					showOpenBracket = false;
-				}
-				markup.append(taggedWordList.get(i).getToken());
-				
-				if(keyword != null && taggedWordList.get(i).getToken().matches(keyword.concat("(.*)"))) {
-					markup.append(prefix).append("KW");
-					prefix = "+";
-				}
-				
-				if(extractionTerm != null && taggedWordList.get(i).getToken().matches(extractionTerm)) {
-					markup.append(prefix).append("EXT");
-					prefix = "+";
-				}
-				
-				if(taggedWordList.get(i).isPrepPhraseObject()) {
-					markup.append(prefix).append("OBJ");
-					if(!taggedWordList.get(i).isPrepPhraseMember()) {
-						markup.append("]");
-						showOpenBracket = true;
-					}
-				}
-				if(i < taggedWordList.size()-1 && !taggedWordList.get(i+1).getToken().matches(PUNC)) {
-					markup.append(" ");
-					orig.append(" ");
-				}
-			}
-		} catch(Exception e) {
-			logger.error("getPPAnnotatedSentence(): {}", e);
-			markup.append("*** Unable to build PP-annotated sentence. See error log for details. ***");
-		}
-
-		String[] ret = { markup.toString(), orig.toString() }; 
-		
-		return ret;
-	}
-	
-	public String[] getPPAnnotatedSentence(String keyword, String extractionTerm) throws Exception {
-		if(taggedWordList == null) {
-			throw new Exception("Please execute tagSentence() before attempting to getPPAnnotatedSentence().");
-		}
-		
-		return getPPAnnotatedSentence(keyword, extractionTerm, taggedWordList);
-	}
-	
-	// Attempt to mimic Eric's output for prep phrase identification. Not used by the camel processes.
-	/*
-	Homebrew prepositional phrase identifier.  Should be superseded by an effective chunker or constituency parser.
-
-	Algorithm:
-	1) Identify prepositions in a sentence.  This can be done either from a list of prepositions passed to the __init__ method,
-	    or by identifying every word token tagged as IN or TO (if preposition_list == None).
-	2) Start a phrase which currently contains only the preposition.
-	3) For each token succeeding the preposition:
-	   a) If the token is a verb, stop and return the phrase, excluding the verb.
-	   b) If the token is a preposition, stop and return the phrase, excluding the preposition.
-	   c) If the token is a comma or semicolon, stop and return the phrase, excluding the token, UNLESS it is a comma and both
-	       the token immediately before and after are adjectives.
-	   d) If the token is a noun, stop and return the phrase INCLUDING the noun,
-	   e) UNLESS the token after the noun is another noun or a coordinating conjunction, in which case include the noun or conjunction
-	       and continue the phrase.
-	4) Identify the token preceding the prepositional phrase and attach it to the returned annotation - some consumers are only
-	    interested in phrases which follow e.g. a noun or adverb.
-	*/
-	public List<PrepPhraseToken> identifyPrepPhrasesLegacy(ArrayList<WordToken> wordList) {
-		// TODO I suspect that there are some logic problems with this code (identifying OBJ, etc)
-		// Camel doesn't at this point care about the PrePhraseToken list, only the boolean tags added to taggedWordList
-		List<PrepPhraseToken> prepPhraseTokens = new ArrayList<PrepPhraseToken>();
-		
-		List<String> defaultPrepositionList = Arrays.asList("after","although","among","as","at","before","between","by","during",
-															"for","from","in","of","on","over","per","than","that","to","while",
-															"with","within","without");
-		if(taggedWordList == null) {
-			identifyPartsOfSpeech(wordList);
-		}
-		
-		List<Integer> comprisingTokenIndex = new ArrayList<Integer>();
-		
-		for(int i=0; i < taggedWordList.size(); i++) {
-			WordToken currentWord = taggedWordList.get(i);
-			
-			if(defaultPrepositionList.contains(currentWord.getToken().toLowerCase())) {
-				// loop through remaining words in the sentence
-				for(int j=i+1; j < taggedWordList.size(); j++) {
-					String nextWord = taggedWordList.get(j).getToken();
-					String nextPOS = taggedWordList.get(j).getPOS(); 
-					
-					// break on preposition or verb
-					if(nextPOS.matches("IN|TO|VB.*"))
-						break;
-					// a semicolon always stops the phrase
-					else if(nextWord.equals(";"))
-						break;
-					// a comma stops the phrase
-					else if(nextWord.equals(","))
-						// unless it is preceded and followed by an adjective
-						if(!(taggedWordList.get(j-1).getPOS().equals("JJ") && taggedWordList.get(j+1).getPOS().equals("JJ")))
-							break;
-					
-					// no breaks; add index of current word to list of comprising tokens
-					comprisingTokenIndex.add(j);
-					
-					// stop on a noun unless the following token is NOT coordinating conjunction or other noun
-					// size() check to avoid OutOfBounds exception
-					if(nextPOS.matches("NN|NNS") && j < taggedWordList.size()-1 &&
-					    !taggedWordList.get(j+1).getPOS().matches("CC|NN|NNS"))
-						break;		
-				}
-
-				if(comprisingTokenIndex.size() > 0) {
-					List<String> comprisingTokens = new ArrayList<String>();
-					StringBuilder value = new StringBuilder();
-					
-					// prepend initial matched preposition
-					comprisingTokenIndex.add(0, i);
-					
-					// loop through list of indexes that make up the prep phrase
-					for(int j=0; j < comprisingTokenIndex.size(); j++) {
-						int index = comprisingTokenIndex.get(j);
-						
-						value.append(taggedWordList.get(index).getToken()).append(" "); // ex. "from their local environment"
-						comprisingTokens.add(taggedWordList.get(index).getToken() + "/" + taggedWordList.get(index).getPOS()); // ex. ["from/IN", "their/PRP$", "local/JJ", "environment/NN"]
-						
-						if(j == comprisingTokenIndex.size()-1) { // last item in list
-							// tag OBJs of prep phrase if conjunction or comma
-							do {
-								taggedWordList.get(index).setPrepPhraseObject(true);
-								index--;
-							} while(taggedWordList.get(index).getPOS().matches("CC|,"));
-							
-							// if final word is a noun, tag as OBJ
-							// TODO potential issue if more than one OBJ exists after the CC
-							if(taggedWordList.get(index).getPOS().matches("NN|NNS"))
-								taggedWordList.get(index).setPrepPhraseObject(true);
-							
-						} else {
-							// set as prep phrase member (for grouping with brackets)
-							taggedWordList.get(index).setPrepPhraseMember(true);
-						}
-					}
-					
-					//int begin = currentWord.getBegin();
-					//int end = begin + value.length()-1; // account for trailing space
-					// set preceding token if not at beginning of sentence
-					//String precedingToken = i>0 ? taggedWordList.get(i-1).getToken() + "/" + taggedWordList.get(i-1).getPOS() : "";
-					
-					//prepPhraseTokens.add(new PrepPhraseToken(begin, end, currentWord.getToken(), "TODO", value.toString().trim(), precedingToken, comprisingTokens));
-					comprisingTokenIndex.clear();
-				}
-			}
-		}
-		
-//		for(PrepPhraseToken ppt : prepPhraseTokens) {
-//			System.out.println("preposition_token: " + ppt.getToken());
-//			System.out.println("begin: " + ppt.getBegin());
-//			System.out.println("end: " + ppt.getEnd());
-//			System.out.println("preceding_token: " + ppt.getPrecedingToken());
-//			System.out.println("value: " + ppt.getValue());
-//			String cts = "";
-//			for(String ct : ppt.getComprisingTokens()) {
-//				cts += " " + ct;
-//			}
-//			System.out.println("comprising tokens: " + cts.trim() + "\n");
-//		}
-		
-		return prepPhraseTokens;
-	}
-	
 	public ArrayList<WordToken> getTaggedWordList() {
 		return taggedWordList;
 	}
 	
-	public ArrayList<WordToken> identifyNounPhrasesLegacy(ArrayList<WordToken> wordList) {
-
-		if(taggedWordList == null) {
-			identifyPartsOfSpeech(wordList);
-		}
-		
-		int headIndex = 0;
-		try {
-			//TODO don't mark as head if surrounded by parens?
-			for(int i=taggedWordList.size()-1; i >= 0; i--) {
-				if(taggedWordList.get(i).getPOS().matches("NN|NNS")) {
-					if(headIndex == 0) {
-						headIndex = i;
-					} else {
-						taggedWordList.get(headIndex).setNounPhraseHead(true);
-						taggedWordList.get(i).setNounPhraseModifier(true);
-					}
-				} else if(taggedWordList.get(i).getPOS().matches("JJ|RB|" + PUNC)) {
-					if(headIndex > 0) {
-						taggedWordList.get(headIndex).setNounPhraseHead(true);
-						taggedWordList.get(i).setNounPhraseModifier(true);
-					}
-				} else {
-					headIndex = 0;
-				}
-			}
-		} catch(Exception e) {
-			System.out.println("Error in identifyNounPhrases(): " + e.toString());
-			Gson gson = new Gson();
-			System.out.println(gson.toJson(wordList));
-		}
-		return taggedWordList;
+	public int getVerbCount() {
+		return verbCount;
 	}
 	
+	public int getPrepCount() {
+		return prepCount;
+	}
+		
+	public int getNounCount() {
+		return nounCount;
+	}
+		
+	public boolean beginsWithPreposition() {
+		return beginsWithPreposition;
+	}
+	
+	public List<TokenPosition> getNegation() {
+		return this.negation;
+	}
+	
+	// TODO this doesn't belong here
+	public String getAnnotatedMarkup(ArrayList<WordToken> wordList) {
+		StringBuilder sb = new StringBuilder();
+		ArrayList<String> markup = new ArrayList<String>();
+
+		//boolean insideVOB = false;
+		boolean ppBegin = true;
+		boolean npBegin = true;
+		boolean tokenAdded = false;
+
+		String vobOpen = "<vob>", vobClose = "</vob>";
+		String lverbSpan = "<lv>";
+		String prepSpan = "<pp>";
+		String nounSpan = "<np>";
+		String stSpan = "<st><sup>";
+		String posSpan = "<pos>/";
+
+		for(WordToken word : wordList) {
+			try {
+				String token = word.isPunctuation() ? word.getToken() : word.getToken() + posSpan + word.getPOS() + "</pos>";;
+				
+				String st = "";
+				for(SemanticType x : word.getSemanticTypeList()) {
+					// additional check to avoid returning extraneous semantic types, e.g. "right" returning 'bpoc' for the phrase "right kidney"
+					// see MetaMapWrapper.findAllWordTokenIndices()
+					if(x.getToken().equalsIgnoreCase(word.getToken()))
+						st += "," + x.getSemanticType();
+				}
+				
+				if(st != "")
+					token += stSpan + st.substring(1) + "</sup></st>";
+				
+				// VERBS OF BEING *********************
+				if(word.isVerbOfBeingSubject()) {
+					markup.add(token + vobOpen + "/SUBJ" + vobClose);
+					tokenAdded = true;
+				} else if(word.isVerbOfBeing()) {
+					markup.add(vobOpen + "[" + vobClose + token + vobOpen + "]" + vobClose);
+					//markup.add(vobSpan + token + "</vob>");
+					//insideVOB = true;
+					tokenAdded = true;
+				}// else if(!word.isVerbOfBeingMember && insideVOB) {
+				//	String temp = markup.get(markup.size() - 1);
+				//	markup.set(markup.size() - 1, temp + vobSpan + "]</vob>");
+				//	insideVOB = false;
+				//}
+				
+				if(word.isVerbOfBeingSubjectComplement()) {
+					markup.add(tokenAdded ? vobOpen + "/SUBJC" + vobClose : token + vobOpen + "/SUBJC" + vobClose);
+					tokenAdded = true;
+				}
+				
+				// LINKING VERBS *********************
+				if(word.isLinkingVerbSubject()) {
+					markup.add(tokenAdded ? lverbSpan + "/SUBJ</lv>" : token + lverbSpan + "/SUBJ</lv>");
+					tokenAdded = true;
+				} else if(word.isLinkingVerb()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, lverbSpan + "[</lv>" + temp + lverbSpan + "]</lv>" + temp);
+					} else {
+						markup.add(lverbSpan + "[</lv>" + token + lverbSpan + "]</lv>");
+						tokenAdded = true;
+					}
+				} else if(word.isLinkingVerbSubjectComplement()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, temp + lverbSpan + "/SUBJC</lv>");
+					} else {
+						markup.add(token + lverbSpan + "/SUBJC]</lv>");
+						tokenAdded = true;
+					}
+					//insideVOB = false;
+				}
+				
+				// PREP PHRASES *********************
+				if(word.isPrepPhraseMember()) {
+					if(word.isPrepPhraseObject()) {
+						markup.add(tokenAdded ? prepSpan + "/OBJ</pp>" : token + prepSpan + "/OBJ</pp>");
+						tokenAdded = true;
+					} else {
+						if(ppBegin) {
+							if(tokenAdded) {
+								String temp = markup.get(markup.size() - 1);
+								markup.set(markup.size() - 1, prepSpan + "[</pp>" + temp);
+							} else {
+								markup.add(prepSpan + "[</pp>" + token);
+								tokenAdded = true;
+							}
+							ppBegin = false;
+						}
+					}
+				} else if(word.isPrepPhraseObject()) {
+					markup.add(tokenAdded ? prepSpan + "/OBJ]</pp>" : token + prepSpan + "/OBJ]</pp>");
+					tokenAdded = true;
+					ppBegin = true;
+				}
+	
+				// NOUN PHRASES  *********************
+				if(word.isNounPhraseModifier()) {
+					if(npBegin) {
+						if(tokenAdded) {
+							String temp = markup.get(markup.size() - 1);
+							markup.set(markup.size() - 1, nounSpan + "[</np>"	+ temp);
+						} else {
+							markup.add(nounSpan + "[</np>" + token);
+							tokenAdded = true;
+						}
+						npBegin = false;
+					}
+				} else if(word.isNounPhraseHead()) {
+					markup.add(tokenAdded ? nounSpan + "/HEAD]</np>" : token + nounSpan + "/HEAD]</np>");
+					npBegin = true;
+					tokenAdded = true;
+				}
+	
+				if(!tokenAdded) {
+					markup.add(token);
+				}
+				tokenAdded = false;
+				
+			} catch(Exception e) {
+				logger.error("getAnnotatedMarkup(): {}", e);
+			}
+		}
+		
+		for(String item : markup) {
+			sb.append(item).append(" ");
+		}
+		
+		return sb.toString();
+	}
+ 	
 	// Attempt to mimic Eric's output for prep phrase identification. Not used by the camel processes.
 	public ArrayList<WordToken> identifyPartsOfSpeechLegacy(ArrayList<WordToken> wordList) {
 		StringBuilder sb = new StringBuilder();

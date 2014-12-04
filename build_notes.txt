@@ -1,0 +1,8 @@
+MST-Tools Export
+
+Java/JAR file
+Uncheck all, expand MST-Tools, check all src
+Export destination: MST-Tools/mst-tools-1.0.0.jar
+Use existing manifest form workspace: /MST-Tools/MANIFEST.MF
+
+

@@ -3,7 +3,7 @@ Class-Path: /home/mst/scott/classes/activemq-all-5.9.0.jar
   /home/mst/scott/classes/gson-2.2.4.jar
   /home/mst/scott/classes/metamap-api-1.0.0.jar
   /home/mst/scott/classes/mongo-java-driver-2.12.0.jar
-  /home/mst/scott/classes/postgresql-9.3-1101.jdbc4.jar  
+  /home/mst/scott/classes/postgresql-9.3-1101.jdbc4.jar
   /home/mst/scott/classes/prologbeans-1.0.0.jar
   /home/mst/scott/classes/twilio-java-sdk-3.4.4-jar-with-dependencies.jar
   /home/mst/scott/classes/guava-17.0.jar
