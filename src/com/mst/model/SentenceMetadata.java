@@ -1,46 +1,65 @@
 package com.mst.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+// The purpose for metadata, in general, is to ease downstream processing when creating the structured output (JSON that represents Ontology/Snomed mapping).
+// The idea is to choose different processing paths based on features of the sentence, such as (really bad example)...
+//   "Does the sentence start with a preposition and contain more than one verb?" 
 
 public class SentenceMetadata {
-	private int nounPhraseCount;
-	private int prepPhraseCount;
-	private List<TokenPosition> nounPhrases;
-	private List<TokenPosition> prepPhrases;
-	private List<TokenPosition> nounPhraseInPrepPhrase;
-	private List<TokenPosition> infVerbFollowsPrepPhrase;
-	private List<TokenPosition> prepPhraseModifiesSUBJ;
-	private boolean beginsWithPreposition;
-	private List<TokenPosition> negationList;
-	private List<VerbPhraseMetadata> verbMetadata;// = new List<VerbMetadata>(); 
-	private List<TokenPosition> compoundVerbPhrases;
+	// simple - aggregate data related to the sentence as a whole
+	// more simple metadata values could be added if a decision is made that storing here is preferable to computing later
+	// ex1. boolean nounPhrasePresent vs. nounPhrases.size() > 1
+	// ex2. boolean nounPhraseInPrepPhrase vs. for(NounPhraseMetadata npm : nounPhrases) { if(npm.isHeadEqPPObj()) return true; }
+	//private boolean beginsWithPrep;
+	private Map<String, Object> simple = new HashMap<String, Object>();
 	
-	public boolean containsPrepPhrase() {
-		return prepPhraseCount > 0;
-	}
-	
-	public boolean containsNounPhrase() {
-		return nounPhraseCount > 0;
-	}
+	// complex - inter and intra phrase-level data that is more involved than a simple count or boolean 
+	private List<VerbPhraseMetadata> verbPhrases = new ArrayList<VerbPhraseMetadata>(); 
+	private List<NounPhraseMetadata> nounPhrases = new ArrayList<NounPhraseMetadata>();
+	private List<PrepPhraseMetadata> prepPhrases = new ArrayList<PrepPhraseMetadata>();
 		
-	public boolean addNounPhraseInPrepPhrase(TokenPosition val) { return nounPhraseInPrepPhrase.add(val); }
-	public boolean isNounPhraseInPrepPhrase() {	return !nounPhraseInPrepPhrase.isEmpty(); }
 	
-	public boolean addInfVerbFollowsPrepPhrase(TokenPosition val) { return infVerbFollowsPrepPhrase.add(val); }
-	public boolean infVerbFollowsPrepPhrase() {	return !infVerbFollowsPrepPhrase.isEmpty(); }
+	public boolean addVerbMetadata(VerbPhraseMetadata val) { return verbPhrases.add(val); }
+	public List<VerbPhraseMetadata> getVerbMetadata() { return verbPhrases; }
 	
-	public boolean addVerbMetadata(VerbPhraseMetadata val) { return verbMetadata.add(val); }
-	public List<VerbPhraseMetadata> getVerbMetadata() { return verbMetadata; }
+	public boolean addNounMetadata(NounPhraseMetadata val) { return nounPhrases.add(val); }
+	public List<NounPhraseMetadata> getNounMetadata() { return nounPhrases; }
 	
-	public void setCompoundVerbPhrases(List<TokenPosition> val) { compoundVerbPhrases = val; }
-	public List<TokenPosition> getCompoundVerbPhrases() { return compoundVerbPhrases; }
+	public boolean addPrepMetadata(PrepPhraseMetadata val) { return prepPhrases.add(val); }
+	public List<PrepPhraseMetadata> getPrepMetadata() { return prepPhrases; }
 	
-	public boolean addPrepPhraseModifiesSUBJ(TokenPosition val) { return prepPhraseModifiesSUBJ.add(val); }
-	public boolean prepPhraseModifiesSUBJ() { return !prepPhraseModifiesSUBJ.isEmpty(); }
+	//public void setBeginsWithPreposition(boolean val) { beginsWithPrep = val; };
+	//public boolean beginsWithPreposition() { return beginsWithPrep; };
+
+	public Map<String, Object> getSimpleMetadata() {
+		return this.simple;
+	}
 	
-	public void setBeginsWithPreposition(boolean val) { beginsWithPreposition = val; };
-	public boolean beginsWithPreposition() { return beginsWithPreposition; };
+	public Object getSimpleMetadataValue(String key) {
+		return this.simple.get(key);
+	}
 	
-	public void setNegationList(List<TokenPosition> val) { negationList = val; };
-	public boolean hasNegation() { return !negationList.isEmpty(); };
+	public boolean addSimpleMetadataValue(String key, Object value) {
+		boolean ret = true;
+		try {
+			simple.put(key, value);
+		} catch(Exception e) {
+			ret = false;
+		}
+		return ret;
+	}
+	
+	public boolean removeSimpleMetadataValue(String key) {
+		boolean ret = true;
+		try {
+			simple.remove(key);
+		} catch(Exception e) {
+			ret = false;
+		}
+		return ret;
+	}
 }

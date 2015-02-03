@@ -4,6 +4,8 @@ public class GenericToken {
 	private String token;
 	private int position; // position of the sentence/word within the paragraph/sentence
 	
+	public GenericToken() {	}
+	
 	public GenericToken(String token, int position) {
 		this.setToken(token);
 		this.setPosition(position);

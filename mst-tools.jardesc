@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="MST-Tools/mst-tools-1.0.0.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/MST-Tools/mst-tools.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/MST-Tools/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="true" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.ontology"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.sql"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.util"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.extract"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.tools"/>
+    </selectedElements>
+</jardesc>

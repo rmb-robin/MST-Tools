@@ -3,13 +3,14 @@ package com.mst.model;
 import java.util.ArrayList;
 
 import com.mst.util.Constants;
+import com.mst.util.Constants.DependentPhraseClass;
 
 public class WordToken extends GenericToken {
 		
 	// the intent of the abbreviated member var names is to cut down on extraneous bytes in the JSON that gets
 	// passed around all over the place in the camel processes
 	
-	private String pos = null;  // part of speech
+	private String pos = "";  // part of speech
 	private String normalizedForm = null;
 	private ArrayList<SemanticType> semanticTypeList = new ArrayList<SemanticType>();
 	private boolean npHead; // noun phrase head
@@ -19,7 +20,7 @@ public class WordToken extends GenericToken {
 	private boolean infHead; // infinitive verb head
 	private boolean inf; // infinitive verb
 	private boolean vob; // verb of being head
-	private boolean vobM; // verb of being member (will possibly deprecate)
+	//private boolean vobM; // verb of being member (will possibly deprecate)
 	private boolean vobSubj; // verb of being subject
 	private boolean vobSubjC; // verb of being subject complement (aka Object)
 	private boolean lvSubj; // linking verb subject
@@ -29,9 +30,17 @@ public class WordToken extends GenericToken {
 	private boolean avSubj; // action verb subject
 	private boolean avObj; // action verb object
 	private boolean prepVerb; // prepositional verb
-	private boolean modAuxVerb;
+	private boolean modAuxVerb; // modal auxiliary
 	private boolean modAuxTerm;
-	private ArrayList<Integer> relations = new ArrayList<Integer>();
+	private DependentPhraseClass dpHead; // dependent phrase head
+	private boolean dpMember; // dependent phrase member
+	private boolean coref; // co-reference
+	private boolean conjAdv; // conjunctive adverb 
+	//private ArrayList<Integer> relations = new ArrayList<Integer>();
+	
+	public WordToken() {
+		super();
+	}
 	
 	public WordToken(String word, String normalizedForm, int position) {
 		super(word, position);
@@ -78,7 +87,7 @@ public class WordToken extends GenericToken {
 		return this.pos.equalsIgnoreCase("CC");
 	}
 	
-	public boolean matchesNegation() {	
+	public boolean isNegationToken() {	
 		return this.getToken().matches(Constants.NEGATION);
 	}
 	
@@ -94,6 +103,22 @@ public class WordToken extends GenericToken {
 		this.modAuxVerb = val;
 	}
 
+	public boolean isCorefernece() {
+		return coref;
+	}
+
+	public void setCoreference(boolean val) {
+		this.coref = val;
+	}
+	
+	public boolean isConjunctiveAdverb() {
+		return conjAdv;
+	}
+
+	public void setConjunctiveAdverb(boolean val) {
+		this.conjAdv = val;
+	}
+	
 	public boolean isModalAuxTerm() {
 		return modAuxTerm;
 	}
@@ -102,15 +127,15 @@ public class WordToken extends GenericToken {
 		this.modAuxTerm = val;
 	}
 	
-	public boolean addRelation(int relationIndex) {
-		return relations.add(relationIndex);
-	}
+//	public boolean addRelation(int relationIndex) {
+//		return relations.add(relationIndex);
+//	}
 	
-	public boolean isInfinitive() {
+	public boolean isInfinitiveVerb() {
 		return inf;
 	}
 
-	public void setInfinitive(boolean val) {
+	public void setInfinitiveVerb(boolean val) {
 		this.inf = val;
 	}
 
@@ -130,9 +155,9 @@ public class WordToken extends GenericToken {
 		this.vob = val;
 	}
 
-	public void setVerbOfBeingMember(boolean val) {
-		this.vobM = val;
-	}
+//	public void setVerbOfBeingMember(boolean val) {
+//		this.vobM = val;
+//	}
 	
 	public boolean isVerbOfBeingSubject() {
 		return vobSubj;
@@ -198,9 +223,9 @@ public class WordToken extends GenericToken {
 		this.avObj = val;
 	}
 	
-	public ArrayList<Integer> getRelations() {
-		return relations;
-	}
+//	public ArrayList<Integer> getRelations() {
+//		return relations;
+//	}
 	
 	public boolean containsSemanticType(String search) {
 		boolean ret = false;
@@ -218,8 +243,16 @@ public class WordToken extends GenericToken {
 		return this.getToken().matches(Constants.PUNC);
 	}
 	
-	public boolean isTokenVerbOfBeing() {
+	public boolean matchesVerbOfBeingConstant() {
 		return this.getToken().matches(Constants.VERBS_OF_BEING);
+	}
+	
+	public boolean matchesPrepositionConstant() {
+		return this.getToken().matches(Constants.PREPOSITIONS);
+	}
+	
+	public boolean matchesConjunctiveAdverbConstant() {
+		return this.getToken().matches(Constants.CONJUNCTIVE_ADVERBS);
 	}
 	
 	public String getPOS() {
@@ -244,6 +277,14 @@ public class WordToken extends GenericToken {
 	
 	public boolean isNounPhraseHead() {
 		return npHead;
+	}
+	
+	public void setDependentPhraseHead(DependentPhraseClass val) {
+		this.dpHead = val;
+	}
+	
+	public DependentPhraseClass getDependentPhraseHead() {
+		return dpHead;
 	}
 	
 	public void setInfinitiveHead(boolean val) {

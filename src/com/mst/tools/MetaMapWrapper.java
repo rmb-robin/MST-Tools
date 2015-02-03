@@ -33,6 +33,7 @@ public class MetaMapWrapper {
 		String host = "";
         try {
             host = Props.getProperty("metamap_api_host");
+            //host = "10.12.128.100";
             if(host == null || host.equalsIgnoreCase("localhost"))
                 api = new MetaMapApiImpl();
             else
@@ -150,7 +151,7 @@ public class MetaMapWrapper {
 				    				int end = pos.get(pos.size() - 1).getX() + pos.get(pos.size() - 1).getY();
 			
 				    				token = sentence.getFullSentence().substring(begin, end);
-System.out.println(token);
+
 				    				if(!preferredNamesToExclude.contains(ev.getPreferredName()) && !tokensToExclude.contains(token)) {
 				    					//metaMapList.add(new MetaMapToken(token, ev.getConceptId(), ev.getConceptName(), ev.getPreferredName(), ev.getSemanticTypes(), ev.getSources()));
 				    					// loop through all instances of token in wordList

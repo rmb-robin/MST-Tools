@@ -259,7 +259,7 @@ public class PostgreSQL {
         }
         
         if(metamapList.size() > 0) {
-	    	sentence.setMetaMapList(metamapList);
+	    	//sentence.setMetaMapList(metamapList);
 	    	
 	    	//if(writeToDB) {
 				//MongoDB mongo = new MongoDB();
@@ -336,7 +336,7 @@ public class PostgreSQL {
         }
         
         if(metamapList.size() > 0) {
-	    	sentence.setMetaMapList(metamapList);
+	    	//sentence.setMetaMapList(metamapList);
 	    	
 	    	if(writeToDB) {
 				//MongoDB mongo = new MongoDB();

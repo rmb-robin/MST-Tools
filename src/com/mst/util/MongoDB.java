@@ -18,19 +18,16 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
-import com.mongodb.WriteResult;
 import com.mongodb.util.JSON;
-import com.mst.model.MetaMapToken;
 import com.mst.model.PubMedArticleList;
 import com.mst.model.SemanticType;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
 import com.mst.model.ontology.SemanticObject;
-import com.mst.model.ontology.SemanticObject.Rule;
 import com.mst.tools.NounHelper;
 import com.mst.tools.POSTagger;
 import com.mst.tools.PrepositionHelper;
-import com.sun.tools.javac.code.Source;
+//import com.sun.tools.javac.code.Source;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +47,7 @@ public class MongoDB {
 			
 			db = mongoClient.getDB(Props.getProperty("mongo_db"));
 			auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
-			
+			//auth = true;
 			gson = new Gson();
 			
 			// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
@@ -121,7 +118,7 @@ public class MongoDB {
 				                	doc.append("ppObj", word.isPrepPhraseObject());
 				                if(word.isInfinitiveHead())
 				                	doc.append("infHead", true);
-				                if(word.isInfinitive())
+				                if(word.isInfinitiveVerb())
 				                	doc.append("inf", true);
 				                if(word.isVerbOfBeing())
 				                	doc.append("vob", true);
@@ -160,6 +157,25 @@ public class MongoDB {
 				//}
 			} catch(Exception e) {
 				logger.error("insertTaggedSentence(): \n{}\n{}", json, e);
+				e.printStackTrace();
+			}
+		}
+		return "";
+	}
+	
+	public String insertTaggedSentenceFull(Sentence sentence) {
+		if(auth) {
+			Gson gson = GsonFactory.build();
+			
+			try {
+				Constants.Source source = Constants.Source.valueOf(sentence.getSource());
+				DBCollection coll = db.getCollection(source.getMongoCollection());
+				
+				DBObject dbObject = (DBObject) JSON.parse(gson.toJson(sentence));
+      			coll.save(dbObject);
+      			
+			} catch(Exception e) {
+				logger.error("insertTaggedSentenceFull(): \n{}", e);
 				e.printStackTrace();
 			}
 		}
@@ -220,27 +236,27 @@ public class MongoDB {
 	}
 	
 	public String insertMetaMapData(String json) {
-		if(auth) {
-			try {
-				Sentence sentence = gson.fromJson(json, Sentence.class);
-				DBCollection coll = db.getCollection("processed_article_camel_metamap");
-				
-				for(MetaMapToken meta : sentence.getMetaMapList()) {
-					BasicDBObject doc = new BasicDBObject("id", sentence.getId()).
-			                append("sentence_id", sentence.getPosition()).
-			                append("value", meta.getValue()).
-			                append("concept_id", meta.getConceptID()).
-			                append("concept_id", meta.getConceptName()).
-			                append("preferred_name", meta.getPreferredName()).
-							append("semantic_types", meta.getSemanticTypes()).
-							append("sources", meta.getSources());
-					
-					coll.insert(doc);
-				}
-			} catch(Exception e) {
-				logger.error("insertMetaMapData(): \n{}\n{}", json, e);
-			}
-		}
+//		if(auth) {
+//			try {
+//				Sentence sentence = gson.fromJson(json, Sentence.class);
+//				DBCollection coll = db.getCollection("processed_article_camel_metamap");
+//				
+//				for(MetaMapToken meta : sentence.getMetaMapList()) {
+//					BasicDBObject doc = new BasicDBObject("id", sentence.getId()).
+//			                append("sentence_id", sentence.getPosition()).
+//			                append("value", meta.getValue()).
+//			                append("concept_id", meta.getConceptID()).
+//			                append("concept_id", meta.getConceptName()).
+//			                append("preferred_name", meta.getPreferredName()).
+//							append("semantic_types", meta.getSemanticTypes()).
+//							append("sources", meta.getSources());
+//					
+//					coll.insert(doc);
+//				}
+//			} catch(Exception e) {
+//				logger.error("insertMetaMapData(): \n{}\n{}", json, e);
+//			}
+//		}
 		return "";
 	}
 	
@@ -411,6 +427,35 @@ public class MongoDB {
 			e.printStackTrace();
 		}
 		return ret;
+	}
+	
+	public ArrayList<Sentence> getAnnotatedSentencesTest() {
+		ArrayList<Sentence> sentenceList = new ArrayList<Sentence>();
+	
+		try {
+			if(auth) {
+				DBCollection coll = db.getCollection("processed_imaging");
+				
+				DBCursor cursor = null;
+				BasicDBObject query = null;
+				BasicDBObject fields = null;
+				
+				fields = new BasicDBObject("_id", 0); // don't return ObjectId
+				query = new BasicDBObject("position", 0);
+				cursor = coll.find(query, fields);
+				
+				while(cursor.hasNext()) {
+					BasicDBObject obj = (BasicDBObject) cursor.next();
+					//System.out.println(obj.toString());
+					Sentence s = gson.fromJson(obj.toString(), Sentence.class);
+					sentenceList.add(s);
+				}
+				
+			}
+		} catch(Exception e) {
+			logger.error("getAnnotatedSentencesFull(): \n{}", e);
+		}
+		return sentenceList;
 	}
 	
 	public ArrayList<Sentence> getAnnotatedSentencesChunk(ArrayList<String> articleIds, int chunkSize) {
@@ -677,16 +722,50 @@ public class MongoDB {
 		return list;
 	}
 	
-	public ArrayList<PubMedArticleList> getPubMedAuditByObjectId(List<String> objectIdsIn) {
+	public ArrayList<Sentence> getSentencesByObjectId(String collection, List<String> objectIds) {
+		ArrayList<Sentence> sentences = new ArrayList<Sentence>();
+		Gson gson = GsonFactory.build();
+		try {
+			if(auth) {
+				BasicDBList idList = new BasicDBList();
+				for(String id : objectIds) {
+					idList.add(new ObjectId(id));
+				}
+				DBObject inClause = new BasicDBObject("$in", idList);
+				DBObject query = new BasicDBObject("_id", inClause);
+
+				DBCursor cursor = db.getCollection(collection).find(query);
+				
+				while(cursor.hasNext()) {
+					BasicDBObject obj = (BasicDBObject) cursor.next();
+					Sentence s = gson.fromJson(obj.toString(), Sentence.class);
+					sentences.add(s);
+				}
+				
+				cursor.close();
+				
+//				DBObject result = db.getCollection(collection).findOne(new ObjectId(objectIds.get(0)));
+//				Sentence s = gson.fromJson(result.toString(), Sentence.class);
+//				sentences.add(s);
+			}
+
+		} catch(Exception e) {
+			logger.error("getSentencesByObjectId(): \n{}", e);
+			e.printStackTrace();
+		}
+		return sentences;
+	}
+	
+	public ArrayList<PubMedArticleList> getPubMedAuditByObjectId(List<String> objectIds) {
 		ArrayList<PubMedArticleList> list = new ArrayList<PubMedArticleList>();
 
 		try {
 			if(auth) {
-				BasicDBList objectIds = new BasicDBList();
-				for(String id : objectIdsIn) {
-					objectIds.add(new ObjectId(id));
+				BasicDBList idList = new BasicDBList();
+				for(String id : objectIds) {
+					idList.add(new ObjectId(id));
 				}
-				DBObject inClause = new BasicDBObject("$in", objectIds);
+				DBObject inClause = new BasicDBObject("$in", idList);
 				DBObject query = new BasicDBObject("_id", inClause);
 				//BasicDBObject query = new BasicDBObject("_id", new ObjectId(objectId));
 				DBCursor cursor = db.getCollection("processed_article_camel_pubmed_audit").find(query);
@@ -880,4 +959,6 @@ public class MongoDB {
 
 		return csvOut;
 	}
+
+	
 }

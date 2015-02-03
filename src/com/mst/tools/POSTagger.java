@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mst.model.SemanticType;
+import com.mst.model.Sentence;
 import com.mst.model.TokenPosition;
 import com.mst.model.WordToken;
 import com.mst.tools.Tokenizer;
@@ -16,6 +17,7 @@ import com.mst.util.StanfordNLP;
 import com.mst.util.Utils;
 
 //import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
 
 
 
@@ -29,7 +31,7 @@ public class POSTagger {
 	private String CMD = "";
 	private int verbCount=0, prepCount=0, nounCount=0;
 	private List<TokenPosition> negation = new ArrayList<TokenPosition>();
-	private boolean beginsWithPreposition = false;
+	//private boolean beginsWithPreposition = false;
 	
 	//private HashMap<String, String> PennTreebankPOSTagest = new HashMap<String, String>();
 	private ArrayList<WordToken> taggedWordList = null;
@@ -71,6 +73,46 @@ public class POSTagger {
 		return identifyPartsOfSpeechLegacy(wordList);
 	}
 	
+	public boolean identifyPartsOfSpeech(Sentence sentence) {
+		boolean ret = true;
+		
+		try {
+			ArrayList<WordToken> words = sentence.getWordList();
+			
+			if(useStanford) {
+				StanfordNLP stanford = new StanfordNLP();
+				sentence.setWordList(stanford.identifyPartsOfSpeech(words));
+	
+			} else {
+				StringBuilder sb = new StringBuilder();
+				
+				// build a Python input string
+				for(WordToken word : words) {
+					sb.append(word.getNormalizedForm());
+					sb.append("<>");  // attempting to pick a delimiter that will never come across as a word
+				}
+				// write to a file for use as input by the python script
+				writeToFile(sb.toString());
+	
+				String pyList = Utils.execCmd(CMD).trim();
+				
+				String[] pyArray = pyList.split("<>");
+				
+				for(int i=0; i < pyArray.length; i++) {
+					words.get(i).setPOS(pyArray[i]);
+				}
+				
+				sentence.setWordList(words);
+			}
+			
+		} catch(Exception e) {
+			ret = false;
+			logger.error("identifyPartsOfSpeech(): {}", e);
+		}
+		return ret;
+	}
+	
+	// soon to be deprecated
 	public boolean identifyPartsOfSpeech(ArrayList<WordToken> wordList) {
 		boolean ret = true;
 		
@@ -102,12 +144,12 @@ public class POSTagger {
 						nounCount++;
 					else if(pyArray[i].matches("IN|TO")) {
 						prepCount++;
-						if(i == 0) { // first word of sentence
-							beginsWithPreposition = true;
-						}
+						//if(i == 0) { // first word of sentence
+						//	beginsWithPreposition = true;
+						//}
 					}
 					
-					if(wordList.get(i).matchesNegation()) {
+					if(wordList.get(i).isNegationToken()) {
 						negation.add(new TokenPosition(wordList.get(i).getToken(), i));
 					}
 				}
@@ -138,9 +180,9 @@ public class POSTagger {
 		return nounCount;
 	}
 		
-	public boolean beginsWithPreposition() {
-		return beginsWithPreposition;
-	}
+	//public boolean beginsWithPreposition() {
+	//	return beginsWithPreposition;
+	//}
 	
 	public List<TokenPosition> getNegation() {
 		return this.negation;
@@ -157,7 +199,8 @@ public class POSTagger {
 		boolean tokenAdded = false;
 
 		String vobOpen = "<vob>", vobClose = "</vob>";
-		String lverbSpan = "<lv>";
+		String lverbSpan = "<lv>"; // linking verb
+		//String averbSpan = "<av>"; // action verb
 		String prepSpan = "<pp>";
 		String nounSpan = "<np>";
 		String stSpan = "<st><sup>";
@@ -200,25 +243,65 @@ public class POSTagger {
 				
 				// LINKING VERBS *********************
 				if(word.isLinkingVerbSubject()) {
-					markup.add(tokenAdded ? lverbSpan + "/SUBJ</lv>" : token + lverbSpan + "/SUBJ</lv>");
+					markup.add(tokenAdded ? "<lv>/SUBJ</lv>" : token + "<lv>/SUBJ</lv>");
 					tokenAdded = true;
 				} else if(word.isLinkingVerb()) {
 					if(tokenAdded) {
 						String temp = markup.get(markup.size() - 1);
-						markup.set(markup.size() - 1, lverbSpan + "[</lv>" + temp + lverbSpan + "]</lv>" + temp);
+						markup.set(markup.size() - 1, "<lv>[</lv>" + temp + "<lv>]</lv>" + temp);
 					} else {
-						markup.add(lverbSpan + "[</lv>" + token + lverbSpan + "]</lv>");
+						markup.add("<lv>[</lv>" + token + "<lv>]</lv>");
 						tokenAdded = true;
 					}
 				} else if(word.isLinkingVerbSubjectComplement()) {
 					if(tokenAdded) {
 						String temp = markup.get(markup.size() - 1);
-						markup.set(markup.size() - 1, temp + lverbSpan + "/SUBJC</lv>");
+						markup.set(markup.size() - 1, temp + "<lv>/SUBJC</lv>");
 					} else {
-						markup.add(token + lverbSpan + "/SUBJC]</lv>");
+						markup.add(token + "<lv>/SUBJC</lv>");
 						tokenAdded = true;
 					}
-					//insideVOB = false;
+				}
+				
+				// ACTION VERBS *********************
+				if(word.isActionVerbSubject()) {
+					markup.add(tokenAdded ? "<av>/SUBJ</av>" : token + "<av>/SUBJ</av>");
+					tokenAdded = true;
+				} else if(word.isActionVerb()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, "<av>[</av>" + temp + "<av>]</av>" + temp); // why the 2nd temp?
+					} else {
+						markup.add("<av>[</av>" + token + "<av>]</av>");
+						tokenAdded = true;
+					}
+				} else if(word.isActionVerbDirectObject()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, temp + "<av>/OBJ</av>");
+					} else {
+						markup.add(token + "<av>/OBJ</av>");
+						tokenAdded = true;
+					}
+				}
+				
+				// INFINITIVE VERBS *********************
+				if(word.isInfinitiveHead()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, "<iv>[</iv>" + temp);
+					} else {
+						markup.add("<iv>[</iv>" + token);
+						tokenAdded = true;
+					}
+				} else if(word.isInfinitiveVerb()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, temp + "<iv>]</iv>");
+					} else {
+						markup.add(token + "<iv>]</iv>");
+						tokenAdded = true;
+					}
 				}
 				
 				// PREP PHRASES *********************

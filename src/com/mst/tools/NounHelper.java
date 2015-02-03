@@ -6,12 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.mst.model.Sentence;
 import com.mst.model.WordToken;
 import com.mst.util.Constants;
 
 public class NounHelper {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private int nounPhraseCount = 0;
+	private int nounPhraseCount = 0;  // possibly deprecated with new metadata strategy
 		
 	public boolean identifyNounPhrases(ArrayList<WordToken> words) {
 		// requires POS-tagged list of WordTokens
@@ -40,6 +41,47 @@ public class NounHelper {
 					if(headIndex > 0) {
 						words.get(headIndex).setNounPhraseHead(true);
 						words.get(i).setNounPhraseModifier(true);
+						if(oldHeadIndex != headIndex) {
+							nounPhraseCount++;
+							oldHeadIndex = headIndex;
+						}
+					}
+				} else {
+					headIndex = 0;
+				}
+			}
+		} catch(Exception e) {
+			ret = false;
+			logger.error("identifyNounPhrases() {}", e);
+		}
+		return ret;
+	}
+	
+	public boolean identifyNounPhrases(Sentence sentence) {
+		// requires POS-tagged list of WordTokens
+		boolean ret = true;
+		
+		int oldHeadIndex = -1;
+		int headIndex = 0;
+		try {
+			//TODO don't mark as head if surrounded by parens?
+			for(int i=sentence.getWordList().size()-1; i >= 0; i--) {
+				WordToken word = sentence.getWordList().get(i);
+				if(word.isNoun()) {
+					if(headIndex == 0) {
+						headIndex = i;
+					} else {
+						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
+						sentence.getWordList().get(i).setNounPhraseModifier(true);
+						if(oldHeadIndex != headIndex) {
+							nounPhraseCount++;
+							oldHeadIndex = headIndex;
+						}
+					}
+				} else if(word.isAdjective() || word.isAdverb() || word.isPunctuation()) {
+					if(headIndex > 0) {
+						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
+						sentence.getWordList().get(i).setNounPhraseModifier(true);
 						if(oldHeadIndex != headIndex) {
 							nounPhraseCount++;
 							oldHeadIndex = headIndex;

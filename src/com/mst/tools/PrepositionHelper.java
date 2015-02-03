@@ -8,20 +8,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mst.model.PrepPhraseToken;
+import com.mst.model.Sentence;
 import com.mst.model.WordToken;
 import com.mst.util.Constants;
 
 public class PrepositionHelper {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private int prepPhraseCount = 0;
+	//private int prepPhraseCount = 0;
 
 	public boolean identifyPrepPhrases(ArrayList<WordToken> words) {
 		boolean ret = true;
 		
 		// TODO I suspect that there are some logic problems with this code (identifying OBJ, etc)
-		List<String> defaultPrepositionList = Arrays.asList("after","although","among","as","at","before","between","by","during",
-															"for","from","in","of","on","over","per","than","that","to","while",
-															"with","within","without");
+		//List<String> defaultPrepositionList = Arrays.asList("after","although","among","as","at","before","between","by","during",
+		//													"for","from","in","of","on","over","per","than","that","to","while",
+		//													"with","within","without");
 		if(words == null) {
 			//identifyPartsOfSpeech(wordList);
 		}
@@ -33,15 +34,16 @@ public class PrepositionHelper {
 				WordToken currentWord = words.get(i);
 				
 				// if token in prep list and NOT part of an infinitive phrase
-				if(defaultPrepositionList.contains(currentWord.getToken().toLowerCase()) && !currentWord.isInfinitiveHead()) {
+				//if(defaultPrepositionList.contains(currentWord.getToken().toLowerCase()) && !currentWord.isInfinitiveHead()) {
+				if(currentWord.matchesPrepositionConstant() && !currentWord.isInfinitiveHead()) {
 					// loop through remaining words in the sentence
 					for(int j=i+1; j < words.size(); j++) {
 						WordToken nextWord = words.get(j);
-						//String nextPOS = words.get(j).getPOS(); 
 						
-						if(nextWord.isPreposition() || nextWord.isVerb()) // break on preposition or verb
+						// end PP on preposition, verb, or DP head
+						if(nextWord.isPreposition() || nextWord.isVerb())
 							break;
-						else if(nextWord.getToken().equals(";")) // a semicolon always stops the phrase
+						else if(nextWord.getToken().matches(";|\\.")) // a semicolon or period always stops the phrase
 							break;
 						else if(nextWord.getToken().equals(",")) // a comma stops the phrase
 							// unless it is preceded and followed by an adjective
@@ -49,19 +51,26 @@ public class PrepositionHelper {
 								break;
 						
 						// no breaks; add index of current word to list of comprising tokens
+						// ## logic above this line EXCLUDES the token that caused the break ##
 						comprisingTokenIndex.add(j);
+						// ## logic below this line INCLUDES the token that caused the break ##
 						
-						// stop on a noun unless the following token is NOT a coordinating conjunction or other noun
+						// stop on a noun unless the following token is a coordinating conjunction or noun
 						// size() check to avoid OutOfBounds exception
-						if(nextWord.isNoun() && j < words.size()-1 &&
-						    !words.get(j+1).getPOS().matches("CC|NN|NNS"))
-							break;		
+						//if(nextWord.isNoun() && j < words.size()-1 &&
+						//   !words.get(j+1).getPOS().matches("CC|NN|NNS"))
+						//	break;	
+						
+						try {
+							if(nextWord.isNoun() && !words.get(j+1).getPOS().matches("CC|NN|NNS"))
+								break;
+						} catch(IndexOutOfBoundsException e) { }
 					}
 	
 					if(comprisingTokenIndex.size() > 0) {
 						// prepend initial matched preposition
 						comprisingTokenIndex.add(0, i);
-						boolean runOnce = true;
+						//boolean runOnce = true;
 						
 						// loop through list of indexes that make up the prep phrase
 						for(int j=0; j < comprisingTokenIndex.size(); j++) {
@@ -71,10 +80,10 @@ public class PrepositionHelper {
 								do {
 									words.get(index).setPrepPhraseObject(true);
 									index--;
-									if(runOnce) {
-										prepPhraseCount++;
-										runOnce = false;
-									}
+									//if(runOnce) {
+									//	prepPhraseCount++;
+									//	runOnce = false;
+									//}
 								} while(words.get(index).getPOS().matches("CC|,|NN|NNS"));
 								
 							} else {
@@ -95,9 +104,91 @@ public class PrepositionHelper {
 		return ret;
 	}
 	
-	public int getPrepPhraseCount() {
-		return prepPhraseCount;
+	public boolean identifyPrepPhrases(Sentence sentence) {
+		boolean ret = true;
+
+		try {
+			List<Integer> comprisingTokenIndex = new ArrayList<Integer>();
+			
+			for(int i=0; i < sentence.getWordList().size(); i++) {
+				WordToken thisWord = sentence.getWordList().get(i);
+				
+				// if token in prep list and NOT part of an infinitive phrase
+				if(thisWord.matchesPrepositionConstant() && !thisWord.isInfinitiveHead()) {
+					// loop through remaining words in the sentence
+					for(int j=i+1; j < sentence.getWordList().size(); j++) {
+						WordToken nextWord = sentence.getWordList().get(j);
+						
+						// end PP on preposition, verb, or DP head
+						if(nextWord.isPreposition() || nextWord.isVerb())
+							break;
+						if(nextWord.getDependentPhraseHead() != null && j-i > 1)
+							// next word is a dep phrase signal and at least one token separates the preposition from the dp signal
+							break;
+						else if(nextWord.getToken().matches(";|\\.")) // a semicolon or period always stops the phrase
+							break;
+						else if(nextWord.getToken().equals(",")) // a comma stops the phrase
+							// unless it is preceded and followed by an adjective
+							if(!(sentence.getWordList().get(j-1).isAdjective()) && sentence.getWordList().get(j+1).isAdjective())
+								break;
+						
+						// no breaks; add index of current word to list of comprising tokens
+						// ## logic above this line EXCLUDES the token that caused the break ##
+						comprisingTokenIndex.add(j);
+						// ## logic below this line INCLUDES the token that caused the break ##
+						
+						// stop on a noun unless the following token is a coordinating conjunction or noun
+						// size() check to avoid OutOfBounds exception
+						//if(nextWord.isNoun() && j < words.size()-1 &&
+						//   !words.get(j+1).getPOS().matches("CC|NN|NNS"))
+						//	break;	
+						
+						try {
+							if(nextWord.isNoun() && !sentence.getWordList().get(j+1).getPOS().matches("CC|NN|NNS"))
+								break;
+						} catch(IndexOutOfBoundsException e) { }
+					}
+	
+					if(comprisingTokenIndex.size() > 0) {
+						// prepend initial matched preposition
+						comprisingTokenIndex.add(0, i);
+						//boolean runOnce = true;
+						
+						// loop through list of indexes that make up the prep phrase
+						for(int j=0; j < comprisingTokenIndex.size(); j++) {
+							int index = comprisingTokenIndex.get(j);
+													
+							if(j == comprisingTokenIndex.size()-1) { // last item in list
+								do {
+									sentence.getWordList().get(index).setPrepPhraseObject(true);
+									index--;
+									//if(runOnce) {
+									//	prepPhraseCount++;
+									//	runOnce = false;
+									//}
+								} while(sentence.getWordList().get(index).getPOS().matches("CC|,|NN|NNS"));
+								
+							} else {
+								// set as prep phrase member
+								sentence.getWordList().get(index).setPrepPhraseMember(true);
+							}
+						}
+						
+						comprisingTokenIndex.clear();
+					}
+				}
+			}
+		} catch(Exception e) {
+			ret = false;
+			logger.error("identifyPrepPhrases(): {}", e);
+		}
+		
+		return ret;
 	}
+	
+//	public int getPrepPhraseCount() {
+//		return prepPhraseCount;
+//	}
 	
 	public String[] getPPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> words) {
 		StringBuilder markup = new StringBuilder();
