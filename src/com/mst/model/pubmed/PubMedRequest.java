@@ -1,4 +1,4 @@
-package com.mst.model;
+package com.mst.model.pubmed;
 
 // created as a structure for json object that will represent a PubMed search request
 // used as input for a camel process

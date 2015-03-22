@@ -17,9 +17,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import com.google.common.base.Joiner;
 import com.google.gson.Gson;
-import com.mst.model.PubMedArticle;
-import com.mst.model.PubMedArticle.AbstractText;
-import com.mst.model.PubMedArticleList;
+import com.mst.model.pubmed.PubMedArticle;
+import com.mst.model.pubmed.PubMedArticleList;
+import com.mst.model.pubmed.PubMedArticle.AbstractText;
 import com.mst.model.Sentence;
 
 import org.slf4j.Logger;

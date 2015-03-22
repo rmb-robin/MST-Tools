@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PrepPhraseMetadata {
-	private List<TokenPosition> phrase = new ArrayList<TokenPosition>();
+	private List<PrepPhraseToken> phrase = new ArrayList<PrepPhraseToken>();
 	private boolean negated;
 	
-	public List<TokenPosition> getPhrase() {
+	public List<PrepPhraseToken> getPhrase() {
 		return phrase;
 	}
-	public void setPhrase(List<TokenPosition> phrase) {
+	public void setPhrase(List<PrepPhraseToken> phrase) {
 		this.phrase = phrase;
 	}
 	public boolean isNegated() {

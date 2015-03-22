@@ -5,22 +5,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-
 import com.mst.model.SemanticType;
 import com.mst.model.Sentence;
-import com.mst.model.TokenPosition;
 import com.mst.model.WordToken;
-import com.mst.tools.Tokenizer;
 import com.mst.util.Props;
 import com.mst.util.StanfordNLP;
 import com.mst.util.Utils;
-
-//import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-
-
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +19,7 @@ public class POSTagger {
 	private String MAXENT_PATH = "";
 	private String PYTHON_INPUT_FILE = "";
 	private String CMD = "";
-	private int verbCount=0, prepCount=0, nounCount=0;
-	private List<TokenPosition> negation = new ArrayList<TokenPosition>();
-	//private boolean beginsWithPreposition = false;
-	
 	//private HashMap<String, String> PennTreebankPOSTagest = new HashMap<String, String>();
-	private ArrayList<WordToken> taggedWordList = null;
-	
-	//private MaxentTagger stanfordTagger = null;
 	private boolean useStanford = false;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -50,7 +33,6 @@ public class POSTagger {
 			
 			if(useStanford) {
 				this.useStanford = useStanford;
-				//stanfordTagger = new MaxentTagger(Props.getProperty("stanford_maxent_path"));
 			}
 			
 		} catch(Exception e) {
@@ -62,15 +44,6 @@ public class POSTagger {
 		MAXENT_PATH = Props.getProperty("maxent_path");
 		PYTHON_INPUT_FILE = MAXENT_PATH + "pyInput.txt";
 		CMD = "python " + MAXENT_PATH + "POSwrapper_rpc.py";
-	}
-	
-	public ArrayList<WordToken> identifyPartsOfSpeech(String input) {
-		Tokenizer t = new Tokenizer();
-		
-		// split words
-		ArrayList<WordToken> wordList = t.splitWords(input);
-		
-		return identifyPartsOfSpeechLegacy(wordList);
 	}
 	
 	public boolean identifyPartsOfSpeech(Sentence sentence) {
@@ -112,82 +85,6 @@ public class POSTagger {
 		return ret;
 	}
 	
-	// soon to be deprecated
-	public boolean identifyPartsOfSpeech(ArrayList<WordToken> wordList) {
-		boolean ret = true;
-		
-		try {
-			if(useStanford) {
-				StanfordNLP stanford = new StanfordNLP();
-				taggedWordList = stanford.identifyPartsOfSpeech(wordList);
-	
-			} else {
-				StringBuilder sb = new StringBuilder();
-				
-				// build a Python input string
-				for(WordToken word : wordList) {
-					sb.append(word.getNormalizedForm());
-					sb.append("<>");  // attempting to pick a delimiter that will never come across as a word
-				}
-				// write to a file for use as input by the python script
-				writeToFile(sb.toString());
-	
-				String pyList = Utils.execCmd(CMD).trim();
-				
-				String[] pyArray = pyList.split("<>");
-				
-				for(int i=0; i < pyArray.length; i++) {
-					wordList.get(i).setPOS(pyArray[i]);
-					if(pyArray[i].startsWith("VB"))
-						verbCount++;
-					else if(pyArray[i].startsWith("NN"))
-						nounCount++;
-					else if(pyArray[i].matches("IN|TO")) {
-						prepCount++;
-						//if(i == 0) { // first word of sentence
-						//	beginsWithPreposition = true;
-						//}
-					}
-					
-					if(wordList.get(i).isNegationToken()) {
-						negation.add(new TokenPosition(wordList.get(i).getToken(), i));
-					}
-				}
-		
-				taggedWordList = wordList;
-			}
-			
-		} catch(Exception e) {
-			ret = false;
-			logger.error("identifyPartsOfSpeech(): {}", e);
-		}
-		return ret;
-	}
-
-	public ArrayList<WordToken> getTaggedWordList() {
-		return taggedWordList;
-	}
-	
-	public int getVerbCount() {
-		return verbCount;
-	}
-	
-	public int getPrepCount() {
-		return prepCount;
-	}
-		
-	public int getNounCount() {
-		return nounCount;
-	}
-		
-	//public boolean beginsWithPreposition() {
-	//	return beginsWithPreposition;
-	//}
-	
-	public List<TokenPosition> getNegation() {
-		return this.negation;
-	}
-	
 	// TODO this doesn't belong here
 	public String getAnnotatedMarkup(ArrayList<WordToken> wordList) {
 		StringBuilder sb = new StringBuilder();
@@ -197,15 +94,19 @@ public class POSTagger {
 		boolean ppBegin = true;
 		boolean npBegin = true;
 		boolean tokenAdded = false;
-
+		//boolean insideDepPhrase = false;
+		
 		String vobOpen = "<vob>", vobClose = "</vob>";
 		String lverbSpan = "<lv>"; // linking verb
 		//String averbSpan = "<av>"; // action verb
 		String prepSpan = "<pp>";
 		String nounSpan = "<np>";
+		String dpSpan = "<dp>";
 		String stSpan = "<st><sup>";
 		String posSpan = "<pos>/";
 
+		int index = 0;
+		
 		for(WordToken word : wordList) {
 			try {
 				String token = word.isPunctuation() ? word.getToken() : word.getToken() + posSpan + word.getPOS() + "</pos>";;
@@ -270,7 +171,7 @@ public class POSTagger {
 				} else if(word.isActionVerb()) {
 					if(tokenAdded) {
 						String temp = markup.get(markup.size() - 1);
-						markup.set(markup.size() - 1, "<av>[</av>" + temp + "<av>]</av>" + temp); // why the 2nd temp?
+						markup.set(markup.size() - 1, "<av>[</av>" + temp + "<av>]</av>");
 					} else {
 						markup.add("<av>[</av>" + token + "<av>]</av>");
 						tokenAdded = true;
@@ -289,27 +190,61 @@ public class POSTagger {
 				if(word.isInfinitiveHead()) {
 					if(tokenAdded) {
 						String temp = markup.get(markup.size() - 1);
-						markup.set(markup.size() - 1, "<iv>[</iv>" + temp);
+						//markup.set(markup.size() - 1, "<iv>[</iv>" + temp);
+						markup.set(markup.size() - 1, "<iv>" + temp);
 					} else {
-						markup.add("<iv>[</iv>" + token);
+						//markup.add("<iv>[</iv>" + token);
+						markup.add("<iv>" + token);
 						tokenAdded = true;
 					}
 				} else if(word.isInfinitiveVerb()) {
 					if(tokenAdded) {
 						String temp = markup.get(markup.size() - 1);
-						markup.set(markup.size() - 1, temp + "<iv>]</iv>");
+						//markup.set(markup.size() - 1, temp + "<iv>]</iv>");
+						markup.set(markup.size() - 1, temp + "</iv>");
 					} else {
-						markup.add(token + "<iv>]</iv>");
+						//markup.add(token + "<iv>]</iv>");
+						markup.add(token + "</iv>");
+						tokenAdded = true;
+					}
+				}
+				
+				// PREPOSITIONAL VERBS *********************
+				if(word.isPrepositionalVerb()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, "<pv>" + temp + "</pv>");
+					} else {
+						markup.add("<pv>" + token + "</pv>");
+						tokenAdded = true;
+					}
+				}
+				
+				// MODAL AUX VERBS *********************
+				if(word.isModalAuxTerm()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, "<mv>" + temp);
+					} else {
+						markup.add("<mv>" + token);
+						tokenAdded = true;
+					}
+				} else if(word.isModalAuxVerb()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, temp + "</mv>");
+					} else {
+						markup.add(token + "</mv>");
 						tokenAdded = true;
 					}
 				}
 				
 				// PREP PHRASES *********************
 				if(word.isPrepPhraseMember()) {
-					if(word.isPrepPhraseObject()) {
-						markup.add(tokenAdded ? prepSpan + "/OBJ</pp>" : token + prepSpan + "/OBJ</pp>");
-						tokenAdded = true;
-					} else {
+					//if(word.isPrepPhraseObject()) {
+					//	markup.add(tokenAdded ? prepSpan + "/OBJ</pp>" : token + prepSpan + "/OBJ</pp>");
+					//	tokenAdded = true;
+					//} else {
 						if(ppBegin) {
 							if(tokenAdded) {
 								String temp = markup.get(markup.size() - 1);
@@ -320,9 +255,10 @@ public class POSTagger {
 							}
 							ppBegin = false;
 						}
-					}
+					//}
 				} else if(word.isPrepPhraseObject()) {
-					markup.add(tokenAdded ? prepSpan + "/OBJ]</pp>" : token + prepSpan + "/OBJ]</pp>");
+					markup.add(tokenAdded ? prepSpan + "]</pp>" : token + prepSpan + "]</pp>");
+					//markup.add(tokenAdded ? prepSpan + "/OBJ]</pp>" : token + prepSpan + "/OBJ]</pp>");
 					tokenAdded = true;
 					ppBegin = true;
 				}
@@ -340,11 +276,33 @@ public class POSTagger {
 						npBegin = false;
 					}
 				} else if(word.isNounPhraseHead()) {
-					markup.add(tokenAdded ? nounSpan + "/HEAD]</np>" : token + nounSpan + "/HEAD]</np>");
+					markup.add(tokenAdded ? nounSpan + "]</np>" : token + nounSpan + "]</np>");
+					//markup.add(tokenAdded ? nounSpan + "/HEAD]</np>" : token + nounSpan + "/HEAD]</np>");
 					npBegin = true;
 					tokenAdded = true;
 				}
 	
+				// DEPENDENT PHRASES  *********************
+				if(word.isDependentPhraseBegin()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+						markup.set(markup.size() - 1, dpSpan + temp);
+					} else {
+						markup.add(dpSpan + token);
+						tokenAdded = true;
+					}
+				}
+				if(word.isDependentPhraseEnd()) {
+					if(tokenAdded) {
+						String temp = markup.get(markup.size() - 1);
+
+						markup.set(markup.size() - 1, temp + "</dp>");
+					} else {
+						markup.add(token + "</dp>");
+						tokenAdded = true;
+					}
+				}
+				
 				if(!tokenAdded) {
 					markup.add(token);
 				}
@@ -353,6 +311,7 @@ public class POSTagger {
 			} catch(Exception e) {
 				logger.error("getAnnotatedMarkup(): {}", e);
 			}
+			index++;
 		}
 		
 		for(String item : markup) {
@@ -362,37 +321,6 @@ public class POSTagger {
 		return sb.toString();
 	}
  	
-	// Attempt to mimic Eric's output for prep phrase identification. Not used by the camel processes.
-	public ArrayList<WordToken> identifyPartsOfSpeechLegacy(ArrayList<WordToken> wordList) {
-		StringBuilder sb = new StringBuilder();
-		
-		try {
-			// build a Python input string
-			for(WordToken word : wordList) {
-				sb.append(word.getNormalizedForm());
-				sb.append("<>");  // attempting to pick a delimiter that will never come across as a word
-			}
-			// write to a file for use as input by the python script
-			writeToFile(sb.toString());
-	
-			//Utils ju = new Utils();
-	
-			String pyList = Utils.execCmd(CMD).trim();
-			String[] pyArray = pyList.split("<>");
-			
-			for(int i=0; i < pyArray.length; i++) {
-				wordList.get(i).setPOS(pyArray[i]);
-				//String posDesc = PennTreebankPOSTagest.get(pyArray[i]);
-				//wordList.get(i).setPOSDesc(posDesc == null ? "" : posDesc);
-			}
-	
-			taggedWordList = wordList;
-		} catch(Exception e) {
-			System.out.println(e.toString());
-		}
-		return taggedWordList;
-	}
-	
  	private boolean writeToFile(String content) {
 		boolean retVal = true;
 

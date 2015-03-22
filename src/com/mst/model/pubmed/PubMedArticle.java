@@ -1,4 +1,4 @@
-package com.mst.model;
+package com.mst.model.pubmed;
 
 import java.util.List;
 

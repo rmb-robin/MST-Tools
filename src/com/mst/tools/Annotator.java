@@ -56,6 +56,8 @@ public class Annotator {
 				// after prep phrase logic, unset potential dependent phrase heads
 				dep.unsetBeginningBoundaries(sentence);
 				
+				dep.processEndingBoundaries2(sentence);
+				
 				// VOB requires POS and prep phrases
 				verbs.identifyVerbsOfBeing(sentence);
 				// LV requires POS, prep phrases, VOB

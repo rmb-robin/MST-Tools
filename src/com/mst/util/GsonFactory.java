@@ -23,6 +23,7 @@ import com.google.gson.JsonSerializer;
 public class GsonFactory {
 	
 	private final static String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+	private final static String MONGO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.000'Z'";
 	private final static Pattern pattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z");
 	
 	public static Gson build() {
@@ -47,11 +48,13 @@ public class GsonFactory {
 				Matcher matcher = pattern.matcher(json.toString());
 				matcher.find();
 				
-				SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+				SimpleDateFormat format = new SimpleDateFormat(MONGO_DATE_FORMAT);
 				Date date = null;
 				try {
 					date = format.parse(matcher.group(0));
-				} catch(ParseException e) { }
+				} catch(ParseException e) { 
+					e.printStackTrace();
+				}
 				
 				return date;
 			}

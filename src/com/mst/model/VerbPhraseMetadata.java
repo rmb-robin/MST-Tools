@@ -4,18 +4,12 @@ import com.mst.util.Constants;
 
 public class VerbPhraseMetadata {
 	private Constants.VerbClass _class;
-	private TokenPositionVerbPhrase subj;
-	private TokenPosition verb;
-	private TokenPositionVerbPhrase subjc;
+	private VerbPhraseToken subj;
+	private VerbPhraseToken verb;
+	private VerbPhraseToken subjc;
 	private boolean compound;
 	private boolean intransitive = true;
-	//private boolean subjNegated;
-	//private boolean subjcNegated;
-	//private TokenPosition subjModByPP; // TPos value to = PP OBJ
-	//private TokenPosition subjcModByPP; // TPos value to = PP OBJ
-	//private boolean subjEqNPHead;
-	//private boolean subjcEqNPHead;
-	private boolean infFollowsPP;
+	private boolean infFollowsPP; // infinitive verb follows prep phrase
 
 	public VerbPhraseMetadata() {	}
 	
@@ -31,27 +25,27 @@ public class VerbPhraseMetadata {
 		this._class = _class;
 	}
 	
-	public TokenPositionVerbPhrase getSubj() {
+	public VerbPhraseToken getSubj() {
 		return subj;
 	}
 
-	public void setSubj(TokenPositionVerbPhrase subj) {
+	public void setSubj(VerbPhraseToken subj) {
 		this.subj = subj;
 	}
 
-	public TokenPosition getVerb() {
+	public VerbPhraseToken getVerb() {
 		return verb;
 	}
 
-	public void setVerb(TokenPosition verb) {
+	public void setVerb(VerbPhraseToken verb) {
 		this.verb = verb;
 	}
 
-	public TokenPositionVerbPhrase getSubjC() {
+	public VerbPhraseToken getSubjC() {
 		return subjc;
 	}
 
-	public void setSubjC(TokenPositionVerbPhrase subjc) {
+	public void setSubjC(VerbPhraseToken subjc) {
 		this.subjc = subjc;
 	}
 
@@ -70,54 +64,6 @@ public class VerbPhraseMetadata {
 	public void setCompound(boolean compound) {
 		this.compound = compound;
 	}
-	
-//	public boolean isSubjectNegated() {
-//		return subjNegated;
-//	}
-//
-//	public void setSubjectNegated(boolean negated) {
-//		this.subjNegated = negated;
-//	}
-//
-//	public boolean isSubjectComplementNegated() {
-//		return subjcNegated;
-//	}
-//
-//	public void setSubjectComplementNegated(boolean negated) {
-//		this.subjcNegated = negated;
-//	}
-//	
-//	public TokenPosition getSubjModByPP() {
-//		return subjModByPP;
-//	}
-//
-//	public void setSubjModByPP(TokenPosition subjModByPP) {
-//		this.subjModByPP = subjModByPP;
-//	}
-//
-//	public TokenPosition getSubjCModByPP() {
-//		return subjcModByPP;
-//	}
-//
-//	public void setSubjCModByPP(TokenPosition subjcModByPP) {
-//		this.subjcModByPP = subjcModByPP;
-//	}
-//
-//	public boolean isSubjEqNPHead() {
-//		return subjEqNPHead;
-//	}
-//
-//	public void setSubjEqNPHead(boolean subjEqNPHead) {
-//		this.subjEqNPHead = subjEqNPHead;
-//	}
-//
-//	public boolean isSubjCEqNPHead() {
-//		return subjcEqNPHead;
-//	}
-//
-//	public void setSubjCEqNPHead(boolean subjcEqNPHead) {
-//		this.subjcEqNPHead = subjcEqNPHead;
-//	}
 	
 	public void setInfFollowsPP(boolean infFollowsPP) {
 		this.infFollowsPP = infFollowsPP;

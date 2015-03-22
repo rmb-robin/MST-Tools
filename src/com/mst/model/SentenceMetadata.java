@@ -21,6 +21,7 @@ public class SentenceMetadata {
 	private List<VerbPhraseMetadata> verbPhrases = new ArrayList<VerbPhraseMetadata>(); 
 	private List<NounPhraseMetadata> nounPhrases = new ArrayList<NounPhraseMetadata>();
 	private List<PrepPhraseMetadata> prepPhrases = new ArrayList<PrepPhraseMetadata>();
+	private List<DependentPhraseMetadata> dependentPhrases = new ArrayList<DependentPhraseMetadata>();
 		
 	
 	public boolean addVerbMetadata(VerbPhraseMetadata val) { return verbPhrases.add(val); }
@@ -31,6 +32,9 @@ public class SentenceMetadata {
 	
 	public boolean addPrepMetadata(PrepPhraseMetadata val) { return prepPhrases.add(val); }
 	public List<PrepPhraseMetadata> getPrepMetadata() { return prepPhrases; }
+	
+	public boolean addDependentMetadata(DependentPhraseMetadata val) { return dependentPhrases.add(val); }
+	public List<DependentPhraseMetadata> getDependentMetadata() { return dependentPhrases; }
 	
 	//public void setBeginsWithPreposition(boolean val) { beginsWithPrep = val; };
 	//public boolean beginsWithPreposition() { return beginsWithPrep; };

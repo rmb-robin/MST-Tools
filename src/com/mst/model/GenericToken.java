@@ -2,7 +2,7 @@ package com.mst.model;
 
 public class GenericToken {
 	private String token;
-	private int position; // position of the sentence/word within the paragraph/sentence
+	private int idx; // position of the sentence/word within the paragraph/sentence
 	
 	public GenericToken() {	}
 	
@@ -12,11 +12,11 @@ public class GenericToken {
 	}
 	
 	public int getPosition() {
-		return position;
+		return idx;
 	}
 
 	public void setPosition(int position) {
-		this.position = position;
+		this.idx = position;
 	}
 
 	public String getToken() {

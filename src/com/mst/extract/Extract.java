@@ -20,10 +20,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.mst.model.PubMedArticleList;
 import com.mst.model.SemanticType;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
+import com.mst.model.pubmed.PubMedArticleList;
 import com.mst.tools.NounHelper;
 import com.mst.tools.POSTagger;
 import com.mst.tools.PrepositionHelper;

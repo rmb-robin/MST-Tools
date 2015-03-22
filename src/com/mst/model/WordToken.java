@@ -16,6 +16,7 @@ public class WordToken extends GenericToken {
 	private boolean npHead; // noun phrase head
 	private boolean npMod; // noun phrase modifier
 	private boolean ppMember; // prep phrase member
+	private boolean ppBegin; // prep phrase begin
 	private boolean ppObj; // prep phrase object
 	private boolean infHead; // infinitive verb head
 	private boolean inf; // infinitive verb
@@ -32,8 +33,9 @@ public class WordToken extends GenericToken {
 	private boolean prepVerb; // prepositional verb
 	private boolean modAuxVerb; // modal auxiliary
 	private boolean modAuxTerm;
-	private DependentPhraseClass dpHead; // dependent phrase head
+	private DependentPhraseClass dpBegin; // dependent phrase head
 	private boolean dpMember; // dependent phrase member
+	private boolean dpEnd; // dependent phrase member
 	private boolean coref; // co-reference
 	private boolean conjAdv; // conjunctive adverb 
 	//private ArrayList<Integer> relations = new ArrayList<Integer>();
@@ -227,12 +229,14 @@ public class WordToken extends GenericToken {
 //		return relations;
 //	}
 	
-	public boolean containsSemanticType(String search) {
+	public boolean containsSemanticType(String regex) {
 		boolean ret = false;
 		for(SemanticType st : this.semanticTypeList) {
 			if(st.getToken().equalsIgnoreCase(this.getToken())) {
-				if(st.getSemanticType().equalsIgnoreCase(search))
+				if(st.getSemanticType().matches(regex)) {
 					ret = true;
+					break;
+				}
 			}
 		}
 		return ret;
@@ -279,12 +283,32 @@ public class WordToken extends GenericToken {
 		return npHead;
 	}
 	
-	public void setDependentPhraseHead(DependentPhraseClass val) {
-		this.dpHead = val;
+	public void setDependentPhraseBegin(DependentPhraseClass val) {
+		this.dpBegin = val;
 	}
 	
-	public DependentPhraseClass getDependentPhraseHead() {
-		return dpHead;
+	public boolean isDependentPhraseBegin() {
+		return this.getDependentPhraseBegin() != null;
+	}
+	
+	public DependentPhraseClass getDependentPhraseBegin() {
+		return dpBegin;
+	}
+	
+	public void setDependentPhraseMember(boolean val) {
+		this.dpMember = val;
+	}
+	
+	public boolean isDependentPhraseMember() {
+		return dpMember;
+	}
+	
+	public void setDependentPhraseEnd(boolean val) {
+		this.dpEnd = val;
+	}
+	
+	public boolean isDependentPhraseEnd() {
+		return dpEnd;
 	}
 	
 	public void setInfinitiveHead(boolean val) {
@@ -309,6 +333,14 @@ public class WordToken extends GenericToken {
 
 	public void setPrepPhraseMember(boolean val) {
 		this.ppMember = val;
+	}
+
+	public boolean isPrepPhraseBegin() {
+		return ppBegin;
+	}
+
+	public void setPrepPhraseBegin(boolean val) {
+		this.ppBegin = val;
 	}
 	
 	public boolean isPrepPhraseObject() {

@@ -19,15 +19,16 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.util.JSON;
-import com.mst.model.PubMedArticleList;
 import com.mst.model.SemanticType;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
 import com.mst.model.ontology.SemanticObject;
+import com.mst.model.pubmed.PubMedArticleList;
 import com.mst.tools.NounHelper;
 import com.mst.tools.POSTagger;
 import com.mst.tools.PrepositionHelper;
 //import com.sun.tools.javac.code.Source;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,17 +47,17 @@ public class MongoDB {
 			mongoClient = new MongoClient(Props.getProperty("mongo_host"));
 			
 			db = mongoClient.getDB(Props.getProperty("mongo_db"));
-			auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
-			//auth = true;
+			//auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
+			auth = true;
 			gson = new Gson();
 			
 			// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
 			// this complements a similar bit of functionality in PubMed.java, which keeps track of existing PMIDs and those which it inserts
 			// to prevent dupes from getting into the pipeline. Must duplicate here to account for processing lag time (possibly many hours)
-			if(existingPMIDs == null) {
+			//if(existingPMIDs == null) {
 				// TODO get this out of the constructor
-				existingPMIDs = getDistinctStringValues("id");
-			}
+			//	existingPMIDs = getDistinctStringValues("id");
+			//}
 		} catch(Exception e) {
 			logger.error("Error establishing a connection to MongoDB. \n{}", e);
 		}
@@ -138,7 +139,7 @@ public class MongoDB {
 				                	//System.out.println(gson.toJson(word.getSemanticTypeList()));
 				                	doc.append("semantic_types", semTypes);
 				                }
-				                doc.append("date_processed", sentence.getDate());
+				                doc.append("date_processed", sentence.getProcessDate());
 				                
 				        processed.insert(doc);
 						
@@ -164,6 +165,7 @@ public class MongoDB {
 	}
 	
 	public String insertTaggedSentenceFull(Sentence sentence) {
+		//System.out.println("Mongo auth value: " + auth);
 		if(auth) {
 			Gson gson = GsonFactory.build();
 			
@@ -172,7 +174,8 @@ public class MongoDB {
 				DBCollection coll = db.getCollection(source.getMongoCollection());
 				
 				DBObject dbObject = (DBObject) JSON.parse(gson.toJson(sentence));
-      			coll.save(dbObject);
+      			//coll.save(dbObject);
+      			coll.insert(dbObject);
       			
 			} catch(Exception e) {
 				logger.error("insertTaggedSentenceFull(): \n{}", e);
@@ -509,7 +512,7 @@ public class MongoDB {
 						if(newSentence) {
 							sentence = new Sentence();
 							sentence.setId(thisArticleId);
-							sentence.setDate(obj.getDate("process_date"));
+							sentence.setProcessDate(obj.getDate("process_date"));
 							sentence.setFullSentence(null);
 							sentence.setPosition(thisSentenceId);
 							newSentence = false;
@@ -619,7 +622,7 @@ public class MongoDB {
 					if(newSentence) {
 						sentence = new Sentence();
 						sentence.setId(thisId);
-						sentence.setDate(obj.getDate("process_date"));
+						sentence.setProcessDate(obj.getDate("process_date"));
 						sentence.setFullSentence(null);
 						sentence.setPosition(thisSentenceId);
 						newSentence = false;

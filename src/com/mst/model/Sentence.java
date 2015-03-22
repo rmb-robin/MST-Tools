@@ -115,11 +115,11 @@ public class Sentence {
 		return this.wordList;
 	}
 	
-	public void setDate(Date processDate) {
+	public void setProcessDate(Date processDate) {
 		this.processDate = processDate;
 	}
 	
-	public Date getDate() {
+	public Date getProcessDate() {
 		return this.processDate;
 	}
 	

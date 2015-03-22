@@ -7,4 +7,4 @@ Class-Path: /home/mst/scott/classes/activemq-all-5.9.0.jar
   /home/mst/scott/classes/prologbeans-1.0.0.jar
   /home/mst/scott/classes/twilio-java-sdk-3.4.4-jar-with-dependencies.jar
   /home/mst/scott/classes/guava-17.0.jar
-
+  /home/mst/scott/classes/jedis-2.6.2.jar

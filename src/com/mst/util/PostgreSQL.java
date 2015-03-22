@@ -85,6 +85,65 @@ public class PostgreSQL {
 		return true;
 	}
 	
+	public String[] getVerbRelationshipData(String subj, String verb, String subjc, boolean negated) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        StringBuilder ret = null;
+        
+        try {
+        	StringBuilder query = new StringBuilder();
+
+        	query.append("select vr.subject, vr.verb, vr.object, c.class, cv.value, c.parent, fs.finding_site ");
+        	query.append("from verb_relationships vr ");
+        	query.append("join classes c on vr.class_id = c.id ");
+        	query.append("join class_values cv on vr.class_value_id = cv.id ");
+        	query.append("join finding_sites fs on vr.finding_site_id = fs.id ");
+        	query.append("where vr.subject = ? and vr.verb = ? and vr.object = ? and vr.negated = ?");
+        	
+        	st = con.prepareStatement(query.toString());
+        	st.setString(1, subj.toLowerCase());
+        	st.setString(2, verb.toLowerCase());
+        	st.setString(3, subjc.toLowerCase());
+        	st.setBoolean(4, negated);
+        	rs = st.executeQuery();
+
+        	if(rs.next()) {
+        		ret = new StringBuilder();
+        		ret.append(rs.getString(1)).append("|")
+        		   .append(rs.getString(2)).append("|")
+        		   .append(rs.getString(3)).append("|")
+        		   .append(rs.getString(4)).append("|")
+        		   .append(rs.getString(5)).append("|")
+        		   .append(rs.getString(6)).append("|")
+        		   .append(rs.getString(7));
+        	}
+            	
+        } catch(Exception e) {
+        	logger.error("getVerbRelationshipData(): \n{}", e);
+        	e.printStackTrace();
+
+        } finally {
+            try {
+                if(rs != null)
+                    rs.close();
+                if(st != null)
+                    st.close();
+                //if(con != null)
+                    //con.close();
+            } catch(Exception e) {
+            	logger.warn("getVerbRelationshipData(): Error closing database objects. \n{}", e);
+            }
+        }
+        
+        if(ret != null) {
+        	return ret.toString().split("\\|");
+        } else {
+        	return null;
+        }
+    }
+	
+	/* 3/11/2015 The queries below are deprecated and only provided for reference */
+	
 	public ArrayList<SyntacticObject> getOntologyEntryByToken(String token) {
         PreparedStatement st = null;
         ResultSet rs = null;

@@ -73,19 +73,19 @@ public class NounHelper {
 					} else {
 						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
 						sentence.getWordList().get(i).setNounPhraseModifier(true);
-						if(oldHeadIndex != headIndex) {
-							nounPhraseCount++;
-							oldHeadIndex = headIndex;
-						}
+						//if(oldHeadIndex != headIndex) {
+						//	nounPhraseCount++;
+						//	oldHeadIndex = headIndex;
+						//}
 					}
 				} else if(word.isAdjective() || word.isAdverb() || word.isPunctuation()) {
 					if(headIndex > 0) {
 						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
 						sentence.getWordList().get(i).setNounPhraseModifier(true);
-						if(oldHeadIndex != headIndex) {
-							nounPhraseCount++;
-							oldHeadIndex = headIndex;
-						}
+						//if(oldHeadIndex != headIndex) {
+						//	nounPhraseCount++;
+						//	oldHeadIndex = headIndex;
+						//}
 					}
 				} else {
 					headIndex = 0;

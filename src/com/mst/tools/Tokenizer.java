@@ -91,9 +91,11 @@ public class Tokenizer {
 		
 		String allowedCharsBetweenSentences = "[\\s\\u2022\\u2002\\u201c]";
 		// # main sentence split (with spaces) 
+		//String regex1 = "(?=(?<!Mr|Ms)(?:\\.))\\s*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[])";
 		String regex1 = "(?<=\\.)\\s*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[])";
 		// # some articles don't have spaces between periods and next sentence
-		String regex2 = "(?<=\\.)\\s*(?=[A-Z][a-z]{2})";
+		String regex2 = "(?<=\\.)\\s*(?=[A-Z][a-z]{2})";  // positive lookbehind that matches a . followed by zero or more spaces followed by a positive lookahead of at least two alphas
+		//String regex2 = "(?=(?<!Mr|Ms)(?:\\.))\\s*(?=[A-Z][a-z]{2})";
 		Pattern falseMatchRegex = Pattern.compile("(vs|v\\.s|i\\.v)\\.$");
 		Pattern[] patterns = { Pattern.compile(regex1), Pattern.compile(regex2) };
 		
@@ -106,7 +108,7 @@ public class Tokenizer {
 		for(Pattern p : patterns) {
 			ArrayList<SentenceToken> acc = new ArrayList<SentenceToken>();
 
-			// The first time through there will only be one entry in sentences. Second pass will go throuh all split
+			// The first time through there will only be one entry in sentences. Second pass will go through all split
 			// sentences looking for instances of pattern regex2
 			for(SentenceToken s : sentences) {
 				int lastSentenceBegin = s.getBegin();

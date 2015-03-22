@@ -1,9 +1,29 @@
 package com.mst.model;
 
-import java.util.List;
-
 public class PrepPhraseToken extends GenericToken {
 
+	private int nounPhraseIdx = -1;
+	
+	public PrepPhraseToken(String token, int position) {
+		super(token, position);
+	}
+	
+	public PrepPhraseToken(String token, int position, int nounPhraseIdx) {
+		this(token, position);
+		this.nounPhraseIdx = nounPhraseIdx;
+	}
+	
+	public int getNounPhraseIdx() {
+		return nounPhraseIdx;
+	}
+	
+	public void setNounPhraseIdx(int val) {
+		nounPhraseIdx = val;
+	}
+	
+	// This class was initially used to mimic Eric's code. The only method that used it
+	// has been deprecated.
+	/*
 	private String precedingToken, value;
 	private List<String> comprisingTokens;
 	
@@ -40,4 +60,5 @@ public class PrepPhraseToken extends GenericToken {
 	public void setComprisingTokens(List<String> comprisingTokens) {
 		this.comprisingTokens = comprisingTokens;
 	}
+	*/
 }
