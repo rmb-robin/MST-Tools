@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -93,18 +95,30 @@ public class PostgreSQL {
         try {
         	StringBuilder query = new StringBuilder();
 
-        	query.append("select vr.subject, vr.verb, vr.object, c.class, cv.value, c.parent, fs.finding_site ");
-        	query.append("from verb_relationships vr ");
-        	query.append("join classes c on vr.class_id = c.id ");
-        	query.append("join class_values cv on vr.class_value_id = cv.id ");
-        	query.append("join finding_sites fs on vr.finding_site_id = fs.id ");
-        	query.append("where vr.subject = ? and vr.verb = ? and vr.object = ? and vr.negated = ?");
+        	String op1 = subj == null ? " is null " : " = ? ";
+        	String op2 = verb == null ? " is null " : " = ? ";
+        	String op3 = subjc == null ? " is null " : " = ? ";
         	
+        	query.append("select vr.subject, vr.verb, vr.object, c.class, cv.value, c.parent, vr.id, a.attribute ")
+		   		 .append("from verb_relationships vr ")
+		   		 .append("join classes c on vr.class_id = c.id ")
+		   		 .append("left join attributes a on vr.attribute_id = a.id ")
+		   		 .append("join class_values cv on vr.class_value_id = cv.id ")
+		   		 .append("where vr.subject ").append(op1)
+		   		 .append("and vr.verb ").append(op2)
+		   		 .append("and vr.object ").append(op3)
+		   		 .append("and vr.negated = ?");
+   		
         	st = con.prepareStatement(query.toString());
-        	st.setString(1, subj.toLowerCase());
-        	st.setString(2, verb.toLowerCase());
-        	st.setString(3, subjc.toLowerCase());
-        	st.setBoolean(4, negated);
+        	int index = 1;
+        	if(subj != null)
+        		st.setString(index++, subj.toLowerCase());
+        	if(verb != null)
+        		st.setString(index++, verb.toLowerCase());
+        	if(subjc != null)
+        		st.setString(index++, subjc.toLowerCase());
+        	st.setBoolean(index++, negated);
+        	
         	rs = st.executeQuery();
 
         	if(rs.next()) {
@@ -115,7 +129,8 @@ public class PostgreSQL {
         		   .append(rs.getString(4)).append("|")
         		   .append(rs.getString(5)).append("|")
         		   .append(rs.getString(6)).append("|")
-        		   .append(rs.getString(7));
+        		   .append(rs.getString(7)).append("|")
+        		   .append(rs.getString(8));
         	}
             	
         } catch(Exception e) {
@@ -132,6 +147,171 @@ public class PostgreSQL {
                     //con.close();
             } catch(Exception e) {
             	logger.warn("getVerbRelationshipData(): Error closing database objects. \n{}", e);
+            }
+        }
+        
+        if(ret != null) {
+        	return ret.toString().split("\\|");
+        } else {
+        	return null;
+        }
+    }
+	
+	public Map<String,String> getVerbRelationshipDataMap(String subj, String verb, String subjc, boolean negated) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        //StringBuilder ret = null;
+        Map<String,String> ret = new HashMap<String,String>();
+        
+        try {
+        	StringBuilder query = new StringBuilder();
+
+        	String op1 = subj == null ? " is null " : " = ? ";
+        	String op2 = verb == null ? " is null " : " = ? ";
+        	String op3 = subjc == null ? " is null " : " = ? ";
+        	
+        	query.append("select vr.subject, vr.verb, vr.object, c.class, cv.value, vr.id, a.attribute ")
+		   		 .append("from verb_relationships2 vr ")
+		   		 .append("join classes c on vr.class_id = c.id ")
+		   		 .append("left join attributes a on vr.attribute_id = a.id ")
+		   		 .append("join class_values cv on vr.class_value_id = cv.id ")
+		   		 .append("where vr.subject ").append(op1)
+		   		 .append("and vr.verb ").append(op2)
+		   		 .append("and vr.object ").append(op3)
+		   		 .append("and vr.negated = ?");
+   		
+        	st = con.prepareStatement(query.toString());
+        	int index = 1;
+        	if(subj != null)
+        		st.setString(index++, subj.toLowerCase());
+        	if(verb != null)
+        		st.setString(index++, verb.toLowerCase());
+        	if(subjc != null)
+        		st.setString(index++, subjc.toLowerCase());
+        	st.setBoolean(index++, negated);
+        	
+        	rs = st.executeQuery();
+
+        	if(rs.next()) {
+        		//ret = new StringBuilder();
+        		ret.put("subject", rs.getString(1));
+        		ret.put("verb", rs.getString(2));
+        		ret.put("object", rs.getString(3));
+        		ret.put("class", rs.getString(4));
+        		ret.put("value", rs.getString(5));
+        		ret.put("rel_id", rs.getString(6));
+        		ret.put("attribute", rs.getString(7));
+        	}
+            	
+        } catch(Exception e) {
+        	logger.error("getVerbRelationshipDataMap(): \n{}", e);
+        	e.printStackTrace();
+
+        } finally {
+            try {
+                if(rs != null)
+                    rs.close();
+                if(st != null)
+                    st.close();
+                //if(con != null)
+                    //con.close();
+            } catch(Exception e) {
+            	logger.warn("getVerbRelationshipData(): Error closing database objects. \n{}", e);
+            }
+        }
+        
+       	return ret;
+    }
+	
+	public Map<String,String> getPPStructuredOutputClassMap(String verbClass, String prepPhrase) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        Map<String,String> ret = new HashMap<String,String>();
+        
+        try {
+        	StringBuilder query = new StringBuilder();
+        	
+        	query.append("select c.class, ppm.id, a.attribute ")
+		   		 .append("from prep_phrase_mapping2 ppm ")
+		   		 .append("join classes c on ppm.class_id = c.id ")
+		   		 .append("join attributes a on ppm.attribute_id = a.id ")
+		   		 .append("where ppm.verb_class = ? ")
+		   		 .append("and ppm.prep_phrase = ?");
+   		        	
+        	st = con.prepareStatement(query.toString());
+        	st.setString(1, verbClass);
+        	st.setString(2, prepPhrase.toLowerCase());
+        	
+        	rs = st.executeQuery();
+
+        	if(rs.next()) {
+        		ret.put("class", rs.getString(1));
+        		ret.put("id", rs.getString(2));
+        		ret.put("attribute", rs.getString(3));
+        	}
+            	
+        } catch(Exception e) {
+        	logger.error("getPPStructuredOutputClassMap(): \n{}", e);
+        	e.printStackTrace();
+
+        } finally {
+            try {
+                if(rs != null)
+                    rs.close();
+                if(st != null)
+                    st.close();
+                //if(con != null)
+                    //con.close();
+            } catch(Exception e) {
+            	logger.warn("getPPStructuredOutputClass(): Error closing database objects. \n{}", e);
+            }
+        }
+        
+       	return ret;
+    }
+	
+	public String[] getPPStructuredOutputClass(String verbClass, String prepPhrase) {
+        PreparedStatement st = null;
+        ResultSet rs = null;
+        StringBuilder ret = null;
+        
+        try {
+        	StringBuilder query = new StringBuilder();
+        	
+        	query.append("select c.class, ppm.id, a.attribute ")
+		   		 .append("from prep_phrase_mapping ppm ")
+		   		 .append("join classes c on ppm.class_id = c.id ")
+		   		 .append("join attributes a on ppm.attribute_id = a.id ")
+		   		 .append("where ppm.verb_class = ? ")
+		   		 .append("and ppm.prep_phrase = ?");
+   		        	
+        	st = con.prepareStatement(query.toString());
+        	st.setString(1, verbClass);
+        	st.setString(2, prepPhrase.toLowerCase());
+        	
+        	rs = st.executeQuery();
+
+        	if(rs.next()) {
+        		ret = new StringBuilder();
+        		ret.append(rs.getString(1)).append("|")
+        		   .append(rs.getString(2)).append("|")
+        		   .append(rs.getString(3));
+        	}
+            	
+        } catch(Exception e) {
+        	logger.error("getPPStructuredOutputClass(): \n{}", e);
+        	e.printStackTrace();
+
+        } finally {
+            try {
+                if(rs != null)
+                    rs.close();
+                if(st != null)
+                    st.close();
+                //if(con != null)
+                    //con.close();
+            } catch(Exception e) {
+            	logger.warn("getPPStructuredOutputClass(): Error closing database objects. \n{}", e);
             }
         }
         

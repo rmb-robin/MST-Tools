@@ -5,12 +5,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import com.mst.model.SemanticType;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
 import com.mst.util.Props;
 import com.mst.util.StanfordNLP;
 import com.mst.util.Utils;
+
+import edu.stanford.nlp.tagger.maxent.MaxentTagger;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +27,9 @@ public class POSTagger {
 	//private HashMap<String, String> PennTreebankPOSTagest = new HashMap<String, String>();
 	private boolean useStanford = false;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	private Map<String, String> translateMap = new HashMap<String, String>();
+	//private final static StanfordNLP stanfordNLP = new StanfordNLP();
+	private static MaxentTagger tagger = null;
 	
 	public POSTagger() {
 		this(false);
@@ -31,10 +39,13 @@ public class POSTagger {
 		try {
 			init();
 			
-			if(useStanford) {
-				this.useStanford = useStanford;
+			if(Boolean.parseBoolean(Props.getProperty("use_stanford_pos"))) {
+			//if(useStanford) {
+				this.useStanford = true;
+				if(tagger == null) {
+					tagger = new MaxentTagger(Props.getProperty("stanford_maxent_path"));
+				}
 			}
-			
 		} catch(Exception e) {
 			logger.error("POSTagger(): {}", e);
 		}
@@ -44,6 +55,10 @@ public class POSTagger {
 		MAXENT_PATH = Props.getProperty("maxent_path");
 		PYTHON_INPUT_FILE = MAXENT_PATH + "pyInput.txt";
 		CMD = "python " + MAXENT_PATH + "POSwrapper_rpc.py";
+		
+		translateMap.put(",", "comma");
+		translateMap.put("#", "hash");
+		translateMap.put(":", "colon");
 	}
 	
 	public boolean identifyPartsOfSpeech(Sentence sentence) {
@@ -53,15 +68,19 @@ public class POSTagger {
 			ArrayList<WordToken> words = sentence.getWordList();
 			
 			if(useStanford) {
-				StanfordNLP stanford = new StanfordNLP();
+				StanfordNLP stanford = new StanfordNLP(tagger);
 				sentence.setWordList(stanford.identifyPartsOfSpeech(words));
-	
+				//System.out.println("POS result: " + sentence.getWordList().get(0).getPOS());
 			} else {
 				StringBuilder sb = new StringBuilder();
 				
 				// build a Python input string
 				for(WordToken word : words) {
-					sb.append(word.getNormalizedForm());
+					String xlate = translateMap.get(word.getToken());
+					if(xlate == null)
+						sb.append(word.getToken());
+					else
+						sb.append(xlate);
 					sb.append("<>");  // attempting to pick a delimiter that will never come across as a word
 				}
 				// write to a file for use as input by the python script
@@ -79,10 +98,17 @@ public class POSTagger {
 			}
 			
 		} catch(Exception e) {
+			//System.out.println("ERROR in identifyPartsOfSpeech: " + e.toString());
 			ret = false;
-			logger.error("identifyPartsOfSpeech(): {}", e);
+			logger.error("identifyPartsOfSpeech(): {}\n{}", e, sentence.getFullSentence());
+			
+			//e.printStackTrace();
 		}
 		return ret;
+	}
+	
+	public void setUseStanford(boolean value) {
+		useStanford = value;
 	}
 	
 	// TODO this doesn't belong here
@@ -109,18 +135,21 @@ public class POSTagger {
 		
 		for(WordToken word : wordList) {
 			try {
-				String token = word.isPunctuation() ? word.getToken() : word.getToken() + posSpan + word.getPOS() + "</pos>";;
+				//String token = word.isPunctuation() ? word.getToken() : word.getToken() + posSpan + word.getPOS() + "</pos>";
+				String token = word.getToken() + posSpan + word.getPOS() + "</pos>";
 				
-				String st = "";
-				for(SemanticType x : word.getSemanticTypeList()) {
-					// additional check to avoid returning extraneous semantic types, e.g. "right" returning 'bpoc' for the phrase "right kidney"
-					// see MetaMapWrapper.findAllWordTokenIndices()
-					if(x.getToken().equalsIgnoreCase(word.getToken()))
-						st += "," + x.getSemanticType();
-				}
+				//String st = "";
+//				for(SemanticType x : word.getSemanticTypeList()) {
+//					// additional check to avoid returning extraneous semantic types, e.g. "right" returning 'bpoc' for the phrase "right kidney"
+//					// see MetaMapWrapper.findAllWordTokenIndices()
+//					if(x.getToken().equalsIgnoreCase(word.getToken()))
+//						st += "," + x.getSemanticType();
+//				}
 				
-				if(st != "")
-					token += stSpan + st.substring(1) + "</sup></st>";
+				if(word.getSemanticType() != null)
+					token += stSpan + word.getSemanticType() + "</sup></st>";
+					//token += stSpan + st.substring(1) + "</sup></st>";
+					
 				
 				// VERBS OF BEING *********************
 				if(word.isVerbOfBeingSubject()) {
@@ -221,7 +250,7 @@ public class POSTagger {
 				}
 				
 				// MODAL AUX VERBS *********************
-				if(word.isModalAuxTerm()) {
+				if(word.isModalAuxVerb()) {
 					if(tokenAdded) {
 						String temp = markup.get(markup.size() - 1);
 						markup.set(markup.size() - 1, "<mv>" + temp);
@@ -241,10 +270,10 @@ public class POSTagger {
 				
 				// PREP PHRASES *********************
 				if(word.isPrepPhraseMember()) {
-					//if(word.isPrepPhraseObject()) {
-					//	markup.add(tokenAdded ? prepSpan + "/OBJ</pp>" : token + prepSpan + "/OBJ</pp>");
-					//	tokenAdded = true;
-					//} else {
+					if(word.isPrepPhraseObject()) {
+						markup.add(tokenAdded ? prepSpan + "/OBJ</pp>" : token + prepSpan + "/OBJ</pp>");
+						tokenAdded = true;
+					} else {
 						if(ppBegin) {
 							if(tokenAdded) {
 								String temp = markup.get(markup.size() - 1);
@@ -255,10 +284,10 @@ public class POSTagger {
 							}
 							ppBegin = false;
 						}
-					//}
+					}
 				} else if(word.isPrepPhraseObject()) {
-					markup.add(tokenAdded ? prepSpan + "]</pp>" : token + prepSpan + "]</pp>");
-					//markup.add(tokenAdded ? prepSpan + "/OBJ]</pp>" : token + prepSpan + "/OBJ]</pp>");
+					//markup.add(tokenAdded ? prepSpan + "]</pp>" : token + prepSpan + "]</pp>");
+					markup.add(tokenAdded ? prepSpan + "/OBJ]</pp>" : token + prepSpan + "/OBJ]</pp>");
 					tokenAdded = true;
 					ppBegin = true;
 				}

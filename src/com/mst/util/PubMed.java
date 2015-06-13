@@ -33,8 +33,8 @@ public class PubMed {
     private String PUBMED_EMAIL = "eric.plumb@gmail.com";
     private final int MIN_YEAR = 1950;
     private final int MAX_YEAR = Calendar.getInstance().get(Calendar.YEAR);
-    private int MAX_ARTICLES_PER_ITERATION = 200;;
-    private int MAX_ARTICLES_TOTAL = 10000;;
+    private int MAX_ARTICLES_PER_ITERATION = 200;
+    private int MAX_ARTICLES_TOTAL = 10000;
     //private final String FILE_OUTPUT_DIR = "/Users/scottdaugherty/Documents/MedicalSearchTech/test_data/1_paragraph/";
     private String PMC_FULL_ARTICLE_URL = "http://www.pubmedcentral.nih.gov/oai/oai.cgi?verb=GetRecord&identifier=oai:pubmedcentral.nih.gov:%s&metadataPrefix=pmc";
     private List<String> existingPMIDs = null;
@@ -144,7 +144,7 @@ public class PubMed {
                     }
 					
 					//writeArticleToFile(articles);
-					writeArticleToJMS(Q_PUBMED, articles);
+					writeArticleToJMS(Q_PUBMED, articles, searchTerm);
 					articlesProcessed += articlesPerIteration; // increment based on number of articles actually processed
 					
 					for(PubMedArticle article : articles)
@@ -432,7 +432,7 @@ public class PubMed {
         return xml;
     }
 	
-	private boolean writeArticleToJMS(String qName, List<PubMedArticle> articles) {
+	private boolean writeArticleToJMS(String qName, List<PubMedArticle> articles, String searchTerm) {
 		boolean retVal = true;
 		
 		for(PubMedArticle article : articles) {
@@ -442,6 +442,8 @@ public class PubMed {
 				
 				Sentence sentence = new Sentence();
 				sentence.setId(article.getPMID());
+				sentence.setSource("PUBMED");
+				sentence.setStudy(searchTerm);
 				
 				if(article.getFullArticleText() == null) {
 					// concatenate full paragraph from individual <AbstractText> elements
@@ -451,8 +453,10 @@ public class PubMed {
 					}
 					
 					sentence.setFullSentence(sb.toString().trim());
+					sentence.setPractice("abstract");
 				} else {
 					sentence.setFullSentence(article.getFullArticleText());
+					sentence.setPractice("fullArticle");
 				}
 				
 				activeMQ.publishMessage(qName, gson.toJson(sentence));

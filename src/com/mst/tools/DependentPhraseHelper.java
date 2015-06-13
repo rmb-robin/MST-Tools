@@ -27,7 +27,7 @@ public class DependentPhraseHelper {
 			if(identifyCorefAndConjAdverb(sentence)) {
 				for(int i=0; i < words.size(); i++) {
 					WordToken thisToken = words.get(i); 
-					if(!(thisToken.isCorefernece() || thisToken.isConjunctiveAdverb() || thisToken.isAdjective())) {
+					if(!(thisToken.isCorefernece() || thisToken.isConjunctiveAdverb() || thisToken.isAdjectivePOS())) {
 						if(i == 0) {
 							if(thisToken.getToken().matches(Constants.INTERSECTION_PREPOSITIONS_AND_DEPENDENT)) {
 								// dependent signal or prep phrase begins the sentence. determined later???

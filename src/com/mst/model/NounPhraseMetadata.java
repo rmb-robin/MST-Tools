@@ -7,9 +7,8 @@ public class NounPhraseMetadata {
 	private List<GenericToken> phrase = new ArrayList<GenericToken>();
 	private boolean negated;
 	private boolean inPP;
-	//private boolean modByPP;
-	//private List<PrepPhraseMetadata> prepPhrases = new ArrayList<PrepPhraseMetadata>();
 	private List<Integer> prepPhrasesIdx = new ArrayList<Integer>();
+	private String st = null;
 	
 	public List<GenericToken> getPhrase() {	return phrase; }
 	
@@ -19,28 +18,26 @@ public class NounPhraseMetadata {
 	
 	public void setNegated(boolean negated) { this.negated = negated; }
 	
-//	public boolean isHeadEqPPObj() {
-//		return headEqPPObj;
-//	}
-//	
-//	public void setHeadEqPPObj(boolean val) {
-//		this.headEqPPObj = val;
-//	}
-	
 	public boolean isWithinPP() { return inPP; }
 	
 	public void setWithinPP(boolean val) { this.inPP = val; }
-	
-	//public boolean addPrepPhrase(PrepPhraseMetadata val) { return prepPhrases.add(val); }
-	
-	//public void setPrepPhrases(List<PrepPhraseMetadata> val) { this.prepPhrases = val; }
-	
-	//public List<PrepPhraseMetadata> getPrepPhrases() { return prepPhrases; }
 	
 	public boolean addPrepPhraseIdx(Integer val) { return prepPhrasesIdx.add(val); }
 	
 	public void setPrepPhrasesIdx(List<Integer> val) { this.prepPhrasesIdx = val; }
 		
-	public List<Integer> getPrepPhrasesIdx() { return prepPhrasesIdx; }	
+	public List<Integer> getPrepPhrasesIdx() { return prepPhrasesIdx; }
+	
+	public String getSemanticType() {return st;	}
+	
+	public void setSemanticType(String val) { st = val;	}
+	
+	public String getNounPhraseString() {
+		StringBuilder np = new StringBuilder();
+		for(GenericToken token : phrase) {
+			np.append(token.getToken()).append(" ");
+		}
+		return np.toString().trim();
+	}
 }
 

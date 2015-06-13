@@ -16,15 +16,120 @@ public class Tokenizer {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private Map<String, String> translateMap = new HashMap<String, String>();
+	//https://www.regex101.com/r/dB1gO3/5
+	private String YEAR_OLD_REGEX = "(?<=\\d)((?i)[\\s-]*YEAR[\\s-]*OLD|\\s*yr?\\.?\\/?o\\.?)(?!m)"; 
+	private String YEAR_OLD_REPL = "-year-old"; 
+	private String YEAR_OLD_SEX_REGEX = "(?<=\\d)yom";
+	private String YEAR_OLD_SEX_REPL = "-year-old male";
 	
 	public Tokenizer() { 
 		init();
 	}
 	
 	private void init() {
-		translateMap.put(",", "comma");
-		translateMap.put("#", "hash");
-		translateMap.put(":", "colon");		
+		
+		translateMap.put("abd","abdominal");
+		translateMap.put("aggresive","aggressive");
+		translateMap.put("asap","atypical small acinar hyperplasia");
+		translateMap.put("bengin","benign");
+		translateMap.put("bx","biopsy");
+		translateMap.put("boney","bony");
+		translateMap.put("ca","cancer");
+		translateMap.put("c/o","complains of");
+		translateMap.put("cabg","coronary artery bypass graft");
+		translateMap.put("bladder scope","cystourethroscopy");
+		translateMap.put("cysto","cystourethroscopy");
+		translateMap.put("cystoscopy","cystourethroscopy");
+		translateMap.put("degaralix","degarilex");
+		translateMap.put("degarelix","degarilex");
+		translateMap.put("degarleix","degarilex");
+		translateMap.put("degerelix","degarilex");
+		translateMap.put("dx","diagnosed");
+		translateMap.put("d/w","discussed with");
+		translateMap.put("f/u","follow up");
+		translateMap.put("follow-up","follow up");
+		translateMap.put("followup","follow up");
+		translateMap.put("gl","gleason");
+		translateMap.put("gleason's","gleason");
+		translateMap.put("gleasono","gleason");
+		translateMap.put("hg","high grade");
+		translateMap.put("hgpin","high grade prostatic intraepithelial neoplasia");
+		translateMap.put("hx","history");
+		translateMap.put("h/o","history of");
+		translateMap.put("homronal","hormonal");
+		translateMap.put("hormoal","hormonal");
+		translateMap.put("hormonl","hormonal");
+		translateMap.put("horomonal","hormonal");
+		translateMap.put("inj","injection");
+		translateMap.put("imrt","intensity modulated radiation therapy");
+		translateMap.put("lh/rh","lhrh");
+		translateMap.put("lhrr","lhrh");
+		translateMap.put("luporn","lupron");
+		translateMap.put("luppron","lupron");
+		translateMap.put("lupro","lupron");
+		translateMap.put("luproj","lupron");
+		translateMap.put("lupronn","lupron");
+		translateMap.put("luq","lupron");
+		translateMap.put("luron","lupron");
+		translateMap.put("lurpn","lupron");
+		translateMap.put("lurpon","lupron");
+		translateMap.put("lymphnode","lymph node");
+		translateMap.put("metastatis","metastasis");
+		translateMap.put("metasteses","metastasis");
+		translateMap.put("metastisis","metastasis");
+		translateMap.put("metastses","metastasis");
+		translateMap.put("mets","metastasis");
+		translateMap.put("metasatic","metastatic");
+		translateMap.put("metastasi","metastatic");
+		translateMap.put("metastatic","metastatic");
+		translateMap.put("metastatic","metastatic");
+		translateMap.put("metastic","metastatic");
+		translateMap.put("metastic","metastatic");
+		translateMap.put("metastsaic","metastatic");
+		translateMap.put("metatatic","metastatic");
+		translateMap.put("metatstatic","metastatic");
+		translateMap.put("metstasis","metastatic");
+		translateMap.put("mos","month");
+		translateMap.put("neg","negative");
+		translateMap.put("nodal","node");
+		translateMap.put("nodle","node");
+		translateMap.put("nodular","node");
+		translateMap.put("nodule","node");
+		translateMap.put("ov","office visit");
+		translateMap.put("onthe","on the");
+		translateMap.put("osseuos","osseous");
+		translateMap.put("osseus","osseous");
+		translateMap.put("osseus","osseous");
+		translateMap.put("pth","parathyroid hormone");
+		translateMap.put("path","pathology");
+		translateMap.put("pt","patient");
+		translateMap.put("pt's","patient's");
+		translateMap.put("rx","prescribed");
+		translateMap.put("prostae","prostate");
+		translateMap.put("prostat","prostate");
+		translateMap.put("prosttae","prostate");
+		translateMap.put("protate","prostate");
+		translateMap.put("cap","prostate cancer");
+		translateMap.put("p ca","prostate cancer");
+		translateMap.put("+pni","prostatic intraepithelial neoplasia");
+		translateMap.put("pin","prostatic intraepithelial neoplasia");
+		translateMap.put("re-started","restarted");
+		translateMap.put("robot","robotic");
+		translateMap.put("ralp","robotic-assisted laparoscopic radical prostatectomy");
+		translateMap.put("skelatal","skeletal");
+		translateMap.put("s/p","status post");
+		translateMap.put("testosteorne","testosterone");
+		translateMap.put("testosterones","testosterone");
+		translateMap.put("testostonene","testosterone");
+		translateMap.put("trus bx","transrectal ultrasound prostate biopsy");
+		translateMap.put("tx","treated");
+		translateMap.put("vs","versus");
+		translateMap.put("wt","weight");
+		translateMap.put("wbbs","whole body bone scan");
+		translateMap.put("xofiga","xofigo");
+		translateMap.put("zofigo","xofigo");
+		translateMap.put("xytiga","zytiga");
+
 	}
 	
 //	public ArrayList<SentenceToken> splitSentences2(String article) {
@@ -88,14 +193,22 @@ public class Tokenizer {
 		// \xe2\x80\x82 U+2002 = EN SPACE
 		// \xe2\x80\x9c U+201C = LEFT DOUBLE QUOTATION MARK (“)
 		// \xe2\x80\x9d U+201D = RIGHT DOUBLE QUOTATION MARK (”)
-		
-		String allowedCharsBetweenSentences = "[\\s\\u2022\\u2002\\u201c]";
+		// U+00A0 = NO-BREAK SPACE
+		//System.out.println(article);
+		article = article.replaceAll(YEAR_OLD_REGEX, YEAR_OLD_REPL);
+		article = article.replaceAll(YEAR_OLD_SEX_REGEX, YEAR_OLD_SEX_REPL);
+		article = article.replaceAll("[A|a]pprox\\.", "approximately ");
+		//System.out.println(article);
+		String allowedCharsBetweenSentences = "[\\s\u2022\u2002\u201c\u00a0]";
+		String titles = "((?i)(?<!Dr\\.|Mr\\.|\bMs\\.|Mrs\\.|mg\\.)";
 		// # main sentence split (with spaces) 
-		//String regex1 = "(?=(?<!Mr|Ms)(?:\\.))\\s*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[])";
-		String regex1 = "(?<=\\.)\\s*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[])";
+		// https://www.regex101.com/r/qP7hH5/3
+		String regex1 = titles + "(?<=\\.|\\?|!)\\s*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[]))";
+
 		// # some articles don't have spaces between periods and next sentence
-		String regex2 = "(?<=\\.)\\s*(?=[A-Z][a-z]{2})";  // positive lookbehind that matches a . followed by zero or more spaces followed by a positive lookahead of at least two alphas
-		//String regex2 = "(?=(?<!Mr|Ms)(?:\\.))\\s*(?=[A-Z][a-z]{2})";
+		//String regex2 = "(?<=\\.)\\s*(?=[A-Z][a-z]{2})";  // positive lookbehind that matches a . followed by zero or more spaces followed by a positive lookahead of at least two alphas
+		String regex2 = titles + "(?<=\\.)\\s*(?=[A-Za-z]))"; // allows for sentences to start with a single letter
+
 		Pattern falseMatchRegex = Pattern.compile("(vs|v\\.s|i\\.v)\\.$");
 		Pattern[] patterns = { Pattern.compile(regex1), Pattern.compile(regex2) };
 		
@@ -220,30 +333,18 @@ public class Tokenizer {
 		ArrayList<WordToken> wordTokens = new ArrayList<WordToken>();
 		
 		String[] words = replaceChars(sentence, false, false);
-		int prevTokenEnd = 0;
 		
 		if(words.length > 0) {
 			int i=0;
+			
 			for(String word : words) {
-				String normalizedForm = null;
-				
-				try {
-					int begin = sentence.indexOf(word, prevTokenEnd);
-					int end = begin + word.length();
-					normalizedForm = word;
-					
-					if(translateMap.containsKey(word)) {
-						normalizedForm = translateMap.get(word);
-					}
-						
-					prevTokenEnd = end;
-					
-				} catch(Exception e) {
-					normalizedForm = "[error]";
-					logger.warn("com.mst.tools.Tokenizer.splitWords(): Error splitting words. \n Input sentence: {} \n {}", sentence, e);
+				String xlate = translateMap.get(word.toLowerCase());
+				if(xlate == null)
+					wordTokens.add(new WordToken(word, null, ++i));
+				else {
+					for(String token : xlate.split(" "))
+						wordTokens.add(new WordToken(token, null, ++i));
 				}
-				
-				wordTokens.add(new WordToken(word, normalizedForm, ++i));
 			}
 		} else {
 			//logger.error("com.mst.tools.Tokenizer.replaceChars() produced an empty array. \n Input sentence: {}", sentence);
@@ -261,6 +362,9 @@ public class Tokenizer {
 		
 		try {
 			s = s.trim();
+			
+			//s = s.replaceAll(YEAR_OLD_REGEX, YEAR_OLD_REPL);
+			//s = s.replaceAll(YEAR_OLD_SEX_REGEX, YEAR_OLD_SEX_REPL);
 			
 			if(s.startsWith("\""))
 				s = s.replaceFirst("\"", "\" ");
@@ -284,7 +388,10 @@ public class Tokenizer {
 		    s = s.replace("%", " % ");
 		    s = s.replace("&", " & ");
 		    
-		    // semi-confusing loop in mst_tokenizer.py. TODO test this!
+		    //s = s.replace("Pt", "Patient");
+		    
+		    // this was copied verbatim from the original python.
+		    // needs to be cleaned up. apparent goal is to add a space to betwen final token and period ending sentence.
 		    // read through a sentence backwards, looking for a period only if it precedes certain chars
 		    int pos = s.length()-1;
 		    while(pos > 0) {
@@ -296,7 +403,8 @@ public class Tokenizer {
 		    }
 		    // if a period is not preceded by another period, replace
 		    if(s.charAt(pos) == '.' && !(pos > 0 && s.charAt(pos-1) == '.'))
-		    	s = s.replace(".", " .");
+		    	s = s.substring(0, s.length()-1) + " .";
+		    	//s = s.replace(".", " .");
 		    
 		    s = s.replace("?", " ? ");
 		    s = s.replace("!", " ! ");
@@ -363,7 +471,7 @@ public class Tokenizer {
 		    s = s.replaceAll("\\s+", " ");
 		    
 		    ret = s.trim().split(" ");
-		    
+		    //System.out.println(s);
 		} catch(Exception e) {
 			logger.error("replaceChars(): Input sentence: {} \n {}", s, e);
 		}

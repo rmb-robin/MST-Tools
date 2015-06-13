@@ -8,3 +8,5 @@ Class-Path: /usr/local/classes/activemq-all-5.9.0.jar
   /usr/local/classes/twilio-java-sdk-3.4.4-jar-with-dependencies.jar
   /usr/local/classes/guava-17.0.jar
   /usr/local/classes/jedis-2.6.2.jar
+  /usr/local/classes/stanford-corenlp-3.4-models.jar
+  /usr/local/classes/stanford-corenlp-3.4.jar

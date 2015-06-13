@@ -1,15 +1,20 @@
 package com.mst.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mst.util.Constants;
 
 public class VerbPhraseMetadata {
 	private Constants.VerbClass _class;
 	private VerbPhraseToken subj;
-	private VerbPhraseToken verb;
-	private VerbPhraseToken subjc;
+	private List<VerbPhraseToken> verbs = new ArrayList<VerbPhraseToken>();
+	private List<VerbPhraseToken> subjc = new ArrayList<VerbPhraseToken>();
+	//private VerbPhraseToken subjc;
 	private boolean compound;
 	private boolean intransitive = true;
 	private boolean infFollowsPP; // infinitive verb follows prep phrase
+	private String st = null;
 
 	public VerbPhraseMetadata() {	}
 	
@@ -33,20 +38,20 @@ public class VerbPhraseMetadata {
 		this.subj = subj;
 	}
 
-	public VerbPhraseToken getVerb() {
-		return verb;
+	public List<VerbPhraseToken> getVerbs() {
+		return verbs;
+	}
+	
+	public void addVerb(VerbPhraseToken verb) {
+		this.verbs.add(verb);
 	}
 
-	public void setVerb(VerbPhraseToken verb) {
-		this.verb = verb;
-	}
-
-	public VerbPhraseToken getSubjC() {
+	public List<VerbPhraseToken> getSubjC() {
 		return subjc;
 	}
 
-	public void setSubjC(VerbPhraseToken subjc) {
-		this.subjc = subjc;
+	public void addSubjC(VerbPhraseToken subjc) {
+		this.subjc.add(subjc);
 	}
 
 	public boolean isCompound() {
@@ -71,6 +76,22 @@ public class VerbPhraseMetadata {
 
 	public boolean isInfFollowsPP() {
 		return infFollowsPP;
+	}
+	
+	public String getSemanticType() {
+		return st;
+	}
+	
+	public void setSemanticType(String val) {
+		st = val;
+	}
+	
+	public String getVerbString() {
+		StringBuilder vp = new StringBuilder();
+		for(VerbPhraseToken token : verbs) {
+			vp.append(token.getToken()).append(" ");
+		}
+		return vp.toString().trim();
 	}
 }
 

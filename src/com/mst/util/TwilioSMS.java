@@ -13,8 +13,12 @@ import com.twilio.sdk.resource.instance.Message;
 public class TwilioSMS { 
  
 	public final String ACCOUNT_SID = "AC75a90e82c7f600132f6e50e7bc4a611f"; 
-	public final String AUTH_TOKEN = "490c1cadaf9ab079bd3483549af686ea"; 
-	public final String FROM_NUMBER = "+15029128794";
+	//public final String ACCOUNT_SID = "AC0dba99ea7c64aaf1f7bd768812800283";
+	public final String AUTH_TOKEN = "490c1cadaf9ab079bd3483549af686ea";
+	//public final String AUTH_TOKEN = "5b96f660fd43e0b909d016cee1d5e2ca";
+	//public final String FROM_NUMBER = "+15029128794";
+	//public final String FROM_NUMBER = "+15005550006";
+	public final String FROM_NUMBER = "+15028224445";
 
 	public void sendSMS(String msg) { 
 		TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN); 

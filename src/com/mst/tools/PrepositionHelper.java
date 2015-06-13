@@ -44,7 +44,7 @@ public class PrepositionHelper {
 							break;
 						else if(nextWord.getToken().equals(",")) // a comma stops the phrase
 							// unless it is preceded and followed by an adjective
-							if(!(words.get(j-1).isAdjective()) && words.get(j+1).isAdjective())
+							if(!(words.get(j-1).isAdjectivePOS()) && words.get(j+1).isAdjectivePOS())
 								break;
 						
 						// no breaks; add index of current word to list of comprising tokens
@@ -59,7 +59,7 @@ public class PrepositionHelper {
 						//	break;	
 						
 						try {
-							if(nextWord.isNoun() && !words.get(j+1).getPOS().matches("CC|NN|NNS"))
+							if(nextWord.isNounPOS() && !words.get(j+1).getPOS().matches("^(CC|NN(S|P|PS)?)$"))
 								break;
 						} catch(IndexOutOfBoundsException e) { }
 					}
@@ -81,7 +81,7 @@ public class PrepositionHelper {
 									//	prepPhraseCount++;
 									//	runOnce = false;
 									//}
-								} while(words.get(index).getPOS().matches("CC|,|NN|NNS"));
+								} while(words.get(index).getPOS().matches("^(CC|,|NN(S|P|PS)?)$"));
 								
 							} else {
 								// set as prep phrase member
@@ -123,45 +123,85 @@ public class PrepositionHelper {
 						if(nextWord.isDependentPhraseBegin() && j-i > 1)
 							// next word is a dep phrase signal and at least one token separates the preposition from the dp signal
 							break;
-						else if(nextWord.getToken().matches(";|\\.")) // a semicolon or period always stops the phrase
+						else if(nextWord.getToken().matches(";|\\.|\\)")) // a semicolon or period always stops the phrase
 							break;
-						else if(nextWord.getToken().equals(",")) // a comma stops the phrase
-							// unless it is preceded and followed by an adjective
-							if(!(sentence.getWordList().get(j-1).isAdjective()) && sentence.getWordList().get(j+1).isAdjective())
+						else if(nextWord.isConjunctionPOS()) { // a a conjuction not followed by a noun/number
+							if(!sentence.getWordList().get(j+1).getPOS().matches("^(CD|JJ|NN(S|P|PS)?)$")) {
+								// deal with Oxford comma followed by a CC (remove comma hanging off the end)
+								if(sentence.getWordList().get(comprisingTokenIndex.get(comprisingTokenIndex.size()-1)).getPOS().matches(",")) {
+									comprisingTokenIndex.remove(comprisingTokenIndex.get(comprisingTokenIndex.size()-1));
+								}
 								break;
-						
+							}
+						} else if(nextWord.getToken().matches(",")) { // a comma stops the phrase
+							// unless it is preceded and followed by an adjective
+							//if(!(sentence.getWordList().get(j-1).isAdjectivePOS()) && sentence.getWordList().get(j+1).isAdjectivePOS())
+							// prep prhase is allowed to continue if comma is follwed by a noun, number, or adjective (in the latter case only if an adjective also preceeds the comma)
+							// TODO what about CC?
+							//if(!(sentence.getWordList().get(j-1).isAdjectivePOS() && sentence.getWordList().get(j+1).isAdjectivePOS()) || 
+							//	!sentence.getWordList().get(j+1).getPOS().matches("^(CD|NN(S|P|PS)?)$"))
+							//	break;
+							if(!sentence.getWordList().get(j+1).getPOS().matches("^(CD|CC|JJ|NN(S|P|PS)?)$"))
+								break;
+						}
 						// no breaks; add index of current word to list of comprising tokens
 						// ## logic above this line EXCLUDES the token that caused the break ##
 						comprisingTokenIndex.add(j);
 						// ## logic below this line INCLUDES the token that caused the break ##
 						
-						// stop on a noun unless the following token is a coordinating conjunction or noun	
+						// stop on a noun/number...	
 						try {
-							if(nextWord.isNoun() && !sentence.getWordList().get(j+1).getPOS().matches("CC|NN|NNS"))
-								break;
+							if(nextWord.isNounPOS() || nextWord.isNumericPOS()) {
+								// unless the following token is a coordinating conjunction, noun, number, or comma
+								if(!sentence.getWordList().get(j+1).getPOS().matches("^(CD|CC|,|NN(S|P|PS)?)$"))
+									break;
+							}
 						} catch(IndexOutOfBoundsException e) { }
 					}
 	
 					if(comprisingTokenIndex.size() > 0) {
 						// prepend initial matched preposition
-						comprisingTokenIndex.add(0, i);
+						//comprisingTokenIndex.add(0, i);
+						sentence.getWordList().get(i).setPrepPhraseBegin(true);
+						sentence.getWordList().get(i).setPrepPhraseMember(true);
 						
 						// loop through list of indexes that make up the prep phrase
+//						for(int j=0; j < comprisingTokenIndex.size(); j++) {
+//							int index = comprisingTokenIndex.get(j);
+//													
+//							if(j == comprisingTokenIndex.size()-1) { // last item in list
+//								do {
+//									sentence.getWordList().get(index).setPrepPhraseObject(true);
+//									index--;
+//									// TODO this loop may no longer be important as long as the final token is marked as the Object
+//								} while(sentence.getWordList().get(index).getPOS().matches("^(CC|,|NN(S|P|PS)?)$") && index >= comprisingTokenIndex.get(0));
+//								
+//							} else {
+//								// set as prep phrase member
+//								sentence.getWordList().get(index).setPrepPhraseMember(true);
+//								if(j == 0) {
+//									sentence.getWordList().get(index).setPrepPhraseBegin(true);
+//								}
+//							}
+//						}
+						
+						// this is a little convoluted.
+						// three booleans make up a PP token: ppBegin, ppMember, ppObj
+						// the final token will only have ppObj set = true (ppMember will = false). This is used in other routines to determine the end of the PP.
+						// the first token (the preposition) will have ppBegin = true and ppMember = true.
+						// all non-final members of the PP will have ppMember = true.
+						// all PP objects will have ppMember = true and ppObj = true.
+						
 						for(int j=0; j < comprisingTokenIndex.size(); j++) {
-							int index = comprisingTokenIndex.get(j);
-													
+							WordToken ppWord = sentence.getWordList().get(comprisingTokenIndex.get(j));
+							
 							if(j == comprisingTokenIndex.size()-1) { // last item in list
-								do {
-									sentence.getWordList().get(index).setPrepPhraseObject(true);
-									index--;
-
-								} while(sentence.getWordList().get(index).getPOS().matches("CC|,|NN|NNS") && index >= comprisingTokenIndex.get(0));
-								
+								ppWord.setPrepPhraseObject(true);
 							} else {
-								// set as prep phrase member
-								sentence.getWordList().get(index).setPrepPhraseMember(true);
-								if(j == 0) {
-									sentence.getWordList().get(index).setPrepPhraseBegin(true);
+								ppWord.setPrepPhraseMember(true);
+								if(ppWord.isNounPOS() || ppWord.isNumericPOS()) {
+									// set as prep phrase member (nouns, cardinal numbers only)
+									ppWord.setPrepPhraseObject(true);
 								}
 							}
 						}

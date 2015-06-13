@@ -26,7 +26,7 @@ public class NounHelper {
 		try {
 			//TODO don't mark as head if surrounded by parens?
 			for(int i=words.size()-1; i >= 0; i--) {
-				if(words.get(i).isNoun()) {
+				if(words.get(i).isNounPOS()) {
 					if(headIndex == 0) {
 						headIndex = i;
 					} else {
@@ -37,7 +37,7 @@ public class NounHelper {
 							oldHeadIndex = headIndex;
 						}
 					}
-				} else if(words.get(i).isAdjective() || words.get(i).isAdverb() || words.get(i).isPunctuation()) {
+				} else if(words.get(i).isAdjectivePOS() || words.get(i).isAdverbPOS() || words.get(i).isPunctuation()) {
 					if(headIndex > 0) {
 						words.get(headIndex).setNounPhraseHead(true);
 						words.get(i).setNounPhraseModifier(true);
@@ -67,7 +67,7 @@ public class NounHelper {
 			//TODO don't mark as head if surrounded by parens?
 			for(int i=sentence.getWordList().size()-1; i >= 0; i--) {
 				WordToken word = sentence.getWordList().get(i);
-				if(word.isNoun()) {
+				if(word.isNounPOS() && !word.isPunctuation()) { // added isPunc because Stanford was tagging ( and ) as NN. This may catch other Stanford POS tagging of punc chars.
 					if(headIndex == 0) {
 						headIndex = i;
 					} else {
@@ -78,7 +78,7 @@ public class NounHelper {
 						//	oldHeadIndex = headIndex;
 						//}
 					}
-				} else if(word.isAdjective() || word.isAdverb() || word.isPunctuation()) {
+				} else if(word.isAdjectivePOS() || word.isAdverbPOS() || word.isPunctuation() || word.isNumericPOS() || word.isPronounPOS()) {
 					if(headIndex > 0) {
 						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
 						sentence.getWordList().get(i).setNounPhraseModifier(true);

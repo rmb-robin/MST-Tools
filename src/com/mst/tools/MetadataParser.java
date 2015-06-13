@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.mst.model.DependentPhraseMetadata;
 import com.mst.model.NounPhraseMetadata;
@@ -34,8 +35,6 @@ public class MetadataParser {
 	public void parseComplex(Sentence sentence) {
 		ArrayList<WordToken> words = sentence.getWordList();
 		SentenceMetadata metadata = sentence.getMetadata();
-		//int verbCount = 0;
-		boolean compoundVerb = false;
 		int i = 0;
 		
 		if(containsPattern(datePattern, sentence.getFullSentence())) {
@@ -62,10 +61,6 @@ public class MetadataParser {
 					}			
 				}
 				
-				//if(word.isConjunction() && verbCount > 0) {
-				//	compoundVerb = true;
-				//}
-				
 				/* PREP phrases */
 				if(word.isPrepPhraseObject() && !word.isPrepPhraseMember()) {
 					PrepPhraseMetadata pp = new PrepPhraseMetadata();
@@ -83,7 +78,7 @@ public class MetadataParser {
 				/* VERB phrases (not handled in VerbPhraseHelper) */
 				if(word.isInfinitiveVerb()) {
 					VerbPhraseMetadata vp = new VerbPhraseMetadata(Constants.VerbClass.INFINITIVE);
-					vp.setVerb(new VerbPhraseToken(word.getToken(), i));
+					vp.addVerb(new VerbPhraseToken(word.getToken(), i));
 					
 					// TODO negated
 					
@@ -98,28 +93,28 @@ public class MetadataParser {
 					
 				if(word.isPrepositionalVerb()) {
 					VerbPhraseMetadata vp = new VerbPhraseMetadata(Constants.VerbClass.PREPOSITIONAL);
-					vp.setVerb(new VerbPhraseToken(word.getToken(), i));
+					vp.addVerb(new VerbPhraseToken(word.getToken(), i));
 					
 					// TODO negated?
 									
 					metadata.addVerbMetadata(vp);
 				} 
 				
-				if(word.isModalAuxVerb()) {
-					VerbPhraseMetadata vp = new VerbPhraseMetadata(Constants.VerbClass.MODAL_AUX);
-					
-					vp.setVerb(new VerbPhraseToken(word.getToken(), i));
-					
-					// a bit of a hack. set the subject of a modal aux verb as the term preceding the verb
-					// modal aux are short phrases such as "could be" or "may have"
-					try {
-						vp.setSubj(new VerbPhraseToken(words.get(i-1).getToken(), i-1));
-					} catch(Exception e) { }
-					
-					// TODO negated?
-					
-					metadata.addVerbMetadata(vp);
-				} 
+//				if(word.isModalAuxVerb()) {
+//					VerbPhraseMetadata vp = new VerbPhraseMetadata(Constants.VerbClass.MODAL_AUX);
+//					
+//					vp.addVerb(new VerbPhraseToken(word.getToken(), i));
+//					
+//					// a bit of a hack. set the subject of a modal aux verb as the term preceding the verb
+//					// modal aux are short phrases such as "could be" or "may have"
+//					try {
+//						vp.setSubj(new VerbPhraseToken(words.get(i-1).getToken(), i-1));
+//					} catch(Exception e) { }
+//					
+//					// TODO negated?
+//					
+//					metadata.addVerbMetadata(vp);
+//				} 
 				
 				
 				/* NOUN phrases */
@@ -164,37 +159,55 @@ public class MetadataParser {
 		// now loop through phrases built in previous loop and construct additional metadata
 		// #####
 		
-		// compound verb phrases
-//		if(compoundVerb) {
-//			for(VerbPhraseMetadata phrase : metadata.getVerbMetadata())
-//				// set every verb phrase compound = true
-//				phrase.setCompound(true);
-//		}
-		
 		for(NounPhraseMetadata phrase : metadata.getNounMetadata()) {
 			int finalTokenPos = 0;
+
 			for(GenericToken tp : phrase.getPhrase()) {
 				// contains comma
 				if(tp.getToken().equals(",")) {
 					metadata.addSimpleMetadataValue("NPContainsComma", true);
 				}
 				finalTokenPos = tp.getPosition();
+
 			}
 			phrase.setPrepPhrasesIdx(getModifyingPrepPhrases(finalTokenPos, metadata.getPrepMetadata()));
+			// query lexicon for noun phrase semantic type
+			String st = Constants.semanticTypes.get(phrase.getNounPhraseString().trim().toLowerCase());
+
+			phrase.setSemanticType(st);
 		}
 		
 		for(PrepPhraseMetadata phrase : metadata.getPrepMetadata()) {
-			for(PrepPhraseToken tp : phrase.getPhrase()) {
-				tp.setNounPhraseIdx(getContainingNounPhraseIdx(tp.getPosition(), metadata.getNounMetadata()));
+			//List<String> st = new ArrayList<String>();
+			
+			for(PrepPhraseToken ppt : phrase.getPhrase()) {
+				ppt.setNounPhraseIdx(getContainingNounPhraseIdx(ppt.getPosition(), metadata.getNounMetadata()));
+				
+				// PP semantic type = concatenation of PP OBJ semantic types
+				// may possibly alter this or make it smarter
+//				if(words.get(ppt.getPosition()).isPrepPhraseBegin() || words.get(ppt.getPosition()).isPrepPhraseObject()) {
+//					st.add(words.get(ppt.getPosition()).getSemanticType());
+//				}
 			}
+
+//			phrase.setSemanticType(Joiner.on("-").join(st));
 		}
 		
 		for(VerbPhraseMetadata phrase : metadata.getVerbMetadata()) {
 			if(phrase.getVerbClass() == Constants.VerbClass.ACTION ||
 				phrase.getVerbClass() == Constants.VerbClass.LINKING_VERB ||
-				phrase.getVerbClass() == Constants.VerbClass.VERB_OF_BEING) {
+				phrase.getVerbClass() == Constants.VerbClass.VERB_OF_BEING || 
+				phrase.getVerbClass() == Constants.VerbClass.MODAL_AUX) {
 				
-				phrase.getVerb().setNegated(checkNegation(words, phrase.getVerb().getPosition()));
+				for(VerbPhraseToken verb : phrase.getVerbs()) {
+					verb.setNegated(checkNegation(words, verb.getPosition()));
+					verb.setPrepPhrasesIdx(getModifyingPrepPhrases(verb.getPosition(), metadata.getPrepMetadata()));
+				}
+				
+				// if verb consists of more than one token, query lexicon for semantic type
+				if(phrase.getVerbs().size() > 1) {
+					phrase.setSemanticType(Constants.semanticTypes.get(phrase.getVerbString()));
+				}
 				
 				if(phrase.getSubj() != null) {
 					phrase.getSubj().setPrepPhrasesIdx(getModifyingPrepPhrases(phrase.getSubj().getPosition(), metadata.getPrepMetadata()));
@@ -202,16 +215,21 @@ public class MetadataParser {
 					phrase.getSubj().setNegated(checkSubjNegation(words, phrase.getSubj().getPosition()));
 				}
 				
-				if(phrase.getSubjC() != null) {
-					phrase.getSubjC().setPrepPhrasesIdx(getModifyingPrepPhrases(phrase.getSubjC().getPosition(), metadata.getPrepMetadata()));
-					phrase.getSubjC().setNounPhraseIdx(getContainingNounPhraseIdx(phrase.getSubjC().getPosition(), metadata.getNounMetadata()));
-					phrase.getSubjC().setNegated(checkSubjCNegation(words, phrase.getSubjC().getPosition()));
-					
-					phrase.getSubjC().setDepPhraseIdx(findModifyingDependentPhrase(words, phrase.getSubjC().getPosition(), metadata.getDependentMetadata()));
+				if(!phrase.getSubjC().isEmpty()) {
+					for(VerbPhraseToken token : phrase.getSubjC()) {
+						token.setPrepPhrasesIdx(getModifyingPrepPhrases(token.getPosition(), metadata.getPrepMetadata()));
+						token.setNounPhraseIdx(getContainingNounPhraseIdx(token.getPosition(), metadata.getNounMetadata()));
+						token.setNegated(checkSubjCNegation(words, token.getPosition()));
+						
+						token.setDepPhraseIdx(findModifyingDependentPhrase(words, token.getPosition(), metadata.getDependentMetadata()));
+					}
 				}
-				
+								
 			} else if(phrase.getVerbClass() == Constants.VerbClass.PREPOSITIONAL) {
-				phrase.getVerb().setPrepPhrasesIdx(getModifyingPrepPhrases(phrase.getVerb().getPosition(), metadata.getPrepMetadata()));
+				//phrase.getVerb().setPrepPhrasesIdx(getModifyingPrepPhrases(phrase.getVerb().getPosition(), metadata.getPrepMetadata()));
+				for(VerbPhraseToken verb : phrase.getVerbs()) {
+					verb.setPrepPhrasesIdx(getModifyingPrepPhrases(verb.getPosition(), metadata.getPrepMetadata()));
+				}
 			}
 		}
 		
@@ -357,9 +375,9 @@ public class MetadataParser {
 		boolean ret = false;
 		
 		try {	
-			if(words.get(tokenPos-1).isNegationToken()) {
+			if(words.get(tokenPos-1).isNegationSignal()) {
 				ret = true;
-			} else if(words.get(tokenPos-1).isArticle() && words.get(tokenPos-2).isNegationToken()) {
+			} else if(words.get(tokenPos-1).isArticle() && words.get(tokenPos-2).isNegationSignal()) {
 				ret = true;
 			}
 		} catch(IndexOutOfBoundsException oob) { }
@@ -375,7 +393,7 @@ public class MetadataParser {
 			for(int i=tokenPos-1; i >= 0; i--) {
 				if(words.get(i).isVerbOfBeing() || words.get(i).isLinkingVerb()) {
 					break;
-				} else if(words.get(i).isNegationToken()) {
+				} else if(words.get(i).isNegationSignal()) {
 					ret = true;
 					break;
 				}
@@ -391,7 +409,7 @@ public class MetadataParser {
 		try {
 			// loop backwards from subject to start of sentence
 			for(int i=tokenPos-1; i >= 0; i--) {
-				if(words.get(i).isNegationToken()) {
+				if(words.get(i).isNegationSignal()) {
 					ret = true;
 					break;
 				}
@@ -444,7 +462,7 @@ public class MetadataParser {
 		tposList.add(new GenericToken(words.get(startPos).getToken(), startPos));
 		
 		for(int i=startPos+1; i < words.size(); i++) {
-			if(words.get(i).isConjunction()) {
+			if(words.get(i).isConjunctionPOS()) {
 				conjFound = true;
 				tposList.add(new GenericToken(words.get(i).getToken(), i));
 			} else {

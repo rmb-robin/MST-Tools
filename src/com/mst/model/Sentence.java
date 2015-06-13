@@ -16,7 +16,7 @@ public class Sentence {
 	//private ArrayList<StanfordDependency> stanfordDependencyList;
 	//private Map<String, Object> simpleMetadata = new HashMap<String, Object>();
 	private SentenceMetadata metadata = new SentenceMetadata();
-	private String id, source, clientId;
+	private String id, source, practice, study;
 	
 	public Sentence() {	
 		this.processDate = new Date();
@@ -75,12 +75,20 @@ public class Sentence {
 		return id;
 	}
 	
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
+	public void setPractice(String practice) {
+		this.practice = practice;
 	}
 	
-	public String getClientId() {
-		return clientId;
+	public String getPractice() {
+		return practice;
+	}
+	
+	public void setStudy(String study) {
+		this.study = study;
+	}
+	
+	public String getStudy() {
+		return study;
 	}
 	
 	public void setSource(String source) {

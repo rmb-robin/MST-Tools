@@ -24,7 +24,12 @@ public class SentenceMetadata {
 	private List<DependentPhraseMetadata> dependentPhrases = new ArrayList<DependentPhraseMetadata>();
 		
 	
-	public boolean addVerbMetadata(VerbPhraseMetadata val) { return verbPhrases.add(val); }
+	public int addVerbMetadata(VerbPhraseMetadata val) {
+		// return the index of the phrase just added
+		verbPhrases.add(val);
+		return verbPhrases.size()-1;
+	}
+	
 	public List<VerbPhraseMetadata> getVerbMetadata() { return verbPhrases; }
 	
 	public boolean addNounMetadata(NounPhraseMetadata val) { return nounPhrases.add(val); }

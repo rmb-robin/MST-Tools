@@ -104,8 +104,8 @@ public class MongoDB {
 				                append("normalized", word.getNormalizedForm()).
 				                append("pos", word.getPOS());
 						
-								if(sentence.getClientId() != null)
-									doc.append("client_id", sentence.getClientId());
+								if(sentence.getPractice() != null)
+									doc.append("client_id", sentence.getPractice());
 								if(sentence.getProcedureDate() != null)
 									doc.append("procedure_date", sentence.getProcedureDate());
 									
@@ -165,10 +165,8 @@ public class MongoDB {
 	}
 	
 	public String insertTaggedSentenceFull(Sentence sentence) {
-		//System.out.println("Mongo auth value: " + auth);
-		if(auth) {
+		if(auth && !sentence.getWordList().isEmpty()) {
 			Gson gson = GsonFactory.build();
-			
 			try {
 				Constants.Source source = Constants.Source.valueOf(sentence.getSource());
 				DBCollection coll = db.getCollection(source.getMongoCollection());

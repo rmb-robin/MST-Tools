@@ -1,18 +1,21 @@
 package com.mst.model.ontology;
 
-//import java.util.ArrayList;
+import java.util.ArrayList;
 
 public class ClinicalFinding {
-	public enum FindingType { PRESENT, ABSENT, SUSPICIOUS, UNKNOWN }
-	public FindingType findingType;
-	public String value;
-	public String size;
-	//public ArrayList<FindingSite> findingSites = new ArrayList<FindingSite>();
 
-	public ClinicalFinding() { }
-	
-	public ClinicalFinding(String value) {
-		this.value = value;
-		//findingSites.add(new FindingSite(value));
-	}
+	public String value;  //cyst, mass, tumor
+	public String _class;  //Appearance-Viz
+	//public String type; //Presence, Absence
+	//public String parent;
+	public ArrayList<FindingSite> findingSites = new ArrayList<FindingSite>();
+	//public String match; //string representing query that matched from constructors table
+	public String complainingOfPain;
+	public String diagnosis;
+	public String diagnosis_failover;
+	public String diagnosis_val;
+	public String gleason;
+	public String psa;
+	public String psa_date;
+
 }

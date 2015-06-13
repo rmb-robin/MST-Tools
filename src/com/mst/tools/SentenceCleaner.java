@@ -19,10 +19,10 @@ public class SentenceCleaner {
 			cleaned = removeProbabilityInfo(cleaned);
 			
 			if(cleaned != null) {
-				// sometimes Òdouble quotesÓ come across in the text of full articles from PubMed. These seem to cause issues for the POS tagger.
+				// sometimes ï¿½double quotesï¿½ come across in the text of full articles from PubMed. These seem to cause issues for the POS tagger.
 				cleaned = cleaned.replaceAll("\"", "");
-				cleaned = cleaned.replaceAll("Ó", "");
-				cleaned = cleaned.replaceAll("Ò", "");
+				cleaned = cleaned.replaceAll("ï¿½", "");
+				cleaned = cleaned.replaceAll("ï¿½", "");
 			}
 		}
 		
@@ -37,33 +37,41 @@ public class SentenceCleaner {
 		try {
 			/* define regex */
 			// not all section headers are in uppercase - we take the most common cases here and match them explicitly
-			// TODO test this to ensure that ? don't get interpreted literally
 			// TODO add (?i) to this since it's added in both uses?
-			String explicitHeaders = "(abstract|introduction and hypothesis|background and aims?|background|aim of the study|aims?|introduction|" +
-	                				 "purposes?|context|(?:materials? and )?methods?|objectives?|results?|conclusions?)";
-			String sectionHeader = "^\\s*%s:\\s*:?\\s*";
-			// start of sentence, zero+ spaces, replace one+ upper/space, colon, zero+ spaces, ONE colon, zero+ spaces
-			String uppercaseHeader = String.format(sectionHeader, "[A-Z\\s&]+");
-			// start of sentence, zero+ spaces, explicitHeaders, colon, zero+ spaces, ONE colon, zero+ spaces
-			// Test: " abstract: : colon: hello this is some text"  <-- everything from "colon" on should be kept
-			String mixedCaseHeader = String.format(sectionHeader, "(?i)".concat(explicitHeaders));
-			// some section headers don't even have colons - we will match these against the explicit headers
+			String pubmedHeaders = "abstract|introduction and hypothesis|background and aims?|background|aim of the study|aims?|introduction|" +
+	                				 "purposes?|context|(?:materials? and )?methods?|objectives?|results?|conclusions?";
+			String wichitaHeaders = "REFERRED HERE|REASON FOR VISIT|SUBJECTIVE2|PREVIOUS TESTS?|ASSESSMENT|CLINICAL IMPRESSION?|PLANS?|CHIEF COMPLAINTS?|HISTORY OF PRESENT ILLNESS|" +
+	                				"PAST MEDICAL/SURGICAL HISTORY|REPORTED|OTHER|DIAGNOSES|PROCEDURAL|SURGICAL|CURRENT MEDICATIONS?|ALLERGIES|PERSONAL HISTORY|FAMILY HISTORY|" + 
+	                				"TB-MOTHER|REVIEW OF SYSTEMS|CARDIOVASCULAR|PULMONARY|MUSCULOSKELETAL|PHYSICAL FINDINGS?|VITAL SIGNS|STANDARD MEASUREMENTS|RECTAL|NOTES|" + 
+	                				"THERAPY|MEANINGFUL USE MEASURES|PLANNING|PROBLEM LIST|FACILITY|SIGNATURES";
+			
+			String genesisHeaders = "Impression|Current Plans?|Future Plans?|Story";
+			
+			String allHeaders = "(?i)(" + pubmedHeaders + "|" + wichitaHeaders + "|" + genesisHeaders + ")";
+			
+			String withColon = "^\\s*%s:\\s*:?\\s*";
+			String withoutColon = "^\\s*%s\\s+";
+
+			String uppercaseWithColon = String.format(withColon, "[A-Z\\s&]+");  //https://www.regex101.com/r/eP3rD3/1
+
+			String explicitWithColon = String.format(withColon, allHeaders);  //https://www.regex101.com/r/nM5eN3/1
+			// some section headers don't have colons - we will match these against the explicit headers
 		    // and require the next word to begin with a capital letter to guard against false positives
-			String noColonHeader = String.format("^\\s*%s\\s+", "(?i)".concat(explicitHeaders));
+			String explicitWithoutColon = String.format(withoutColon, allHeaders);  //https://www.regex101.com/r/sM1xT6/1
 			
 			/* begin processing */
-			output = input.replaceAll(uppercaseHeader, "");
+			output = input.replaceAll(uppercaseWithColon, "");
 			// remove headers which are mixed-case and match one of the explicitly defined header patterns
-			output = output.replaceAll(mixedCaseHeader, "");
+			output = output.replaceAll(explicitWithColon, "");
 			
 			// remove headers which match an explicitly defined pattern but are not followed by a colon
-			Pattern p = Pattern.compile(noColonHeader);
+			Pattern p = Pattern.compile(explicitWithoutColon);
 			Matcher matcher = p.matcher(output);
 			if(matcher.find()) {
 				// confirm that the next character in the string is upper-case (i.e., starts the actual sentence) -
 	            // we can't do this in the regex because it ignores case
-				if(String.valueOf(output.charAt(matcher.end())).matches("[A-Z]")) {
-					output = output.replaceAll(noColonHeader, ""); 
+				if(String.valueOf(output.charAt(matcher.end())).matches("[A-Z0-9]")) {
+					output = output.replaceAll(explicitWithoutColon, ""); 
 				}
 			}
 		} catch(Exception e) {

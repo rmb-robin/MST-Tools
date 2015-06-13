@@ -12,7 +12,9 @@ public class WordToken extends GenericToken {
 	
 	private String pos = "";  // part of speech
 	private String normalizedForm = null;
-	private ArrayList<SemanticType> semanticTypeList = new ArrayList<SemanticType>();
+	//private ArrayList<SemanticType> semanticTypeList = new ArrayList<SemanticType>();
+	private ArrayList<SemanticType> semanticTypeList = null;
+	private String st = null;
 	private boolean npHead; // noun phrase head
 	private boolean npMod; // noun phrase modifier
 	private boolean ppMember; // prep phrase member
@@ -31,8 +33,9 @@ public class WordToken extends GenericToken {
 	private boolean avSubj; // action verb subject
 	private boolean avObj; // action verb object
 	private boolean prepVerb; // prepositional verb
-	private boolean modAuxVerb; // modal auxiliary
-	private boolean modAuxTerm;
+	private boolean mv; // modal auxiliary
+	private boolean mvSubj;
+	private boolean mvSubjC;
 	private DependentPhraseClass dpBegin; // dependent phrase head
 	private boolean dpMember; // dependent phrase member
 	private boolean dpEnd; // dependent phrase member
@@ -48,69 +51,101 @@ public class WordToken extends GenericToken {
 		super(word, position);
 		this.setNormalizedForm(normalizedForm);
 	}
-	
+	/*
+	@Override
+	public String getToken() {
+		if(normalizedForm == null)
+			return super.getToken();
+		else
+			return normalizedForm;
+	}
+	*/
 	public boolean isVerb() {	
-		return this.pos.startsWith("VB");
+		return pos.startsWith("VB");
 	}
 	
 	public boolean isPreposition() {	
-		return this.pos.matches("IN|TO");
+		return pos.matches("IN|TO");
 	}
 	
 	public boolean isArticle() {
-		return this.getToken().matches(Constants.ARTICLE);
+		return getToken().matches(Constants.ARTICLE);
 	}
 	
 	public boolean matchesVerbSubjectExclusion() {
-		return this.getToken().matches(Constants.VERB_SUBJ_SUBJC_EXCLUSIONS);
+		return getToken().matches(Constants.VERB_SUBJ_SUBJC_EXCLUSIONS);
 	}
 	
-	public boolean isPronoun() {	
-		return this.pos.matches("PRP|PRP\\$");
+	public boolean isPronounPOS() {	
+		return pos.matches("PRP|PRP\\$");
 	}
 	
 	public boolean isModalAuxPOS() {	
-		return this.pos.matches("MD");
+		return pos.matches("MD");
 	}
 	
-	public boolean isAdjective() {	
-		return this.pos.matches("JJ|JJR|JJS");
+	public boolean isAdjectivePOS() {	
+		return pos.matches("JJ|JJR|JJS");
+	}
+
+	public boolean isDeterminerPOS() {	
+		return pos.equalsIgnoreCase("DT");
 	}
 	
-	public boolean isNoun() {	
-		return this.pos.startsWith("NN");
+	public boolean isNounPOS() {	
+		return pos.startsWith("NN");
 	}
 	
-	public boolean isAdverb() {	
-		return this.pos.matches("RB|RBR|RBS");
+	public boolean isAdverbPOS() {	
+		return pos.matches("RB|RBR|RBS");
+	}
+
+	public boolean isNumericPOS() {	
+		return pos.equalsIgnoreCase("CD");
 	}
 	
-	public boolean isConjunction() {	
-		return this.pos.equalsIgnoreCase("CC");
+	public boolean isConjunctionPOS() {	
+		return pos.equalsIgnoreCase("CC");
 	}
 	
-	public boolean isNegationToken() {	
-		return this.getToken().matches(Constants.NEGATION);
+	public boolean isNegationSignal() {	
+		return getToken().matches(Constants.NEGATION);
 	}
 	
-	public boolean matchesModalAuxVerb() {	
-		return this.getToken().matches(Constants.MODAL_AUX_VERB);
+	public boolean isModalAuxSignal() {
+		return getToken().matches(Constants.MODAL_AUX_VERB);
 	}
 
 	public boolean isModalAuxVerb() {
-		return modAuxVerb;
+		return mv;
 	}
 
 	public void setModalAuxVerb(boolean val) {
-		this.modAuxVerb = val;
+		mv = val;
 	}
 
+	public boolean isModalSubject() {
+		return mvSubj;
+	}
+
+	public void setModalSubject(boolean val) {
+		mvSubj = val;
+	}
+	
+	public boolean isModalSubjectComplement() {
+		return mvSubjC;
+	}
+
+	public void setModalSubjectComplement(boolean val) {
+		mvSubjC = val;
+	}
+	
 	public boolean isCorefernece() {
 		return coref;
 	}
 
 	public void setCoreference(boolean val) {
-		this.coref = val;
+		coref = val;
 	}
 	
 	public boolean isConjunctiveAdverb() {
@@ -118,27 +153,15 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setConjunctiveAdverb(boolean val) {
-		this.conjAdv = val;
+		conjAdv = val;
 	}
-	
-	public boolean isModalAuxTerm() {
-		return modAuxTerm;
-	}
-
-	public void setModalAuxTerm(boolean val) {
-		this.modAuxTerm = val;
-	}
-	
-//	public boolean addRelation(int relationIndex) {
-//		return relations.add(relationIndex);
-//	}
 	
 	public boolean isInfinitiveVerb() {
 		return inf;
 	}
 
 	public void setInfinitiveVerb(boolean val) {
-		this.inf = val;
+		inf = val;
 	}
 
 	public boolean isPrepositionalVerb() {
@@ -146,7 +169,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setPrepositionalVerb(boolean val) {
-		this.prepVerb = val;
+		prepVerb = val;
 	}
 	
 	public boolean isVerbOfBeing() {
@@ -154,19 +177,15 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setVerbOfBeing(boolean val) {
-		this.vob = val;
+		vob = val;
 	}
 
-//	public void setVerbOfBeingMember(boolean val) {
-//		this.vobM = val;
-//	}
-	
 	public boolean isVerbOfBeingSubject() {
 		return vobSubj;
 	}
 
 	public void setVerbOfBeingSubject(boolean val) {
-		this.vobSubj = val;
+		vobSubj = val;
 	}
 
 	public boolean isVerbOfBeingSubjectComplement() {
@@ -174,7 +193,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setVerbOfBeingSubjectComplement(boolean val) {
-		this.vobSubjC = val;
+		vobSubjC = val;
 	}
 
 	public boolean isLinkingVerbSubject() {
@@ -182,7 +201,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setLinkingVerbSubject(boolean val) {
-		this.lvSubj = val;
+		lvSubj = val;
 	}
 
 	public boolean isLinkingVerb() {
@@ -190,7 +209,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setLinkingVerb(boolean val) {
-		this.lv = val;
+		lv = val;
 	}
 
 	public boolean isLinkingVerbSubjectComplement() {
@@ -198,7 +217,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setLinkingVerbSubjectComplement(boolean val) {
-		this.lvSubjC = val;
+		lvSubjC = val;
 	}
 
 	public boolean isActionVerb() {
@@ -206,7 +225,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setActionVerb(boolean val) {
-		this.av = val;
+		av = val;
 	}
 
 	public boolean isActionVerbSubject() {
@@ -214,7 +233,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setActionVerbSubject(boolean val) {
-		this.avSubj = val;
+		avSubj = val;
 	}
 	
 	public boolean isActionVerbDirectObject() {
@@ -222,16 +241,12 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setActionVerbDirectObject(boolean val) {
-		this.avObj = val;
+		avObj = val;
 	}
-	
-//	public ArrayList<Integer> getRelations() {
-//		return relations;
-//	}
 	
 	public boolean containsSemanticType(String regex) {
 		boolean ret = false;
-		for(SemanticType st : this.semanticTypeList) {
+		for(SemanticType st : semanticTypeList) {
 			if(st.getToken().equalsIgnoreCase(this.getToken())) {
 				if(st.getSemanticType().matches(regex)) {
 					ret = true;
@@ -244,19 +259,23 @@ public class WordToken extends GenericToken {
 	
 	public boolean isPunctuation() {
 		// !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-		return this.getToken().matches(Constants.PUNC);
+		return getToken().matches(Constants.PUNC);
 	}
 	
-	public boolean matchesVerbOfBeingConstant() {
-		return this.getToken().matches(Constants.VERBS_OF_BEING);
+	public boolean isVerbOfBeingSignal() {
+		return getToken().matches(Constants.VERBS_OF_BEING);
+	}
+	
+	public boolean isLinkingVerbSignal() {
+		return getToken().matches(Constants.LINKING_VERBS);
 	}
 	
 	public boolean matchesPrepositionConstant() {
-		return this.getToken().matches(Constants.PREPOSITIONS);
+		return getToken().matches(Constants.PREPOSITIONS);
 	}
 	
 	public boolean matchesConjunctiveAdverbConstant() {
-		return this.getToken().matches(Constants.CONJUNCTIVE_ADVERBS);
+		return getToken().matches(Constants.CONJUNCTIVE_ADVERBS);
 	}
 	
 	public String getPOS() {
@@ -264,19 +283,27 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setPOS(String val) {
-		this.pos = val;
+		pos = val;
+	}
+
+	public String getSemanticType() {
+		return st;
+	}
+
+	public void setSemanticType(String val) {
+		st = val;
 	}
 	
 	public ArrayList<SemanticType> getSemanticTypeList() {
-		return this.semanticTypeList;
+		return semanticTypeList;
 	}
 	
 	public void setSemanticTypeList(ArrayList<SemanticType> val) {
-		this.semanticTypeList = val;
+		semanticTypeList = val;
 	}
 	
 	public void setNounPhraseHead(boolean val) {
-		this.npHead = val;
+		npHead = val;
 	}
 	
 	public boolean isNounPhraseHead() {
@@ -284,11 +311,11 @@ public class WordToken extends GenericToken {
 	}
 	
 	public void setDependentPhraseBegin(DependentPhraseClass val) {
-		this.dpBegin = val;
+		dpBegin = val;
 	}
 	
 	public boolean isDependentPhraseBegin() {
-		return this.getDependentPhraseBegin() != null;
+		return getDependentPhraseBegin() != null;
 	}
 	
 	public DependentPhraseClass getDependentPhraseBegin() {
@@ -296,7 +323,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public void setDependentPhraseMember(boolean val) {
-		this.dpMember = val;
+		dpMember = val;
 	}
 	
 	public boolean isDependentPhraseMember() {
@@ -304,7 +331,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public void setDependentPhraseEnd(boolean val) {
-		this.dpEnd = val;
+		dpEnd = val;
 	}
 	
 	public boolean isDependentPhraseEnd() {
@@ -312,7 +339,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public void setInfinitiveHead(boolean val) {
-		this.infHead = val;
+		infHead = val;
 	}
 	
 	public boolean isInfinitiveHead() {
@@ -320,7 +347,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public void setNounPhraseModifier(boolean val) {
-		this.npMod = val;
+		npMod = val;
 	}
 	
 	public boolean isNounPhraseModifier() {
@@ -332,7 +359,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setPrepPhraseMember(boolean val) {
-		this.ppMember = val;
+		ppMember = val;
 	}
 
 	public boolean isPrepPhraseBegin() {
@@ -340,7 +367,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setPrepPhraseBegin(boolean val) {
-		this.ppBegin = val;
+		ppBegin = val;
 	}
 	
 	public boolean isPrepPhraseObject() {
@@ -348,14 +375,14 @@ public class WordToken extends GenericToken {
 	}
 
 	public void setPrepPhraseObject(boolean val) {
-		this.ppObj = val;
+		ppObj = val;
 	}
 	
 	public String getNormalizedForm() {
 		return normalizedForm;
 	}
 
-	public void setNormalizedForm(String normalizedForm) {
-		this.normalizedForm = normalizedForm;
+	public void setNormalizedForm(String val) {
+		normalizedForm = val;
 	}
 }

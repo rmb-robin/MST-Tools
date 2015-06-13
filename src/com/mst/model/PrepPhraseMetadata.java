@@ -6,6 +6,7 @@ import java.util.List;
 public class PrepPhraseMetadata {
 	private List<PrepPhraseToken> phrase = new ArrayList<PrepPhraseToken>();
 	private boolean negated;
+	private String st = null;
 	
 	public List<PrepPhraseToken> getPhrase() {
 		return phrase;
@@ -20,4 +21,15 @@ public class PrepPhraseMetadata {
 		this.negated = negated;
 	}
 	
+	public String getSemanticType() {return st;	}
+	
+	public void setSemanticType(String val) { st = val;	}
+	
+	public String getPrepPhraseString() {
+		StringBuilder pp = new StringBuilder();
+		for(GenericToken token : phrase) {
+			pp.append(token.getToken()).append(" ");
+		}
+		return pp.toString().trim();
+	}
 }

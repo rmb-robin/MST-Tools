@@ -14,5 +14,7 @@
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/guava-17.0.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/stanford-corenlp-3.4-models.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/stanford-corenlp-3.4.jar"/>
+	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/opencsv-3.3.jar" sourcepath="/Users/scottdaugherty/.m2/repository/com/opencsv/opencsv/3.3/opencsv-3.3-sources.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
