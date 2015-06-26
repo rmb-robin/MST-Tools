@@ -13,7 +13,7 @@ import com.mst.util.Constants;
 public class PrepositionHelper {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	public boolean identifyPrepPhrases(ArrayList<WordToken> words) {
+	/*public boolean identifyPrepPhrases(ArrayList<WordToken> words) {
 		boolean ret = true;
 		
 		// TODO I suspect that there are some logic problems with this code (identifying OBJ, etc)
@@ -99,9 +99,8 @@ public class PrepositionHelper {
 		}
 		
 		return ret;
-	}
+	}*/
 	
-	// TODO: can this be simplified?
 	public boolean identifyPrepPhrases(Sentence sentence) {
 		boolean ret = true;
 
@@ -126,13 +125,15 @@ public class PrepositionHelper {
 						else if(nextWord.getToken().matches(";|\\.|\\)")) // a semicolon or period always stops the phrase
 							break;
 						else if(nextWord.isConjunctionPOS()) { // a a conjuction not followed by a noun/number
-							if(!sentence.getWordList().get(j+1).getPOS().matches("^(CD|JJ|NN(S|P|PS)?)$")) {
-								// deal with Oxford comma followed by a CC (remove comma hanging off the end)
-								if(sentence.getWordList().get(comprisingTokenIndex.get(comprisingTokenIndex.size()-1)).getPOS().matches(",")) {
-									comprisingTokenIndex.remove(comprisingTokenIndex.get(comprisingTokenIndex.size()-1));
+							try {
+								if(!sentence.getWordList().get(j+1).getPOS().matches("^(CD|JJ|NN(S|P|PS)?)$")) {
+									// deal with Oxford comma followed by a CC (remove comma hanging off the end)
+									if(sentence.getWordList().get(comprisingTokenIndex.get(comprisingTokenIndex.size()-1)).getPOS().matches(",")) {
+										comprisingTokenIndex.remove(comprisingTokenIndex.get(comprisingTokenIndex.size()-1));
+									}
+									break;
 								}
-								break;
-							}
+							} catch(IndexOutOfBoundsException e) { }
 						} else if(nextWord.getToken().matches(",")) { // a comma stops the phrase
 							// unless it is preceded and followed by an adjective
 							//if(!(sentence.getWordList().get(j-1).isAdjectivePOS()) && sentence.getWordList().get(j+1).isAdjectivePOS())
