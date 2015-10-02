@@ -114,7 +114,7 @@ public class POSTagger {
 	}
 	
 	// TODO this doesn't belong here
-	public String getAnnotatedMarkup(ArrayList<WordToken> wordList) {
+	/*public String getAnnotatedMarkup(ArrayList<WordToken> wordList) {
 		StringBuilder sb = new StringBuilder();
 		ArrayList<String> markup = new ArrayList<String>();
 
@@ -350,7 +350,7 @@ public class POSTagger {
 		}
 		
 		return sb.toString();
-	}
+	}*/
  	
  	private boolean writeToFile(String content) {
 		boolean retVal = true;

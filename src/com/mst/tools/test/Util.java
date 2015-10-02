@@ -3,7 +3,7 @@ package com.mst.tools.test;
 import java.util.ArrayList;
 
 import com.mst.model.Sentence;
-import com.mst.tools.Annotator2;
+import com.mst.tools.Annotator;
 import com.mst.tools.MetadataParser;
 
 public class Util {
@@ -11,7 +11,7 @@ public class Util {
 		Sentence output = new Sentence();
 		
 		try {
-			Annotator2 ann = new Annotator2();
+			Annotator ann = new Annotator();
 			MetadataParser mdp = new MetadataParser();
 			
 			ArrayList<Sentence> sentences = ann.annotate(input, false);

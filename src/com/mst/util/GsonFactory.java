@@ -23,7 +23,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
-import com.mst.model.MapValue2;
+import com.mst.model.MapValue;
 
 /*
  * Custom factory for Gson that registers a de/serializer that can handle MongoDB's ISODate type.
@@ -80,13 +80,13 @@ public class GsonFactory {
 			@Override
 			public Multimap<String, ?> deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
 				
-				Type mapType = new TypeToken<Map<String, Collection<MapValue2>>>(){}.getType();
-				Map<String, Collection<MapValue2>> map = context.deserialize(json, mapType);
+				Type mapType = new TypeToken<Map<String, Collection<MapValue>>>(){}.getType();
+				Map<String, Collection<MapValue>> map = context.deserialize(json, mapType);
 				
-				Multimap<String, MapValue2> multimap = ArrayListMultimap.create();
+				Multimap<String, MapValue> multimap = ArrayListMultimap.create();
 				
-				for(Entry<String, Collection<MapValue2>> e : map.entrySet()) {
-		            Collection<MapValue2> value = (Collection<MapValue2>) e.getValue();
+				for(Entry<String, Collection<MapValue>> e : map.entrySet()) {
+		            Collection<MapValue> value = (Collection<MapValue>) e.getValue();
 		            multimap.putAll(e.getKey(), value);
 		        }
 				
@@ -149,13 +149,13 @@ public class GsonFactory {
 			@Override
 			public Multimap<String, ?> deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
 				
-				Type mapType = new TypeToken<Map<String, Collection<MapValue2>>>(){}.getType();
-				Map<String, Collection<MapValue2>> map = context.deserialize(json, mapType);
+				Type mapType = new TypeToken<Map<String, Collection<MapValue>>>(){}.getType();
+				Map<String, Collection<MapValue>> map = context.deserialize(json, mapType);
 				
-				Multimap<String, MapValue2> multimap = ArrayListMultimap.create();
+				Multimap<String, MapValue> multimap = ArrayListMultimap.create();
 				
-				for(Entry<String, Collection<MapValue2>> e : map.entrySet()) {
-		            Collection<MapValue2> value = (Collection<MapValue2>) e.getValue();
+				for(Entry<String, Collection<MapValue>> e : map.entrySet()) {
+		            Collection<MapValue> value = (Collection<MapValue>) e.getValue();
 		            multimap.putAll(e.getKey(), value);
 		        }
 				

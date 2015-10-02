@@ -10,9 +10,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.mst.util.Constants;
 
+// TODO what uses this class?!?
 public class RegexProcessor {
 
 	public void process(List<Multimap<String, MapValue>> related, String sentence) {
+		/*
 		// PSA/Gleason regex processing. Find instances that could not be picked up by a constructor.
 		
 		//Pattern ggRegex = Pattern.compile(Constants.GLEASON_REGEX);
@@ -125,6 +127,7 @@ public class RegexProcessor {
 				}
 			}
 		}
+		*/
 	}
 	
 	private String parseGleasonValue(String in) {

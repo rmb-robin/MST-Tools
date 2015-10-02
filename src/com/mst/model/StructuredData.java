@@ -11,42 +11,27 @@ public class StructuredData {
 	public Date date = new Date(0);
 	public String practice;
 	public String study;
-	// related to a verb phrase
-	public List<Multimap<String, MapValue>> related = new ArrayList<Multimap<String, MapValue>>();
-	// unrelated to a verb phrase; i.e., appears in a noun or prep phrase that cannot be grammatically related (by current metadata) to a verb phrase
-	public List<Multimap<String, MapValue>> unrelated = new ArrayList<Multimap<String, MapValue>>();
-	public List<Multimap<String, MapValue>> regex = new ArrayList<Multimap<String, MapValue>>();
+	public List<Multimap<String, MapValue>> data = new ArrayList<Multimap<String, MapValue>>();
 	public String sentence;
 
 	public List<MapValue> getValue(String searchKey, String searchValue, String targetKey) {	
-		//List<MapValue> list = new ArrayList<MapValue>();
-		
-		//getValueFromList(regex, searchKey, searchValue, targetKey, list);
-		//getValueFromList(related, searchKey, searchValue, targetKey, list);
-		//getValueFromList(unrelated, searchKey, searchValue, targetKey, list);
-		
-		return getValue(searchKey, searchValue, targetKey, ".*");
-		
-		//return list;
+		return getValue(searchKey, searchValue, targetKey, ".*", ".*");
 	}
 	
-	public List<MapValue> getValue(String searchKey, String searchValue, String targetKey, String targetValue) {	
+	public List<MapValue> getValue(String searchKey, String searchValue, String targetKey, String targetValue, String source) {	
 		List<MapValue> list = new ArrayList<MapValue>();
 		
-		getValueFromList(regex, searchKey, searchValue, targetKey, targetValue, list);
-		
-		getValueFromList(related, searchKey, searchValue, targetKey, targetValue, list);
-			
-		getValueFromList(unrelated, searchKey, searchValue, targetKey, targetValue, list);
+		getValueFromList(data, searchKey, searchValue, targetKey, targetValue, list, source);
 		
 		return list;
 	}
 	
-	public void getValueFromList(List<Multimap<String, MapValue>> list, String searchKey, String searchValue, String targetKey, String targetValue, List<MapValue> outputList) {
+	public void getValueFromList(List<Multimap<String, MapValue>> list, String searchKey, String searchValue, String targetKey, String targetValue, List<MapValue> outputList, String source) {
 
-		for(Multimap<String, MapValue> map : list) {			
+		for(Multimap<String, MapValue> map : list) {
 			for(MapValue mapValue : map.get(searchKey)) { // ex. Diagnostic Procedure
-				if(mapValue.value.matches("(?i)"+searchValue)) { // ex. Gleason
+				if(mapValue.value.matches("(?i)"+searchValue) && // ex. Gleason
+				   mapValue.source.matches("(?i)"+source)) { // ex. related
 					if(targetKey.equalsIgnoreCase(searchKey)) {
 						outputList.add(mapValue);
 					} else {
