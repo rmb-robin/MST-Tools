@@ -15,7 +15,7 @@ public class RegexProcessor {
 	public void process(List<Multimap<String, MapValue>> related, String sentence) {
 		// PSA/Gleason regex processing. Find instances that could not be picked up by a constructor.
 		
-		Pattern ggRegex = Pattern.compile(Constants.GLEASON_REGEX);
+		//Pattern ggRegex = Pattern.compile(Constants.GLEASON_REGEX);
 		Pattern psaRegex1 = Pattern.compile("PSA\\s*\\d\\d\\/\\d\\d\\/\\d\\d:?\\s*<?\\d\\d?\\.?\\d{1,2}"); //PSA 09/26/13: 0.46PSA 01/29/14: 0.18PSA 06/19/14: 0.05.
 		//Pattern psaRegex2 = Pattern.compile("PSA\\s*of\\s*\\d?\\d\\.\\d+\\s*((on|in)\\s*(\\d\\d\\/\\d\\d\\/\\d{2}|\\d{4}))?");
 		Pattern chesapeakePSA1 = Pattern.compile("(?i)PSA( \\(Most Recent\\))? \\(\\s*(\\d\\d?\\.\\d\\d?|[A-Za-z]*)\\s*\\)"); // PSA (Most Recent) (5.4)   PSA (2.5)   PSA (Most Recent) (undetectable)   https://www.regex101.com/r/dV6zN8/1
@@ -30,7 +30,7 @@ public class RegexProcessor {
 		final String ABSV_LABEL = "Absolute Value";
 		final String DATE_LABEL = "Known Event Date";
 		
-		Matcher matcher = ggRegex.matcher(sentence);
+		Matcher matcher = Constants.GLEASON_REGEX.matcher(sentence);
 
 		while(matcher.find()) {
 			String val = matcher.group(matcher.groupCount()); // get last group, which should be the Gleason value
@@ -40,7 +40,7 @@ public class RegexProcessor {
 				Multimap<String, MapValue> mm = ArrayListMultimap.create();
 				
 				mm.put(DIAP_LABEL, new MapValue(GLEASON_LABEL));
-				mm.put(ABSV_LABEL, new MapValue(parseGleasonValue(val), null, ggRegex.toString()));
+				mm.put(ABSV_LABEL, new MapValue(parseGleasonValue(val), null, Constants.GLEASON_REGEX.toString()));
 				
 				related.add(mm);
 			}

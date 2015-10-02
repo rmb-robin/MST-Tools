@@ -2,6 +2,8 @@ package com.mst.tools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +16,14 @@ import com.mst.model.VerbPhraseToken;
 import com.mst.model.WordToken;
 import com.mst.util.Constants;
 
-
 public class VerbHelper {
 	private final String INFINITIVE_HEAD_TERM = "(?i)to";
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
+	private final Pattern ALLOWABLE_JJ_REGEX = Pattern.compile("\\.|,|\\(|\\!");
+	private final Pattern PAREN_BEGIN_REGEX = Pattern.compile("\\(|\\[|\\{");
+	private final Pattern PAREN_END_REGEX = Pattern.compile("\\)|\\]|\\}");
+	
 	public boolean identifyInfinitivePhrases(Sentence sentence) {
 		// must be preceded by POSTagger.identifyPartsOfSpeech()
 		// must execute before POSTagger.identifyPrepPhrases()
@@ -66,6 +71,11 @@ public class VerbHelper {
 		
 		ArrayList<WordToken> words = sentence.getWordList();
 		
+		// TODO
+		// why didn't "has all been" come through here...?
+		// His bloodwork has all been good, and his last scan in 03/01/2014 was not convincing for any metastases where he is feeling pain.
+	
+		
 		try {
 			for(int i=0; i < words.size(); i++) {
 				WordToken thisToken = words.get(i);
@@ -81,12 +91,11 @@ public class VerbHelper {
 						thisToken.setLinkingVerb(true);
 						
 						int subjIdx = identifyVerbSubject(words, i);
-						//int subjcIdx = identifySubjectComplement(words, i);
-						List<Integer> subjcIdxs = identifySubjectComplement(words, i);
+						List<Integer> subjcIdxs = identifySubjectComplement(words, i, false);
 						
 						if(subjIdx != -1)
 							words.get(subjIdx).setLinkingVerbSubject(subjIdx != -1);
-						//if(subjcIdx != -1) words.get(subjcIdx).setLinkingVerbSubjectComplement(subjcIdx != -1);
+
 						if(!subjcIdxs.isEmpty())
 							for(int idx : subjcIdxs)
 								words.get(idx).setVerbOfBeingSubjectComplement(true);
@@ -119,7 +128,7 @@ public class VerbHelper {
 				WordToken thisToken = words.get(i);
 				try {
 					// first time around, compare against just the list of MV signals
-					// if a MV is found, compare subsequent tokens against VOB and LV signals
+					// if a MV is found, check subsequent tokens for verb POS to allow for compound
 					if(!mvFound && thisToken.isModalAuxSignal()) {
 						mvFound = true;
 						
@@ -127,15 +136,10 @@ public class VerbHelper {
 
 						// now identify subject and subject complement and set metadata
 						int subjIdx = identifyVerbSubject(words, i);
-						//List<Integer> subjcIdxs = identifySubjectComplement(words, i);
 						
 						if(subjIdx != -1) 
 							words.get(subjIdx).setVerbOfBeingSubject(true);
 
-						//if(!subjcIdxs.isEmpty())
-						//	for(int idx : subjcIdxs)
-						//		words.get(idx).setVerbOfBeingSubjectComplement(true);
-						
 						mvMetadataIndex = sentence.getMetadata().addVerbMetadata(setVerbPhraseMetadata(Constants.VerbClass.MODAL_AUX, i, words, subjIdx, null));
 					
 					} else if(mvFound && (thisToken.isVerbOfBeingSignal() || thisToken.isLinkingVerbSignal())) {
@@ -153,11 +157,75 @@ public class VerbHelper {
 			for(VerbPhraseMetadata vpm : sentence.getMetadata().getVerbMetadata()) {
 				if(vpm.getVerbClass() == Constants.VerbClass.MODAL_AUX) {
 					int lastVerbIdx = vpm.getVerbs().get(vpm.getVerbs().size()-1).getPosition();
-					List<Integer> subjcIdxs = identifySubjectComplement(words, lastVerbIdx);
+					List<Integer> subjcIdxs = identifySubjectComplement(words, lastVerbIdx, vpm.getVerbs().size() > 1);
 					
 					for(int idx : subjcIdxs) {
-						words.get(idx).setVerbOfBeingSubjectComplement(true);
+						words.get(idx).setModalSubjectComplement(true);
 						vpm.getSubjC().add(new VerbPhraseToken(words.get(idx).getToken(), idx));
+					}
+				}
+			}
+			
+		} catch(Exception e) {
+			logger.error("identifyModalAuxiliaryVerbs() {}", e);
+		}
+
+		return words;
+	}
+	
+	public ArrayList<WordToken> identifyModalAuxiliaryVerbs2(Sentence sentence) {
+		
+		int mvMetadataIndex = -1;
+		boolean mvFound = false;
+		
+		ArrayList<WordToken> words = sentence.getWordList();
+		
+		try {
+			for(int i=0; i < words.size(); i++) {
+				WordToken thisToken = words.get(i);
+				try {
+					// first time around, compare against just the list of MV signals
+					// if a MV is found, check subsequent tokens for verb POS to allow for compound
+					if(!mvFound && thisToken.isModalAuxSignal()) {
+						mvFound = true;
+						
+						thisToken.setModalAuxVerb(true);
+
+						// now identify subject and subject complement and set metadata
+						int subjIdx = identifyVerbSubject(words, i);
+						
+						if(subjIdx != -1) 
+							words.get(subjIdx).setVerbOfBeingSubject(true);
+
+						mvMetadataIndex = sentence.getMetadata().addVerbMetadata(setVerbPhraseMetadata(Constants.VerbClass.MODAL_AUX, i, words, subjIdx, null));
+					
+					} else if(mvFound && thisToken.isVerb()) {
+						sentence.getMetadata().getVerbMetadata().get(mvMetadataIndex).addVerb(new VerbPhraseToken(thisToken.getToken(), i));
+						thisToken.setModalAuxVerb(true);
+						
+					} else {
+						if(!thisToken.isAdverbPOS()) // allow for ex. "may still be taking"
+							mvFound = false;
+					}
+				} catch(IndexOutOfBoundsException e) { }
+			}
+			
+			// because MVs can be compound (e.g. "may be taking"), identification of SUBJC must be delayed until the entire phrase is built
+			for(VerbPhraseMetadata vpm : sentence.getMetadata().getVerbMetadata()) {
+				if(vpm.getVerbClass() == Constants.VerbClass.MODAL_AUX) {
+					int lastVerbIdx = vpm.getVerbs().get(vpm.getVerbs().size()-1).getPosition();
+					List<Integer> subjcIdxs = identifySubjectComplement(words, lastVerbIdx, vpm.getVerbs().size() > 1);
+					
+					for(int idx : subjcIdxs) {
+						words.get(idx).setModalSubjectComplement(true);
+						vpm.getSubjC().add(new VerbPhraseToken(words.get(idx).getToken(), idx));
+						
+						// SRD 9/4/15 - experiment with allowing verbs that end in -ed and -ing
+						// remove any verbs from compound list that have been marked as SUBJC
+						//       to back out- remove this and one line from identifySubjectComplement.
+						//for(int i=vpm.getVerbs().size()-1; i >= 0 ; i--)
+						//	if(vpm.getVerbs().get(i).getPosition() == idx)
+						//		vpm.getVerbs().remove(i);
 					}
 				}
 			}
@@ -190,13 +258,8 @@ public class VerbHelper {
 					
 					thisToken.setActionVerb(true);
 
-					//int subjIdx = identifyActionVerbSubject(words, i);
-					//int objIdx = identifyActionVerbDirectObject(words, i);
-					//List<Integer> objIdxs = new ArrayList<Integer>();
-					//objIdxs.add(objIdx);
-					
 					int subjIdx = identifyVerbSubject(words, i);
-					List<Integer> subjcIdxs = identifySubjectComplement(words, i);
+					List<Integer> subjcIdxs = identifySubjectComplement(words, i, false);
 					
 					if(subjIdx > -1)
 						words.get(subjIdx).setActionVerbSubject(true);
@@ -229,22 +292,6 @@ public class VerbHelper {
 				vpm.addSubjC(new VerbPhraseToken(words.get(idx).getToken(), idx));
 		}
 		
-		return vpm;
-	}
-	
-	private VerbPhraseMetadata setVerbPhraseMetadataOld(Constants.VerbClass _class, int verbIdx, ArrayList<WordToken> words, int subjIdx, int objIdx) {
-		VerbPhraseMetadata vpm = new VerbPhraseMetadata(_class);
-//		
-//		vpm.addVerb(new VerbPhraseToken(words.get(verbIdx).getToken(), verbIdx));
-//		
-//		if(subjIdx != -1) {
-//			vpm.setSubj(new VerbPhraseToken(words.get(subjIdx).getToken(), subjIdx));
-//		}
-//		
-//		if(objIdx != -1) {
-//			vpm.setSubjC(new VerbPhraseToken(words.get(objIdx).getToken(), objIdx));
-//		}
-//		
 		return vpm;
 	}
 	
@@ -282,83 +329,6 @@ public class VerbHelper {
 		return sentence.getWordList();
 	}
 	
-	// must be preceded by POSTagger.identifyPartsOfSpeech(), POSTagger.identifyPrepPhrases()
-	public ArrayList<WordToken> identifyVerbsOfBeing_old(Sentence sentence) {
-		
-//		// TODO this needs to be overhauled since removing VOB member designations
-//		
-//		try {
-//			for(int i=0; i < sentence.getWordList().size(); i++) {
-//				
-//				if(sentence.getWordList().get(i).isVerbOfBeingSignal()) {
-//					// avoid indexOutOfBounds exception on the +1
-//					if(i < sentence.getWordList().size() - 1) {
-//						sentence.getWordList().get(i).setVerbOfBeing(true);
-//						
-//						int vobIndex = i;
-//						WordToken nextToken = sentence.getWordList().get(i+1);
-//						
-//						// Step 1. Process token following the verb of being
-//						// if next token is a verb or ends in 'ly' or 'ed', mark as vob member
-//						if(nextToken.isVerb() || nextToken.getToken().matches(".*(?i)ly|ed")) {
-//							//wordList.get(i+1).setVerbOfBeingMember(true);
-//							i++;
-//						}
-//						// TODO should this be nextToken+1?
-//						// additional check: if next token ends in "ly", also denote its successor as a vob member
-//						if(nextToken.getToken().matches(".*(?i)ly")) {
-//							if(i < sentence.getWordList().size()-1) { // avoid IndexOutOfBounds
-//								//wordList.get(i+1).setVerbOfBeingMember(true);
-//								i++;
-//							}
-//						}
-//						
-//						// Step 2. process up to three tokens following the verb of being 
-//						int tokensRemaining = Math.min(3, sentence.getWordList().size()-1 - vobIndex);
-//						boolean verbFound = false;
-//						
-//						for(int j=vobIndex + tokensRemaining; j > vobIndex; j--) {
-//							if(verbFound) {
-//								//wordList.get(j).setVerbOfBeingMember(true);
-//							} else {
-//								if(sentence.getWordList().get(j).isPreposition()) {
-//									// if beginning a prep phrase then mark the preceding token
-//									verbFound = true;
-//								} else if(sentence.getWordList().get(j).isVerb()) {
-//									// if a verb then mark verb itself
-//									//wordList.get(j).setVerbOfBeingMember(true);
-//									verbFound = true;
-//								}
-//							}
-//						}
-//					
-//						if(i == vobIndex && !verbFound) {
-//							// if no vob members found, unset vob head
-//							sentence.getWordList().get(vobIndex).setVerbOfBeing(false);
-//							// TODO what if verb follows verb of being (first scenario)? Do we still process following 3 tokens and mark isLinkingVerb?
-//							//wordList.get(vobIndex).isLinkingVerb = true;
-//						} else {
-//							// verb of being found
-//							// now identify subject and subject complement and set metadata
-//							int subjIdx = identifyVerbSubject(sentence.getWordList(), vobIndex);
-//							int subjcIdx = identifySubjectComplementOld(sentence.getWordList(), vobIndex);
-//							
-//							if(subjIdx != -1) sentence.getWordList().get(subjIdx).setVerbOfBeingSubject(true);
-//							if(subjcIdx != -1) sentence.getWordList().get(subjcIdx).setVerbOfBeingSubjectComplement(true);
-//								
-//							sentence.getMetadata().addVerbMetadata(setVerbPhraseMetadata(Constants.VerbClass.VERB_OF_BEING, vobIndex, sentence.getWordList(), subjIdx, subjcIdx));
-//						}
-//					}
-//				}
-//			}
-//		} catch(Exception e) {
-//			logger.error("identifyVerbsOfBeing() {}", e);
-//			e.printStackTrace();
-//		}
-//
-		return sentence.getWordList();
-	}
-	
 	// must be preceded by POSTagger.identifyPartsOfSpeech(), POSTagger.identifyPrepPhrases(), identifyModalAuxVerbs()
 	public ArrayList<WordToken> identifyVerbsOfBeing(Sentence sentence) {
 		
@@ -375,8 +345,7 @@ public class VerbHelper {
 					WordToken thisToken = words.get(i);
 					
 					// first time around, compare against the list of VOB signals
-					// if a VOB is found, compare subsequent tokens against VOB and LV signals
-					// this is done to find verb structures such as "has become"
+					// if a VOB is found, check subsequent tokens for verb POS to allow for compound
 					if(!vobFound && thisToken.isVerbOfBeingSignal() && !thisToken.isModalAuxVerb()) {
 						int vobIndex = i;
 						// process up to three tokens following the verb of being 
@@ -417,11 +386,92 @@ public class VerbHelper {
 			for(VerbPhraseMetadata vpm : metadata.getVerbMetadata()) {
 				if(vpm.getVerbClass() == Constants.VerbClass.VERB_OF_BEING) {
 					int lastVerbIdx = vpm.getVerbs().get(vpm.getVerbs().size()-1).getPosition();
-					List<Integer> subjcIdxs = identifySubjectComplement(words, lastVerbIdx);
+					List<Integer> subjcIdxs = identifySubjectComplement(words, lastVerbIdx, vpm.getVerbs().size() > 1);
 					
 					for(int idx : subjcIdxs) {
 						words.get(idx).setVerbOfBeingSubjectComplement(true);
 						vpm.getSubjC().add(new VerbPhraseToken(words.get(idx).getToken(), idx));
+					}
+				}
+			}
+			
+		} catch(Exception e) {
+			logger.error("identifyVerbsOfBeing() {}", e);
+			e.printStackTrace();
+		}
+
+		return words;
+	}
+	
+	public ArrayList<WordToken> identifyVerbsOfBeing2(Sentence sentence) {
+		
+		int vobMetadataIndex = -1; // keeps track of which index in metadata.verbPhrases this entry has been added
+		boolean vobFound = false;
+		
+		ArrayList<WordToken> words = sentence.getWordList();
+		
+		try {
+			SentenceMetadata metadata = sentence.getMetadata();
+			
+			for(int i=0; i < words.size(); i++) {
+				//if(i < words.size() - 1) { // avoid IndexOutOfBounds exception. TODO still necessary?
+					WordToken thisToken = words.get(i);
+					
+					// first time around, compare against the list of VOB signals
+					// if a VOB is found, check subsequent tokens for verb POS to allow for compound
+					if(!vobFound && thisToken.isVerbOfBeingSignal() && !thisToken.isModalAuxVerb()) { // TODO isModal() necessary? these two lists don't share any tokens
+						int vobIndex = i;
+						// process up to three tokens following the verb of being 
+						int tokensRemaining = Math.min(3, words.size()-1 - vobIndex);
+							
+						for(int j=vobIndex + tokensRemaining; j > vobIndex; j--) {
+						    if(words.get(j).isVerb() || words.get(j).isPreposition()) {
+								vobFound = true;
+								
+								thisToken.setVerbOfBeing(true);
+								
+								// now identify subject and set metadata
+								int subjIdx = identifyVerbSubject(words, vobIndex);
+								
+								if(subjIdx != -1)
+									words.get(subjIdx).setVerbOfBeingSubject(true);
+								
+								// create new verb metadata entry, returning index of new entry for later use
+								// note that SUBJC identification is delayed until later, in its own loop
+								vobMetadataIndex = metadata.addVerbMetadata(setVerbPhraseMetadata(Constants.VerbClass.VERB_OF_BEING, vobIndex, words, subjIdx, null));
+								
+								break;
+						    }
+						}
+
+					} else if(vobFound && thisToken.isVerb()) {
+						// part of a compound verb. add this verb to the existing metadata verb phrase object
+						metadata.getVerbMetadata().get(vobMetadataIndex).addVerb(new VerbPhraseToken(thisToken.getToken(), i));
+						thisToken.setVerbOfBeing(true);
+					} else {
+						if(!thisToken.isAdverbPOS()) // allow for ex. "is still taking"
+							vobFound = false;
+					}
+				//}
+			}
+			
+			// because VOBs can be compound (e.g. "is taking"), identification of SUBJC must be delayed until the entire phrase is built
+			for(VerbPhraseMetadata vpm : metadata.getVerbMetadata()) {
+				if(vpm.getVerbClass() == Constants.VerbClass.VERB_OF_BEING) {
+					// all of these indexes are 1-based
+					int lastVerbIdx = vpm.getVerbs().get(vpm.getVerbs().size()-1).getPosition();
+					List<Integer> subjcIdxs = identifySubjectComplement(words, lastVerbIdx, vpm.getVerbs().size() > 1);
+					
+					for(int idx : subjcIdxs) {
+						words.get(idx).setVerbOfBeingSubjectComplement(true);
+						vpm.getSubjC().add(new VerbPhraseToken(words.get(idx).getToken(), idx));
+						
+						// SRD 9/4/15 - experiment with allowing verbs that end in -ed and -ing
+						// remove any verbs from compound list that have been marked as SUBJC
+						//       to back out- remove this and one line from identifySubjectComplement.
+						//for(int i=vpm.getVerbs().size()-1; i >= 0 ; i--)
+						//	if(vpm.getVerbs().get(i).getPosition() == idx)
+						//		vpm.getVerbs().remove(i);
 					}
 				}
 			}
@@ -489,10 +539,9 @@ public class VerbHelper {
 	}
 	
 	private int identifyVerbSubject(ArrayList<WordToken> wordList, int verbIndex) {
-		
-		// TODO what checks need to occur to ensure that wordList is valid?
 	
 		int subjIndex = -1;
+		int stack = 0;
 		
 		if(verbIndex == 0) {
 			subjIndex = 0; // verb is first word of sentence
@@ -501,18 +550,31 @@ public class VerbHelper {
 			// and is not in the list of exclusions
 			// and is not a noun phrase modifier (ensuring that it's just a normal token or, if part of a noun phrase, the HEAD)
 			for(int i=verbIndex-1; i >= 0; i--) {
+				WordToken token = wordList.get(i);
 				// break if verb is within a dependent phrase and we've looped past the beginning of said DP
 				// RULE: verb SUBJ/SUBJC cannot exist outside the DP if the verb is in a DP, nor can a SUBJ exist in a DP
-				if(wordList.get(verbIndex).isDependentPhraseMember() != wordList.get(i).isDependentPhraseMember()) {
+				// RULE: verb SUBJ/SUBJC cannot be within parentheses.
+				if(wordList.get(verbIndex).isDependentPhraseMember() != token.isDependentPhraseMember())
 					break;
-				}
 				
-				if(!(wordList.get(i).isPrepPhraseObject() || 
-					 wordList.get(i).isPrepPhraseMember() || 
-					 wordList.get(i).isNounPhraseModifier() || 
-					 wordList.get(i).matchesVerbSubjectExclusion() ||
-					 wordList.get(i).isVerb() ||
-					 wordList.get(i).isPunctuation() )) {
+				if(token.isSubjectComplement())
+					break;
+				
+				// these are reversed from what is seen in identifySubjectComplement() because we're looping backwards.
+				if(PAREN_BEGIN_REGEX.matcher(token.getToken()).matches())
+					stack--;
+				else if(PAREN_END_REGEX.matcher(token.getToken()).matches())
+					stack++;
+				
+				if(stack == 0 &&
+				   !(token.isPrepPhraseObject() || 
+					 token.isPrepPhraseMember() || 
+					 token.isNounPhraseModifier() || 
+					 token.matchesVerbSubjectExclusion() ||
+					 token.isVerb() ||
+					 token.isModalAuxPOS() ||
+					 token.isPunctuation() ||
+					 token.isNegationSignal())) { // SRD 7/10/15 - "... while risk factors do not include coronary artery disease,..."
 					
 					subjIndex = i;
 					break;
@@ -523,184 +585,115 @@ public class VerbHelper {
 		return subjIndex;
 	}
 	
-	private List<Integer> identifySubjectComplement(ArrayList<WordToken> wordList, int verbIndex) {
+	private List<Integer> identifySubjectComplement(ArrayList<WordToken> wordList, int verbIndex, boolean compoundVerb) {
 		
 		List<Integer> scIndexes = new ArrayList<Integer>();
 		
 		// if the term immediately following the verb ends the sentence, mark it as the subjc
-		// assumption is that token[index] is as such: verb[0] token[1] .[2] (period)
-		if(verbIndex == wordList.size()-2) {
-			scIndexes.add(verbIndex+1);
-		} else {
-			for(int i=verbIndex+1; i < wordList.size(); i++) {
-				WordToken token = wordList.get(i);
+		int stack = 0;
+	
+		for(int i=verbIndex+1; i < wordList.size(); i++) {
+			WordToken token = wordList.get(i);
+			
+			// RULE: verb and subjc must both exist, or not exist, within a DP (no crossing borders)
+			if(wordList.get(verbIndex).isDependentPhraseMember() != token.isDependentPhraseMember()) {
+				break;
+			}
+			
+			// example where we might want to allow a verb as subjc...
+			//   "In the last few years his PSA has been slowly rising."
+			if(token.isPrepPhraseObject() || token.isPrepPhraseMember() || token.isVerb()) {
+				break;
+			}
+			//He started Lupron and Xgeva and Firmagon in 2014.
+			// TODO need an example to explain why I took out !token.isNounPhraseModifier()
+			//  an example sentence that supports adding it back is: [He] [is having] [catheter related pain] and I wrote an Rx.
+			//  "She is having random wuperbupic pain and she has seen gyn and ruled out that as an etiology." <- pain, she are compound SUBJCs
+			// TODO should presence of a prep phrase short-circuit SUBJC detection?
+			// TODO should VB be prohibited?
+			// TODO check this sentence (pain and wrote are subjcs):
+			//   He is having catheter related pain and I wrote an Rx.
+			
+			if(PAREN_BEGIN_REGEX.matcher(token.getToken()).matches())
+				stack++;
+			else if(PAREN_END_REGEX.matcher(token.getToken()).matches())
+				stack--;
+			
+			if(stack == 0 && 
+			   !(token.isNounPhraseModifier() || 
+				 //token.matchesVerbSubjectExclusion() ||
+			     token.isConjunctionPOS() ||
+				 token.isPunctuation() ||
+				 token.isPreposition() ||
+				 token.isDeterminerPOS())) {
 				
-				// RULE: verb and subjc must both exist, or not exist, within a DP (no crossing borders)
-				if(wordList.get(verbIndex).isDependentPhraseMember() != token.isDependentPhraseMember()) {
-					break;
-				}
-				
-				// example where we might want to allow a verb as subjc...
-				// In the last few years his PSA has been slowly rising.
-				if(token.isPrepPhraseObject() || token.isPrepPhraseMember() || token.isVerb()) {
-					break;
-				}
-				//He started Lupron and Xgeva and Firmagon in 2014.
-				// TODO need an example to explain why I took out !token.isNounPhraseModifier()
-				//  an example sentence that supports adding it back is: [He] [is having] [catheter related pain] and I wrote an Rx.
-				// TODO Should PRP be prohibited?:
-				//  [She] [is having] random wuperbupic pain and she has seen gyn and ruled out that as an etiology. <- pain, she are SUBJCs
-				// TODO should presence of a prep phrase short-circuit SUBJC detection?
-				// TODO should VB be prohibited?
-				// TODO check this sentence (pain and wrote are subjcs):
-				//   He is having catheter related pain and I wrote an Rx.
-				
-				if(!(token.isNounPhraseModifier() || 
-					 token.matchesVerbSubjectExclusion() ||
-					 token.isPunctuation() ||
-					 token.isNegationSignal() ||  
-					 token.isAdjectivePOS() ||
-					 token.isPreposition() ||
-					 token.isAdverbPOS() || 
-					 token.isDeterminerPOS() || 
-					 //token.isVerb() || // to fix "He is a 47-year-old white male, married/VBN with 3 children, requesting permanent sterilization."
-					 //token.isVerbOfBeingSignal() || // the following two may be unnecessary now with the addition of !isVerb()
-					 //token.isLinkingVerbSignal() ||
-					 token.isPronounPOS())) { // this may cause issues but I can't think of a good example... "He feels that his shoes are too tight."
+				WordToken nextToken = null;
+				boolean compoundSUBJC = false;
+				try {
+					nextToken = wordList.get(i+1);
+					// conjunction, comma, adverb, adjective following the current token allow the loop to continue
+					if(nextToken.isConjunctionPOS() || nextToken.getPOS().equalsIgnoreCase(",") || nextToken.isAdverbPOS() || nextToken.isAdjectivePOS())
+						compoundSUBJC = true;
 					
+				} catch(IndexOutOfBoundsException e) { }
+				
+				if(nextToken == null) {
+					// final token, no period
 					scIndexes.add(i);
+				} else {
+					if(token.isAdjectivePOS() || token.isAdverbPOS()) {	
+						// JJ/RB are allowed if the following token is .,(! or a prep token or a dependent signal or a conjunction
+						if(ALLOWABLE_JJ_REGEX.matcher(nextToken.getToken()).matches() ||
+							nextToken.isPreposition() ||
+							nextToken.isDependentPhraseBegin() || 
+							nextToken.isConjunctionPOS()) {
+							
+							scIndexes.add(i);
+						}
+					} else {
+						scIndexes.add(i);
+					}
 					
-					try {
-						WordToken nextToken = wordList.get(i+1);
-						
-						if(!(nextToken.isConjunctionPOS() || nextToken.getPOS().matches(","))) // allowable compound separators
-							break;
-					} catch(IndexOutOfBoundsException e) { }
+					if(!compoundSUBJC)
+						break;
 				}
+				
+//				if(token.isAdjectivePOS() || token.isAdverbPOS()) {
+//					if(nextToken != null) {
+//						// JJ/RB are allowed if the following token is .,(! or a prep token or a dependent signal or a conjunction
+//						if(ALLOWABLE_JJ_REGEX.matcher(nextToken.getToken()).matches() ||
+//							nextToken.isPreposition() ||
+//							nextToken.isDependentPhraseBegin() || 
+//							nextToken.isConjunctionPOS()) {
+//							
+//							scIndexes.add(i);
+//						}
+//						
+//					} else {
+//						// JJ/RB are allowed if not preceded by another token (period is missing)
+//						scIndexes.add(i);
+//					}
+//				} else {
+//					// some other POS came through
+//					scIndexes.add(i);
+//				}
+//				
+//				if(nextToken != null && !(nextToken.isConjunctionPOS() || nextToken.isAdverbPOS() || nextToken.getPOS().equalsIgnoreCase(",")))
+//					break;
+				
 			}
 		}
-		//System.out.println(scIndexes);
+		
+		// SRD 9/4/15 - experiment with allowing verbs that end in -ed and -ing
+		// no SUBJC found by normal means and the verb is compound
+		// set the final verb in this case (if it meets the endsWith() criteria) as the SUBJC
+		if(scIndexes.size() == 0 && compoundVerb) {
+			String finalVerb = wordList.get(verbIndex).getToken();
+			if(finalVerb.endsWith("ed") || finalVerb.endsWith("ing"))
+				scIndexes.add(verbIndex);
+		}
+
 		return scIndexes;
 	}
 	
-	private int identifySubjectComplementOld(ArrayList<WordToken> wordList, int verbIndex) {
-		
-		int scIndex = -1;
-		
-		// if the term immediately following the verb ends the sentence, mark it as the subjc
-		// assumption is that token[index] is as such: verb[0] token[1] .[2] (period)
-		if(verbIndex == wordList.size()-2) {
-			scIndex = verbIndex+1;
-		} else {
-			for(int i=verbIndex+1; i < wordList.size(); i++) {
-				// RULE: verb and subjc must both exist, or not exist, within a DP (no crossing borders)
-				if(wordList.get(verbIndex).isDependentPhraseMember() != wordList.get(i).isDependentPhraseMember()) {
-					break;
-				}
-				
-				WordToken token = wordList.get(i);
-				//if(wordList.get(i).isConjunction()) {
-				//	// default subjc to token following the verb
-				//	scIndex = verbIndex + 1;
-				//	break;
-				//} else {
-					// subjc cannot be part of a prep phrase
-					// nor can it be a noun phrase modifier (ensuring that it's just a normal token or, if part of a noun phrase, the HEAD)
-					// nor can it appear in a list of exclusions
-					if(!(token.isPrepPhraseObject() || 
-					     token.isPrepPhraseMember() || 
-						 token.isNounPhraseModifier() || 
-						 token.matchesVerbSubjectExclusion() ||
-						 token.isPunctuation() ||
-						 token.isNegationSignal() || 
-						 token.isConjunctionPOS() || 
-						 token.isAdjectivePOS() ||
-						 token.isPreposition() ||
-						 token.isAdverbPOS() || 
-						 token.isDeterminerPOS() || 
-						 token.isVerbOfBeingSignal() ||
-						 token.isLinkingVerbSignal())) {
-						
-						scIndex = i;
-						break;
-					}
-				//}
-			}
-		}
-		/*
-		// the goal here is to loop through all tokens, beginning with the verb, looking
-		// for the last occurrence of a noun
-		for(int i = vobIndex; i < wordList.size(); i++) {
-			//if(wordList.get(i).isAdjective() || wordList.get(i).isNoun() || wordList.get(i).isPronoun()) {
-			if(wordList.get(i).isNoun()) {
-				scIndex = i;
-			} else if(scIndex > -1 && !wordList.get(i).isNoun()) {
-				// dealing with "evidence of X" 
-				// -- Jan mentions handling it as an interphrase constructor
-				// -- could also handle it here by detecting "of" as the next word
-				break;
-			}
-		}
-		*/
-		return scIndex;
-	}
-	
-	private int identifySubjectComplementOlder(ArrayList<WordToken> wordList, int verbIndex) {
-	
-		int scIndex = -1;
-		
-		// if the term immediately following the verb ends the sentence, mark it as the subjc
-		// assumption is that token[index] is as such: verb[0] token[1] .[2] (period)
-		if(verbIndex == wordList.size()-2) {
-			scIndex = verbIndex+1;
-		} else {
-			for(int i=verbIndex+1; i < wordList.size(); i++) {
-				// RULE: verb and subjc must both exist, or not exist, within a DP (no crossing borders)
-				if(wordList.get(verbIndex).isDependentPhraseMember() != wordList.get(i).isDependentPhraseMember()) {
-					break;
-				}
-				
-				WordToken token = wordList.get(i);
-				//if(wordList.get(i).isConjunction()) {
-				//	// default subjc to token following the verb
-				//	scIndex = verbIndex + 1;
-				//	break;
-				//} else {
-					// subjc cannot be part of a prep phrase
-					// nor can it be a noun phrase modifier (ensuring that it's just a normal token or, if part of a noun phrase, the HEAD)
-					// nor can it appear in a list of exclusions
-					if(!(token.isPrepPhraseObject() || 
-					     token.isPrepPhraseMember() || 
-						 token.isNounPhraseModifier() || 
-						 token.matchesVerbSubjectExclusion() ||
-						 token.isPunctuation() ||
-						 token.isNegationSignal() || 
-						 token.isConjunctionPOS() || 
-						 token.isAdjectivePOS() || 
-						 token.isAdverbPOS() || 
-						 token.isDeterminerPOS())) {
-						
-						scIndex = i;
-						break;
-					}
-				//}
-			}
-		}
-		/*
-		// the goal here is to loop through all tokens, beginning with the verb, looking
-		// for the last occurrence of a noun
-		for(int i = vobIndex; i < wordList.size(); i++) {
-			//if(wordList.get(i).isAdjective() || wordList.get(i).isNoun() || wordList.get(i).isPronoun()) {
-			if(wordList.get(i).isNoun()) {
-				scIndex = i;
-			} else if(scIndex > -1 && !wordList.get(i).isNoun()) {
-				// dealing with "evidence of X" 
-				// -- Jan mentions handling it as an interphrase constructor
-				// -- could also handle it here by detecting "of" as the next word
-				break;
-			}
-		}
-		*/
-		return scIndex;
-	}
 }

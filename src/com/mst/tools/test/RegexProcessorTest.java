@@ -1,4 +1,4 @@
-package com.mst.tools;
+package com.mst.tools.test;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.google.common.collect.Multimap;
 import com.mst.model.MapValue;
+import com.mst.tools.RegexProcessor;
 
 public class RegexProcessorTest {
 

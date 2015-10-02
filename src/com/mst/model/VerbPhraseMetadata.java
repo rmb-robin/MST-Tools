@@ -10,10 +10,9 @@ public class VerbPhraseMetadata {
 	private VerbPhraseToken subj;
 	private List<VerbPhraseToken> verbs = new ArrayList<VerbPhraseToken>();
 	private List<VerbPhraseToken> subjc = new ArrayList<VerbPhraseToken>();
-	//private VerbPhraseToken subjc;
-	private boolean compound;
-	private boolean intransitive = true;
-	private boolean infFollowsPP; // infinitive verb follows prep phrase
+	//private boolean compound;
+	//private boolean intransitive = true;
+	//private boolean infFollowsPP; // infinitive verb follows prep phrase
 	private String st = null;
 
 	public VerbPhraseMetadata() {	}
@@ -54,29 +53,29 @@ public class VerbPhraseMetadata {
 		this.subjc.add(subjc);
 	}
 
-	public boolean isCompound() {
-		return compound;
-	}
-
-	public void setIntransitive(boolean intransitive) {
-		this.intransitive = intransitive;
-	}
-
-	public boolean isIntransitive() {
-		return intransitive;
-	}
-
-	public void setCompound(boolean compound) {
-		this.compound = compound;
-	}
-	
-	public void setInfFollowsPP(boolean infFollowsPP) {
-		this.infFollowsPP = infFollowsPP;
-	}
-
-	public boolean isInfFollowsPP() {
-		return infFollowsPP;
-	}
+//	public boolean isCompound() {
+//		return compound;
+//	}
+//
+//	public void setIntransitive(boolean intransitive) {
+//		this.intransitive = intransitive;
+//	}
+//
+//	public boolean isIntransitive() {
+//		return intransitive;
+//	}
+//
+//	public void setCompound(boolean compound) {
+//		this.compound = compound;
+//	}
+//	
+//	public void setInfFollowsPP(boolean infFollowsPP) {
+//		this.infFollowsPP = infFollowsPP;
+//	}
+//
+//	public boolean isInfFollowsPP() {
+//		return infFollowsPP;
+//	}
 	
 	public String getSemanticType() {
 		return st;
@@ -91,7 +90,31 @@ public class VerbPhraseMetadata {
 		for(VerbPhraseToken token : verbs) {
 			vp.append(token.getToken()).append(" ");
 		}
-		return vp.toString().trim();
+		return vp.toString().trim().toLowerCase();
+	}
+
+	public boolean isPhraseNegated() {
+		if(subj != null && subj.isNegated())
+			return true;
+		
+		for(VerbPhraseToken verb : verbs) 
+			if(verb.isNegated())
+				return true;
+
+		for(VerbPhraseToken obj : subjc) 
+			if(obj.isNegated())
+				return true;
+		
+		return false;
+	}
+	
+	public boolean isVerbNegated() {
+		
+		for(VerbPhraseToken verb : verbs) 
+			if(verb.isNegated())
+				return true;
+		
+		return false;
 	}
 }
 

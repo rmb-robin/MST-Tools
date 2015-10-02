@@ -3,14 +3,24 @@ package com.mst.model;
 public class PrepPhraseToken extends GenericToken {
 
 	private int nounPhraseIdx = -1;
+	private boolean isObject;
 	
 	public PrepPhraseToken(String token, int position) {
-		super(token, position);
+		this(token, position, -1, false);
 	}
 	
 	public PrepPhraseToken(String token, int position, int nounPhraseIdx) {
-		this(token, position);
+		this(token, position, nounPhraseIdx, false);
+	}
+	
+	public PrepPhraseToken(String token, int position, boolean isObject) {
+		this(token, position, -1, isObject);
+	}
+	
+	public PrepPhraseToken(String token, int position, int nounPhraseIdx, boolean isObject) {
+		super(token, position);
 		this.nounPhraseIdx = nounPhraseIdx;
+		this.isObject = isObject;
 	}
 	
 	public int getNounPhraseIdx() {
@@ -21,44 +31,11 @@ public class PrepPhraseToken extends GenericToken {
 		nounPhraseIdx = val;
 	}
 	
-	// This class was initially used to mimic Eric's code. The only method that used it
-	// has been deprecated.
-	/*
-	private String precedingToken, value;
-	private List<String> comprisingTokens;
+	public boolean isObject() {
+		return isObject;
+	}
 	
-	public PrepPhraseToken(int begin, int end, 
-						String word, String parent,
-						String value, String precedingToken, List<String> comprisingTokens) {
-		super(word, -1);
-		
-		this.setValue(value);
-		this.setPrecedingToken(precedingToken);
-		this.setComprisingTokens(comprisingTokens);
+	public void isObject(boolean isObject) {
+		this.isObject = isObject;
 	}
-
-	public String getPrecedingToken() {
-		return precedingToken;
-	}
-
-	public void setPrecedingToken(String precedingToken) {
-		this.precedingToken = precedingToken;
-	}
-
-	public String getValue() {
-		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public List<String> getComprisingTokens() {
-		return comprisingTokens;
-	}
-
-	public void setComprisingTokens(List<String> comprisingTokens) {
-		this.comprisingTokens = comprisingTokens;
-	}
-	*/
 }

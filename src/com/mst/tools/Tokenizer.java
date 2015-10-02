@@ -17,10 +17,20 @@ public class Tokenizer {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private Map<String, String> translateMap = new HashMap<String, String>();
 	//https://www.regex101.com/r/dB1gO3/5
-	private String YEAR_OLD_REGEX = "(?<=\\d)((?i)[\\s-]*YEAR[\\s-]*OLD|\\s*yr?\\.?\\/?o\\.?)(?!m)"; 
-	private String YEAR_OLD_REPL = "-year-old"; 
-	private String YEAR_OLD_SEX_REGEX = "(?<=\\d)yom";
-	private String YEAR_OLD_SEX_REPL = "-year-old male";
+	
+	private final String allowedCharsBetweenSentences = "[\\s\u2022\u2002\u201c\u00a0]";
+	private final String titles = "((?<!Dr\\.|Mr\\.|Ms\\.|Mrs\\.|MG\\.|mg\\.|Jan\\.|Feb\\.|Mar\\.|Apr\\.|May\\.|Jun\\.|Jul\\.|Aug\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)";
+	// # main sentence split (with spaces)
+	private final String regex1 = titles + "(?<=\\.|\\?|!)\\s*;*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[]))"; // https://www.regex101.com/r/qP7hH5/4
+	// # some articles don't have spaces between periods and next sentence
+	private final String regex2 = titles + "(?<=\\.)\\s*(?=[A-Za-z]))"; // allows for sentences to start with a single letter
+
+	private Pattern falseMatchRegex = Pattern.compile("(vs|v\\.s|i\\.v)\\.$");
+	private Pattern[] patterns = { Pattern.compile(regex1), Pattern.compile(regex2) };
+	private static Pattern singlePunc = Pattern.compile(",|:|@|#|\\$|%|&|\\?|\\!|\\[|\\]|\\(|\\)|\\{|\\}|<|>|;|--|\"|\\.\\.\\.");
+	private Pattern brackets = Pattern.compile("^[\"\\(\\[].*");
+	private Pattern trailingChars = Pattern.compile("(?<=\\.|\\?|!)([\\.|\\s\\?\\!;]*)$"); 
+	private Matcher trailingMatcher = trailingChars.matcher("");
 	
 	public Tokenizer() { 
 		init();
@@ -36,6 +46,7 @@ public class Tokenizer {
 		translateMap.put("boney","bony");
 		translateMap.put("ca","cancer");
 		translateMap.put("c/o","complains of");
+		translateMap.put("c/w","consistent with");
 		translateMap.put("cabg","coronary artery bypass graft");
 		translateMap.put("bladder scope","cystourethroscopy");
 		translateMap.put("cysto","cystourethroscopy");
@@ -129,88 +140,16 @@ public class Tokenizer {
 		translateMap.put("xofiga","xofigo");
 		translateMap.put("zofigo","xofigo");
 		translateMap.put("xytiga","zytiga");
+		translateMap.put("approx.","approximately");
 
 	}
-	
-//	public ArrayList<SentenceToken> splitSentences2(String article) {
-//		// \xe2\x80\xa2 U+2022 = BULLET (•)
-//		// \xe2\x80\x82 U+2002 = EN SPACE
-//		// \xe2\x80\x9c U+201C = LEFT DOUBLE QUOTATION MARK (“)
-//		// \xe2\x80\x9d U+201D = RIGHT DOUBLE QUOTATION MARK (”)
-//		
-//		String allowedCharsBetweenSentences = "[\\s\\u2022\\u2002\\u201c]";
-//		// # main sentence split (with spaces) 
-//		String regex1 = "(?<=\\.)\\s*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[])";
-//		// # some articles don't have spaces between periods and next sentence
-//		String regex2 = "(?<=\\.)\\s*(?=[A-Z][a-z]{2})";
-//		Pattern falseMatchRegex = Pattern.compile("(vs|v\\.s|i\\.v)\\.$");
-//		Pattern[] patterns = { Pattern.compile(regex1), Pattern.compile(regex2) };
-//		
-//		ArrayList<SentenceToken> sentences = new ArrayList<SentenceToken>();
-//		int i = 0;
-//		sentences.add(new SentenceToken(0, article.length(), article, null, ++i));
-//
-//		for(Pattern p : patterns) {
-//			ArrayList<SentenceToken> acc = new ArrayList<SentenceToken>();
-//
-//			for(SentenceToken s : sentences) {
-//				int lastSentenceBegin = s.getBegin();
-//				
-//				Matcher matcher = p.matcher(s.getToken());
-//				while(matcher.find()) {
-//					int sentenceEnd = s.getBegin() + matcher.start();
-//					int sentenceBeg = s.getBegin() + matcher.end();
-//
-//					String newSentence = article.substring(lastSentenceBegin, sentenceEnd);
-//					
-//					if(falseMatchRegex.matcher(newSentence).matches()) {
-//						break; // SRD: skip sentence altogether?
-//					}
-//					// # if sentence is bracketed by quotes, parentheses, or brackets, its closing one will not be included
-//	                // # since _split_regexes[0]'s matcher for that can't go in the lookbehind since it's optional
-//					if(Pattern.matches("^[\"\\(\\[].*", newSentence)) { // matches ",(,[ at the beginning
-//						newSentence = article.substring(lastSentenceBegin, ++sentenceEnd);
-//					}
-//					acc.add(new SentenceToken(lastSentenceBegin, sentenceEnd, newSentence, null, ++i));
-//				    lastSentenceBegin = sentenceBeg;
-//				}
-//				if(lastSentenceBegin > 0) {
-//	                // add final match
-//					acc.add(new SentenceToken(lastSentenceBegin, s.getEnd(), article.substring(lastSentenceBegin, s.getEnd()), null, ++i));	                
-//				} else {
-//					// add the full string if no match
-//					acc.add(new SentenceToken(s.getBegin(), s.getEnd(), s.getToken(), null, ++i));
-//				}
-//			}
-//			sentences = acc;
-//		}
-//		
-//		return sentences;
-//	}
-	
+		
 	public ArrayList<SentenceToken> splitSentences(String article) {
 		// \xe2\x80\xa2 U+2022 = BULLET (•)
 		// \xe2\x80\x82 U+2002 = EN SPACE
 		// \xe2\x80\x9c U+201C = LEFT DOUBLE QUOTATION MARK (“)
 		// \xe2\x80\x9d U+201D = RIGHT DOUBLE QUOTATION MARK (”)
 		// U+00A0 = NO-BREAK SPACE
-		//System.out.println(article);
-		article = article.replaceAll(YEAR_OLD_REGEX, YEAR_OLD_REPL);
-		article = article.replaceAll(YEAR_OLD_SEX_REGEX, YEAR_OLD_SEX_REPL);
-		article = article.replaceAll("[A|a]pprox\\.", "approximately ");
-		//System.out.println(article);
-		String allowedCharsBetweenSentences = "[\\s\u2022\u2002\u201c\u00a0]";
-		String titles = "((?i)(?<!Dr\\.|Mr\\.|\bMs\\.|Mrs\\.|mg\\.)";
-		// # main sentence split (with spaces) 
-		// https://www.regex101.com/r/qP7hH5/3
-		String regex1 = titles + "(?<=\\.|\\?|!)\\s*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[]))";
-
-		// # some articles don't have spaces between periods and next sentence
-		//String regex2 = "(?<=\\.)\\s*(?=[A-Z][a-z]{2})";  // positive lookbehind that matches a . followed by zero or more spaces followed by a positive lookahead of at least two alphas
-		String regex2 = titles + "(?<=\\.)\\s*(?=[A-Za-z]))"; // allows for sentences to start with a single letter
-
-		Pattern falseMatchRegex = Pattern.compile("(vs|v\\.s|i\\.v)\\.$");
-		Pattern[] patterns = { Pattern.compile(regex1), Pattern.compile(regex2) };
 		
 		ArrayList<SentenceToken> sentences = new ArrayList<SentenceToken>();
 		int i = 0;
@@ -229,6 +168,7 @@ public class Tokenizer {
 				Matcher matcher = p.matcher(s.getToken());
 				while(matcher.find()) {
 					try {
+						// TODO begin/end is deprecated and needs to be removed
 						int sentenceEnd = s.getBegin() + matcher.start();
 						int sentenceBeg = s.getBegin() + matcher.end();
 	
@@ -239,7 +179,7 @@ public class Tokenizer {
 						}
 						// # if sentence is bracketed by quotes, parentheses, or brackets, its closing one will not be included
 		                // # since _split_regexes[0]'s matcher for that can't go in the lookbehind since it's optional
-						if(Pattern.matches("^[\"\\(\\[].*", newSentence)) { // matches ",(,[ at the beginning
+						if(brackets.matcher(newSentence).matches()) { // matches ",(,[ at the beginning
 							newSentence = article.substring(lastSentenceBegin, ++sentenceEnd);
 						}
 						acc.add(new SentenceToken(lastSentenceBegin, sentenceEnd, newSentence, null, ++i));
@@ -261,69 +201,80 @@ public class Tokenizer {
 			sentences = acc;
 		}
 		
+		for(SentenceToken sentence : sentences) {
+			trailingMatcher.reset(sentence.getToken());
+			try {
+				sentence.setToken(trailingMatcher.replaceAll(""));
+			} catch(Exception e) {
+				System.out.println("Exception in Tokenizer replacing trailing characters.");
+				System.out.println(sentence.getToken());
+				System.out.println(e.getMessage());
+			}
+		}
+		
 		return sentences;
 	}
 	
-	// article: represents a full article's text or multiple paragraphs of text
-	public ArrayList<SentenceToken> splitSentences_old(String article) {
+	public ArrayList<SentenceToken> splitSentencesTest(String article) {
 		// \xe2\x80\xa2 U+2022 = BULLET (•)
 		// \xe2\x80\x82 U+2002 = EN SPACE
 		// \xe2\x80\x9c U+201C = LEFT DOUBLE QUOTATION MARK (“)
 		// \xe2\x80\x9d U+201D = RIGHT DOUBLE QUOTATION MARK (”)
+		// U+00A0 = NO-BREAK SPACE
 		
-		String allowedCharsBetweenSentences = "[\\s\\u2022\\u2002\\u201c]";
-		// # main sentence split (with spaces) 
-		String regex1 = "(?<=\\.)\\s*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[])";
-		// # some articles don't have spaces between periods and next sentence
-		String regex2 = "(?<=\\.)\\s*(?=[A-Z][a-z]{2})";
-		Pattern falseMatchRegex = Pattern.compile("(vs|v\\.s|i\\.v)\\.$");
-		Pattern[] patterns = { Pattern.compile(regex1), Pattern.compile(regex2) };
-		
-		// add the incoming paragraph as the only item in the List
 		ArrayList<SentenceToken> sentences = new ArrayList<SentenceToken>();
 		int i = 0;
+		// start with full paragraph text
 		sentences.add(new SentenceToken(0, article.length(), article, null, ++i));
 
-		// logic copied verbatim from python. not optimized
+		// logic copied verbatim from python. a few optimizations
 		for(Pattern p : patterns) {
 			ArrayList<SentenceToken> acc = new ArrayList<SentenceToken>();
 
+			// The first time through there will only be one entry in sentences. Second pass will go through all split
+			// sentences looking for instances of pattern regex2
 			for(SentenceToken s : sentences) {
-
 				int lastSentenceBegin = s.getBegin();
-				boolean matched = false;
 				
 				Matcher matcher = p.matcher(s.getToken());
 				while(matcher.find()) {
-					int sentenceEnd = s.getBegin() + matcher.start();
-					int sentenceBeg = s.getBegin() + matcher.end();
-
-					String newSentence = s.getToken().substring(lastSentenceBegin, sentenceEnd);
-					
-					if(falseMatchRegex.matcher(newSentence).matches()) {
-						// SRD: skip sentence altogether?
-						break;
+					try {
+						// TODO begin/end is deprecated and needs to be removed
+						int sentenceEnd = s.getBegin() + matcher.start();
+						int sentenceBeg = s.getBegin() + matcher.end();
+	
+						String newSentence = article.substring(lastSentenceBegin, sentenceEnd);
+						
+						if(falseMatchRegex.matcher(newSentence).matches()) {
+							break;
+						}
+						// # if sentence is bracketed by quotes, parentheses, or brackets, its closing one will not be included
+		                // # since _split_regexes[0]'s matcher for that can't go in the lookbehind since it's optional
+						if(brackets.matcher(newSentence).matches()) { // matches ",(,[ at the beginning
+							newSentence = article.substring(lastSentenceBegin, ++sentenceEnd);
+						}
+						acc.add(new SentenceToken(lastSentenceBegin, sentenceEnd, newSentence, null, ++i));
+					    lastSentenceBegin = sentenceBeg;
+					    
+					} catch(Exception e) {
+						lastSentenceBegin = 0;
+						logger.error("splitSentences(): Sentence: {} \n Regex Pattern: {} \n {}", s.getToken(), p.toString(), e);
 					}
-					// # if sentence is bracketed by quotes, parentheses, or brackets, its closing one will not be included
-	                // # since _split_regexes[0]'s matcher for that can't go in the lookbehind since it's optional
-					// SRD: anywhere in the sentence? should this test the beginning?
-					if(Pattern.matches("\"\\(\\[", newSentence)) { // matches "([
-						sentenceEnd += 1;
-						newSentence = s.getToken().substring(lastSentenceBegin, sentenceEnd);
-						//newSentence = matcher.group();
-					}
-				    matched = true;
-				    acc.add(new SentenceToken(lastSentenceBegin, sentenceEnd, newSentence, null, ++i));
-				    lastSentenceBegin = sentenceBeg;
 				}
-				if(matched) {
-	                // add last one
-					acc.add(new SentenceToken(lastSentenceBegin, s.getEnd(), article.substring(lastSentenceBegin, s.getEnd()), null, ++i));	                
+				if(lastSentenceBegin > 0) {
+	                // add final match
+					acc.add(new SentenceToken(lastSentenceBegin, s.getEnd(), article.substring(lastSentenceBegin, s.getEnd()), null, ++i));
 				} else {
+					// add the full string if no match
 					acc.add(new SentenceToken(s.getBegin(), s.getEnd(), s.getToken(), null, ++i));
 				}
 			}
 			sentences = acc;
+		}
+		
+		for(SentenceToken sentence : sentences) {
+			trailingMatcher.reset(sentence.getToken());
+			sentence.setToken(trailingMatcher.replaceAll(""));
 		}
 		
 		return sentences;
@@ -363,9 +314,6 @@ public class Tokenizer {
 		try {
 			s = s.trim();
 			
-			//s = s.replaceAll(YEAR_OLD_REGEX, YEAR_OLD_REPL);
-			//s = s.replaceAll(YEAR_OLD_SEX_REGEX, YEAR_OLD_SEX_REPL);
-			
 			if(s.startsWith("\""))
 				s = s.replaceFirst("\"", "\" ");
 			else if(s.startsWith("'"))
@@ -376,22 +324,35 @@ public class Tokenizer {
 		    s = s.replace("[\"", "[ \" ");
 		    s = s.replace("{\"", "{ \" ");
 		    s = s.replace("<\"", "< \" ");
-		    s = s.replace("  ", " ");
 		    
-		    s = s.replace("...", " ... ");
-		    // possibly handle cases where one char becomes surrounded by space with regex
-		    s = s.replace(",", " , ");
-		    s = s.replace(":", " : ");
-		    s = s.replace("@", " @ ");
-		    s = s.replace("#", " # ");
-		    s = s.replace("$", " $ ");
-		    s = s.replace("%", " % ");
-		    s = s.replace("&", " & ");
-		    
-		    //s = s.replace("Pt", "Patient");
+		    Matcher matcher = singlePunc.matcher(s);
+		    while(matcher.find()) {
+		    	s = s.replace(matcher.group(), " " + matcher.group() + " ");
+		    }
+//		    s = s.replace("...", " ... ");
+//		    s = s.replace(",", " , ");
+//		    s = s.replace(":", " : ");
+//		    s = s.replace("@", " @ ");
+//		    s = s.replace("#", " # ");
+//		    s = s.replace("$", " $ ");
+//		    s = s.replace("%", " % ");
+//		    s = s.replace("&", " & ");
+//		    s = s.replace("?", " ? ");
+//		    s = s.replace("!", " ! ");
+//		    s = s.replace("[", " [ ");
+//		    s = s.replace("]", " ] ");
+//		    s = s.replace("(", " ( ");
+//		    s = s.replace(")", " ) ");
+//		    s = s.replace("{", " { ");
+//		    s = s.replace("}", " } ");
+//		    s = s.replace("<", " < ");
+//		    s = s.replace(">", " > ");
+//		    s = s.replace(";", " ; ");
+//		    s = s.replace("--", " -- ");
+//		    s = s.replace("\"", " \" ");
 		    
 		    // this was copied verbatim from the original python.
-		    // needs to be cleaned up. apparent goal is to add a space to betwen final token and period ending sentence.
+		    // needs to be cleaned up. apparent goal is to add a space between final token and period ending sentence.
 		    // read through a sentence backwards, looking for a period only if it precedes certain chars
 		    int pos = s.length()-1;
 		    while(pos > 0) {
@@ -404,23 +365,8 @@ public class Tokenizer {
 		    // if a period is not preceded by another period, replace
 		    if(s.charAt(pos) == '.' && !(pos > 0 && s.charAt(pos-1) == '.'))
 		    	s = s.substring(0, s.length()-1) + " .";
-		    	//s = s.replace(".", " .");
 		    
-		    s = s.replace("?", " ? ");
-		    s = s.replace("!", " ! ");
-		    s = s.replace("[", " [ ");
-		    s = s.replace("]", " ] ");
-		    s = s.replace("(", " ( ");
-		    s = s.replace(")", " ) ");
-		    s = s.replace("{", " { ");
-		    s = s.replace("}", " } ");
-		    s = s.replace("<", " < ");
-		    s = s.replace(">", " > ");
-		    s = s.replace(";", " ; ");
-		    s = s.replace("--", " -- ");
 		    
-		    s = s.replace("\"", " \" ");
-	
 		    s = s.replace(" '", " ' ");  // added 26 August 2012
 		    s = s.replace("' ", " ' ");
 		    
@@ -460,15 +406,14 @@ public class Tokenizer {
 		    s = s.replace("'Twas ", " 'T was ");
 		    s = s.replace("'twas ", " 't was ");
 		    s = s.replace(" Wanna ", " Wan na ");
-		    //s = s.replace(" wanna ", " wanna ");
 		    
-		    if(mallet) {
-		    	s = s.replace("#", "hash")
-		    		 .replace(":", "colon")
-		    		 .replace(",", "comma");
-		    }
+//		    if(mallet) {
+//		    	s = s.replace("#", "hash")
+//		    		 .replace(":", "colon")
+//		    		 .replace(",", "comma");
+//		    }
 		    
-		    s = s.replaceAll("\\s+", " ");
+		    s = s.replaceAll("\\s{2,}", " ");
 		    
 		    ret = s.trim().split(" ");
 		    //System.out.println(s);

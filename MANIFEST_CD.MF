@@ -10,3 +10,4 @@ Class-Path: /usr/local/classes/activemq-all-5.9.0.jar
   /usr/local/classes/jedis-2.6.2.jar
   /usr/local/classes/stanford-corenlp-3.4-models.jar
   /usr/local/classes/stanford-corenlp-3.4.jar
+  /usr/local/classes/commons-pool2-2.4.2.jar

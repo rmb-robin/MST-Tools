@@ -9,17 +9,15 @@ import com.mst.model.Sentence;
 import com.mst.model.SentenceToken;
 import com.mst.model.WordToken;
 import com.mst.util.Constants;
-import com.mst.util.Props;
 
-public class Annotator {
-	//private Jedis jedis = null;
-	
-	
+public class Annotator2 {
+
 	// The purpose of this class/method is to ensure that the annotation steps proceed in the 
 	// correct order (primarily for the sake of the verb classes).
 	//
 	// It mimics the Camel process, for bench testing purposes. It's also used by the web utility.
 	public ArrayList<Sentence> annotate(String text, boolean useStanfordPOS) {
+		//Jedis jedis = Constants.RedisDB.INSTANCE.getInstance();
 		
 		ArrayList<Sentence> output = new ArrayList<Sentence>();
 		
@@ -118,9 +116,9 @@ public class Annotator {
 					dep.processEndingBoundaries2(sentence);
 					
 					// requires POS
-					verbs.identifyModalAuxiliaryVerbs(sentence);
+					verbs.identifyModalAuxiliaryVerbs2(sentence);
 					// VOB requires POS and prep phrases and modal aux
-					verbs.identifyVerbsOfBeing(sentence);
+					verbs.identifyVerbsOfBeing2(sentence);
 					// LV requires POS, prep phrases, VOB, modal aux
 					verbs.identifyLinkingVerbs(sentence);
 					// PrepV requires POS, prep phrases

@@ -12,7 +12,6 @@ public class WordToken extends GenericToken {
 	
 	private String pos = "";  // part of speech
 	private String normalizedForm = null;
-	//private ArrayList<SemanticType> semanticTypeList = new ArrayList<SemanticType>();
 	private ArrayList<SemanticType> semanticTypeList = null;
 	private String st = null;
 	private boolean npHead; // noun phrase head
@@ -23,7 +22,6 @@ public class WordToken extends GenericToken {
 	private boolean infHead; // infinitive verb head
 	private boolean inf; // infinitive verb
 	private boolean vob; // verb of being head
-	//private boolean vobM; // verb of being member (will possibly deprecate)
 	private boolean vobSubj; // verb of being subject
 	private boolean vobSubjC; // verb of being subject complement (aka Object)
 	private boolean lvSubj; // linking verb subject
@@ -41,7 +39,6 @@ public class WordToken extends GenericToken {
 	private boolean dpEnd; // dependent phrase member
 	private boolean coref; // co-reference
 	private boolean conjAdv; // conjunctive adverb 
-	//private ArrayList<Integer> relations = new ArrayList<Integer>();
 	
 	public WordToken() {
 		super();
@@ -65,55 +62,68 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isPreposition() {	
-		return pos.matches("IN|TO");
+		//return pos.matches("IN|TO");
+		return Constants.PREPOSITIONS.matcher(pos).matches();
 	}
 	
 	public boolean isArticle() {
-		return getToken().matches(Constants.ARTICLE);
+		//return getToken().matches(Constants.ARTICLE);
+		return Constants.ARTICLE.matcher(getToken()).matches();
 	}
 	
 	public boolean matchesVerbSubjectExclusion() {
-		return getToken().matches(Constants.VERB_SUBJ_SUBJC_EXCLUSIONS);
+		//return getToken().matches(Constants.VERB_SUBJ_SUBJC_EXCLUSIONS);
+		return Constants.VERB_SUBJ_SUBJC_EXCLUSIONS.matcher(getToken()).matches();
+	}
+	
+	public boolean isSubjectComplement() {
+		return vobSubjC || lvSubjC || avObj || mvSubjC;
 	}
 	
 	public boolean isPronounPOS() {	
-		return pos.matches("PRP|PRP\\$");
+		return pos.startsWith("PRP");
 	}
 	
 	public boolean isModalAuxPOS() {	
-		return pos.matches("MD");
+		return pos.equals("MD");
 	}
 	
 	public boolean isAdjectivePOS() {	
-		return pos.matches("JJ|JJR|JJS");
+		return pos.startsWith("JJ");
 	}
 
 	public boolean isDeterminerPOS() {	
-		return pos.equalsIgnoreCase("DT");
+		return pos.equals("DT");
 	}
 	
 	public boolean isNounPOS() {	
 		return pos.startsWith("NN");
 	}
 	
+	public boolean isProperNoun() {	
+		return pos.equals("NNP");
+	}
+	
 	public boolean isAdverbPOS() {	
-		return pos.matches("RB|RBR|RBS");
+		return pos.startsWith("RB");
 	}
 
 	public boolean isNumericPOS() {	
-		return pos.equalsIgnoreCase("CD");
+		return pos.equals("CD");
 	}
 	
 	public boolean isConjunctionPOS() {	
-		return pos.equalsIgnoreCase("CC");
+		return pos.equals("CC");
 	}
 	
 	public boolean isNegationSignal() {	
-		return getToken().matches(Constants.NEGATION);
+		//return getToken().matches(Constants.NEGATION);
+		return Constants.NEGATION.matcher(getToken()).matches();
 	}
 	
 	public boolean isModalAuxSignal() {
-		return getToken().matches(Constants.MODAL_AUX_VERB);
+		//return getToken().matches(Constants.MODAL_AUX_VERB);
+		return Constants.MODAL_AUX_VERB.matcher(getToken()).matches();
 	}
 
 	public boolean isModalAuxVerb() {
@@ -259,23 +269,28 @@ public class WordToken extends GenericToken {
 	
 	public boolean isPunctuation() {
 		// !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
-		return getToken().matches(Constants.PUNC);
+		//return getToken().matches(Constants.PUNC);
+		return Constants.PUNC.matcher(getToken()).matches();
 	}
 	
 	public boolean isVerbOfBeingSignal() {
-		return getToken().matches(Constants.VERBS_OF_BEING);
+		//return getToken().matches(Constants.VERBS_OF_BEING);
+		return Constants.VERBS_OF_BEING.matcher(getToken()).matches();
 	}
 	
 	public boolean isLinkingVerbSignal() {
-		return getToken().matches(Constants.LINKING_VERBS);
+		//return getToken().matches(Constants.LINKING_VERBS);
+		return Constants.LINKING_VERBS.matcher(getToken()).matches();
 	}
 	
 	public boolean matchesPrepositionConstant() {
-		return getToken().matches(Constants.PREPOSITIONS);
+		//return getToken().matches(Constants.PREPOSITIONS);
+		return Constants.PREPOSITIONS.matcher(getToken()).matches();
 	}
 	
 	public boolean matchesConjunctiveAdverbConstant() {
-		return getToken().matches(Constants.CONJUNCTIVE_ADVERBS);
+		//return getToken().matches(Constants.CONJUNCTIVE_ADVERBS);
+		return Constants.CONJUNCTIVE_ADVERBS.matcher(getToken()).matches();
 	}
 	
 	public String getPOS() {

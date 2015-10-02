@@ -6,33 +6,42 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mst.util.DateNormalizer;
+
 public class SentenceCleaner {
 	
 	final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	public String cleanSentence(String input) {
-		String cleaned = null;
+	private String YEAR_OLD_REGEX = "(?<=\\d)((?i)[\\s-]*YEAR[\\s-]*OLD|\\s*yr?\\.?\\/?o\\.?)(?!m)"; 
+	private String YEAR_OLD_REPL = "-year-old"; 
+	private String YEAR_OLD_SEX_REGEX = "(?<=\\d)yom";
+	private String YEAR_OLD_SEX_REPL = "-year-old male";
+	
+	private static DateNormalizer dateNormalizer = new DateNormalizer();
+	
+	public String cleanSentence(String sentence) {
 		
-		cleaned = removeSectionHeader(input);
+		// age regex replacements act upon split sentences
+		sentence = sentence.replaceAll(YEAR_OLD_REGEX, YEAR_OLD_REPL);
+		sentence = sentence.replaceAll(YEAR_OLD_SEX_REGEX, YEAR_OLD_SEX_REPL);
+		
+		sentence = removeSectionHeader(sentence);
 
-		if(cleaned != null) { 
-			cleaned = removeProbabilityInfo(cleaned);
+		sentence = removeProbabilityInfo(sentence);
 			
-			if(cleaned != null) {
-				// sometimes �double quotes� come across in the text of full articles from PubMed. These seem to cause issues for the POS tagger.
-				cleaned = cleaned.replaceAll("\"", "");
-				cleaned = cleaned.replaceAll("�", "");
-				cleaned = cleaned.replaceAll("�", "");
-			}
-		}
+		// TODO not sure if these are still necessary after the switch to Stanford POS
+		// sometimes �double quotes� come across in the text of full articles from PubMed. These seem to cause issues for the POS tagger.
+		//cleaned = cleaned.replaceAll("\"", "");
+		//cleaned = cleaned.replaceAll("�", "");
+		//cleaned = cleaned.replaceAll("�", "");
 		
-		// null will be returned if an error occurred in either method
-		return cleaned;
+		sentence = dateNormalizer.normalize(sentence);
+		
+		return sentence;
 	}
 	
-	// ported from original python. no optimizations
 	private String removeSectionHeader(String input) {
-		String output = null;
+		String output = input;
 		
 		try {
 			/* define regex */
@@ -76,20 +85,20 @@ public class SentenceCleaner {
 			}
 		} catch(Exception e) {
 			logger.error("removeSectionHeader(): {}", e);
-			output = null;
 		}
 		
 		return output;
 	}
 	
+	// this was ported from the original python code. Not exactly sure the use-case but probably related to PubMed articles.
 	private String removeProbabilityInfo(String input) {
-		String output = null;
+		String output = input;
 		
 		try {
 			// # matches positive or negative integer, float, percent or fractional number
 	        // # TODO: add comma in integer part of number
 			String numberPattern = "-?\\$?\\d*[\\.\\/]?\\d+[%%]?";
-			String multipleSpaces = "\\s{2,}";
+			//String multipleSpaces = "\\s{2,}";
 			String emptyParens = String.format("\\s*[(\\[]%1$s(and|respectively)?%1$s[)\\]]", "[\\s;,]*");
 			
 			StringBuilder sb = new StringBuilder();
@@ -112,12 +121,11 @@ public class SentenceCleaner {
 			
 			/* begin processing */
 			output = input.replaceAll(probabilities, " ");
-			output = output.replaceAll(multipleSpaces, " ");
+			//output = output.replaceAll(multipleSpaces, " "); // this will be done in Tokenizer.java
 			output = output.replaceAll(emptyParens, "");
 			
 		} catch(Exception e) {
 			logger.error("removeProbabilityInfo(): {}", e);
-			output = null;
 		}
 		
 		return output;

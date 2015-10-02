@@ -1,12 +1,12 @@
 package com.mst.tools;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Joiner;
+import redis.clients.jedis.Jedis;
+
 import com.google.common.collect.Lists;
 import com.mst.model.DependentPhraseMetadata;
 import com.mst.model.NounPhraseMetadata;
@@ -19,7 +19,6 @@ import com.mst.model.VerbPhraseToken;
 import com.mst.model.VerbPhraseMetadata;
 import com.mst.model.WordToken;
 import com.mst.util.Constants;
-import com.mst.util.Utils;
 
 public class MetadataParser {
 
@@ -52,6 +51,10 @@ public class MetadataParser {
 		if(containsPattern(uppercasePattern, sentence.getFullSentence())) {
 			metadata.addSimpleMetadataValue("containsUppercase", true);
 		}
+		if(containsPattern(Constants.NEGATION, sentence.getFullSentence())) {
+			metadata.addSimpleMetadataValue("containsNegation", true);
+		}
+		// TODO add containsMultipleVerbPhrases, possibly containsParens
 		
 		for(WordToken word : words) {
 			try {
@@ -71,6 +74,14 @@ public class MetadataParser {
 					// check negation, beginning with position of prep phrase start
 					pp.setNegated(checkNegation(words, pp.getPhrase().get(0).getPosition()));
 					
+					// check intra-pp tokens for negation
+					for(PrepPhraseToken token : pp.getPhrase()) {
+						if(words.get(token.getPosition()).isNegationSignal()) {
+							pp.setNegated(true);
+							break;
+						}
+					}
+					
 					metadata.addPrepMetadata(pp);
 				}
 
@@ -80,13 +91,11 @@ public class MetadataParser {
 					VerbPhraseMetadata vp = new VerbPhraseMetadata(Constants.VerbClass.INFINITIVE);
 					vp.addVerb(new VerbPhraseToken(word.getToken(), i));
 					
-					// TODO negated
-					
 					// infinitive follows prep phrase
-					try {
-						if(i > 0 && words.get(i-1).isPrepPhraseObject())
-							vp.setInfFollowsPP(true);
-					} catch(IndexOutOfBoundsException e) { }
+//					try {
+//						if(i > 0 && words.get(i-1).isPrepPhraseObject())
+//							vp.setInfFollowsPP(true);
+//					} catch(IndexOutOfBoundsException e) { }
 					
 					metadata.addVerbMetadata(vp);
 				}	
@@ -99,23 +108,6 @@ public class MetadataParser {
 									
 					metadata.addVerbMetadata(vp);
 				} 
-				
-//				if(word.isModalAuxVerb()) {
-//					VerbPhraseMetadata vp = new VerbPhraseMetadata(Constants.VerbClass.MODAL_AUX);
-//					
-//					vp.addVerb(new VerbPhraseToken(word.getToken(), i));
-//					
-//					// a bit of a hack. set the subject of a modal aux verb as the term preceding the verb
-//					// modal aux are short phrases such as "could be" or "may have"
-//					try {
-//						vp.setSubj(new VerbPhraseToken(words.get(i-1).getToken(), i-1));
-//					} catch(Exception e) { }
-//					
-//					// TODO negated?
-//					
-//					metadata.addVerbMetadata(vp);
-//				} 
-				
 				
 				/* NOUN phrases */
 				if(word.isNounPhraseHead()) {
@@ -130,8 +122,13 @@ public class MetadataParser {
 					// check negation, from start of phrase
 					np.setNegated(checkNegation(words, np.getPhrase().get(0).getPosition()));
 					
-					// contains verb, backwards from head
-					//nounPhraseContainsVerb(words, i);
+					// check intra-np tokens for negation
+					for(GenericToken token : np.getPhrase()) {
+						if(words.get(token.getPosition()).isNegationSignal()) {
+							np.setNegated(true);
+							break;
+						}
+					}
 					
 					metadata.addNounMetadata(np);
 				}
@@ -172,25 +169,36 @@ public class MetadataParser {
 			}
 			phrase.setPrepPhrasesIdx(getModifyingPrepPhrases(finalTokenPos, metadata.getPrepMetadata()));
 			// query lexicon for noun phrase semantic type
-			String st = Constants.semanticTypes.get(phrase.getNounPhraseString().trim().toLowerCase());
+			//String st = Constants.semanticTypes.get(phrase.getNounPhraseString().trim().toLowerCase());
+			
+			String st;// = jedis.get("st:"+phrase.getNounPhraseString().trim().toLowerCase());
 
+			try(Jedis jedis = Constants.MyJedisPool.INSTANCE.getResource()) {
+				//list = jedis.hmget("ct:"+key, "attr", "qualifier");
+				st = jedis.get("st:"+phrase.getNounPhraseString().trim().toLowerCase());
+			}
+			
 			phrase.setSemanticType(st);
 		}
 		
-		for(PrepPhraseMetadata phrase : metadata.getPrepMetadata()) {
-			//List<String> st = new ArrayList<String>();
+		for(int j=0; j < metadata.getPrepMetadata().size(); j++) {
+			PrepPhraseMetadata phrase = metadata.getPrepMetadata().get(j);
+			
+			if(j > 0) {
+				// if prep phrase is negated are all grammatically-linked to it also negated?
+				PrepPhraseMetadata prevPhrase = metadata.getPrepMetadata().get(j-1);
+				
+				if(prevPhrase.isNegated()) {
+					int prevPhraseEndIdx = prevPhrase.getPhrase().get(prevPhrase.getPhrase().size()-1).getPosition();
+					if(phrase.getPhrase().get(0).getPosition() - prevPhraseEndIdx == 1) {
+						phrase.setNegated(true);
+					}
+				}
+			}
 			
 			for(PrepPhraseToken ppt : phrase.getPhrase()) {
 				ppt.setNounPhraseIdx(getContainingNounPhraseIdx(ppt.getPosition(), metadata.getNounMetadata()));
-				
-				// PP semantic type = concatenation of PP OBJ semantic types
-				// may possibly alter this or make it smarter
-//				if(words.get(ppt.getPosition()).isPrepPhraseBegin() || words.get(ppt.getPosition()).isPrepPhraseObject()) {
-//					st.add(words.get(ppt.getPosition()).getSemanticType());
-//				}
 			}
-
-//			phrase.setSemanticType(Joiner.on("-").join(st));
 		}
 		
 		for(VerbPhraseMetadata phrase : metadata.getVerbMetadata()) {
@@ -206,7 +214,10 @@ public class MetadataParser {
 				
 				// if verb consists of more than one token, query lexicon for semantic type
 				if(phrase.getVerbs().size() > 1) {
-					phrase.setSemanticType(Constants.semanticTypes.get(phrase.getVerbString()));
+					//phrase.setSemanticType(Constants.semanticTypes.get(phrase.getVerbString()));
+					try(Jedis jedis = Constants.MyJedisPool.INSTANCE.getResource()) {
+						phrase.setSemanticType(jedis.get("st:"+phrase.getVerbString().toLowerCase()));
+					}
 				}
 				
 				if(phrase.getSubj() != null) {
@@ -309,76 +320,20 @@ public class MetadataParser {
 		return depPhrasePos;
 	}
 	
-	private VerbPhraseToken findSubject(ArrayList<WordToken> words, int verbPos, Constants.VerbClass _class) {
-		VerbPhraseToken tpos = null;
-		
-		for(int i=verbPos-1; i >= 0; i--) {
-			switch(_class) {
-				case ACTION:
-					if(words.get(i).isActionVerbSubject()) {
-						tpos = new VerbPhraseToken(words.get(i).getToken(), i);
-					}
-					break;
-				case VERB_OF_BEING:
-					if(words.get(i).isVerbOfBeingSubject()) {
-						tpos = new VerbPhraseToken(words.get(i).getToken(), i);
-					}
-					break;
-				case LINKING_VERB:
-					if(words.get(i).isLinkingVerbSubject()) {
-						tpos = new VerbPhraseToken(words.get(i).getToken(), i);
-					}
-					break;
-				default:
-					
-					break;
-			}
-			if(tpos != null)
-				break;
-		}
-		
-		return tpos;
-	}
-	
-	private VerbPhraseToken findObjectOrSubjectComplement(ArrayList<WordToken> words, int verbPos, Constants.VerbClass _class) {
-		VerbPhraseToken tpos = null;
-		
-		for(int i=verbPos+1; i < words.size(); i++) {
-			switch(_class) {
-				case ACTION:
-					if(words.get(i).isActionVerbDirectObject()) {
-						tpos = new VerbPhraseToken(words.get(i).getToken(), i);
-					}
-					break;
-				case VERB_OF_BEING:
-					if(words.get(i).isVerbOfBeingSubjectComplement()) {
-						tpos = new VerbPhraseToken(words.get(i).getToken(), i);
-					}
-					break;
-				case LINKING_VERB:
-					if(words.get(i).isLinkingVerbSubjectComplement()) {
-						tpos = new VerbPhraseToken(words.get(i).getToken(), i);
-					}
-					break;
-				default:
-					
-					break;
-			}
-			if(tpos != null)
-				break;
-		}
-		
-		return tpos;
-	}
-	
 	private boolean checkNegation(ArrayList<WordToken> words, int tokenPos) {
 		boolean ret = false;
 		
 		try {	
-			if(words.get(tokenPos-1).isNegationSignal()) {
-				ret = true;
-			} else if(words.get(tokenPos-1).isArticle() && words.get(tokenPos-2).isNegationSignal()) {
-				ret = true;
+			// loop backward from tokenPos
+			for(int i=tokenPos-1; i >= 0; i--) {
+				WordToken word = words.get(i);
+
+				if(words.get(i).isNegationSignal()) { // flipped this logic to allow "fail" to be detected as negation signal
+					ret = true;
+					break;
+				} else if(word.isVerb() || word.isPrepPhraseObject()) { // break on a verb or prep phrase 
+					break;
+				}
 			}
 		} catch(IndexOutOfBoundsException oob) { }
 		
@@ -389,12 +344,12 @@ public class MetadataParser {
 		boolean ret = false;
 		
 		try {
-			// loop backwards from subject complement to verb
+			// loop backward from subject complement to verb
 			for(int i=tokenPos-1; i >= 0; i--) {
-				if(words.get(i).isVerbOfBeing() || words.get(i).isLinkingVerb()) {
-					break;
-				} else if(words.get(i).isNegationSignal()) {
+				if(words.get(i).isNegationSignal()) {
 					ret = true;
+					break;
+				} else if(words.get(i).isVerbOfBeing() || words.get(i).isLinkingVerb()) {
 					break;
 				}
 			}
@@ -419,68 +374,9 @@ public class MetadataParser {
 		return ret;
 	}
 	
-	private boolean isWithinDependentPhrase(ArrayList<WordToken> words, int tokenPos) {
-		return words.get(tokenPos).isDependentPhraseMember() || words.get(tokenPos).isDependentPhraseBegin();
-	}
-	
 	private boolean containsPattern(Pattern pattern, String fullSentence) {
 		Matcher matcher = pattern.matcher(fullSentence);
 		return matcher.find();
-	}
-	
-	private GenericToken isTokenModifiedByPrepPhrase(ArrayList<WordToken> words, int tokenPos) {
-		GenericToken tpos = null;
-		
-		try {
-			// this token is NOT a prep phrase member but the next token IS (the final token of a prep phrase is never a member)	
-			if(!words.get(tokenPos).isPrepPhraseMember() && words.get(tokenPos+1).isPrepPhraseMember()) {
-				// return object or preposition?
-				tpos = new GenericToken(words.get(tokenPos+1).getToken(), tokenPos+1);
-				/*
-				for(int i=tokenPos+1; i < words.size(); i++) {
-					if(words.get(i).isPrepPhraseObject()) {
-						tpos = new TokenPosition(words.get(i).getToken(), i);
-						break;
-					}
-				}
-				*/
-			}
-		} catch(IndexOutOfBoundsException oob) { }
-		
-		return tpos;
-	}
-	
-	private boolean isTokenNounPhraseHead(ArrayList<WordToken> words, int tokenPos) {
-		return words.get(tokenPos).isNounPhraseHead();		
-	}
-
-	private List<GenericToken> getCompoundVerbs(ArrayList<WordToken> words, int startPos) {
-		List<GenericToken> tposList = new ArrayList<GenericToken>();
-		boolean conjFound = false;
-		
-		// add initial verb
-		tposList.add(new GenericToken(words.get(startPos).getToken(), startPos));
-		
-		for(int i=startPos+1; i < words.size(); i++) {
-			if(words.get(i).isConjunctionPOS()) {
-				conjFound = true;
-				tposList.add(new GenericToken(words.get(i).getToken(), i));
-			} else {
-				if(conjFound) {
-					if(words.get(i).isLinkingVerb() || words.get(i).isInfinitiveVerb() || words.get(i).isVerbOfBeing()) {
-						tposList.add(new GenericToken(words.get(i).getToken(), i));
-						conjFound = false;
-					}
-				}
-			}
-			
-		}
-		
-		// don't return empty, single-verb, or verb/conj-only list
-		if(tposList.size() <= 2)
-			tposList = null;
-		
-		return tposList;
 	}
 
 	private List<GenericToken> buildNounPhrase(ArrayList<WordToken> words, int startPos) {
@@ -505,48 +401,20 @@ public class MetadataParser {
 		return tposList;
 	}
 	
-	// for error-checking purposes. may remove in time.
-//	private boolean nounPhraseContainsVerb(ArrayList<WordToken> words, int startPos) {
-//		boolean ret = false;
-//		
-//		for(int i=startPos-1; i >= 0; i--) {
-//			if(words.get(i).isNounPhraseModifier()) {
-//				if(words.get(i).isVerb()) {
-//					ret = true;
-//					break;
-//				}
-//			} else {
-//				break;
-//			}
-//		}
-//		
-//		return ret;
-//	}
-	
 	private List<PrepPhraseToken> buildPrepPhrase(ArrayList<WordToken> words, int startPos) {
-		List<PrepPhraseToken> tposList = new ArrayList<PrepPhraseToken>();
+		List<PrepPhraseToken> list = new ArrayList<PrepPhraseToken>();
 		
-		//boolean inNP = (words.get(startPos).isNounPhraseHead() || words.get(startPos).isNounPhraseModifier()); 
-		//int npIdx = getContainingNounPhraseIdx(startPos, nounList); 
-		
-		// add prep phrase object
-		tposList.add(new PrepPhraseToken(words.get(startPos).getToken(), startPos, -1));
-		
-		for(int i=startPos-1; i >= 0; i--) {
-			if(words.get(i).isPrepPhraseMember()) {
-				//npIdx = getContainingNounPhraseIdx(startPos, nounList); 
-				tposList.add(new PrepPhraseToken(words.get(i).getToken(), i, -1));
-			} else {
+		for(int i=startPos; i >= 0; i--) {
+			list.add(new PrepPhraseToken(words.get(i).getToken(), i, words.get(i).isPrepPhraseObject()));
+			
+			if(words.get(i).isPrepPhraseBegin())
 				break;
-			}
 		}
 		
-		if(tposList.isEmpty())
-			tposList = null;
+		if(list.isEmpty())
+			return null;
 		else
-			tposList = Lists.reverse(tposList);
-		
-		return tposList;
+			return Lists.reverse(list);
 	}
 	
 	private List<GenericToken> buildDependentPhrase(ArrayList<WordToken> words, int startPos) {
@@ -564,20 +432,6 @@ public class MetadataParser {
 		
 		return tposList;
 	}
-
-//	private List<PrepPhraseMetadata> getModifyingPrepPhrases(int sourcePos, List<PrepPhraseMetadata> prepList) {
-//		List<PrepPhraseMetadata> modList = new ArrayList<PrepPhraseMetadata>();
-//		
-//		// loop through each prep phrase and add it to a list if it modifies the token before it
-//		for(PrepPhraseMetadata phrase : prepList) {
-//			if(phrase.getPhrase().get(0).getPosition() == sourcePos+1) {
-//				modList.add(phrase);
-//				sourcePos = phrase.getPhrase().get(phrase.getPhrase().size()-1).getPosition();
-//			}
-//		}
-//		
-//		return modList;
-//	}
 	
 	private List<Integer> getModifyingPrepPhrases(int sourcePos, List<PrepPhraseMetadata> prepList) {
 		List<Integer> modList = new ArrayList<Integer>();
@@ -592,23 +446,6 @@ public class MetadataParser {
 		}
 		
 		return modList;
-	}
-	
-	private NounPhraseMetadata getContainingNounPhrase(int sourcePos, List<NounPhraseMetadata> nounList) {
-		NounPhraseMetadata npMetadata = null;
-		
-		for(NounPhraseMetadata phrase : nounList) {
-			for(GenericToken token : phrase.getPhrase()) {
-				if(token.getPosition() == sourcePos) {
-					npMetadata = phrase;
-					break;
-				}
-			}
-			if(npMetadata != null)
-				break;
-		}
-		
-		return npMetadata;
 	}
 	
 	private int getContainingNounPhraseIdx(int sourcePos, List<NounPhraseMetadata> nounList) {

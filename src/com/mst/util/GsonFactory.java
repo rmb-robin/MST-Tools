@@ -1,6 +1,5 @@
 package com.mst.util;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,7 +12,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.reflect.TypeParameter;
+import com.google.gson.ExclusionStrategy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -24,7 +23,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
-import com.mst.model.MapValue;
+import com.mst.model.MapValue2;
 
 /*
  * Custom factory for Gson that registers a de/serializer that can handle MongoDB's ISODate type.
@@ -81,13 +80,82 @@ public class GsonFactory {
 			@Override
 			public Multimap<String, ?> deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
 				
-				Type mapType = new TypeToken<Map<String, Collection<MapValue>>>(){}.getType();
-				Map<String, Collection<MapValue>> map = context.deserialize(json, mapType);
+				Type mapType = new TypeToken<Map<String, Collection<MapValue2>>>(){}.getType();
+				Map<String, Collection<MapValue2>> map = context.deserialize(json, mapType);
 				
-				Multimap<String, MapValue> multimap = ArrayListMultimap.create();
+				Multimap<String, MapValue2> multimap = ArrayListMultimap.create();
 				
-				for(Entry<String, Collection<MapValue>> e : map.entrySet()) {
-		            Collection<MapValue> value = (Collection<MapValue>) e.getValue();
+				for(Entry<String, Collection<MapValue2>> e : map.entrySet()) {
+		            Collection<MapValue2> value = (Collection<MapValue2>) e.getValue();
+		            multimap.putAll(e.getKey(), value);
+		        }
+				
+				return multimap;
+			}
+		};
+		
+		b.registerTypeAdapter(Date.class, ser);
+		b.registerTypeAdapter(Date.class, deser);
+		b.registerTypeAdapter(Multimap.class, mmSerializer);
+		b.registerTypeAdapter(Multimap.class, mmDeserializer);
+		
+        return b.create();
+    }
+	
+	public static Gson build(ExclusionStrategy exclude) {
+        GsonBuilder b = new GsonBuilder()
+        	.setExclusionStrategies(exclude);
+        
+        JsonSerializer<Date> ser = new JsonSerializer<Date>() {
+			@Override
+			public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
+				Date d = (Date) src;
+	        	SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+		        JsonObject jo = new JsonObject();
+		        jo.addProperty("$date", format.format(d));
+				return jo;
+			}
+		};
+		
+		JsonDeserializer<Date> deser = new JsonDeserializer<Date>() {
+			@Override
+			public Date deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+				Matcher matcher = MONGO_DATE_PATTERN.matcher(json.toString());
+				matcher.find();
+				
+				SimpleDateFormat format = new SimpleDateFormat(MONGO_DATE_FORMAT);
+				Date date = null;
+				try {
+					date = format.parse(matcher.group(0));
+				} catch(ParseException e) { 
+					e.printStackTrace();
+				}
+				
+				return date;
+			}
+		};
+		
+		JsonSerializer<Multimap<String, String>> mmSerializer = new JsonSerializer<Multimap<String, String>>() {
+			//@SuppressWarnings("serial")
+			//private final Type t = new TypeToken<Map<String, String>>() {}.getType();
+			  
+			@Override
+			public JsonElement serialize(Multimap<String, String> src, Type typeOfSrc, JsonSerializationContext context) {
+				return context.serialize(src.asMap());
+			}
+		};
+        
+		JsonDeserializer<Multimap<String, ?>> mmDeserializer = new JsonDeserializer<Multimap<String, ?>>() {
+			@Override
+			public Multimap<String, ?> deserialize(JsonElement json, Type type, JsonDeserializationContext context) throws JsonParseException {
+				
+				Type mapType = new TypeToken<Map<String, Collection<MapValue2>>>(){}.getType();
+				Map<String, Collection<MapValue2>> map = context.deserialize(json, mapType);
+				
+				Multimap<String, MapValue2> multimap = ArrayListMultimap.create();
+				
+				for(Entry<String, Collection<MapValue2>> e : map.entrySet()) {
+		            Collection<MapValue2> value = (Collection<MapValue2>) e.getValue();
 		            multimap.putAll(e.getKey(), value);
 		        }
 				

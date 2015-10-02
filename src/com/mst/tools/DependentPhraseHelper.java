@@ -29,12 +29,12 @@ public class DependentPhraseHelper {
 					WordToken thisToken = words.get(i); 
 					if(!(thisToken.isCorefernece() || thisToken.isConjunctiveAdverb() || thisToken.isAdjectivePOS())) {
 						if(i == 0) {
-							if(thisToken.getToken().matches(Constants.INTERSECTION_PREPOSITIONS_AND_DEPENDENT)) {
+							if(Constants.INTERSECTION_PREPOSITIONS_AND_DEPENDENT.matcher(thisToken.getToken()).matches()) {
 								// dependent signal or prep phrase begins the sentence. determined later???
 								words.get(i).setDependentPhraseBegin(Constants.DependentPhraseClass.BEGINS_SENTENCE);
 								words.get(i).setDependentPhraseMember(true);
 								sentence.getMetadata().addSimpleMetadataValue("depSignalBeginsSentencePrep", true);
-							} else if(thisToken.getToken().matches(Constants.DEPENDENT_SIGNALS)) {
+							} else if(Constants.DEPENDENT_SIGNALS.matcher(thisToken.getToken()).matches()) {
 								// dependent signal begins the sentence
 								words.get(i).setDependentPhraseBegin(Constants.DependentPhraseClass.BEGINS_SENTENCE);
 								words.get(i).setDependentPhraseMember(true);
@@ -45,7 +45,7 @@ public class DependentPhraseHelper {
 							WordToken nextToken = words.get(i+1);
 
 							if(!nextToken.getToken().matches("\\.")) {
-								if(thisToken.getToken().matches(Constants.DEPENDENT_SIGNALS)) {
+								if(Constants.DEPENDENT_SIGNALS.matcher(thisToken.getToken()).matches()) {
 									if(prevToken.getToken().matches(",")) {
 										// dependent signal precedes a comma
 										words.get(i).setDependentPhraseBegin(Constants.DependentPhraseClass.PRECEDED_BY_COMMA);

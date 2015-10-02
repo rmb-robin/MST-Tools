@@ -5,63 +5,16 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
-import com.mst.util.Constants;
 
 public class NounHelper {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-	private int nounPhraseCount = 0;  // possibly deprecated with new metadata strategy
 		
-	public boolean identifyNounPhrases(ArrayList<WordToken> words) {
-		// requires POS-tagged list of WordTokens
-		boolean ret = true;
-		if(words == null) {
-			//identifyPartsOfSpeech(wordList);
-		}
-		
-		int oldHeadIndex = -1;
-		int headIndex = 0;
-		try {
-			//TODO don't mark as head if surrounded by parens?
-			for(int i=words.size()-1; i >= 0; i--) {
-				if(words.get(i).isNounPOS()) {
-					if(headIndex == 0) {
-						headIndex = i;
-					} else {
-						words.get(headIndex).setNounPhraseHead(true);
-						words.get(i).setNounPhraseModifier(true);
-						if(oldHeadIndex != headIndex) {
-							nounPhraseCount++;
-							oldHeadIndex = headIndex;
-						}
-					}
-				} else if(words.get(i).isAdjectivePOS() || words.get(i).isAdverbPOS() || words.get(i).isPunctuation()) {
-					if(headIndex > 0) {
-						words.get(headIndex).setNounPhraseHead(true);
-						words.get(i).setNounPhraseModifier(true);
-						if(oldHeadIndex != headIndex) {
-							nounPhraseCount++;
-							oldHeadIndex = headIndex;
-						}
-					}
-				} else {
-					headIndex = 0;
-				}
-			}
-		} catch(Exception e) {
-			ret = false;
-			logger.error("identifyNounPhrases() {}", e);
-		}
-		return ret;
-	}
-	
 	public boolean identifyNounPhrases(Sentence sentence) {
 		// requires POS-tagged list of WordTokens
 		boolean ret = true;
 		
-		int oldHeadIndex = -1;
 		int headIndex = 0;
 		try {
 			//TODO don't mark as head if surrounded by parens?
@@ -73,19 +26,13 @@ public class NounHelper {
 					} else {
 						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
 						sentence.getWordList().get(i).setNounPhraseModifier(true);
-						//if(oldHeadIndex != headIndex) {
-						//	nounPhraseCount++;
-						//	oldHeadIndex = headIndex;
-						//}
 					}
-				} else if(word.isAdjectivePOS() || word.isAdverbPOS() || word.isPunctuation() || word.isNumericPOS() || word.isPronounPOS()) {
+				//} else if((word.isAdjectivePOS() || word.isAdverbPOS() || word.isPunctuation() || word.isNumericPOS() || word.isPronounPOS()) && !word.getToken().equalsIgnoreCase(",")) {
+				} else if((word.isAdjectivePOS() || word.isAdverbPOS() || word.isNumericPOS() || word.isPronounPOS())) { // SRD 7/17/15 removed all punc because parens were being included in two-token noun phrases
+					// SRD 7/10/15 - testing a fix for ex. "Followed for metastatic prostate cancer, urethral stricture, and BPH."
 					if(headIndex > 0) {
 						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
 						sentence.getWordList().get(i).setNounPhraseModifier(true);
-						//if(oldHeadIndex != headIndex) {
-						//	nounPhraseCount++;
-						//	oldHeadIndex = headIndex;
-						//}
 					}
 				} else {
 					headIndex = 0;
@@ -96,44 +43,6 @@ public class NounHelper {
 			logger.error("identifyNounPhrases() {}", e);
 		}
 		return ret;
-	}
-	
-	public int getNounPhraseCount() {
-		return nounPhraseCount;
-	}
-	
-	public ArrayList<WordToken> identifyNounPhrasesLegacy(ArrayList<WordToken> words) {
-	
-		if(words == null) {
-			//identifyPartsOfSpeech(wordList);
-		}
-		
-		int headIndex = 0;
-		try {
-			//TODO don't mark as head if surrounded by parens?
-			for(int i=words.size()-1; i >= 0; i--) {
-				if(words.get(i).getPOS().matches("NN|NNS")) {
-					if(headIndex == 0) {
-						headIndex = i;
-					} else {
-						words.get(headIndex).setNounPhraseHead(true);
-						words.get(i).setNounPhraseModifier(true);
-					}
-				} else if(words.get(i).getPOS().matches("JJ|RB|" + Constants.PUNC)) {
-					if(headIndex > 0) {
-						words.get(headIndex).setNounPhraseHead(true);
-						words.get(i).setNounPhraseModifier(true);
-					}
-				} else {
-					headIndex = 0;
-				}
-			}
-		} catch(Exception e) {
-			System.out.println("Error in identifyNounPhrases(): " + e.toString());
-			Gson gson = new Gson();
-			System.out.println(gson.toJson(words));
-		}
-		return words;
 	}
 	
 	// somewhat legacy/deprecated
@@ -188,12 +97,4 @@ public class NounHelper {
 		
 		return sb.toString();
 	}
-	
-//	public String getNPAnnotatedSentence(String keyword, String extractionTerm, boolean annotate) throws Exception {
-//		if(taggedWordList == null) {
-//			throw new Exception("Please execute tagSentence() before attempting to getNPAnnotatedSentence().");
-//		}
-//		
-//		return getNPAnnotatedSentence(keyword, extractionTerm, taggedWordList, annotate);
-//	}
 }

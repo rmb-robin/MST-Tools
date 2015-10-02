@@ -30,6 +30,7 @@ import com.mst.tools.PrepositionHelper;
 //import com.sun.tools.javac.code.Source;
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +45,16 @@ public class MongoDB {
 	
 	public MongoDB() {
 		try {
-			mongoClient = new MongoClient(Props.getProperty("mongo_host"));
+			//mongoClient = new MongoClient(Props.getProperty("mongo_host"));
 			
-			db = mongoClient.getDB(Props.getProperty("mongo_db"));
-			//auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
+			//db = mongoClient.getDB(Props.getProperty("mongo_db"));
+			
+			//if(Props.getProperty("mongo_host").equalsIgnoreCase("mongo01.medicalsearchtechnologies.com")) 
+			//	auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
+			//else 
 			auth = true;
-			gson = new Gson();
+			
+			gson = GsonFactory.build();
 			
 			// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
 			// this complements a similar bit of functionality in PubMed.java, which keeps track of existing PMIDs and those which it inserts
@@ -165,20 +170,43 @@ public class MongoDB {
 	}
 	
 	public String insertTaggedSentenceFull(Sentence sentence) {
-		if(auth && !sentence.getWordList().isEmpty()) {
-			Gson gson = GsonFactory.build();
+		if(!sentence.getWordList().isEmpty()) {
+			//Gson gson = GsonFactory.build();
 			try {
 				Constants.Source source = Constants.Source.valueOf(sentence.getSource());
-				DBCollection coll = db.getCollection(source.getMongoCollection());
+
+				DBCollection coll = Constants.MongoDB.INSTANCE.getCollection(source.getMongoCollection());
 				
 				DBObject dbObject = (DBObject) JSON.parse(gson.toJson(sentence));
-      			//coll.save(dbObject);
+
       			coll.insert(dbObject);
       			
 			} catch(Exception e) {
 				logger.error("insertTaggedSentenceFull(): \n{}", e);
 				e.printStackTrace();
 			}
+		}
+		return "";
+	}
+
+	public String insertTaggedSentenceFullTest(String sentence) {
+		try {
+			DBObject dbObject = (DBObject) JSON.parse(sentence);
+			
+			ArrayList<WordToken> wordList = (ArrayList<WordToken>) dbObject.get("wordList");
+		
+			if(wordList != null && !wordList.isEmpty()) {
+				dbObject.put("processDate", new Date());
+				
+				Constants.Source source = Constants.Source.valueOf((String)dbObject.get("source"));
+
+				DBCollection coll = Constants.MongoDB.INSTANCE.getCollection(source.getMongoCollection());
+			
+				coll.insert(dbObject);
+			}
+		} catch(Exception e) {
+			logger.error("insertTaggedSentenceFull(): \n{}", e);
+			e.printStackTrace();
 		}
 		return "";
 	}
@@ -897,7 +925,6 @@ public class MongoDB {
 		return articleIds;
 	}
 	
-	
 	public String getAnnotatedAsCSV() {
 		String csvOut = "";
 		
@@ -960,6 +987,5 @@ public class MongoDB {
 
 		return csvOut;
 	}
-
 	
 }

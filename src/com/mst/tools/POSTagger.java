@@ -28,7 +28,6 @@ public class POSTagger {
 	private boolean useStanford = false;
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	private Map<String, String> translateMap = new HashMap<String, String>();
-	//private final static StanfordNLP stanfordNLP = new StanfordNLP();
 	private static MaxentTagger tagger = null;
 	
 	public POSTagger() {
@@ -67,42 +66,45 @@ public class POSTagger {
 		try {
 			ArrayList<WordToken> words = sentence.getWordList();
 			
-			if(useStanford) {
-				StanfordNLP stanford = new StanfordNLP(tagger);
-				sentence.setWordList(stanford.identifyPartsOfSpeech(words));
-				//System.out.println("POS result: " + sentence.getWordList().get(0).getPOS());
+			if(words == null || words.isEmpty()) {
+				ret = false;
 			} else {
-				StringBuilder sb = new StringBuilder();
-				
-				// build a Python input string
-				for(WordToken word : words) {
-					String xlate = translateMap.get(word.getToken());
-					if(xlate == null)
-						sb.append(word.getToken());
-					else
-						sb.append(xlate);
-					sb.append("<>");  // attempting to pick a delimiter that will never come across as a word
+				if(useStanford) {
+					StanfordNLP stanford = new StanfordNLP(tagger);
+					sentence.setWordList(stanford.identifyPartsOfSpeech(words));
+					//System.out.println("POS result: " + sentence.getWordList().get(0).getPOS());
+				} else {
+					StringBuilder sb = new StringBuilder();
+					
+					// build a Python input string
+					for(WordToken word : words) {
+						String xlate = translateMap.get(word.getToken());
+						if(xlate == null)
+							sb.append(word.getToken());
+						else
+							sb.append(xlate);
+						sb.append("<>");  // attempting to pick a delimiter that will never come across as a word
+					}
+					// write to a file for use as input by the python script
+					writeToFile(sb.toString());
+		
+					String pyList = Utils.execCmd(CMD).trim();
+					
+					String[] pyArray = pyList.split("<>");
+					
+					for(int i=0; i < pyArray.length; i++) {
+						words.get(i).setPOS(pyArray[i]);
+					}
+					
+					sentence.setWordList(words);
 				}
-				// write to a file for use as input by the python script
-				writeToFile(sb.toString());
-	
-				String pyList = Utils.execCmd(CMD).trim();
-				
-				String[] pyArray = pyList.split("<>");
-				
-				for(int i=0; i < pyArray.length; i++) {
-					words.get(i).setPOS(pyArray[i]);
-				}
-				
-				sentence.setWordList(words);
 			}
-			
 		} catch(Exception e) {
 			//System.out.println("ERROR in identifyPartsOfSpeech: " + e.toString());
 			ret = false;
 			logger.error("identifyPartsOfSpeech(): {}\n{}", e, sentence.getFullSentence());
 			
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		return ret;
 	}

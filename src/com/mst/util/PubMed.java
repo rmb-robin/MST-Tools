@@ -442,7 +442,7 @@ public class PubMed {
 				
 				Sentence sentence = new Sentence();
 				sentence.setId(article.getPMID());
-				sentence.setSource("PUBMED");
+				sentence.setPractice("PubMed");
 				sentence.setStudy(searchTerm);
 				
 				if(article.getFullArticleText() == null) {
@@ -453,10 +453,10 @@ public class PubMed {
 					}
 					
 					sentence.setFullSentence(sb.toString().trim());
-					sentence.setPractice("abstract");
+					sentence.setSource("PubMed_Abstract");
 				} else {
 					sentence.setFullSentence(article.getFullArticleText());
-					sentence.setPractice("fullArticle");
+					sentence.setSource("PubMed_FullArticle");
 				}
 				
 				activeMQ.publishMessage(qName, gson.toJson(sentence));

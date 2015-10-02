@@ -4,251 +4,252 @@ import java.net.UnknownHostException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 
 public class Constants {
 	
 	public static Map<String, String> semanticTypes = new HashMap<String, String>();
 	
-	static {
+	static {		
 		semanticTypes.put("[age]","age");
-		semanticTypes.put("added","avb-added");
-		semanticTypes.put("administered","avb-administered");
-		semanticTypes.put("began","avb-began");
-		semanticTypes.put("begun","avb-began");
-		semanticTypes.put("biopsied","avb-biopsied");
-		semanticTypes.put("cancelled","avb-cancelled");
-		semanticTypes.put("chose","avb-chose");
-		semanticTypes.put("decided","avb-chose");
-		semanticTypes.put("selected","avb-chose");
-		semanticTypes.put("complains","avb-complains");
-		semanticTypes.put("considered","avb-considered");
-		semanticTypes.put("continued","avb-continued");
-		semanticTypes.put("continues","avb-continues");
-		semanticTypes.put("remains","avb-continues");
-		semanticTypes.put("declined","avb-decrease");
-		semanticTypes.put("decreased","avb-decrease");
-		semanticTypes.put("dropped","avb-decrease");
-		semanticTypes.put("delayed","avb-delay");
-		semanticTypes.put("postponed","avb-delay");
-		semanticTypes.put("denies","avb-denies");
-		semanticTypes.put("discussed","avb-discussed");
-		semanticTypes.put("evaluated","avb-discussed");
-		semanticTypes.put("elected","avb-elected");
-		semanticTypes.put("enrolled","avb-enrolled");
-		semanticTypes.put("completed","avb-finish");
-		semanticTypes.put("completes","avb-finish");
-		semanticTypes.put("finished","avb-finish");
-		semanticTypes.put("given","avb-given");
-		semanticTypes.put("changed","avb-increase");
-		semanticTypes.put("increased","avb-increase");
-		semanticTypes.put("jumped","avb-increase");
-		semanticTypes.put("rose","avb-increase");
-		semanticTypes.put("obtained","avb-obtained");
-		semanticTypes.put("presents","avb-presnt");
-		semanticTypes.put("refused","avb-refused");
-		semanticTypes.put("remained","avb-remained");
-		semanticTypes.put("returns","avb-returns");
-		semanticTypes.put("scheduled","avb-scheduled");
-		semanticTypes.put("revealed","avb-show");
-		semanticTypes.put("showed","avb-show");
-		semanticTypes.put("suggests","avb-show");
-		semanticTypes.put("signed","avb-signed");
-		semanticTypes.put("re-started","avb-start");
-		semanticTypes.put("received","avb-start");
-		semanticTypes.put("restarted","avb-start");
-		semanticTypes.put("resume","avb-start");
-		semanticTypes.put("resumed","avb-start");
-		semanticTypes.put("start","avb-start");
-		semanticTypes.put("started","avb-start");
-		semanticTypes.put("stopped","avb-stop");
-		semanticTypes.put("discontinued","avb-stopped");
-		semanticTypes.put("failed","avb-stopped");
-		semanticTypes.put("failing","avb-stopped");
-		semanticTypes.put("terminated","avb-stopped");
-		semanticTypes.put("recommend","avb-suggest");
-		semanticTypes.put("recommended","avb-suggest");
-		semanticTypes.put("suggest","avb-suggest");
-		semanticTypes.put("takes","avb-takes");
-		semanticTypes.put("tolerated","avb-tolerated");
-		semanticTypes.put("tolerated","avb-tolerated");
-		semanticTypes.put("treated","avb-treated");
-		semanticTypes.put("underwent","avb-undwen");
-		semanticTypes.put("was","bevbpa");
-		semanticTypes.put("was failing","bevbpa-failing");
-		semanticTypes.put("was restarted","bevbpa-start");
-		semanticTypes.put("was started","bevbpa-start");
-		semanticTypes.put("am","bevbpr");
-		semanticTypes.put("are","bevbpr");
-		semanticTypes.put("be","bevbpr");
-		semanticTypes.put("been","bevbpr");
-		semanticTypes.put("being","bevbpr");
-		semanticTypes.put("had","bevbpr");
-		semanticTypes.put("has","bevbpr");
-		semanticTypes.put("has been","bevbpr");
-		semanticTypes.put("have","bevbpr");
-		semanticTypes.put("is","bevbpr");
-		semanticTypes.put("is having","bevbpr");
-		semanticTypes.put("has been approved","bevbpr-approved");
-		semanticTypes.put("have been approved","bevbpr-approved");
-		semanticTypes.put("is approved","bevbpr-approved");
-		semanticTypes.put("has chosen","bevbpr-chosen");
-		semanticTypes.put("has decided","bevbpr-chosen");
-		semanticTypes.put("is considering","bevbpr-consider");
-		semanticTypes.put("am receiving","bevbpr-continue");
-		semanticTypes.put("has been continuing","bevbpr-continue");
-		semanticTypes.put("has continued","bevbpr-continue");
-		semanticTypes.put("have been given","bevbpr-continue");
-		semanticTypes.put("have been resumed","bevbpr-continue");
-		semanticTypes.put("have been treated","bevbpr-continue");
-		semanticTypes.put("have continued","bevbpr-continue");
-		semanticTypes.put("have remained","bevbpr-continue");
-		semanticTypes.put("have restarted","bevbpr-continue");
-		semanticTypes.put("have resumed","bevbpr-continue");
-		semanticTypes.put("is continued","bevbpr-continue");
-		semanticTypes.put("is continuing","bevbpr-continue");
-		semanticTypes.put("is receiving","bevbpr-continue");
-		semanticTypes.put("is taking","bevbpr-continue");
-		semanticTypes.put("is undergoing","bevbpr-continue");
-		semanticTypes.put("is using","bevbpr-continue");
-		semanticTypes.put("am recommending","bevbpr-discussed");
-		semanticTypes.put("has been discussed","bevbpr-discussed");
-		semanticTypes.put("has been evaluated","bevbpr-discussed");
-		semanticTypes.put("has been recommending","bevbpr-discussed");
-		semanticTypes.put("has considered","bevbpr-discussed");
-		semanticTypes.put("has contemplated","bevbpr-discussed");
-		semanticTypes.put("has discussed","bevbpr-discussed");
-		semanticTypes.put("has evaluated","bevbpr-discussed");
-		semanticTypes.put("has recommended","bevbpr-discussed");
-		semanticTypes.put("have considered","bevbpr-discussed");
-		semanticTypes.put("have discussed","bevbpr-discussed");
-		semanticTypes.put("have recommended","bevbpr-discussed");
-		semanticTypes.put("is contemplating","bevbpr-discussed");
-		semanticTypes.put("is recommending","bevbpr-discussed");
-		semanticTypes.put("is doing","bevbpr-do");
-		semanticTypes.put("has failed","bevbpr-failed");
-		semanticTypes.put("have failed","bevbpr-failed");
-		semanticTypes.put("is failing","bevbpr-failed");
-		semanticTypes.put("is going","bevbpr-going");
-		semanticTypes.put("has refused","bevbpr-refused");
-		semanticTypes.put("is refusing","bevbpr-refused");
-		semanticTypes.put("is seen","bevbpr-seen");
-		semanticTypes.put("am restarting","bevbpr-started");
-		semanticTypes.put("has administered","bevbpr-started");
-		semanticTypes.put("has been beginning","bevbpr-started");
-		semanticTypes.put("has been given","bevbpr-started");
-		semanticTypes.put("has been receiving","bevbpr-started");
-		semanticTypes.put("has been restarted","bevbpr-started");
-		semanticTypes.put("has been restarting","bevbpr-started");
-		semanticTypes.put("has been starting","bevbpr-started");
-		semanticTypes.put("has been taking","bevbpr-started");
-		semanticTypes.put("has been treated","bevbpr-started");
-		semanticTypes.put("has been undergoing","bevbpr-started");
-		semanticTypes.put("has been using","bevbpr-started");
-		semanticTypes.put("has begun","bevbpr-started");
-		semanticTypes.put("has remained","bevbpr-started");
-		semanticTypes.put("has restarted","bevbpr-started");
-		semanticTypes.put("has returned","bevbpr-started");
-		semanticTypes.put("has undergone","bevbpr-started");
-		semanticTypes.put("have given","bevbpr-started");
-		semanticTypes.put("have started","bevbpr-started");
-		semanticTypes.put("is beginning","bevbpr-started");
-		semanticTypes.put("is being treated","bevbpr-started");
-		semanticTypes.put("is given","bevbpr-started");
-		semanticTypes.put("is restarting","bevbpr-started");
-		semanticTypes.put("is starting","bevbpr-started");
-		semanticTypes.put("is taking","bevbpr-started");
-		semanticTypes.put("has been finishing","bevbpr-stopping");
-		semanticTypes.put("has been stopping","bevbpr-stopping");
-		semanticTypes.put("has been terminated","bevbpr-stopping");
-		semanticTypes.put("has discontinued","bevbpr-stopping");
-		semanticTypes.put("have discontinued","bevbpr-stopping");
-		semanticTypes.put("have terminated","bevbpr-stopping");
-		semanticTypes.put("is discontinued","bevbpr-stopping");
-		semanticTypes.put("is finishing","bevbpr-stopping");
-		semanticTypes.put("is stopping","bevbpr-stopping");
-		semanticTypes.put("is terminated","bevbpr-stopping");
-		semanticTypes.put("has been tolerating","bevbpr-tolerate");
-		semanticTypes.put("has been working","bevbpr-tolerate");
-		semanticTypes.put("has worked","bevbpr-tolerate");
-		semanticTypes.put("is responding","bevbpr-tolerate");
-		semanticTypes.put("is staying","bevbpr-tolerate");
-		semanticTypes.put("is tolerating","bevbpr-tolerate");
-		semanticTypes.put("is tolerating","bevbpr-tolerate");
-		semanticTypes.put("is working","bevbpr-tolerate");
-		semanticTypes.put("has worsened","bevbpr-worsened");
-		semanticTypes.put("had been approved","bevpa-beenapproved");
-		semanticTypes.put("was approved","bevpa-beenapproved");
-		semanticTypes.put("had been failing","bevpa-beenfailing");
-		semanticTypes.put("had chosen","bevpa-chosen");
-		semanticTypes.put("had considered","bevpa-considered");
-		semanticTypes.put("had contemplated","bevpa-considered");
-		semanticTypes.put("had evaluated","bevpa-considered");
-		semanticTypes.put("had continued","bevpa-continued");
-		semanticTypes.put("had remained","bevpa-continued");
-		semanticTypes.put("was continued","bevpa-continued");
-		semanticTypes.put("was continuing","bevpa-continued");
-		semanticTypes.put("was staying","bevpa-continued");
-		semanticTypes.put("was taking","bevpa-continued");
-		semanticTypes.put("was undergoing","bevpa-continued");
-		semanticTypes.put("was using","bevpa-continued");
-		semanticTypes.put("had decided","bevpa-decided");
-		semanticTypes.put("had been recommending","bevpa-discussed");
-		semanticTypes.put("had discussed","bevpa-discussed");
-		semanticTypes.put("was considered","bevpa-discussed");
-		semanticTypes.put("was discussed","bevpa-discussed");
-		semanticTypes.put("was evaluated","bevpa-discussed");
-		semanticTypes.put("was recommended","bevpa-discussed");
-		semanticTypes.put("was recommending","bevpa-discussed");
-		semanticTypes.put("were discussed","bevpa-discussed");
-		semanticTypes.put("were evaluated","bevpa-discussed");
-		semanticTypes.put("were recommending","bevpa-discussed");
-		semanticTypes.put("had refused","bevpa-refused");
-		semanticTypes.put("had returned","bevpa-returned");
-		semanticTypes.put("had been restarted","bevpa-started");
-		semanticTypes.put("had been treated","bevpa-started");
-		semanticTypes.put("had begun","bevpa-started");
-		semanticTypes.put("had given","bevpa-started");
-		semanticTypes.put("had restarted","bevpa-started");
-		semanticTypes.put("had resumed","bevpa-started");
-		semanticTypes.put("had started","bevpa-started");
-		semanticTypes.put("was administered","bevpa-started");
-		semanticTypes.put("was beginning","bevpa-started");
-		semanticTypes.put("was begun","bevpa-started");
-		semanticTypes.put("was given","bevpa-started");
-		semanticTypes.put("was given","bevpa-started");
-		semanticTypes.put("was receiving","bevpa-started");
-		semanticTypes.put("was restarted","bevpa-started");
-		semanticTypes.put("was restarting","bevpa-started");
-		semanticTypes.put("was resumed","bevpa-started");
-		semanticTypes.put("was started","bevpa-started");
-		semanticTypes.put("was starting","bevpa-started");
-		semanticTypes.put("had discontinued","bevpa-stopped");
-		semanticTypes.put("had failed","bevpa-stopped");
-		semanticTypes.put("had terminated","bevpa-stopped");
-		semanticTypes.put("was discontinued","bevpa-stopped");
-		semanticTypes.put("was finishing","bevpa-stopped");
-		semanticTypes.put("was stopping","bevpa-stopped");
-		semanticTypes.put("was terminated","bevpa-stopped");
-		semanticTypes.put("was treated","bevpa-treated");
-		semanticTypes.put("had worked","bevpa-worked");
-		semanticTypes.put("was responding","bevpa-worked");
-		semanticTypes.put("was tolerating","bevpa-worked");
-		semanticTypes.put("was working","bevpa-worked");
-		semanticTypes.put("had worsened","bevpa-worsened");
-		semanticTypes.put("abdomen","bpoc");
+		semanticTypes.put("[number]","number");
+		semanticTypes.put("[proper noun]","propn");
+		semanticTypes.put("[date]","date");
+/*		semanticTypes.put("added","""avb-added");
+		semanticTypes.put("administered",""avb-administered");
+		semanticTypes.put("began",""avb-began");
+		semanticTypes.put("begun",""avb-began");
+		semanticTypes.put("biopsied",""avb-biopsied");
+		semanticTypes.put("cancelled",""avb-cancelled");
+		semanticTypes.put("chose",""avb-chose");
+		semanticTypes.put("decided",""avb-chose");
+		semanticTypes.put("selected",""avb-chose");
+		semanticTypes.put("complains",""avb-complains");
+		semanticTypes.put("considered",""avb-considered");
+		semanticTypes.put("continued",""avb-continued");
+		semanticTypes.put("continues",""avb-continues");
+		semanticTypes.put("remains",""avb-continues");
+		semanticTypes.put("declined",""avb-decrease");
+		semanticTypes.put("decreased",""avb-decrease");
+		semanticTypes.put("dropped",""avb-decrease");
+		semanticTypes.put("delayed",""avb-delay");
+		semanticTypes.put("postponed",""avb-delay");
+		semanticTypes.put("denies",""avb-denies");
+		semanticTypes.put("discussed",""avb-discussed");
+		semanticTypes.put("evaluated",""avb-discussed");
+		semanticTypes.put("elected",""avb-elected");
+		semanticTypes.put("enrolled",""avb-enrolled");
+		semanticTypes.put("completed",""avb-finish");
+		semanticTypes.put("completes",""avb-finish");
+		semanticTypes.put("finished",""avb-finish");
+		semanticTypes.put("given",""avb-given");
+		semanticTypes.put("changed",""avb-increase");
+		semanticTypes.put("increased",""avb-increase");
+		semanticTypes.put("jumped",""avb-increase");
+		semanticTypes.put("rose",""avb-increase");
+		semanticTypes.put("obtained",""avb-obtained");
+		semanticTypes.put("presents",""avb-presnt");
+		semanticTypes.put("refused",""avb-refused");
+		semanticTypes.put("remained",""avb-remained");
+		semanticTypes.put("returns",""avb-returns");
+		semanticTypes.put("scheduled",""avb-scheduled");
+		semanticTypes.put("revealed",""avb-show");
+		semanticTypes.put("showed",""avb-show");
+		semanticTypes.put("suggests",""avb-show");
+		semanticTypes.put("signed",""avb-signed");
+		semanticTypes.put("re-started",""avb-start");
+		semanticTypes.put("received",""avb-start");
+		semanticTypes.put("restarted",""avb-start");
+		semanticTypes.put("resume",""avb-start");
+		semanticTypes.put("resumed",""avb-start");
+		semanticTypes.put("start",""avb-start");
+		semanticTypes.put("started",""avb-start");
+		semanticTypes.put("stopped",""avb-stop");
+		semanticTypes.put("discontinued",""avb-stopped");
+		semanticTypes.put("failed",""avb-stopped");
+		semanticTypes.put("failing",""avb-stopped");
+		semanticTypes.put("terminated",""avb-stopped");
+		semanticTypes.put("recommend",""avb-suggest");
+		semanticTypes.put("recommended",""avb-suggest");
+		semanticTypes.put("suggest",""avb-suggest");
+		semanticTypes.put("takes",""avb-takes");
+		semanticTypes.put("tolerated",""avb-tolerated");
+		semanticTypes.put("treated",""avb-treated");
+		semanticTypes.put("underwent",""avb-undwen");*/
+/*		semanticTypes.put("was",""bevbpa");
+		semanticTypes.put("was failing",""bevbpa-failing");
+		semanticTypes.put("am",""bevbpr");
+		semanticTypes.put("are",""bevbpr");
+		semanticTypes.put("be",""bevbpr");
+		semanticTypes.put("been",""bevbpr");
+		semanticTypes.put("being",""bevbpr");
+		semanticTypes.put("had",""bevbpr");
+		semanticTypes.put("has",""bevbpr");
+		semanticTypes.put("has been",""bevbpr");
+		semanticTypes.put("have",""bevbpr");
+		semanticTypes.put("is",""bevbpr");
+		semanticTypes.put("is having",""bevbpr");
+		semanticTypes.put("has been approved",""bevbpr-approved");
+		semanticTypes.put("have been approved",""bevbpr-approved");
+		semanticTypes.put("is approved",""bevbpr-approved");
+		semanticTypes.put("has chosen",""bevbpr-chosen");
+		semanticTypes.put("has decided",""bevbpr-chosen");
+		semanticTypes.put("is considering",""bevbpr-consider");
+		semanticTypes.put("am receiving",""bevbpr-continue");
+		semanticTypes.put("has been continuing",""bevbpr-continue");
+		semanticTypes.put("has continued",""bevbpr-continue");
+		semanticTypes.put("have been given",""bevbpr-continue");
+		semanticTypes.put("have been resumed",""bevbpr-continue");
+		semanticTypes.put("have been treated",""bevbpr-continue");
+		semanticTypes.put("have continued",""bevbpr-continue");
+		semanticTypes.put("have remained",""bevbpr-continue");
+		semanticTypes.put("have restarted",""bevbpr-continue");
+		semanticTypes.put("have resumed",""bevbpr-continue");
+		semanticTypes.put("is continued",""bevbpr-continue");
+		semanticTypes.put("is continuing",""bevbpr-continue");
+		semanticTypes.put("is receiving",""bevbpr-continue");
+		semanticTypes.put("is taking",""bevbpr-continue");
+		semanticTypes.put("is undergoing",""bevbpr-continue");
+		semanticTypes.put("is using",""bevbpr-continue");
+		semanticTypes.put("am recommending",""bevbpr-discussed");
+		semanticTypes.put("has been discussed",""bevbpr-discussed");
+		semanticTypes.put("has been evaluated",""bevbpr-discussed");
+		semanticTypes.put("has been recommending",""bevbpr-discussed");
+		semanticTypes.put("has considered",""bevbpr-discussed");
+		semanticTypes.put("has contemplated",""bevbpr-discussed");
+		semanticTypes.put("has discussed",""bevbpr-discussed");
+		semanticTypes.put("has evaluated",""bevbpr-discussed");
+		semanticTypes.put("has recommended",""bevbpr-discussed");
+		semanticTypes.put("have considered",""bevbpr-discussed");
+		semanticTypes.put("have discussed",""bevbpr-discussed");
+		semanticTypes.put("have recommended",""bevbpr-discussed");
+		semanticTypes.put("is contemplating",""bevbpr-discussed");
+		semanticTypes.put("is recommending",""bevbpr-discussed");
+		semanticTypes.put("is doing",""bevbpr-do");
+		semanticTypes.put("has failed",""bevbpr-failed");
+		semanticTypes.put("have failed",""bevbpr-failed");
+		semanticTypes.put("is failing",""bevbpr-failed");
+		semanticTypes.put("is going",""bevbpr-going");
+		semanticTypes.put("has refused",""bevbpr-refused");
+		semanticTypes.put("is refusing",""bevbpr-refused");
+		semanticTypes.put("is seen",""bevbpr-seen");
+		semanticTypes.put("am restarting",""bevbpr-started");
+		semanticTypes.put("has administered",""bevbpr-started");
+		semanticTypes.put("has been beginning",""bevbpr-started");
+		semanticTypes.put("has been given",""bevbpr-started");
+		semanticTypes.put("has been receiving",""bevbpr-started");
+		semanticTypes.put("has been restarted",""bevbpr-started");
+		semanticTypes.put("has been restarting",""bevbpr-started");
+		semanticTypes.put("has been starting",""bevbpr-started");
+		semanticTypes.put("has been taking",""bevbpr-started");
+		semanticTypes.put("has been treated",""bevbpr-started");
+		semanticTypes.put("has been undergoing",""bevbpr-started");
+		semanticTypes.put("has been using",""bevbpr-started");
+		semanticTypes.put("has begun",""bevbpr-started");
+		semanticTypes.put("has remained",""bevbpr-started");
+		semanticTypes.put("has restarted",""bevbpr-started");
+		semanticTypes.put("has returned",""bevbpr-started");
+		semanticTypes.put("has undergone",""bevbpr-started");
+		semanticTypes.put("have given",""bevbpr-started");
+		semanticTypes.put("have started",""bevbpr-started");
+		semanticTypes.put("is beginning",""bevbpr-started");
+		semanticTypes.put("is being treated",""bevbpr-started");
+		semanticTypes.put("is given",""bevbpr-started");
+		semanticTypes.put("is restarting",""bevbpr-started");
+		semanticTypes.put("is starting",""bevbpr-started");
+		semanticTypes.put("has been finishing",""bevbpr-stopping");
+		semanticTypes.put("has been stopping",""bevbpr-stopping");
+		semanticTypes.put("has been terminated",""bevbpr-stopping");
+		semanticTypes.put("has discontinued",""bevbpr-stopping");
+		semanticTypes.put("have discontinued",""bevbpr-stopping");
+		semanticTypes.put("have terminated",""bevbpr-stopping");
+		semanticTypes.put("is discontinued",""bevbpr-stopping");
+		semanticTypes.put("is finishing",""bevbpr-stopping");
+		semanticTypes.put("is stopping",""bevbpr-stopping");
+		semanticTypes.put("is terminated",""bevbpr-stopping");
+		semanticTypes.put("has been tolerating",""bevbpr-tolerate");
+		semanticTypes.put("has been working",""bevbpr-tolerate");
+		semanticTypes.put("has worked",""bevbpr-tolerate");
+		semanticTypes.put("is responding",""bevbpr-tolerate");
+		semanticTypes.put("is staying",""bevbpr-tolerate");
+		semanticTypes.put("is tolerating",""bevbpr-tolerate");
+		semanticTypes.put("is working",""bevbpr-tolerate");
+		semanticTypes.put("has worsened",""bevbpr-worsened");
+		semanticTypes.put("had been approved",""bevbpa-beenapproved");
+		semanticTypes.put("was approved",""bevbpa-beenapproved");
+		semanticTypes.put("had been failing",""bevbpa-beenfailing");
+		semanticTypes.put("had chosen",""bevbpa-chosen");
+		semanticTypes.put("had considered",""bevbpa-considered");
+		semanticTypes.put("had contemplated",""bevbpa-considered");
+		semanticTypes.put("had evaluated",""bevbpa-considered");
+		semanticTypes.put("had continued",""bevbpa-continued");
+		semanticTypes.put("had remained",""bevbpa-continued");
+		semanticTypes.put("was continued",""bevbpa-continued");
+		semanticTypes.put("was continuing",""bevbpa-continued");
+		semanticTypes.put("was staying",""bevbpa-continued");
+		semanticTypes.put("was taking",""bevbpa-continued");
+		semanticTypes.put("was undergoing",""bevbpa-continued");
+		semanticTypes.put("was using",""bevbpa-continued");
+		semanticTypes.put("had decided",""bevbpa-decided");
+		semanticTypes.put("had been recommending",""bevbpa-discussed");
+		semanticTypes.put("had discussed",""bevbpa-discussed");
+		semanticTypes.put("was considered",""bevbpa-discussed");
+		semanticTypes.put("was discussed",""bevbpa-discussed");
+		semanticTypes.put("was evaluated",""bevbpa-discussed");
+		semanticTypes.put("was recommended",""bevbpa-discussed");
+		semanticTypes.put("was recommending",""bevbpa-discussed");
+		semanticTypes.put("were discussed",""bevbpa-discussed");
+		semanticTypes.put("were evaluated",""bevbpa-discussed");
+		semanticTypes.put("were recommending",""bevbpa-discussed");
+		semanticTypes.put("had refused",""bevbpa-refused");
+		semanticTypes.put("had returned",""bevbpa-returned");
+		semanticTypes.put("had been restarted",""bevbpa-started");
+		semanticTypes.put("had been treated",""bevbpa-started");
+		semanticTypes.put("had begun",""bevbpa-started");
+		semanticTypes.put("had given",""bevbpa-started");
+		semanticTypes.put("had restarted",""bevbpa-started");
+		semanticTypes.put("had resumed",""bevbpa-started");
+		semanticTypes.put("had started",""bevbpa-started");
+		semanticTypes.put("was administered",""bevbpa-started");
+		semanticTypes.put("was beginning",""bevbpa-started");
+		semanticTypes.put("was begun",""bevbpa-started");
+		semanticTypes.put("was given",""bevbpa-started");
+		semanticTypes.put("was receiving",""bevbpa-started");
+		semanticTypes.put("was restarted",""bevbpa-started");
+		semanticTypes.put("was restarting",""bevbpa-started");
+		semanticTypes.put("was resumed",""bevbpa-started");
+		semanticTypes.put("was started",""bevbpa-started");
+		semanticTypes.put("was starting",""bevbpa-started");
+		semanticTypes.put("had discontinued",""bevbpa-stopped");
+		semanticTypes.put("had failed",""bevbpa-stopped");
+		semanticTypes.put("had terminated",""bevbpa-stopped");
+		semanticTypes.put("was discontinued",""bevbpa-stopped");
+		semanticTypes.put("was finishing",""bevbpa-stopped");
+		semanticTypes.put("was stopping",""bevbpa-stopped");
+		semanticTypes.put("was terminated",""bevbpa-stopped");
+		semanticTypes.put("was treated",""bevbpa-treated");
+		semanticTypes.put("had worked",""bevbpa-worked");
+		semanticTypes.put("was responding",""bevbpa-worked");
+		semanticTypes.put("was tolerating",""bevbpa-worked");
+		semanticTypes.put("was working",""bevbpa-worked");
+		semanticTypes.put("had worsened",""bevbpa-worsened");*/
+/*		semanticTypes.put("abdomen","bpoc");
 		semanticTypes.put("abdomen/pelvis","bpoc");
 		semanticTypes.put("abdominal","bpoc");
 		semanticTypes.put("abdominal/pelvic","bpoc");
 		semanticTypes.put("adrenal","bpoc");
 		semanticTypes.put("back","bpoc");
 		semanticTypes.put("bladder","bpoc");
-		semanticTypes.put("bladder","bpoc");
 		semanticTypes.put("bone","bpoc");
 		semanticTypes.put("brain","bpoc");
-		semanticTypes.put("breast","bpoc");
 		semanticTypes.put("breast","bpoc");
 		semanticTypes.put("chest","bpoc");
 		semanticTypes.put("colon","bpoc");
@@ -275,7 +276,6 @@ public class Constants {
 		semanticTypes.put("pelvis","bpoc");
 		semanticTypes.put("penile","bpoc");
 		semanticTypes.put("pituitary","bpoc");
-		semanticTypes.put("pituitary","bpoc");
 		semanticTypes.put("prostate","bpoc");
 		semanticTypes.put("prostate gland","bpoc");
 		semanticTypes.put("pulmonary","bpoc");
@@ -298,7 +298,7 @@ public class Constants {
 		semanticTypes.put("ureteral","bpoc");
 		semanticTypes.put("urethral","bpoc");
 		semanticTypes.put("visceral","bpoc");
-		semanticTypes.put("[date]","date");
+		
 		semanticTypes.put("better","diagre");
 		semanticTypes.put("dull","diagre");
 		semanticTypes.put("intermittant","diagre");
@@ -318,7 +318,6 @@ public class Constants {
 		semanticTypes.put("ct scan","diap");
 		semanticTypes.put("cysto","diap");
 		semanticTypes.put("cystogram","diap");
-		semanticTypes.put("cystourethroscopy","diap");
 		semanticTypes.put("cystourethroscopy","diap");
 		semanticTypes.put("dexa","diap");
 		semanticTypes.put("dexa scan","diap");
@@ -390,7 +389,6 @@ public class Constants {
 		semanticTypes.put("ascriptin","drugoc");
 		semanticTypes.put("aspergum","drugoc");
 		semanticTypes.put("aspirin","drugoc");
-		semanticTypes.put("aspirin","drugoc");
 		semanticTypes.put("bayer aspirin","drugoc");
 		semanticTypes.put("bayer buffered aspirin","drugoc");
 		semanticTypes.put("bayer low adult strength","drugoc");
@@ -423,7 +421,6 @@ public class Constants {
 		semanticTypes.put("midol ib","drugoc");
 		semanticTypes.put("midol maximum strength cramp formula","drugoc");
 		semanticTypes.put("motrin","drugoc");
-		semanticTypes.put("motrin","drugoc");
 		semanticTypes.put("motrin childrens","drugoc");
 		semanticTypes.put("motrin ib","drugoc");
 		semanticTypes.put("motrin infant drops","drugoc");
@@ -448,7 +445,6 @@ public class Constants {
 		semanticTypes.put("sudafed","drugoc");
 		semanticTypes.put("theraflu","drugoc");
 		semanticTypes.put("triaminic","drugoc");
-		semanticTypes.put("tylenol","drugoc");
 		semanticTypes.put("tylenol","drugoc");
 		semanticTypes.put("vanquish","drugoc");
 		semanticTypes.put("vicks","drugoc");
@@ -715,7 +711,6 @@ public class Constants {
 		semanticTypes.put("oxaliplatin","drugpr");
 		semanticTypes.put("oxaprozin","drugpr");
 		semanticTypes.put("oxybutinin","drugpr");
-		semanticTypes.put("oxybutinin","drugpr");
 		semanticTypes.put("oxybutinin chloride","drugpr");
 		semanticTypes.put("oxybutinin chloride er","drugpr");
 		semanticTypes.put("oxycodone","drugpr");
@@ -754,7 +749,6 @@ public class Constants {
 		semanticTypes.put("prominal","drugpr");
 		semanticTypes.put("proscar","drugpr");
 		semanticTypes.put("prosteon","drugpr");
-		semanticTypes.put("prosteon","drugpr");
 		semanticTypes.put("provenge","drugpr");
 		semanticTypes.put("purinethol","drugpr");
 		semanticTypes.put("purixan","drugpr");
@@ -789,7 +783,6 @@ public class Constants {
 		semanticTypes.put("taxane","drugpr");
 		semanticTypes.put("taxanes","drugpr");
 		semanticTypes.put("taxol","drugpr");
-		semanticTypes.put("taxotere","drugpr");
 		semanticTypes.put("taxotere","drugpr");
 		semanticTypes.put("tbo-filgrastim","drugpr");
 		semanticTypes.put("temodar","drugpr");
@@ -855,7 +848,7 @@ public class Constants {
 		semanticTypes.put("bone fracture","dysn");
 		semanticTypes.put("bone fractures","dysn");
 		semanticTypes.put("bone lytic lesions","dysn");
-		semanticTypes.put("bone mets","dysn");
+		semanticTypes.put("bone metastasis","dysn");
 		semanticTypes.put("bph","dysn");
 		semanticTypes.put("braf","dysn");
 		semanticTypes.put("braf v600e","dysn");
@@ -865,7 +858,6 @@ public class Constants {
 		semanticTypes.put("cdk4","dysn");
 		semanticTypes.put("celiac artery","dysn");
 		semanticTypes.put("copd","dysn");
-		semanticTypes.put("cva","dysn");
 		semanticTypes.put("cva","dysn");
 		semanticTypes.put("cyst","dysn");
 		semanticTypes.put("dermatitis","dysn");
@@ -931,54 +923,52 @@ public class Constants {
 		semanticTypes.put("waldenstroms macroglobulinemia","dysn");
 		semanticTypes.put("for","for");
 		semanticTypes.put("from","from");
-		semanticTypes.put("had","had");
 		semanticTypes.put("in","in");
-		semanticTypes.put("here","locati");
-		semanticTypes.put("appear","lvb");
-		semanticTypes.put("appears","lvb");
-		semanticTypes.put("become","lvb");
-		semanticTypes.put("becomes","lvb");
-		semanticTypes.put("feels","lvb");
-		semanticTypes.put("felt","lvb");
-		semanticTypes.put("is","lvb");
-		semanticTypes.put("looks","lvb");
-		semanticTypes.put("prove","lvb");
-		semanticTypes.put("proves","lvb");
-		semanticTypes.put("can","mvb");
-		semanticTypes.put("could","mvb");
-		semanticTypes.put("may","mvb");
-		semanticTypes.put("might","mvb");
-		semanticTypes.put("must","mvb");
-		semanticTypes.put("shall","mvb");
-		semanticTypes.put("should","mvb");
-		semanticTypes.put("will","mvb");
-		semanticTypes.put("would","mvb");
-		semanticTypes.put("will be approved","mvb-beapproved");
-		semanticTypes.put("may be evaluated","mvb-beevaluated");
-		semanticTypes.put("must be evaluated","mvb-beevaluated");
-		semanticTypes.put("will be considered","mvb-beevaluated");
-		semanticTypes.put("will be evaluated","mvb-beevaluated");
-		semanticTypes.put("will be restarted","mvb-bestarted");
-		semanticTypes.put("will be started","mvb-bestarted");
-		semanticTypes.put("may be treated","mvb-betreated");
-		semanticTypes.put("will be treated","mvb-betreated");
-		semanticTypes.put("may continue","mvb-continue");
-		semanticTypes.put("may resume","mvb-continue");
-		semanticTypes.put("might continue","mvb-continue");
-		semanticTypes.put("might resume","mvb-continue");
-		semanticTypes.put("will continue","mvb-continue");
-		semanticTypes.put("will resume","mvb-continue");
-		semanticTypes.put("will evaluate","mvb-eval");
-		semanticTypes.put("will study","mvb-eval");
-		semanticTypes.put("will recommend","mvb-recomm");
-		semanticTypes.put("will suggest","mvb-recomm");
-		semanticTypes.put("can resume","mvb-start");
-		semanticTypes.put("could start","mvb-start");
-		semanticTypes.put("may start","mvb-start");
-		semanticTypes.put("might start","mvb-start");
-		semanticTypes.put("will start","mvb-start");
-		semanticTypes.put("will undergo","mvb-undergo");
-		semanticTypes.put("no","negata");
+		semanticTypes.put("here","locaticon");*/
+/*		semanticTypes.put("appear",""lvb");
+		semanticTypes.put("appears",""lvb");
+		semanticTypes.put("become",""lvb");
+		semanticTypes.put("becomes",""lvb");
+		semanticTypes.put("feels",""lvb");
+		semanticTypes.put("felt",""lvb");
+		semanticTypes.put("looks",""lvb");
+		semanticTypes.put("prove",""lvb");
+		semanticTypes.put("proves",""lvb");
+		semanticTypes.put("can",""mvb");
+		semanticTypes.put("could",""mvb");
+		semanticTypes.put("may",""mvb");
+		semanticTypes.put("might",""mvb");
+		semanticTypes.put("must",""mvb");
+		semanticTypes.put("shall",""mvb");
+		semanticTypes.put("should",""mvb");
+		semanticTypes.put("will",""mvb");
+		semanticTypes.put("would",""mvb");
+		semanticTypes.put("will be approved",""mvb-beapproved");
+		semanticTypes.put("may be evaluated",""mvb-beevaluated");
+		semanticTypes.put("must be evaluated",""mvb-beevaluated");
+		semanticTypes.put("will be considered",""mvb-beevaluated");
+		semanticTypes.put("will be evaluated",""mvb-beevaluated");
+		semanticTypes.put("will be restarted",""mvb-bestarted");
+		semanticTypes.put("will be started",""mvb-bestarted");
+		semanticTypes.put("may be treated",""mvb-betreated");
+		semanticTypes.put("will be treated",""mvb-betreated");
+		semanticTypes.put("may continue",""mvb-continue");
+		semanticTypes.put("may resume",""mvb-continue");
+		semanticTypes.put("might continue",""mvb-continue");
+		semanticTypes.put("might resume",""mvb-continue");
+		semanticTypes.put("will continue",""mvb-continue");
+		semanticTypes.put("will resume",""mvb-continue");
+		semanticTypes.put("will evaluate",""mvb-eval");
+		semanticTypes.put("will study",""mvb-eval");
+		semanticTypes.put("will recommend",""mvb-recomm");
+		semanticTypes.put("will suggest",""mvb-recomm");
+		semanticTypes.put("can resume",""mvb-start");
+		semanticTypes.put("could start",""mvb-start");
+		semanticTypes.put("may start",""mvb-start");
+		semanticTypes.put("might start",""mvb-start");
+		semanticTypes.put("will start",""mvb-start");
+		semanticTypes.put("will undergo",""mvb-undergo");*/
+/*		semanticTypes.put("no","negata");
 		semanticTypes.put("neoplasia","neop");
 		semanticTypes.put("oncocytoma","neop");
 		semanticTypes.put("dysplasia","neop-abn");
@@ -1004,7 +994,6 @@ public class Constants {
 		semanticTypes.put("masses","neop-tum");
 		semanticTypes.put("tumor","neop-tum");
 		semanticTypes.put("tumors","neop-tum");
-		semanticTypes.put("[number]","number");
 		semanticTypes.put("of","of");
 		semanticTypes.put("off","off");
 		semanticTypes.put("office visit","offvis");
@@ -1064,7 +1053,6 @@ public class Constants {
 		semanticTypes.put("bone marrow biopsies","prbymeth");
 		semanticTypes.put("bone marrow biopsy","prbymeth");
 		semanticTypes.put("brachytherapy","prbymeth");
-		semanticTypes.put("brachytherapy","prbymeth");
 		semanticTypes.put("breast mri","prbymeth");
 		semanticTypes.put("breast physical exam","prbymeth");
 		semanticTypes.put("breast self-exam","prbymeth");
@@ -1081,7 +1069,6 @@ public class Constants {
 		semanticTypes.put("calcium levels","prbymeth");
 		semanticTypes.put("carbon coated zirconium beads","prbymeth");
 		semanticTypes.put("carcinoembryonic antigen","prbymeth");
-		semanticTypes.put("catheter","prbymeth");
 		semanticTypes.put("catheter","prbymeth");
 		semanticTypes.put("catheters","prbymeth");
 		semanticTypes.put("cea","prbymeth");
@@ -1264,8 +1251,6 @@ public class Constants {
 		semanticTypes.put("quantitative immunoglobulin","prbymeth");
 		semanticTypes.put("radiation","prbymeth");
 		semanticTypes.put("radiation therapy","prbymeth");
-		semanticTypes.put("radiation therapy","prbymeth");
-		semanticTypes.put("radiation therapy","prbymeth");
 		semanticTypes.put("radical mastectomy","prbymeth");
 		semanticTypes.put("ralp","prbymeth");
 		semanticTypes.put("rbc","prbymeth");
@@ -1361,7 +1346,7 @@ public class Constants {
 		semanticTypes.put("xrt","prbymeth");
 		semanticTypes.put("zirconium beads","prbymeth");
 		semanticTypes.put("zoledronic acid","prbymeth");
-		semanticTypes.put("[proper noun]","propn");
+		
 		semanticTypes.put("i","provid");
 		semanticTypes.put("we","provid");
 		semanticTypes.put("consultation","ptconsul");
@@ -1376,7 +1361,6 @@ public class Constants {
 		semanticTypes.put("increased","qlco");
 		semanticTypes.put("negative","qlco");
 		semanticTypes.put("normal","qlco");
-		semanticTypes.put("positive","qlco");
 		semanticTypes.put("stable","qlco");
 		semanticTypes.put("undectable","qlco");
 		semanticTypes.put("african american","race");
@@ -1427,7 +1411,6 @@ public class Constants {
 		semanticTypes.put("leakage","sympto");
 		semanticTypes.put("lightheaded","sympto");
 		semanticTypes.put("loss of appetite","sympto");
-		semanticTypes.put("loss of appetite","sympto");
 		semanticTypes.put("luts","sympto");
 		semanticTypes.put("night sweats","sympto");
 		semanticTypes.put("no appetite","sympto");
@@ -1465,15 +1448,117 @@ public class Constants {
 		semanticTypes.put("watchful/waiting","waiting");
 		semanticTypes.put("with","with");
 		semanticTypes.put("abnormal","qlco");
+/*		semanticTypes.put("developed",""avb-developed");
+		semanticTypes.put("confirm",""avb-confirm");
+		semanticTypes.put("confirmed",""avb-confirm");
+		semanticTypes.put("confirms",""avb-confirm");
+		semanticTypes.put("found",""avb-found");
+		semanticTypes.put("has known",""bevbpa-known");*/
+/*		semanticTypes.put("did show","did-show");
+		semanticTypes.put("symptomatic","symptomatic");
+		semanticTypes.put("asymptomatic","asymptomatic");
+		semanticTypes.put("disease","dysn");
+		semanticTypes.put("castrate resistant","dysn");
+		semanticTypes.put("involvement","fnd");
+		semanticTypes.put("consistent","presence");
+		semanticTypes.put("suspicious","suspicious");
+		semanticTypes.put("concerning","presence");
+		semanticTypes.put("suggestive","presence");
+		semanticTypes.put("evidence","presence");
+		semanticTypes.put("documentation","presence");
+		semanticTypes.put("progression","change-val");
+		semanticTypes.put("resolution","change-val");
+		semanticTypes.put("positive","presence");
+		semanticTypes.put("discussion","discussion");
+		semanticTypes.put("initiation","initiation");
+		semanticTypes.put("history","history");
+		semanticTypes.put("after","after");
+		semanticTypes.put("her","patien");
+		semanticTypes.put("also","also");
+		semanticTypes.put("alternatives","alternatives");
+		semanticTypes.put("approval","approval");
+		semanticTypes.put("benefit","benefit");
+		semanticTypes.put("benefits","benefits");
+		semanticTypes.put("candidate","candidate");
+		semanticTypes.put("combination","combination");
+		semanticTypes.put("consideration","consideration");
+		semanticTypes.put("continue","continue");
+		semanticTypes.put("continue","continue");
+		semanticTypes.put("cost","cost");
+		semanticTypes.put("course","course");
+		semanticTypes.put("currently","currently");
+		semanticTypes.put("currently","currently");
+		semanticTypes.put("dose","dose");
+		semanticTypes.put("dose","dose");
+		semanticTypes.put("due","due");
+		semanticTypes.put("due","due");
+		semanticTypes.put("effects","effects");
+		semanticTypes.put("good","good");
+		semanticTypes.put("happy","happy");
+		semanticTypes.put("improved","improved");
+		semanticTypes.put("improved","improved");
+		semanticTypes.put("improvement","improvement");
+		semanticTypes.put("improvement","improvement");
+		semanticTypes.put("improvement","improvement");
+		semanticTypes.put("instead","instead");
+		semanticTypes.put("interested","interested");
+		semanticTypes.put("managed","managed");
+		semanticTypes.put("more","more");
+		semanticTypes.put("not","not");
+		semanticTypes.put("now","now");
+		semanticTypes.put("now","now");
+		semanticTypes.put("option","option");
+		semanticTypes.put("literature","literature");
+		semanticTypes.put("pamphlet","pamphlet");
+		semanticTypes.put("pay","pay");
+		semanticTypes.put("placed","placed");
+		semanticTypes.put("pleased","pleased");
+		semanticTypes.put("prescription","prescription");
+		semanticTypes.put("problems","problems");
+		semanticTypes.put("proceed","proceed");
+		semanticTypes.put("progress","progress");
+		semanticTypes.put("put","put");
+		semanticTypes.put("reaction","reaction");
+		semanticTypes.put("ready","ready");
+		semanticTypes.put("repeat","repeat");
+		semanticTypes.put("resolved","resolved");
+		semanticTypes.put("result","result");
+		semanticTypes.put("results","results");
+		semanticTypes.put("samples","samples");
+		semanticTypes.put("satisfied","satisfied");
+		semanticTypes.put("stay","stay");
+		semanticTypes.put("stay","stay");
+		semanticTypes.put("still","still");
+		semanticTypes.put("success","success");
+		semanticTypes.put("supply","supply");
+		semanticTypes.put("switch","switch");
+		semanticTypes.put("switch","switch");
+		semanticTypes.put("switched","switched");
+		semanticTypes.put("trial","trial");
+		semanticTypes.put("tried","tried");
+		semanticTypes.put("was","was");
+		semanticTypes.put("wean","wean");
+		semanticTypes.put("well","well");
+		semanticTypes.put("went","went");*/
 
 
+		//semanticTypes.put("evidence","evidence");
+		//semanticTypes.put("metastatic focus","mets-f");
+		//semanticTypes.put("bone metastases","dysn");
+	//	semanticTypes.put("increasing",""avb-increase");
 	}
 	
 	public enum Source {
-		PUBMED {
+		PUBMED_ABSTRACT {
 			@Override
 			public String getMongoCollection() {
-				return "pubmed";
+				return "annotations";
+			}
+		},
+		PUBMED_FULLARTICLE {
+			@Override
+			public String getMongoCollection() {
+				return "annotations";
 			}
 		}, 
 		CT_SCAN {
@@ -1499,6 +1584,12 @@ public class Constants {
 			public String getMongoCollection() {
 				return "test";
 			}
+		},
+		MEDS {
+			@Override
+			public String getMongoCollection() {
+				return "discreet";
+			}
 		};
 		public String getMongoCollection() {
 			return "test";
@@ -1516,54 +1607,67 @@ public class Constants {
 	public static final String MONGO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	
 	// https://www.regex101.com/r/vL8jA2/2
-	public static final String DATE_REGEX_ST = "^\\d\\d?(-|\\/)(\\d\\d?(-|\\/))?\\d\\d(\\d{2})?$";
+	//public static final String DATE_REGEX_ST = "^\\d\\d?(-|\\/)(\\d\\d?(-|\\/))?\\d\\d(\\d{2})?$";
+	public static final Pattern DATE_REGEX_ST = Pattern.compile("^\\d\\d?(-|\\/)(\\d\\d?(-|\\/))?\\d\\d(\\d{2})?$");
 	// https://www.regex101.com/r/pX0gC8/4
-	public static final String GLEASON_REGEX = "(?i)(Gleason|GG)\\s*(score(\\s*of)?:?\\s*|grade\\s*)?(\\d\\s*\\+\\s*\\d|\\d\\s*\\(?\\d\\s*\\+\\s*\\d\\)?|\\s*\\d+)";
+	//public static final String GLEASON_REGEX = "(?i)(Gleason|GG)\\s*(score(\\s*of)?:?\\s*|grade\\s*)?(\\d\\s*\\+\\s*\\d|\\d\\s*\\(?\\d\\s*\\+\\s*\\d\\)?|\\s*\\d+)";
+	public static final Pattern GLEASON_REGEX = Pattern.compile("(Gleason|GG)\\s*(score(\\s*of)?:?\\s*|grade\\s*)?(\\d\\s*\\+\\s*\\d|\\d\\s*\\(?\\d\\s*\\+\\s*\\d\\)?|\\s*\\d+)", Pattern.CASE_INSENSITIVE);
 	
-	public static final String AGE_REGEX = "\\d{1,3}-year-old";
+	//public static final String AGE_REGEX = "\\d{1,3}-year-old";
+	public static final Pattern AGE_REGEX = Pattern.compile("\\d{1,3}-year-old");
 	
-	public static final String PUNC = "!|\"|#|\\$|%|&|'|\\(|\\)|\\*|\\+|,|-|\\.|/|:|;|<|=|>|\\?|@|\\[|\\\\|]|\\^|_|`|\\{|\\||}|~";
+	//public static final String PUNC = "!|\"|#|\\$|%|&|'|\\(|\\)|\\*|\\+|,|-|\\.|/|:|;|<|=|>|\\?|@|\\[|\\\\|]|\\^|_|`|\\{|\\||}|~";
+	public static final Pattern PUNC = Pattern.compile("!|\"|#|\\$|%|&|'|\\(|\\)|\\*|\\+|,|-|\\.|/|:|;|<|=|>|\\?|@|\\[|\\]|\\^|_|`|\\{|\\||\\}|~");
 	
-	public static final String VERBS_OF_BEING = "(?i)has|having|am|are|is|was|were|be|being|been|had|have";
+	//public static final String VERBS_OF_BEING = "(?i)has|having|am|are|is|was|were|be|being|been|had|have";
+	public static final Pattern VERBS_OF_BEING = Pattern.compile("has|having|am|are|is|was|were|be|being|been|had|have", Pattern.CASE_INSENSITIVE);
 	
-	//public static final String LINKING_VERBS = "(?i)is|are|be|appear|was|were|remains|feels|felt|seems|being|looks|prove|remained|become|becomes|been|seemed";
-	//public static final String LINKING_VERBS = "(?i)is|appear|remains|feels|felt|seems|looks|prove|remained|become|becomes|seemed|given|started|restarted|treated|tolerating|taking|develop";
-	public static final String LINKING_VERBS = "(?i)appear|become|becomes|feels|felt|is|looks|prove|remained|remains|seemed|seems|abandoned|accepted|accepting|accessed|accompanied|achieved|acting|added|adjusted|administered|admitted|advanced|advised|affected|aggravated|aggravating|allowed|ambulating|analysed|answered|anticipated|applied|appreciated|approved|arranged|asked|asking|assessed|associated|attempted|attributed|available.|awaiting|awakening|based|battling|becoming|began|beginning|begun|biopsied|bothered|broken|brought|bumped|called|cancelled|cared|carried|catheterized|caused|causing|challenging|changed|changing|characterized|checked|checking|chosen|clamped|cleaned|clear|cleared|clearing|climbed|climbing|clogged|co-existing|combined|come|comes|coming|commenced|compared|complained|complaining|complains|complete|completed|complicated|concerened|concerned|concerning|condylomata|confined|confirmed|confused|considered|considering|constipated|consulted|contacted|contemplating|continue|continued|continues|continuing|contraindicated|contributing|controlled|converted|corrected|counseled|counselled|covered|crept|cured|cut|cutting|dealing|decided|deciding|declined|declining|decreased|decreasing|deemed|deferred|dehydrated|delayed|delivered|demonstrated|denied|depressed|described|describing|desired|detailed|detected|determined|developed|developing|diagnosed|dilated|diminished|discharged|discontinued|discouraged|discussed|disinclined|documented|doing|done|doubled|draining|drawn|dribbling|drinking|dropped|dropping|dying|eating|ejaculated|elected|electing|emanating|emphasized|employed|emptying|encountered|encouraged|encouraging|engaged|enrolled|entered|estimated|evaluated|exacerbated|exacerbating|examined|excellent|excluded|exercising|exhausted|expected|experienced|experiencing|explained|exploring|expressed|factoring|failed|failing|fallen|fatigued|faxed|feeling|felt|filled|fine|finished|finishing|fired|fixed|fluctuated|fluctuating|flushed|focused|followed|following|forcing|forming|found|frustrated|frustrating|functioning|gained|gaining|getting|give|given|giving|going|gone|gotten|graded|great|handling|happened|happening|headed|heading|healed|healing|held|helped|helping|highlighted|hindered|hit|holding|hopes|hospitalized|hurting|identified|imaged|improved|improving|inclined|included|increased|increasing|indicated|informed|initiated|injected|inquiring|inserted|instilled|instructed|interpreted|interrupted|invaded|investigated|involved|involving|jumped|known|lacking|leaking|leaning|learned|learning|leaving|left|lessened|limiting|lingering|listed|loaded|located|looking|losing|lost|made|magnified|maintained|managed|managing|married|measured|meeting|met|missed|missing|moderated|monitored|monitoring|motivated|moved|moving|needed|normalized|noted|noticed|noting|observed|obtained|occas|occurring|offered|omitted|oozing|operating|opposed|opted|ordered|passed|passing|pending|performed|persisted|pine|placed|planing|planned|planning|plannng|pleased|pointed|postponed|prepared|prepped|prescribed|presented|preserved|problems|progressed|Progressing|prolonged|provided|pulled|pushing|put|putting|quit|ran|randomized|ranged|read|readmitted|reassured|recalled|received|receiving|rechecked|recommended|recommending|recounseled|recovered|recovering|recuperating|recurred|reduced|referred|refilled|refused|refusing|regaining|regarding|reinserted|reiterated|rejected|related|relieved|remained|remaining|remembered|reminded|removed|repaired|repeated|replaced|repleted|reported|reporting|requested|required|resolved|resolving|responded|responding|restarted|re-started|resulted|resumed|retaining|retired|retiring|retracted|returned|returning|revealed|reviewed|revised|riding|risen|rising|rremaining|ruled|run|running|sacrificed|said|satisfied|saturated|scheduled|screened|seeing|seen|seing|selected|sending|sent|set|setting|settled|severe|shooting|shown|signficant|sitting|sleeping|slowed|slowing|smoked|smoking|spared|spoken|spotting|squinching|stabilized|standing|stared|started|starting|stated|stayed|staying|stones|stooling|stopped|stopping|straining|struck|subsided|suffering|suggested|suggesting|summarized|supplemented|supposed|suppressed|suspected|suspended|switched|switching|taken|taking|talked|tansitioned|targeted|terminated|thickened|thinking|thought|threatening|thrilled|tied|tingling|tired|told|tolerated|tolerating|transferred|transferring|transitioned|transitioning|treated|treating|trending|trialed|tried|troubled|trying|undergoing|undergone|undertaken|updated|urinating|used|using|vaporized|viewed|visualized|voided|voiding|waiting|waking|washing|watched|watching|weakened|weaning|wearing|well|wetting|wiped|woken|worked|working|worn|worried|worsened|worsening|wrestling|written";
+	//public static final String LINKING_VERBS = "(?i)appear|become|becomes|feels|felt|is|looks|prove|remained|remains|seemed|seems|abandoned|accepted|accepting|accessed|accompanied|achieved|acting|added|adjusted|administered|admitted|advanced|advised|affected|aggravated|aggravating|allowed|ambulating|analysed|answered|anticipated|applied|appreciated|approved|arranged|asked|asking|assessed|associated|attempted|attributed|available|awaiting|awakening|based|battling|becoming|began|beginning|begun|biopsied|bothered|broken|brought|bumped|called|cancelled|cared|carried|catheterized|caused|causing|challenging|changed|changing|characterized|checked|checking|chosen|clamped|cleaned|clear|cleared|clearing|climbed|climbing|clogged|co-existing|combined|come|comes|coming|commenced|compared|complained|complaining|complains|complete|completed|complicated|concerened|concerned|concerning|condylomata|confined|confirmed|confused|considered|considering|constipated|consulted|contacted|contemplating|continue|continued|continues|continuing|contraindicated|contributing|controlled|converted|corrected|counseled|counselled|covered|crept|cured|cut|cutting|dealing|decided|deciding|declined|declining|decreased|decreasing|deemed|deferred|dehydrated|delayed|delivered|demonstrated|denied|depressed|described|describing|desired|detailed|detected|determined|developed|developing|diagnosed|dilated|diminished|discharged|discontinued|discouraged|discussed|disinclined|documented|doing|done|doubled|draining|drawn|dribbling|drinking|dropped|dropping|dying|eating|ejaculated|elected|electing|emanating|emphasized|employed|emptying|encountered|encouraged|encouraging|engaged|enrolled|entered|estimated|evaluated|exacerbated|exacerbating|examined|excellent|excluded|exercising|exhausted|expected|experienced|experiencing|explained|exploring|expressed|factoring|failed|failing|fallen|fatigued|faxed|feeling|felt|filled|fine|finished|finishing|fired|fixed|fluctuated|fluctuating|flushed|focused|followed|following|forcing|forming|found|frustrated|frustrating|functioning|gained|gaining|getting|give|given|giving|going|gone|gotten|graded|great|handling|happened|happening|headed|heading|healed|healing|held|helped|helping|highlighted|hindered|hit|holding|hopes|hospitalized|hurting|identified|imaged|improved|improving|inclined|included|increased|increasing|indicated|informed|initiated|injected|inquiring|inserted|instilled|instructed|interpreted|interrupted|invaded|investigated|involved|involving|jumped|known|lacking|leaking|leaning|learned|learning|leaving|left|lessened|limiting|lingering|listed|loaded|located|looking|losing|lost|made|magnified|maintained|managed|managing|married|measured|meeting|met|missed|missing|moderated|monitored|monitoring|motivated|moved|moving|needed|normalized|noted|noticed|noting|observed|obtained|occas|occurring|offered|omitted|oozing|operating|opposed|opted|ordered|passed|passing|pending|performed|persisted|pine|placed|planing|planned|planning|plannng|pleased|pointed|postponed|prepared|prepped|prescribed|presented|preserved|problems|progressed|Progressing|prolonged|provided|pulled|pushing|put|putting|quit|ran|randomized|ranged|read|readmitted|reassured|recalled|received|receiving|rechecked|recommended|recommending|recounseled|recovered|recovering|recuperating|recurred|reduced|referred|refilled|refused|refusing|regaining|regarding|reinserted|reiterated|rejected|related|relieved|remained|remaining|remembered|reminded|removed|repaired|repeated|replaced|repleted|reported|reporting|requested|required|resolved|resolving|responded|responding|restarted|re-started|resulted|resumed|retaining|retired|retiring|retracted|returned|returning|revealed|reviewed|revised|riding|risen|rising|rremaining|ruled|run|running|sacrificed|said|satisfied|saturated|scheduled|screened|seeing|seen|seing|selected|sending|sent|set|setting|settled|severe|shooting|shown|signficant|sitting|sleeping|slowed|slowing|smoked|smoking|spared|spoken|spotting|squinching|stabilized|standing|stared|started|starting|stated|stayed|staying|stones|stooling|stopped|stopping|straining|struck|subsided|suffering|suggested|suggesting|summarized|supplemented|supposed|suppressed|suspected|suspended|switched|switching|taken|taking|talked|tansitioned|targeted|terminated|thickened|thinking|thought|threatening|thrilled|tied|tingling|tired|told|tolerated|tolerating|transferred|transferring|transitioned|transitioning|treated|treating|trending|trialed|tried|troubled|trying|undergoing|undergone|undertaken|updated|urinating|used|using|vaporized|viewed|visualized|voided|voiding|waiting|waking|washing|watched|watching|weakened|weaning|wearing|well|wetting|wiped|woken|worked|working|worn|worried|worsened|worsening|wrestling|written|show";
+	public static final Pattern LINKING_VERBS = Pattern.compile("appear|become|becomes|feels|felt|is|looks|prove|remained|remains|seemed|seems|abandoned|accepted|accepting|accessed|accompanied|achieved|acting|added|adjusted|administered|admitted|advanced|advised|affected|aggravated|aggravating|allowed|ambulating|analysed|answered|anticipated|applied|appreciated|approved|arranged|asked|asking|assessed|associated|attempted|attributed|available|awaiting|awakening|based|battling|becoming|began|beginning|begun|biopsied|bothered|broken|brought|bumped|called|cancelled|cared|carried|catheterized|caused|causing|challenging|changed|changing|characterized|checked|checking|chosen|clamped|cleaned|clear|cleared|clearing|climbed|climbing|clogged|co-existing|combined|come|comes|coming|commenced|compared|complained|complaining|complains|complete|completed|complicated|concerened|concerned|concerning|condylomata|confined|confirmed|confused|considered|considering|constipated|consulted|contacted|contemplating|continue|continued|continues|continuing|contraindicated|contributing|controlled|converted|corrected|counseled|counselled|covered|crept|cured|cut|cutting|dealing|decided|deciding|declined|declining|decreased|decreasing|deemed|deferred|dehydrated|delayed|delivered|demonstrated|denied|depressed|described|describing|desired|detailed|detected|determined|developed|developing|diagnosed|dilated|diminished|discharged|discontinued|discouraged|discussed|disinclined|documented|doing|done|doubled|draining|drawn|dribbling|drinking|dropped|dropping|dying|eating|ejaculated|elected|electing|emanating|emphasized|employed|emptying|encountered|encouraged|encouraging|engaged|enrolled|entered|estimated|evaluated|exacerbated|exacerbating|examined|excellent|excluded|exercising|exhausted|expected|experienced|experiencing|explained|exploring|expressed|factoring|failed|failing|fallen|fatigued|faxed|feeling|felt|filled|fine|finished|finishing|fired|fixed|fluctuated|fluctuating|flushed|focused|followed|following|forcing|forming|found|frustrated|frustrating|functioning|gained|gaining|getting|give|given|giving|going|gone|gotten|graded|great|handling|happened|happening|headed|heading|healed|healing|held|helped|helping|highlighted|hindered|hit|holding|hopes|hospitalized|hurting|identified|imaged|improved|improving|inclined|included|increased|increasing|indicated|informed|initiated|injected|inquiring|inserted|instilled|instructed|interpreted|interrupted|invaded|investigated|involved|involving|jumped|known|lacking|leaking|leaning|learned|learning|leaving|left|lessened|limiting|lingering|listed|loaded|located|looking|losing|lost|made|magnified|maintained|managed|managing|married|measured|meeting|met|missed|missing|moderated|monitored|monitoring|motivated|moved|moving|needed|normalized|noted|noticed|noting|observed|obtained|occas|occurring|offered|omitted|oozing|operating|opposed|opted|ordered|passed|passing|pending|performed|persisted|pine|placed|planing|planned|planning|plannng|pleased|pointed|postponed|prepared|prepped|prescribed|presented|preserved|problems|progressed|Progressing|prolonged|provided|pulled|pushing|put|putting|quit|ran|randomized|ranged|read|readmitted|reassured|recalled|received|receiving|rechecked|recommended|recommending|recounseled|recovered|recovering|recuperating|recurred|reduced|referred|refilled|refused|refusing|regaining|regarding|reinserted|reiterated|rejected|related|relieved|remained|remaining|remembered|reminded|removed|repaired|repeated|replaced|repleted|reported|reporting|requested|required|resolved|resolving|responded|responding|restarted|re-started|resulted|resumed|retaining|retired|retiring|retracted|returned|returning|revealed|reviewed|revised|riding|risen|rising|rremaining|ruled|run|running|sacrificed|said|satisfied|saturated|scheduled|screened|seeing|seen|seing|selected|sending|sent|set|setting|settled|severe|shooting|shown|signficant|sitting|sleeping|slowed|slowing|smoked|smoking|spared|spoken|spotting|squinching|stabilized|standing|stared|started|starting|stated|stayed|staying|stones|stooling|stopped|stopping|straining|struck|subsided|suffering|suggested|suggesting|summarized|supplemented|supposed|suppressed|suspected|suspended|switched|switching|taken|taking|talked|tansitioned|targeted|terminated|thickened|thinking|thought|threatening|thrilled|tied|tingling|tired|told|tolerated|tolerating|transferred|transferring|transitioned|transitioning|treated|treating|trending|trialed|tried|troubled|trying|undergoing|undergone|undertaken|updated|urinating|used|using|vaporized|viewed|visualized|voided|voiding|waiting|waking|washing|watched|watching|weakened|weaning|wearing|well|wetting|wiped|woken|worked|working|worn|worried|worsened|worsening|wrestling|written|show|start", Pattern.CASE_INSENSITIVE);
 	
-	public static final String MODAL_AUX_VERB = "(?i)can|could|may|must|should|will|would|shall|might";
+	//public static final String MODAL_AUX_VERB = "(?i)can|could|did|may|must|should|will|would|shall|might";
+	public static final Pattern MODAL_AUX_VERB = Pattern.compile("can|could|did|may|must|should|will|would|shall|might", Pattern.CASE_INSENSITIVE);
 	
-	public static final String NEGATION = "(?i)no|not|without|none";
+	//public static final String NEGATION = "(?i)no|not|without|none|negative|neither|nor";
+	//public static final Pattern NEGATION = Pattern.compile("no|not|without|none|negative|neither|nor|fail|failed", Pattern.CASE_INSENSITIVE);
+	public static final Pattern NEGATION = Pattern.compile("no|not|without|none|negative|neither|nor", Pattern.CASE_INSENSITIVE);
 	
-	public static final String ARTICLE = "(?i)a|an|the";
+	//public static final String ARTICLE = "(?i)a|an|the";
+	public static final Pattern ARTICLE = Pattern.compile("a|an|the", Pattern.CASE_INSENSITIVE);
 	
-	//public static final String VERB_SUBJ_SUBJC_EXCLUSIONS = "(?i)a|an|also|and|another|as|be|but|could|elsewhere|has|may|otherwise|seen|left|right|to|which|would|mm|cm";
-	public static final String VERB_SUBJ_SUBJC_EXCLUSIONS = "(?i)a|also|an|and|another|as|be|but|cm|could|elsewhere|has|left|may|mm|otherwise|right|seen|to|which|would";
+	public static final Pattern PREPOSITION = Pattern.compile("IN|TO");
 	
-	public static final String PREPOSITIONS = "(?i)after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|that|to|while|with|within|without|off|since|until";
+	//public static final String VERB_SUBJ_SUBJC_EXCLUSIONS = "(?i)a|also|an|and|another|as|be|but|cm|could|elsewhere|has|left|may|mm|otherwise|right|seen|to|which|would";
+	public static final Pattern VERB_SUBJ_SUBJC_EXCLUSIONS = Pattern.compile("a|also|an|and|another|as|be|but|cm|could|elsewhere|has|left|may|mm|otherwise|right|seen|to|which|would", Pattern.CASE_INSENSITIVE);
+	
+	//public static final String PREPOSITIONS = "(?i)after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|that|to|while|with|within|without|off|since|until";
+	public static final Pattern PREPOSITIONS = Pattern.compile("after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|that|to|while|with|within|without|off|since|until", Pattern.CASE_INSENSITIVE);
 	
 	//public static final String DEPENDENT_SIGNALS = "(?i)that|when|where|which|who|whom|whose|otherwise|after|also|although|and|as|because|before|certainly|consequently|finally|" +
 	//					"first|furthermore|however|if|indeed|later|meanwhile|moreover|nevertheless|or|overall|provided|second|since|so|than|then|therefore|though|though|" +
 	//					"thus|unless|until|whence|whenever|whereas|wherever|whether|while|whither|how|what|whatever|whichever|why|whoever|whomever|whosoever|whomsoever";
 
-	public static final String DEPENDENT_SIGNALS = "(?i)after|also|although|as|because|before|certainly|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why";
+	//public static final String DEPENDENT_SIGNALS = "(?i)after|also|although|as|because|before|certainly|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why";
+	public static final Pattern DEPENDENT_SIGNALS = Pattern.compile("after|also|although|as|because|before|certainly|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why", Pattern.CASE_INSENSITIVE);
 	
-	public static final String CONJUNCTIVE_ADVERBS = "(?i)furthermore|however|moreover|nevertheless|therefore"; // left out "in contrast"
+	//public static final String CONJUNCTIVE_ADVERBS = "(?i)furthermore|however|moreover|nevertheless|therefore"; // left out "in contrast"
+	public static final Pattern CONJUNCTIVE_ADVERBS = Pattern.compile("furthermore|however|moreover|nevertheless|therefore", Pattern.CASE_INSENSITIVE); // left out "in contrast"
 
-	public static final String INTERSECTION_PREPOSITIONS_AND_DEPENDENT = "(?i)after|as|before|since|than|until"; // since and until are not preps in our list. wtf?
+	//public static final String INTERSECTION_PREPOSITIONS_AND_DEPENDENT = "(?i)after|as|before|since|than|until"; // since and until are not preps in our list. wtf?
+	public static final Pattern INTERSECTION_PREPOSITIONS_AND_DEPENDENT = Pattern.compile("after|as|before|since|than|until", Pattern.CASE_INSENSITIVE); // since and until are not preps in our list. wtf?
+	
+	private static final String MONGO_DB_HOST = Props.getProperty("mongo_host");
+	private static final String MONGO_DB = Props.getProperty("mongo_db");
 	
 	public enum MongoDB {
 	    INSTANCE;
-
-	    private static final String MONGO_DB_HOST = "10.12.128.98";
+	    
 	    private MongoClient mongo;
 	    private DB db;
 
 	    MongoDB() {
-//	        MongoClientOptions options = MongoClientOptions.builder()
-//	                .connectionsPerHost(100)
-//	                .autoConnectRetry(true)
-//	                .readPreference(ReadPreference.secondaryPreferred())
-//	                .build();
+	    	System.out.println("Established MongoDB connection");
+	    	System.out.println(MONGO_DB_HOST + " / " + MONGO_DB + " / " + Props.getProperty("mongo_user") + " / " + Props.getProperty("mongo_pw"));
 
 	        try {
 	            mongo = new MongoClient(MONGO_DB_HOST);
@@ -1571,20 +1675,72 @@ public class Constants {
 	            e.printStackTrace();
 	        }
 
-	        db = mongo.getDB("test");
-	         //authenticate if needed
-	         //boolean auth = someDB.authenticate("username", "password".toCharArray());
-	         //if(!auth){
-	         //     System.out.println("Error Connecting To DB");
-	         //}        
+	        db = mongo.getDB(MONGO_DB);
+	        
+	        if(MONGO_DB_HOST.equalsIgnoreCase("mongo01.medicalsearchtechnologies.com")) {
+	        	System.out.println("Authenticating to Digital Ocean server...");
+				boolean auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
+				System.out.println("MongoDB auth: " + auth);
+	        }
 	    }
-
+	    
 	    public DB getDB() {
 	    	return db;
+	    }
+	    
+	    public DBCollection getCollection(String collection) {
+	    	return db.getCollection(collection);
 	    }
 
 	    public void close(){
 	        mongo.close();
+	    }
+	}
+	
+	public enum RedisDBx {
+	    INSTANCE;
+	    
+	    private Jedis jedis;
+
+	    RedisDBx() {
+	        try {
+	            jedis = new Jedis(MONGO_DB_HOST);
+		    	System.out.println("Established Redis connection");
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    public Jedis getInstance() {
+	    	return jedis;
+	    }
+
+	    public void close(){
+	        jedis.close();
+	    }
+	}
+
+	public enum MyJedisPool {
+	    INSTANCE;
+	    
+	    private JedisPool pool;
+	    
+	    MyJedisPool() {
+	        try {
+	        	JedisPoolConfig config = new JedisPoolConfig();
+	        	pool = new JedisPool(config, MONGO_DB_HOST);
+		    	System.out.println("Established Jedis Pool.");
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    public Jedis getResource() {
+	    	return pool.getResource();
+	    }
+
+	    public void close(){
+	       pool.close();
 	    }
 	}
 	
