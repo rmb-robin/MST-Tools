@@ -117,6 +117,7 @@ public class Meds { //implements Comparable<Meds> {
 					meds.doseRoute = route;
 			}
 		} catch(Exception e) {
+			System.out.println("Error in Meds.parseMedsData()");
 			System.out.println(e.toString());
 			System.out.println(meds.raw);
 		}

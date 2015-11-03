@@ -46,7 +46,7 @@ public class MapValue {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(value).append(", ").append(qualifier).append(", ").append(debug).append(", ").append(negated);
+		sb.append(value).append("\t").append(qualifier).append("\t").append(debug).append("\t").append(negated).append("\t").append(source).append("\t").append(negSource);
 		return sb.toString();
 	}
 }
