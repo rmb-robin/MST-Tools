@@ -59,6 +59,7 @@ public class StructuredOutputHelper {
 	private Set<String> stByToken = new HashSet<>(); // missing ST by token
 	private Set<String> unprocessedSentences = new HashSet<>(); // sentences for which we found no structured data
 	private Set<String> foundSTByToken = new HashSet<>();
+	private Set<String> processedData = new HashSet<>();
 	
 	private Pattern plusRegex = Pattern.compile("\\d+\\s*\\+\\s*\\d+");
 	
@@ -95,6 +96,7 @@ public class StructuredOutputHelper {
 		RELATED_TO_VERB,
 		VERB_PHRASE_COUNT,
 		SUBJ_SUBJC_EQUAL,
+		DUPE,
 		SENTENCE;
 	};
 	
@@ -188,7 +190,16 @@ public class StructuredOutputHelper {
 							if(subjST != null) {
 								String[] attribute = getConstructor(subjST + "|" + verbST);
 								if(attribute != null) {
-									related.put(attribute[0], new MapValue(verbPhrase.getSubj().getToken(), verbPhrase.isPhraseNegated() ? ABSENCE_QUALIFIER : attribute[1], subjST + "|" + verbST, verbPhrase.isPhraseNegated(), "related", Joiner.on(',').join(negSource)));
+									String value = "";
+									//if(verbPhrase.getSubj().getNounPhraseIdx() != -1) {
+										// if SUBJC is within a noun phrase, store entire phrase as value
+									//	value = metadata.getNounMetadata().get(verbPhrase.getSubj().getNounPhraseIdx()).getNounPhraseString();
+									//	processedNounPhrases.add(verbPhrase.getSubj().getNounPhraseIdx());
+									//} else {
+										// otherwise, store just the SUBJC token
+										value = verbPhrase.getSubj().getToken();
+									//}
+									related.put(attribute[0], new MapValue(value, verbPhrase.isPhraseNegated() ? ABSENCE_QUALIFIER : attribute[1], subjST + "|" + verbST, verbPhrase.isPhraseNegated(), "related", Joiner.on(',').join(negSource)));
 									logFound(verbPhrase.getSubj().getToken(), subjST, subjST+"|"+verbST, verbPhrase.getSubj().getToken()+"|"+verbPhrase.getVerbString(), "VP", sentence.getFullSentence());
 								} else {
 									// no constructor for this ST pair
@@ -1026,6 +1037,8 @@ public class StructuredOutputHelper {
 				}
 			}
 			
+			
+			
 			for(Multimap<String, MapValue> related : structured.data) {
 				processMapEntries2(related, data);
 			}
@@ -1095,7 +1108,8 @@ public class StructuredOutputHelper {
 				data[Headers.ADMIN_OF_DRUG.ordinal()] = val.value;
 				data[Headers.NEGATION_SRC.ordinal()] = val.negSource;
 				
-				report.writeNext(data);
+				//report.writeNext(data);
+				writeData(data);
 				write = false;
 			}
 			
@@ -1108,7 +1122,8 @@ public class StructuredOutputHelper {
 				data[Headers.PROCEDURE_BY_METHOD.ordinal()] = val.value;
 				data[Headers.NEGATION_SRC.ordinal()] = val.negSource;
 				
-				report.writeNext(data);
+				//report.writeNext(data);
+				writeData(data);
 				write = false;
 			}
 			
@@ -1121,7 +1136,8 @@ public class StructuredOutputHelper {
 				data[Headers.FINDING_SITE.ordinal()] = val.value;
 				data[Headers.NEGATION_SRC.ordinal()] = val.negSource;
 				
-				report.writeNext(data);
+				//report.writeNext(data);
+				writeData(data);
 				write = false;
 			}
 			
@@ -1131,18 +1147,42 @@ public class StructuredOutputHelper {
 				data[Headers.DEBUG.ordinal()] = val.debug;
 				data[Headers.VERB.ordinal()] = getVerbTemporal(val.debug);
 				data[Headers.ABSENCE.ordinal()] = val.negated ? "Y" : "";
-				data[Headers.FINDING_SITE.ordinal()] = val.value;
+				data[Headers.DIAGNOSTIC_PROCEDURE.ordinal()] = val.value;
 				data[Headers.NEGATION_SRC.ordinal()] = val.negSource;
 				
-				report.writeNext(data);
+				//report.writeNext(data);
+				writeData(data);
 				write = false;
 			}
 			
-			if(write)
-		    	report.writeNext(data);
+			if(write) {
+		    	//report.writeNext(data);
+		    	writeData(data);
+			}
 			
 			clearHeaderValues(data);
 		}
+	}
+	
+	private void writeData(String[] data) {
+		// 11/4/2015
+		// this is a quick and dirty way to limit dupes in the structured data report.
+		// a better way would be to limit the dupe structured.data entry from being created.
+		String str = Joiner.on(',').useForNull("").join(data);
+		//if(!processedData.contains(str)) {
+		//	report.writeNext(data);
+		//	processedData.add(str);
+		//}
+		// 11/5/2015
+		// Jan decided that he doesn't want to limit dupes. He wants to see the duplicate rows and have them filterable.
+		if(!processedData.contains(str)) {
+			data[Headers.DUPE.ordinal()] = "N";
+			processedData.add(str);
+		} else {
+			data[Headers.DUPE.ordinal()] = "Y";
+		}
+		
+		report.writeNext(data);
 	}
 	
 	private String getVerbTemporal(String input) {

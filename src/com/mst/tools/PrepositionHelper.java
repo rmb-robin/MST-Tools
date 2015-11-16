@@ -88,7 +88,7 @@ public class PrepositionHelper {
 							} else {
 								ppWord.setPrepPhraseMember(true);
 								if(ppWord.isNounPOS() || ppWord.isNumericPOS()) {
-									// set as prep phrase member (nouns, cardinal numbers only)
+									// set as prep phrase object (nouns, cardinal numbers only)
 									ppWord.setPrepPhraseObject(true);
 								}
 							}
@@ -106,6 +106,7 @@ public class PrepositionHelper {
 		return ret;
 	}
 	
+	// this is legacy and not currently used
 	public String[] getPPAnnotatedSentence(String keyword, String extractionTerm, ArrayList<WordToken> words) {
 		StringBuilder markup = new StringBuilder();
 		StringBuilder orig = new StringBuilder();

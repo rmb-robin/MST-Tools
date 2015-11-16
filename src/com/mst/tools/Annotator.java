@@ -15,6 +15,7 @@ public class Annotator {
 	private final Pattern PUNC = Pattern.compile(",|\\(|\\)|-");
 	private final Pattern PROPN = Pattern.compile("^[A-Z][a-z]+");
 	private final Pattern SHOWS = Pattern.compile("shows?", Pattern.CASE_INSENSITIVE);
+	private final Pattern NOUN_OVERRIDES = Pattern.compile("ct|dexa", Pattern.CASE_INSENSITIVE);
 	
 	// The purpose of this class/method is to ensure that the annotation steps proceed in the 
 	// correct order (primarily for the sake of the verb classes).
@@ -143,7 +144,7 @@ public class Annotator {
 					// POS overrides
 					// TODO get POS overrides into POSTagger
 					if(PUNC.matcher(word.getToken()).matches()) { // Stanford tags these as NN
-						word.setPOS(word.getToken());
+						word.setPOS(word.getToken()); // reset POS to match punctuation char
 					} else if(word.getToken().equalsIgnoreCase("scan")) {
 						try {
 							// override the POS of scan (Stanford = VB) to NN if preceded by ST diap or token "bone"
@@ -154,6 +155,8 @@ public class Annotator {
 						} catch(Exception e) { }
 					} else if(SHOWS.matcher(word.getToken()).matches()) {
 						word.setPOS("VB");
+					} else if(NOUN_OVERRIDES.matcher(word.getToken()).matches()) {
+						word.setPOS("NN");
 					}
 					
 					idx++;
