@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mst.util.Constants;
 import com.mst.util.DateNormalizer;
 
 public class SentenceCleaner {
@@ -96,6 +97,20 @@ public class SentenceCleaner {
 		//cleaned = cleaned.replaceAll("�", "");
 		
 		sentence = dateNormalizer.normalize(sentence);
+		
+		Matcher tnm = Constants.TNM_STAGING_REGEX.matcher(sentence);
+		if(tnm.find()) {
+			if(!(tnm.group().equalsIgnoreCase("TX") || tnm.group().equalsIgnoreCase("TX."))) {
+				sentence = sentence.replace(tnm.group(), tnm.group().replace(" ", "").replace('t', 'T').replace('n', 'N').replace('m', 'M') + " ");
+			}
+		}
+		
+		Matcher measu = Constants.MEASUREMENT_REGEX.matcher(sentence);
+		//System.out.println(sentence);
+		if(measu.find()) {
+			sentence = sentence.replace(measu.group(), measu.group().replace(" ", "") + " ");
+			//System.out.println(sentence);
+		}
 		
 		return sentence;
 	}

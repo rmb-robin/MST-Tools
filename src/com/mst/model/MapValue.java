@@ -1,5 +1,7 @@
 package com.mst.model;
 
+import java.util.Map;
+
 import com.mst.util.Constants;
 
 public class MapValue {
@@ -30,6 +32,10 @@ public class MapValue {
 	}
 	
 	public MapValue(String value, String qualifier, String debug, boolean negated, String source, String negSource) {
+		this(value, qualifier, debug, false, source, null, null);
+	}
+	
+	public MapValue(String value, String qualifier, String debug, boolean negated, String source, String negSource,  Map<String, String> metadata) {
 		if(Constants.AGE_REGEX.matcher(value).matches()) {
 			String[] age = value.split("-");
 	    	value = age[0];
@@ -41,6 +47,7 @@ public class MapValue {
 		this.negated = negated;
 		this.source = source;
 		this.negSource = negSource;
+		//this.metadata = metadata;
 	}
 	
 	@Override

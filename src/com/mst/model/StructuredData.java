@@ -2,7 +2,9 @@ package com.mst.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.Multimap;
 
@@ -13,6 +15,7 @@ public class StructuredData {
 	public String study;
 	public List<Multimap<String, MapValue>> data = new ArrayList<Multimap<String, MapValue>>();
 	public String sentence;
+	//public Map<String, String> metadata = new HashMap<>();
 
 	public List<MapValue> getValue(String searchKey, String searchValue, String targetKey) {	
 		return getValue(searchKey, searchValue, targetKey, ".*", ".*");

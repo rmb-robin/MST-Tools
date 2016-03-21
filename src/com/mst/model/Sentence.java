@@ -2,6 +2,7 @@ package com.mst.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 public class Sentence {
 
@@ -14,6 +15,7 @@ public class Sentence {
 	//private ArrayList<StanfordDependency> stanfordDependencyList;
 	private SentenceMetadata metadata = new SentenceMetadata();
 	private String id, source, practice, study;
+	private HashMap<String, String> discreet = new HashMap<>();
 	
 	public Sentence() {	
 		this.processDate = new Date();
@@ -35,6 +37,14 @@ public class Sentence {
 	public SentenceMetadata getMetadata() { return metadata; }
 	
 	public void setMetadata(SentenceMetadata val) { metadata = val; }
+	
+	public HashMap<String, String> getDiscreet() {
+		return this.discreet;
+	}
+	
+	public void setDiscreet(HashMap<String, String> map) {
+		this.discreet = map;
+	}
 	
 	public void setId(String id) {
 		this.id = id;

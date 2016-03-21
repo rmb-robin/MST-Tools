@@ -40,8 +40,10 @@ import com.mst.model.WordToken;
 import com.mst.model.discreet.Meds;
 import com.mst.model.discreet.Patient;
 import com.mst.util.Constants;
+import com.mst.util.Constants.StructuredNotationReturnValue;
 import com.mst.util.GsonFactory;
 import com.mst.util.Props;
+import com.mst.util.Utils;
 import com.opencsv.CSVWriter;
 
 import org.slf4j.Logger;
@@ -62,7 +64,9 @@ public class StructuredOutputHelper {
 	private Set<String> unprocessedSentences = new HashSet<>(); // sentences for which we found no structured data
 	private Set<String> foundSTByToken = new HashSet<>();
 	private Set<String> processedData = new HashSet<>();
-	private final List<String> parentFindings = Arrays.asList("admin of drug", "clinical finding", "diagnostic procedure", "procedure by method");
+	private final List<String> parentFindings = Arrays.asList("admin of drug", "clinical finding", "diagnostic procedure", "procedure by method", "symptom");
+	private Set<String> missingSTs = new HashSet<>();
+	private Set<String> missingFTs = new HashSet<>();
 	
 	private Pattern plusRegex = Pattern.compile("\\d+\\s*\\+\\s*\\d+");
 	
@@ -72,8 +76,6 @@ public class StructuredOutputHelper {
 	private boolean writeLogs = false;
 	
 	private final String ABSENCE_QUALIFIER = "Absence";
-	
-	//Map<String, String> semTypeAttributeMap = new HashMap<>();
 	
 	private enum Headers {
 		PATIENT_ID,
@@ -112,6 +114,176 @@ public class StructuredOutputHelper {
 		this.writeLogs = writeLogs;
 	}
 	
+	public StructuredData process2(Sentence sentence, boolean writeToMongo) {
+		// this is used by the camel process
+		//System.out.println("Calling StructuredOutputHelper.process2() for sentence: " + sentence.getFullSentence());
+		
+		if(writeLogs) {
+			initReports("scott", "test");
+			
+			String[] headers = new String[Headers.values().length];
+			int j = 0;
+			for(Headers header : Headers.values()) {
+				headers[j] = header.name();
+				j++;
+			}
+			report.writeNext(headers);
+		}
+		
+		StructuredData output = buildStructuredOutput2(sentence, writeToMongo);
+		
+		if(writeLogs) {
+			writeLogs(buildReportPath("scott", "test"));
+			try {
+				report.close();
+			} catch(Exception e) { e.printStackTrace(); }
+		}
+		return output;
+	}
+	
+	//public void testStructured2_0(Sentence sentence) {
+	//	buildStructuredData2_0(sentence, false);
+	//}
+	
+	// this only exists to support showing JSON on the annotation tool website because I don't have
+	// time to figure out the Jersey built-in JSON unmarshalling in JAXB
+	public String processReturnJSON(Sentence sentence, boolean writeToMongo) {
+		return gson.toJson(buildStructuredOutput2(sentence, writeToMongo));
+	}
+	
+	// also used by the web interface. will eventually become the default.
+	public String processStructured2_0(Sentence sentence, boolean writeToMongo) {
+		return gson.toJson(buildStructuredData2_0(sentence));
+	}
+	
+	public void process2(String practice, String study, int limit, boolean writeToMongo, boolean medsOnly) {
+		
+		//long startTime = Constants.getTime();
+		
+		try {
+			if(writeLogs) {
+				initReports(practice, study);
+				
+				String[] headers = new String[Headers.values().length];
+				int j = 0;
+				for(Headers header : Headers.values()) {
+					headers[j] = header.name();
+					j++;
+				}
+				report.writeNext(headers);
+			}
+			
+			if(medsOnly) {
+				getMeds(practice);
+			} else {
+				DBCollection coll = Constants.MongoDB.INSTANCE.getCollection("annotations");
+				
+				DBObject query = QueryBuilder.start()
+						.put("practice").is(practice)
+						.put("study").is(study)
+						.get();
+				
+				DBCursor cursor = null;
+				
+				if(limit == -1)
+					cursor = coll.find(query);
+				else
+					cursor = coll.find(query).limit(limit);
+				
+				int count = 0, cursorSize = cursor.size();
+				
+				while(cursor.hasNext()) {
+					if(count++ % 100 == 0)
+						System.out.println(count + " / " + cursorSize);
+					
+					BasicDBObject obj = (BasicDBObject) cursor.next();
+					Sentence sentence = gson.fromJson(obj.toString(), Sentence.class);
+					
+					buildStructuredOutput2(sentence, writeToMongo);
+					//System.out.println(foo);
+				}
+				
+				cursor.close();
+				
+				writeLogs(buildReportPath(practice, study));
+			}
+			
+			//System.out.println(Constants.formatTime((Constants.getTime() - startTime)/1000.0));
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			Constants.MongoDB.INSTANCE.close();
+			try {
+				report.close();
+			} catch(Exception e) { e.printStackTrace(); }
+		}
+	}
+	
+	public void buildStructuredReportOnly(String practice, String study, int limit, boolean includeMeds, List<String> whitelist) {
+		CSVWriter structuredReport = null;
+		
+		try {
+			String fileId = practice + "_" + study + "_" + new SimpleDateFormat("MM-dd-yyyy-HH:mm").format(new Date());
+			
+			try {
+				structuredReport = new CSVWriter(new FileWriter(buildReportPath(practice, study) + "structured_" + fileId + ".csv"), ',');
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+			
+			String[] headers = new String[Headers.values().length];
+			int j = 0;
+			for(Headers header : Headers.values()) {
+				headers[j] = header.name();
+				j++;
+			}
+			structuredReport.writeNext(headers);
+			
+			if(includeMeds) {
+//					getMeds(practice);
+			}
+			
+			else {
+				DBCollection coll = Constants.MongoDB.INSTANCE.getCollection("structured");
+				
+				DBObject query = QueryBuilder.start()
+						.put("practice").is(practice)
+						.put("study").is(study)
+						.get();
+				
+				DBCursor cursor = null;
+				
+				if(limit == -1)
+					cursor = coll.find(query);
+				else
+					cursor = coll.find(query).limit(limit);
+				
+				int count = 0, cursorSize = cursor.size();
+				
+				while(cursor.hasNext()) {
+					if(count++ % 100 == 0)
+						System.out.println(count + " / " + cursorSize);
+					
+					BasicDBObject obj = (BasicDBObject) cursor.next();
+					StructuredData structured = gson.fromJson(obj.toString(), StructuredData.class);
+					
+					processStructuredEntry(structured, structuredReport, whitelist);
+				}
+				
+				cursor.close();
+			}
+					
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			//Constants.MongoDB.INSTANCE.close();
+			try {
+				structuredReport.close();
+			} catch(Exception e) { e.printStackTrace(); }
+		}
+	}
+	
 	private String[] getConstructor(String key) {
 		String[] array = new String[2];
 		List<String> list;
@@ -130,13 +302,6 @@ public class StructuredOutputHelper {
 		return array;
 		
 		//return constructors.get(key);
-	}
-	
-	private String getAttributeFromRedis(String key) {
-		
-		try(Jedis jedis = Constants.MyJedisPool.INSTANCE.getResource()) {
-			return jedis.get("st2:"+key);
-		}
 	}
 	
 	private StructuredData buildStructuredOutput2(Sentence sentence, boolean writeToMongo) {
@@ -259,28 +424,28 @@ public class StructuredOutputHelper {
 							for(int ppIdx : verbPhrase.getSubj().getPrepPhrasesIdx()) {
 								// TODO apply negation to verb phrase as a whole and pass to processPrepPhrase()
 								// 9/23/15 - changed to send verbST rather than null to support sentences where SUBJ and VB are one and the same. "Is on Lupron."
-								processPrepPhrase2(words, metadata, related, processedNounPhrases, processedPrepPhrases, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "related", negSource);
+								processPrepPhrase(words, metadata, related, processedNounPhrases, processedPrepPhrases, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "related", negSource);
 							}
 							// 1d) process noun phrases related to subj
 							if(verbPhrase.getSubj().getNounPhraseIdx() > -1) {
-								processNounPhrase2(words, metadata, related, processedNounPhrases, verbPhrase.getSubj().getNounPhraseIdx(), sentence.getFullSentence(), null, false, "related", negSource);
+								processNounPhrase(words, metadata, related, processedNounPhrases, verbPhrase.getSubj().getNounPhraseIdx(), sentence.getFullSentence(), null, false, "related", negSource);
 							}
 						}
 				
 						// 1e) process prep phrases related to (final) verb (of phrase)
 						for(int ppIdx : verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPrepPhrasesIdx()) {
-							processPrepPhrase2(words, metadata, related, processedNounPhrases, processedPrepPhrases, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "related", negSource);
+							processPrepPhrase(words, metadata, related, processedNounPhrases, processedPrepPhrases, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "related", negSource);
 						}
 						
 						for(VerbPhraseToken subjc : verbPhrase.getSubjC()) {
 							// 1f) process prep phrases related to subjc
 							for(int ppIdx : subjc.getPrepPhrasesIdx()) {
-								processPrepPhrase2(words, metadata, related, processedNounPhrases, processedPrepPhrases, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), words.get(subjc.getPosition()).getSemanticType(), "related", negSource);
+								processPrepPhrase(words, metadata, related, processedNounPhrases, processedPrepPhrases, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), words.get(subjc.getPosition()).getSemanticType(), "related", negSource);
 							}
 							
 							// 1g) process noun phrases related to subjc
 							if(subjc.getNounPhraseIdx() > -1) {
-								processNounPhrase2(words, metadata, related, processedNounPhrases, subjc.getNounPhraseIdx(), sentence.getFullSentence(), verbST, verbPhrase.isPhraseNegated(), "related", negSource);
+								processNounPhrase(words, metadata, related, processedNounPhrases, subjc.getNounPhraseIdx(), sentence.getFullSentence(), verbST, verbPhrase.isPhraseNegated(), "related", negSource);
 							}
 						}
 						
@@ -301,7 +466,7 @@ public class StructuredOutputHelper {
 			negSource.clear();
 			for(int i=0; i < metadata.getPrepMetadata().size(); i++) {
 				Multimap<String, MapValue> temp = ArrayListMultimap.create();
-				processPrepPhrase2(words, metadata, temp, processedNounPhrases, processedPrepPhrases, i, sentence.getFullSentence(), false, null, "unrelated", negSource);
+				processPrepPhrase(words, metadata, temp, processedNounPhrases, processedPrepPhrases, i, sentence.getFullSentence(), false, null, "unrelated", negSource);
 				if(!temp.isEmpty())
 					structured.data.add(temp);
 			}
@@ -310,7 +475,7 @@ public class StructuredOutputHelper {
 			negSource.clear();
 			for(int i=0; i < metadata.getNounMetadata().size(); i++) {
 				Multimap<String, MapValue> temp = ArrayListMultimap.create();
-				processNounPhrase2(words, metadata, temp, processedNounPhrases, i, sentence.getFullSentence(), null, false, "unrelated", negSource);
+				processNounPhrase(words, metadata, temp, processedNounPhrases, i, sentence.getFullSentence(), null, false, "unrelated", negSource);
 				if(!temp.isEmpty())
 					structured.data.add(temp);
 			}
@@ -345,7 +510,7 @@ public class StructuredOutputHelper {
 			}
 			
 			// 5) process various regex patterns
-			processRegex2(structured.data, sentence.getFullSentence());
+			processRegex(structured.data, sentence.getFullSentence());
 			
 			if(writeLogs) {
 				report2(structured, metadata);
@@ -374,322 +539,47 @@ public class StructuredOutputHelper {
 		return structured;
 	}
 	
-	// 12/4/2015 - 2nd attempt at processing structured data without left|right constructors. what data structure should hold these results? 
-	// should they be processed on the fly and converted to IDC-10 codes? is that even feasible?
-	private StructuredData2_0 buildStructuredData2_0(Sentence sentence, boolean writeToMongo) {
+	public Set<String> getMissingSemanticTypes() { return missingSTs; }
+	
+	public Set<String> getMissingFindingTypes() { return missingFTs; }
+	
+	private String getSemanticType(ArrayList<WordToken> words, int index, String source) {
+		String st = words.get(index).getSemanticType();
 		
-		StructuredData2_0 structured = new StructuredData2_0();
-		
-		structured.patientId = sentence.getId();
-		structured.practice = sentence.getPractice();
-		structured.study = sentence.getStudy();
-		structured.date = sentence.getProcedureDate();
-		structured.sentence = sentence.getFullSentence();
-		
-		// maintain lists of token indexes that have been processed to avoid duplicate findings.
-		List<Integer> processedTokens = new ArrayList<Integer>();
-		List<String> parentFindings = Arrays.asList("Admin of Drug", "Clinical Finding", "Subject");
-		List<Finding> findings = new ArrayList<>();
-		
-		Set<String> negSource = new HashSet<>();
-		
-		try {
-			SentenceMetadata metadata = sentence.getMetadata();
-			
-//			/* Structured Metadata */
-//			//structured.metadata.put("verbPhraseCount", String.valueOf(metadata.getVerbMetadata().size()));
-//			
-//			// Subject of a verb phrase equal to another verb phrase's subject complement (object). This is invalid and is tracked for algorithm cleanup purposes.
-//			for(VerbPhraseMetadata vpm1 : metadata.getVerbMetadata()) {
-//				if(vpm1.getSubj() != null) {
-//					int subjIdx = vpm1.getSubj().getPosition();
-//					for(VerbPhraseMetadata vpm2 : metadata.getVerbMetadata()) {
-//						for(VerbPhraseToken subjc : vpm2.getSubjC()) {
-//							if(subjIdx == subjc.getPosition()) {
-//								//structured.metadata.put("subjEqSubjC", "Y");
-//								break;
-//							}
-//						}
-//					}
-//				}
-//			}	
-//			/* End Structured Metadata */
-			
-			ArrayList<WordToken> words = sentence.getWordList();
-		
-			// 1) loop through verb phrases
-			for(VerbPhraseMetadata verbPhrase : metadata.getVerbMetadata()) {
-				//Multimap<String, MapValue> findings = ArrayListMultimap.create();
-				negSource.clear();
-				
-				// track which component of the verb phrase is negated for research purposes when looking at the structured data
-				if(verbPhrase.getSubj() != null && verbPhrase.getSubj().isNegated())
-					negSource.add("SUBJ");
-				for(VerbPhraseToken token : verbPhrase.getSubjC())
-					if(token.isNegated())
-						negSource.add("SUBJC");
-				for(VerbPhraseToken token : verbPhrase.getVerbs())
-					if(token.isNegated())
-						negSource.add("VB");
-				
-				switch(verbPhrase.getVerbClass()) {
-					case ACTION:
-					case LINKING_VERB:
-					case VERB_OF_BEING:
-					case MODAL_AUX:
-						// Verb phrase subject and verb will each have, at most, one semantic type.
-						// Because there can be more than one subject complement (object) in a verb phrase, each can have its own semantic type.
-						
-						String subjST = (verbPhrase.getSubj() != null) ? words.get(verbPhrase.getSubj().getPosition()).getSemanticType() : null;
-						String verbST = null;
-						
-						// verbST will be either null, that of the only token, that of the entire phrase (if present), or that of
-						// the final token (if entire phrase has no ST)
-						if(verbPhrase.getVerbs().size() == 1) {
-							verbST = words.get(verbPhrase.getVerbs().get(0).getPosition()).getSemanticType();
-						} else {
-							verbST = verbPhrase.getSemanticType();
-							
-							if(verbST == null)
-								verbST = words.get(verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPosition()).getSemanticType();
-						}
-						
-						if(verbST != null) {
-							Finding subject = null;
-							// 1a) generate finding for subj
-							if(subjST != null) {
-								String attribute = getAttributeFromRedis(subjST);
-								if(attribute != null) {
-									subject = new Finding(attribute, verbPhrase.getSubj().getToken(), "VB-SUBJ", negSource, verbST.split("_")[0], verbST.split("_")[1], subjST);	
-									//findings.put(attribute, new MapValue(verbPhrase.getSubj().getToken(), verbST.split("_")[1], subjST + "|" + verbST, verbPhrase.isPhraseNegated(), "VB-SUBJ", Joiner.on(',').join(negSource)));
-									processedTokens.add(verbPhrase.getSubj().getPosition());
-									//logFound(verbPhrase.getSubj().getToken(), subjST, subjST, verbPhrase.getSubj().getToken()+"|"+verbPhrase.getVerbString(), "VP", sentence.getFullSentence());
-									List<Finding> temp = new ArrayList<>();
-									// process prep phrases related to subj
-									// TODO: this assumes that both the verb and subj have a defined semantic type
-									// AND that the subjST has an attribute (should this last requirement be relaxed?)
-									for(int ppIdx : verbPhrase.getSubj().getPrepPhrasesIdx()) {
-										processPrepPhrase2_0(words, metadata, temp, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB-SUBJ-PP", negSource);
-										
-										for(Finding finding : temp)
-											subject.children.add(finding);
-									}
-									
-									// process noun phrases related to subj
-									if(verbPhrase.getSubj().getNounPhraseIdx() > -1) {
-										temp = new ArrayList<>();
-										processNounPhrase2_1(words, metadata, temp, processedTokens, verbPhrase.getSubj().getNounPhraseIdx(), sentence.getFullSentence(), null, false, "VB-SUBJ-NP", negSource);
-										
-										for(Finding finding : temp)
-											subject.children.add(finding);
-									}
-									
-									//findings.add(subject);
-									
-								} else {
-									// no attribute for this ST
-									logMissing(relCounts, subjST);
-									logMissingEx(relByToken, verbPhrase.getSubj().getToken(), verbPhrase.getVerbString(), subjST, verbST, sentence.getFullSentence(), "VB-SUBJ");
-								}
-							} else {
-								if(verbPhrase.getSubj() != null) {
-									// subj exists, but has no ST
-									logMissing(stCounts, verbPhrase.getSubj().getToken() + "|" + words.get(verbPhrase.getSubj().getPosition()).getPOS());
-									logMissingST(verbPhrase.getSubj().getToken(), verbPhrase.getSubj().getToken()+"|"+verbPhrase.getVerbString(), sentence.getFullSentence(), "VB-SUBJ");
-								}
-							}
-							
-							// process prep phrases related to (final) verb (of phrase)
-							// Ex. He is on Lupron.
-							for(int ppIdx : verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPrepPhrasesIdx()) {
-								List<Finding> temp = new ArrayList<>();
-								processPrepPhrase2_0(words, metadata, temp, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB-PP", negSource);
-								
-								for(Finding finding : temp)
-									if(subject == null)
-										findings.add(finding);
-									else
-										subject.children.add(finding);
-							}
-							
-							// 1b) generate finding for subjc(s)
-							for(VerbPhraseToken subjc : verbPhrase.getSubjC()) {
-								//Multimap<String, MapValue> temp = ArrayListMultimap.create();
-								String subjcST = words.get(subjc.getPosition()).getSemanticType();
-							
-								Finding subjcFinding = null;
-								
-								if(subjcST != null) {
-									String attribute = getAttributeFromRedis(subjcST);
-									if(attribute != null) {
-										subjcFinding = new Finding(attribute, subjc.getToken(), "VB-OBJ", negSource, verbST.split("_")[0], verbST.split("_")[1], subjcST);
-										//temp.put(attribute, new MapValue(subjc.getToken(), verbST.split("_")[1], verbST + "|" + subjcST, verbPhrase.isPhraseNegated(), "VB-OBJ", Joiner.on(',').join(negSource)));
-										
-										processedTokens.add(subjc.getPosition());
-									} else {
-										logMissing(relCounts, subjcST);
-										logMissingEx(relByToken, verbPhrase.getVerbString(), subjc.getToken(), verbST, subjcST, sentence.getFullSentence(), "VB-OBJ");
-									}
-								} else {
-									logMissing(stCounts, subjc.getToken() + "|" + words.get(subjc.getPosition()).getPOS());
-									logMissingST(subjc.getToken(), verbPhrase.getVerbString()+"|"+subjc.getToken(), sentence.getFullSentence(), "VB-OBJ");
-								}
-								
-								// 1f) process prep phrases related to subjc
-								for(int ppIdx : subjc.getPrepPhrasesIdx()) {
-									List<Finding> temp = new ArrayList<>();
-									processPrepPhrase2_0(words, metadata, temp, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), words.get(subjc.getPosition()).getSemanticType(), "VB-OBJ-PP", negSource);
-								
-									for(Finding finding : temp) {
-										if(subjcFinding != null)
-											subjcFinding.children.add(finding); // add PP finding(s) as children of SUBJC
-										else if(subject != null)
-											subject.children.add(finding); // no SUBJC, so add findings as childred of SUBJ
-										else {
-											// can't skip and defer to PP processing below because processPrepPhrase2_0 has already added the PP token indexes to processedTokens
-											findings.add(finding);
-										}
-									}
-								}
-								
-								// 1g) process noun phrases related to subjc
-								if(subjc.getNounPhraseIdx() > -1) {
-									List<Finding> temp = new ArrayList<>();
-									
-									processNounPhrase2_1(words, metadata, temp, processedTokens, subjc.getNounPhraseIdx(), sentence.getFullSentence(), verbST, verbPhrase.isPhraseNegated(), "VB-OBJ-NP", negSource);
-									
-									for(Finding finding : temp) {
-										if(subjcFinding != null)
-											subjcFinding.children.add(finding); // add PP finding(s) as children of SUBJC
-										else if(subject != null)
-											subject.children.add(finding); // no SUBJC, so add findings as childred of SUBJ
-										else {
-											// can't skip and defer to NP processing below because processPrepPhrase2_0 has already added the PP token indexes to processedTokens
-											findings.add(finding);
-										}
-									}
-								}
-								
-								if(subjcFinding != null) {
-									if(subject != null)
-										subject.children.add(subjcFinding);
-									else
-										findings.add(subjcFinding);
-								}
-							}
-							
-							if(subject != null)
-								findings.add(subject);
-							
-						} else {
-							// log missing ST for verb
-							//String verb = (verbPhrase.getVerbs().size() == 1) ? words.get(verbPhrase.getVerbs().get(0).getPosition()).getToken() : verbPhrase.getVerbString();
-							logMissing(stCounts, verbPhrase.getVerbString()+"|VB");
-							logMissingST(verbPhrase.getVerbString(), "", sentence.getFullSentence(), "VB");
-						}
-					
-					case PREPOSITIONAL:
-					case INFINITIVE:
-						
-					default:
-						
-						break;
-				}
-				
-//				if(!findings.isEmpty()) {
-//					structured.data.add(findings);
-//				}
-			}
-			
-			// 2) loop through prep phrases to catch any that aren't grammatically-related to a verb phrase
-			negSource.clear();
-			for(int i=0; i < metadata.getPrepMetadata().size(); i++) {
-				List<Finding> temp = new ArrayList<>();
-				processPrepPhrase2_0(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), false, null, "PP", negSource);
-				for(Finding finding : temp)
-					findings.add(finding);
-			}
-			
-			// 3) loop through noun phrases to catch any that aren't grammatically-related to a verb phrase
-			negSource.clear();
-			for(int i=0; i < metadata.getNounMetadata().size(); i++) {
-				List<Finding> temp = new ArrayList<>();
-				processNounPhrase2_1(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), null, false, "NP", negSource);
-				for(Finding finding : temp)
-					findings.add(finding);
-			}
-			
-			negSource.clear();
-			// 4) process fragments when no metadata is present
-			if(metadata.getVerbMetadata().isEmpty() && metadata.getPrepMetadata().isEmpty() && metadata.getNounMetadata().isEmpty()) {
-				int size = -1;
-				// account for punctuation ending the sentence
-				if(words.get(words.size()-1).isPunctuation())
-					size = words.size() - 1;
-				else
-					size = words.size();
-				
-				for(int i=0; i < size; i++) {
-					String tokenST = words.get(i).getSemanticType();
-
-					// somewhat crude way to detect negation in a fragment.
-					// if a token matches a negation signal, notate the fragment as negated
-					// Ex. "PSA not stable."
-					if(i > 0 && Constants.NEGATION.matcher(words.get(i-1).getToken()).matches()) {
-						negSource.add("FRAG");
-					}
-					
-					if(tokenST != null) {
-						String attribute = getAttributeFromRedis(tokenST);
-						
-						if(attribute != null) {
-							Finding finding = new Finding(attribute, words.get(i).getToken(), "FRAG", negSource, null, null, tokenST);
-							findings.add(finding);
-							
-							processedTokens.add(i);
-						}
-					}
-				}
-			}
-			
-			// 5) process various regex patterns
-//			processRegex2(structured.data, sentence.getFullSentence());
-			
-//			if(writeLogs) {
-//				report2(structured, metadata);
-//				if(structured.data.isEmpty()) {
-//					unprocessedSentences.add(sentence.getFullSentence());
-//				}
-//			}
-			
-/*			try {
-				if(writeToMongo) {
-					//if(!structured.related.isEmpty() || !structured.unrelated.isEmpty() || !structured.regex.isEmpty()) {
-					if(!structured.data.isEmpty()) {
-						String json = gson.toJson(structured);
-						DBCollection coll = Constants.MongoDB.INSTANCE.getCollection("structured");
-						DBObject dbObject = (DBObject) JSON.parse(json);
-						coll.insert(dbObject);
-					}
-				}
-			} catch(Exception e) {
-				logger.error("buildStructuredOutput2(): writeToMongo {}", e);
-			}
-*/		
-			structured.findings = findings;
-			
-		} catch(Exception e) {
-			logger.error("buildStructuredOutput2(): {}", e);
+//		if(st == null) {
+//			//missingSTs.add(words.get(index).getToken() + "<>" + source);
+//			missingSTs.add(words.get(index).getToken());
+//		}
+		if(st == null) {
+			st = "unk";
 		}
 		
-		System.out.println(gson.toJson(structured));
-		return structured;
+		return st;
+	}
+	
+	private String getFindingType(String st) {
+		String ft = null;
+		
+		// don't bother looking up verbs; ex. demonstrate_present
+		if(st != null && st.indexOf('_') == -1) {
+			try(Jedis jedis = Constants.MyJedisPool.INSTANCE.getResource()) {
+				ft = jedis.get("st2:"+st);
+			}
+			
+			if(ft == null) {
+				//missingFTs.add(st);
+				ft = "UNKNOWN";
+			}
+		}
+		
+		return ft;
 	}
 	
 	// 12/15/2015 - 3rd attempt at processing structured data without left|right constructors.
 	// attempt to enforce a hierarchy to the results. Ex Admin of Drug is always the parent of a Temporal finding
-	public StructuredData2_0 buildStructuredData2_1(Sentence sentence, boolean writeToMongo) {
+	public List<StructuredData2_0> buildStructuredData2_0(Sentence sentence) {
 		
+		List<StructuredData2_0> structuredList = new ArrayList<>();
 		StructuredData2_0 structured = new StructuredData2_0();
 		
 		structured.patientId = sentence.getId();
@@ -697,6 +587,7 @@ public class StructuredOutputHelper {
 		structured.study = sentence.getStudy();
 		structured.date = sentence.getProcedureDate();
 		structured.sentence = sentence.getFullSentence();
+		structured.discreet = sentence.getDiscreet();
 		
 		// maintain lists of token indexes that have been processed to avoid duplicate findings.
 		List<Integer> processedTokens = new ArrayList<Integer>();
@@ -751,24 +642,22 @@ public class StructuredOutputHelper {
 						// Step 1: Do a little pre-work to store the semantic types for the verb phrase subject and verb.
 						//         Verb phrase subject and verb will each have, at most, one semantic type.
 						//         Because there can be more than one subject complement (object) in a verb phrase, each can have its own semantic type.
-						String subjST = (verbPhrase.getSubj() != null) ? words.get(verbPhrase.getSubj().getPosition()).getSemanticType() : null;
+						String subjST = (verbPhrase.getSubj() != null) ? getSemanticType(words, verbPhrase.getSubj().getPosition(), "VB-SUBJ") : null;
 						
 						String verbST = null;
 						// verbST will be either null, that of the only token, that of the entire phrase (if present), or that of
 						// the final token (if entire phrase has no ST)
 						if(verbPhrase.getVerbs().size() == 1) {
-							verbST = words.get(verbPhrase.getVerbs().get(0).getPosition()).getSemanticType();
+							verbST = getSemanticType(words, verbPhrase.getVerbs().get(0).getPosition(), "VB");
 						} else {
 							verbST = verbPhrase.getSemanticType();
 							
 							if(verbST == null)
-								verbST = words.get(verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPosition()).getSemanticType();
+								verbST = getSemanticType(words, verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPosition(), "VB");
 						}
-						// log missing ST for verb
-						if(verbST == null) {
-							logMissing(stCounts, verbPhrase.getVerbString()+"|VB");
-							logMissingST(verbPhrase.getVerbString(), "", sentence.getFullSentence(), "VB");
-							
+						if(verbST == null || verbST.indexOf('_') == -1) {
+							// TODO issue where our verb list (in Constants.java) contains a token that Stanford correctly tags as a non-verb based on context. Ex. "left nodule without change"
+							// the underscore check is a bandaid for that issue
 							// override ST if none specified
 							verbST = verbPhrase.getVerbString() + "_unknown";
 						}
@@ -782,7 +671,7 @@ public class StructuredOutputHelper {
 						
 						// 1a) generate finding for subj
 						if(subjST != null) {
-							String type = getAttributeFromRedis(subjST);
+							String type = getFindingType(subjST);
 							if(type != null) {
 								Finding subject = new Finding(type, verbPhrase.getSubj().getToken(), "VB-SUBJ", negSource, verbST.split("_")[0], verbST.split("_")[1], subjST);	
 								
@@ -793,12 +682,12 @@ public class StructuredOutputHelper {
 								// TODO should these be outside the type != null condition?
 								// process noun phrases related to subj
 								if(verbPhrase.getSubj().getNounPhraseIdx() > -1) {
-									parents = processNounPhrase2_1(words, metadata, parents, processedTokens, verbPhrase.getSubj().getNounPhraseIdx(), sentence.getFullSentence(), verbST, false, "VB-SUBJ", negSource);									
+									parents = processNounPhrase2_0(words, metadata, parents, processedTokens, verbPhrase.getSubj().getNounPhraseIdx(), sentence.getFullSentence(), verbST, false, "VB-SUBJ", negSource);									
 								}
 								
 								// process prep phrases related to subj
 								for(int ppIdx : verbPhrase.getSubj().getPrepPhrasesIdx()) {
-									parents = processPrepPhrase2_2(words, metadata, parents, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB-SUBJ", negSource);
+									parents = processPrepPhrase2_0(words, metadata, parents, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB-SUBJ", negSource);
 								}
 							}
 						}
@@ -806,20 +695,20 @@ public class StructuredOutputHelper {
 						// process prep phrases related to (final) verb (of phrase)
 						// Ex. He is on Lupron.
 						for(int ppIdx : verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPrepPhrasesIdx()) {					
-							parents = processPrepPhrase2_2(words, metadata, parents, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB", negSource);
+							parents = processPrepPhrase2_0(words, metadata, parents, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB", negSource);
 						}
 
 						// 1b) generate finding for subjc(s)
 						for(VerbPhraseToken subjc : verbPhrase.getSubjC()) {
-							String subjcST = words.get(subjc.getPosition()).getSemanticType();
+							String subjcST = getSemanticType(words, subjc.getPosition(), "VB-OBJ");
 												
 							if(subjcST != null) {
-								String type = getAttributeFromRedis(subjcST);
+								String type = getFindingType(subjcST);
 								if(type != null) {
 									
 									// process noun phrases related to subjc
 									if(subjc.getNounPhraseIdx() > -1) {
-										parents = processNounPhrase2_1(words, metadata, parents, processedTokens, subjc.getNounPhraseIdx(), sentence.getFullSentence(), verbST, verbPhrase.isPhraseNegated(), "VB-OBJ", negSource);
+										parents = processNounPhrase2_0(words, metadata, parents, processedTokens, subjc.getNounPhraseIdx(), sentence.getFullSentence(), verbST, verbPhrase.isPhraseNegated(), "VB-OBJ", negSource);
 									} else {
 										Finding subjcFinding = new Finding(type, subjc.getToken(), "VB-OBJ", negSource, verbST.split("_")[0], verbST.split("_")[1], subjcST);
 										
@@ -841,7 +730,7 @@ public class StructuredOutputHelper {
 									
 									// process prep phrases related to subjc
 									for(int ppIdx : subjc.getPrepPhrasesIdx()) {
-										parents = processPrepPhrase2_2(words, metadata, parents, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB-OBJ", negSource);
+										parents = processPrepPhrase2_0(words, metadata, parents, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB-OBJ", negSource);
 									}
 								}
 							}
@@ -867,11 +756,11 @@ public class StructuredOutputHelper {
 				if(!metadata.getNounMetadata().get(i).isWithinPP()) {
 					// this chunk of code will handle random noun phrases and those that are modified by a prep phrase
 					List<Finding> temp = new ArrayList<>();
-					processNounPhrase2_1(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), "null_null", false, null, negSource);
+					processNounPhrase2_0(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), "null_null", false, null, negSource);
 					
 					// process any prep phrases modifying the noun phrase
 					for(int j : metadata.getNounMetadata().get(i).getPrepPhrasesIdx()) {
-						temp = processPrepPhrase2_2(words, metadata, temp, processedTokens, j, sentence.getFullSentence(), false, "null_null", null, negSource);
+						temp = processPrepPhrase2_0(words, metadata, temp, processedTokens, j, sentence.getFullSentence(), false, "null_null", null, negSource);
 					}
 					
 					for(Finding finding : temp)
@@ -880,7 +769,6 @@ public class StructuredOutputHelper {
 			}
 			
 			// 3) loop through prep phrases to catch any that aren't grammatically-related to a verb phrase
-			// TODO negation
 			negSource.clear();
 			for(int i=0; i < metadata.getPrepMetadata().size(); i++) {
 				List<Finding> temp = new ArrayList<>();
@@ -888,12 +776,17 @@ public class StructuredOutputHelper {
 				// determine if token preceding the prep phrase is a finding candidate
 				List<PrepPhraseToken> prepPhrase = metadata.getPrepMetadata().get(i).getPhrase();
 				int ppPos = prepPhrase.get(0).getPosition();
+				
 				if(ppPos > 0 && !processedTokens.contains(ppPos-1)) {
 					// prep phrase does not begin the fragment AND we haven't already processed the preceding token (by virtue of it being within a noun phrase, for example)
 					String precedingToken = words.get(ppPos - 1).getToken();
-					String precedingTokenST = words.get(ppPos - 1).getSemanticType();
+					String precedingTokenST = getSemanticType(words, ppPos - 1, "PP");
 					
-					String type = getAttributeFromRedis(precedingTokenST);
+					if(Utils.checkForNegation(words, i)) {
+						negSource.add("PP");
+					}
+					
+					String type = getFindingType(precedingTokenST);
 					if(type != null) {
 						Finding child = new Finding(type, precedingToken, "PP", negSource, null, null, precedingTokenST);
 						temp.add(child);
@@ -901,746 +794,92 @@ public class StructuredOutputHelper {
 					}
 				}
 				
-				temp = processPrepPhrase2_2(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), false, "null_null", null, negSource);
+				temp = processPrepPhrase2_0(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), false, "null_null", null, negSource);
 				for(Finding finding : temp)
 					findings.add(finding);
 			}
 
 			negSource.clear();
-			// 4) process fragments when no metadata is present
-			if(metadata.getVerbMetadata().isEmpty() && metadata.getPrepMetadata().isEmpty() && metadata.getNounMetadata().isEmpty()) {
-				int size = -1;
-				// account for punctuation ending the sentence
-				if(words.get(words.size()-1).isPunctuation())
-					size = words.size() - 1;
-				else
-					size = words.size();
-				
-				for(int i=0; i < size; i++) {
-					String tokenST = words.get(i).getSemanticType();
+			
+			// 4) Final sweep through the sentence to pick up phrases not bounded by a known type (NP, PP, etc) such as "PSA not stable"
 
-					// somewhat crude way to detect negation in a fragment.
-					// if a token matches a negation signal, note the fragment as negated
-					// Ex. "PSA not stable."
-					if(i > 0 && Constants.NEGATION.matcher(words.get(i-1).getToken()).matches()) {
-						negSource.add("FRAG");
-					}
-					
-					if(tokenST != null) {
-						String type = getAttributeFromRedis(tokenST);
+			//if(metadata.getVerbMetadata().isEmpty() && metadata.getPrepMetadata().isEmpty() && metadata.getNounMetadata().isEmpty()) {
+				// account for punctuation ending the sentence
+				int length = words.get(words.size()-1).isPunctuation() ? words.size() - 1 : words.size(); 
+				
+				String source = (metadata.getVerbMetadata().isEmpty() && metadata.getPrepMetadata().isEmpty() && metadata.getNounMetadata().isEmpty()) ? "FRAG-NO-METADATA" : "FRAG";
+				
+				for(int i=0; i < length; i++) {
+					if(!processedTokens.contains(i)) {
+						String tokenST = getSemanticType(words, i, "FRAG");
+	
+						// somewhat crude way to detect negation in a fragment.
+						// if a token matches a negation signal, note the fragment as negated
+						// Ex. "PSA not stable."
+						try {
+							//if(Constants.NEGATION.matcher(words.get(i-1).getToken()).matches()) {
+							if(Utils.checkForNegation(words, i)) {
+								negSource.add("FRAG");
+							}
+						} catch(IndexOutOfBoundsException oob) { }
 						
-						if(type != null) {
-							Finding finding = new Finding(type, words.get(i).getToken(), "FRAG", negSource, null, null, tokenST);
-							findings.add(finding);
+						if(tokenST != null) {
+							String type = getFindingType(tokenST);
 							
-							processedTokens.add(i);
+							if(type != null) {
+								Finding finding = new Finding(type, words.get(i).getToken(), source, negSource, null, null, tokenST);
+								findings.add(finding);
+								
+								processedTokens.add(i);
+							}
 						}
 					}
 				}
-			}
+			//}
 
 			// 5) process various regex patterns
 			processRegex2_0(findings, sentence.getFullSentence());
 			
-//				if(writeLogs) {
-//					report2(structured, metadata);
-//					if(structured.data.isEmpty()) {
-//						unprocessedSentences.add(sentence.getFullSentence());
-//					}
-//				}
+			//structured.findings = findings;
 			
-/*			try {
-				if(writeToMongo) {
-					//if(!structured.related.isEmpty() || !structured.unrelated.isEmpty() || !structured.regex.isEmpty()) {
-					if(!structured.data.isEmpty()) {
-						String json = gson.toJson(structured);
-						DBCollection coll = Constants.MongoDB.INSTANCE.getCollection("structured");
-						DBObject dbObject = (DBObject) JSON.parse(json);
-						coll.insert(dbObject);
-					}
+			// quick and dirty way to multiple findings into distinct StructuredData2_0 objects
+			for(Finding finding : findings) {
+				StructuredData2_0 struct = StructuredData2_0.getInstance(structured);
+				
+				if(Constants.AGE_REGEX.matcher(finding.value.toString()).matches()) {
+					String[] arr = finding.value.toString().split("_");
+					finding.value = arr[0];
 				}
-			} catch(Exception e) {
-				logger.error("buildStructuredOutput2(): writeToMongo {}", e);
+				
+				struct.findings.add(finding);
+				struct.notation = finding.getNotationString(StructuredNotationReturnValue.VALUE);
+				struct.flat = finding.flatten();
+				structuredList.add(struct);
 			}
-*/		
-			structured.findings = findings;
 			
 		} catch(Exception e) {
 			logger.error("buildStructuredOutput2(): {}", e);
+			logger.error(sentence.getFullSentence());
 			e.printStackTrace();
 		}
 		
-		System.out.println(gson.toJson(structured));
-		return structured;
+		return structuredList;
 	}
 	
-	// first attempt at mapping structured data from semantic types alone (no constructor lookups at this stage)
-	private StructuredData buildStructuredData(Sentence sentence, boolean writeToMongo) {
-		
-		StructuredData structured = new StructuredData();
-		
-		structured.patientId = sentence.getId();
-		structured.practice = sentence.getPractice();
-		structured.study = sentence.getStudy();
-		structured.date = sentence.getProcedureDate();
-		structured.sentence = sentence.getFullSentence();
-		
-		// maintain lists of token indexes that have been processed to avoid duplicate findings.
-		List<Integer> processedTokens = new ArrayList<Integer>();
-		
-		Set<String> negSource = new HashSet<>();
-		
-		try {
-			SentenceMetadata metadata = sentence.getMetadata();
-			
-			/* Structured Metadata */
-			//structured.metadata.put("verbPhraseCount", String.valueOf(metadata.getVerbMetadata().size()));
-			
-			// Subject of a verb phrase equal to another verb phrase's subject complement (object). This is invalid and is tracked for algorithm cleanup purposes.
-			for(VerbPhraseMetadata vpm1 : metadata.getVerbMetadata()) {
-				if(vpm1.getSubj() != null) {
-					int subjIdx = vpm1.getSubj().getPosition();
-					for(VerbPhraseMetadata vpm2 : metadata.getVerbMetadata()) {
-						for(VerbPhraseToken subjc : vpm2.getSubjC()) {
-							if(subjIdx == subjc.getPosition()) {
-								//structured.metadata.put("subjEqSubjC", "Y");
-								break;
-							}
-						}
-					}
-				}
-			}	
-			/* End Structured Metadata */
-			
-			ArrayList<WordToken> words = sentence.getWordList();
-		
-			// 1) loop through verb phrases
-			for(VerbPhraseMetadata verbPhrase : metadata.getVerbMetadata()) {
-				Multimap<String, MapValue> findings = ArrayListMultimap.create();
-				negSource.clear();
-				
-				// Jan wanted to know which component of the verb phrase was negated for research purposes when looking at the structured data
-				if(verbPhrase.getSubj() != null && verbPhrase.getSubj().isNegated())
-					negSource.add("SUBJ");
-				for(VerbPhraseToken token : verbPhrase.getSubjC())
-					if(token.isNegated())
-						negSource.add("SUBJC");
-				for(VerbPhraseToken token : verbPhrase.getVerbs())
-					if(token.isNegated())
-						negSource.add("VB");
-				
-				switch(verbPhrase.getVerbClass()) {
-					case ACTION:
-					case LINKING_VERB:
-					case VERB_OF_BEING:
-					case MODAL_AUX:
-						
-						String subjST = (verbPhrase.getSubj() != null) ? words.get(verbPhrase.getSubj().getPosition()).getSemanticType() : null;
-						String verbST = null;
-						
-						// verbST will be either null, that of the only token, that of the entire phrase (if present), or that of
-						// the final token (if entire phrase has no ST)
-						if(verbPhrase.getVerbs().size() == 1) {
-							verbST = words.get(verbPhrase.getVerbs().get(0).getPosition()).getSemanticType();
-						} else {
-							verbST = verbPhrase.getSemanticType();
-							
-							if(verbST == null)
-								verbST = words.get(verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPosition()).getSemanticType();
-						}
-						
-						if(verbST != null) {
-							// 1a) generate finding for subj
-							if(subjST != null) {
-								String attribute = getAttributeFromRedis(subjST);
-								if(attribute != null) {
-									findings.put(attribute, new MapValue(verbPhrase.getSubj().getToken(), verbST.split("_")[1], subjST + "|" + verbST, verbPhrase.isPhraseNegated(), "VB-SUBJ", Joiner.on(',').join(negSource)));
-									processedTokens.add(verbPhrase.getSubj().getPosition());
-									//logFound(verbPhrase.getSubj().getToken(), subjST, subjST, verbPhrase.getSubj().getToken()+"|"+verbPhrase.getVerbString(), "VP", sentence.getFullSentence());
-								} else {
-									// no attribute for this ST
-									logMissing(relCounts, subjST);
-									logMissingEx(relByToken, verbPhrase.getSubj().getToken(), verbPhrase.getVerbString(), subjST, verbST, sentence.getFullSentence(), "VB-SUBJ");
-								}
-							} else {
-								if(verbPhrase.getSubj() != null) {
-									// subj exists, but has no ST
-									logMissing(stCounts, verbPhrase.getSubj().getToken() + "|" + words.get(verbPhrase.getSubj().getPosition()).getPOS());
-									logMissingST(verbPhrase.getSubj().getToken(), verbPhrase.getSubj().getToken()+"|"+verbPhrase.getVerbString(), sentence.getFullSentence(), "VB-SUBJ");
-								}
-							}
-							
-							// 1b) generate finding for subjc(s)
-							for(VerbPhraseToken subjc : verbPhrase.getSubjC()) {
-								Multimap<String, MapValue> temp = ArrayListMultimap.create();
-								String subjcST = words.get(subjc.getPosition()).getSemanticType();
-							
-								if(subjcST != null) {
-									String attribute = getAttributeFromRedis(subjcST);
-									if(attribute != null) {
-										temp.put(attribute, new MapValue(subjc.getToken(), verbST.split("_")[1], verbST + "|" + subjcST, verbPhrase.isPhraseNegated(), "VB-OBJ", Joiner.on(',').join(negSource)));
-										//logFound(subjc.getToken(), subjcST, verbST+"|"+subjcST, verbPhrase.getVerbString()+"|"+subjc.getToken(),"VP", sentence.getFullSentence());
-										processedTokens.add(subjc.getPosition());
-									} else {
-										logMissing(relCounts, subjcST);
-										logMissingEx(relByToken, verbPhrase.getVerbString(), subjc.getToken(), verbST, subjcST, sentence.getFullSentence(), "VB-OBJ");
-									}
-								} else {
-									logMissing(stCounts, subjc.getToken() + "|" + words.get(subjc.getPosition()).getPOS());
-									logMissingST(subjc.getToken(), verbPhrase.getVerbString()+"|"+subjc.getToken(), sentence.getFullSentence(), "VB-OBJ");
-								}
-								
-								// 1f) process prep phrases related to subjc
-								for(int ppIdx : subjc.getPrepPhrasesIdx()) {
-									processPrepPhraseST(words, metadata, temp, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), words.get(subjc.getPosition()).getSemanticType(), "VB-PP", negSource);
-								}
-								
-								// 1g) process noun phrases related to subjc
-								if(subjc.getNounPhraseIdx() > -1) {
-									processNounPhraseST(words, metadata, temp, processedTokens, subjc.getNounPhraseIdx(), sentence.getFullSentence(), verbST, verbPhrase.isPhraseNegated(), "VB-NP", negSource);
-								}
-								
-								if(!temp.isEmpty()) {
-									structured.data.add(temp);
-								}
-							}
-							
-						} else {
-							// log missing ST for verb
-							//String verb = (verbPhrase.getVerbs().size() == 1) ? words.get(verbPhrase.getVerbs().get(0).getPosition()).getToken() : verbPhrase.getVerbString();
-							logMissing(stCounts, verbPhrase.getVerbString()+"|VB");
-							logMissingST(verbPhrase.getVerbString(), "", sentence.getFullSentence(), "VB");
-						}
-						
-						if(verbPhrase.getSubj() != null) {
-							// 1c) process prep phrases related to subj
-							for(int ppIdx : verbPhrase.getSubj().getPrepPhrasesIdx()) {
-								// TODO apply negation to verb phrase as a whole and pass to processPrepPhrase()
-								// 9/23/15 - changed to send verbST rather than null to support sentences where SUBJ and VB are one and the same. "Is on Lupron."
-								processPrepPhraseST(words, metadata, findings, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB-PP", negSource);
-							}
-							// 1d) process noun phrases related to subj
-							if(verbPhrase.getSubj().getNounPhraseIdx() > -1) {
-								processNounPhraseST(words, metadata, findings, processedTokens, verbPhrase.getSubj().getNounPhraseIdx(), sentence.getFullSentence(), null, false, "VB-NP", negSource);
-							}
-						}
-				
-						// 1e) process prep phrases related to (final) verb (of phrase)
-						for(int ppIdx : verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPrepPhrasesIdx()) {
-							processPrepPhraseST(words, metadata, findings, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB-PP", negSource);
-						}
-						
-						// this was moved up within the SUBJC processing loop to improve accuracy when multiple SUBJCs. appears to 
-						// be having other positive side effects as well by grouping related findings.
-//						for(VerbPhraseToken subjc : verbPhrase.getSubjC()) {
-//							// 1f) process prep phrases related to subjc
-//							for(int ppIdx : subjc.getPrepPhrasesIdx()) {
-//								processPrepPhraseST(words, metadata, findings, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), words.get(subjc.getPosition()).getSemanticType(), "VB-PP", negSource);
-//							}
-//							
-//							// 1g) process noun phrases related to subjc
-//							if(subjc.getNounPhraseIdx() > -1) {
-//								processNounPhraseST(words, metadata, findings, processedTokens, subjc.getNounPhraseIdx(), sentence.getFullSentence(), verbST, verbPhrase.isPhraseNegated(), "VB-NP", negSource);
-//							}
-//						}
-						
-					case PREPOSITIONAL:
-					case INFINITIVE:
-						
-					default:
-						
-						break;
-				}
-				
-				if(!findings.isEmpty()) {
-					structured.data.add(findings);
-				}
-			}
-			
-			// 2) loop through prep phrases to catch any that aren't grammatically-related to a verb phrase
-			negSource.clear();
-			for(int i=0; i < metadata.getPrepMetadata().size(); i++) {
-				Multimap<String, MapValue> temp = ArrayListMultimap.create();
-				processPrepPhraseST(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), false, null, "PP", negSource);
-				if(!temp.isEmpty())
-					structured.data.add(temp);
-			}
-			
-			// 3) loop through noun phrases to catch any that aren't grammatically-related to a verb phrase
-			negSource.clear();
-			for(int i=0; i < metadata.getNounMetadata().size(); i++) {
-				Multimap<String, MapValue> temp = ArrayListMultimap.create();
-				processNounPhraseST(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), null, false, "NP", negSource);
-				if(!temp.isEmpty())
-					structured.data.add(temp);
-			}
-			
-			// 4) process fragments when no metadata is present
-			if(metadata.getVerbMetadata().isEmpty() && metadata.getPrepMetadata().isEmpty() && metadata.getNounMetadata().isEmpty()) {
-				int size = -1;
-				// account for punctuation ending the sentence
-				if(words.get(words.size()-1).isPunctuation())
-					size = words.size() - 1;
-				else
-					size = words.size();
-				
-				// TODO possibly expand this to look for negation anywhere in the fragment and apply downstream.
-				// Ex. "PSA not stable." <-- does not capture negation currently.
-				boolean negated = Constants.NEGATION.matcher(words.get(0).getToken()).matches();
-				
-				for(int i=0; i < size; i++) {
-					String tokenST = words.get(i).getSemanticType();
-					
-					if(tokenST != null) {
-						String attribute = getAttributeFromRedis(tokenST);
-						
-						if(attribute != null) {
-							Multimap<String, MapValue> temp = ArrayListMultimap.create();
-							//temp.put(attribute, new MapValue(words.get(i).getToken(), negated ? ABSENCE_QUALIFIER : attribute[1], "|" + rightST, negated, "FRAG", null));
-							temp.put(attribute, new MapValue(words.get(i).getToken(), null, tokenST, negated, "FRAG", null));
-							processedTokens.add(i);
-							structured.data.add(temp);
-						}
-					}
-				}
-			}
-			
-			// 5) process various regex patterns
-			processRegex2(structured.data, sentence.getFullSentence());
-			
-			if(writeLogs) {
-				report2(structured, metadata);
-				if(structured.data.isEmpty()) {
-					unprocessedSentences.add(sentence.getFullSentence());
-				}
-			}
-			
-			try {
-				if(writeToMongo) {
-					//if(!structured.related.isEmpty() || !structured.unrelated.isEmpty() || !structured.regex.isEmpty()) {
-					if(!structured.data.isEmpty()) {
-						String json = gson.toJson(structured);
-						DBCollection coll = Constants.MongoDB.INSTANCE.getCollection("structured");
-						DBObject dbObject = (DBObject) JSON.parse(json);
-						coll.insert(dbObject);
-					}
-				}
-			} catch(Exception e) {
-				logger.error("buildStructuredOutput2(): writeToMongo {}", e);
-			}
-		} catch(Exception e) {
-			logger.error("buildStructuredOutput2(): {}", e);
-		}
-		
-		return structured;
-	}
-	
-	public StructuredData process2(Sentence sentence, boolean writeToMongo) {
-		// this is used by the camel process
-		//System.out.println("Calling StructuredOutputHelper.process2() for sentence: " + sentence.getFullSentence());
-		
-		if(writeLogs) {
-			initReports("scott", "test");
-			
-			String[] headers = new String[Headers.values().length];
-			int j = 0;
-			for(Headers header : Headers.values()) {
-				headers[j] = header.name();
-				j++;
-			}
-			report.writeNext(headers);
-		}
-		
-		StructuredData output = buildStructuredOutput2(sentence, writeToMongo);
-		
-		if(writeLogs) {
-			writeLogs(buildReportPath("scott", "test"));
-			try {
-				report.close();
-			} catch(Exception e) { e.printStackTrace(); }
-		}
-		return output;
-	}
-	
-	public void testStructured2_0(Sentence sentence) {
-		buildStructuredData2_1(sentence, false);
-	}
-	
-	public StructuredData processST(Sentence sentence, boolean writeToMongo) {
-		// this is used by the camel process
-		//System.out.println("Calling StructuredOutputHelper.process2() for sentence: " + sentence.getFullSentence());
-		
-		if(writeLogs) {
-			initReports("scott", "test");
-			
-			String[] headers = new String[Headers.values().length];
-			int j = 0;
-			for(Headers header : Headers.values()) {
-				headers[j] = header.name();
-				j++;
-			}
-			report.writeNext(headers);
-		}
-		
-		StructuredData output = buildStructuredData(sentence, writeToMongo);
-		
-		if(writeLogs) {
-			writeLogs(buildReportPath("scott", "test"));
-			try {
-				report.close();
-			} catch(Exception e) { e.printStackTrace(); }
-		}
-		return output;
-	}
-	
-	// this only exists to support showing JSON on the annotation tool website because I don't have
-	// time to figure out the Jersey built-in JSON unmarshalling in JAXB
-	public String processReturnJSON(Sentence sentence, boolean writeToMongo) {
-		return gson.toJson(buildStructuredOutput2(sentence, writeToMongo));
-	}
-	
-	// also used by the web interface. will eventually become the default.
-	public String processStructured2_0(Sentence sentence, boolean writeToMongo) {
-		return gson.toJson(buildStructuredData2_1(sentence, writeToMongo));
-	}
-	
-	public void process2(String practice, String study, int limit, boolean writeToMongo, boolean medsOnly) {
-		
-		//long startTime = Constants.getTime();
-		
-		try {
-			if(writeLogs) {
-				initReports(practice, study);
-				
-				String[] headers = new String[Headers.values().length];
-				int j = 0;
-				for(Headers header : Headers.values()) {
-					headers[j] = header.name();
-					j++;
-				}
-				report.writeNext(headers);
-			}
-			
-			if(medsOnly) {
-				getMeds(practice);
-			} else {
-				DBCollection coll = Constants.MongoDB.INSTANCE.getCollection("annotations");
-				
-				DBObject query = QueryBuilder.start()
-						.put("practice").is(practice)
-						.put("study").is(study)
-						.get();
-				
-				DBCursor cursor = null;
-				
-				if(limit == -1)
-					cursor = coll.find(query);
-				else
-					cursor = coll.find(query).limit(limit);
-				
-				int count = 0, cursorSize = cursor.size();
-				
-				while(cursor.hasNext()) {
-					if(count++ % 100 == 0)
-						System.out.println(count + " / " + cursorSize);
-					
-					BasicDBObject obj = (BasicDBObject) cursor.next();
-					Sentence sentence = gson.fromJson(obj.toString(), Sentence.class);
-					
-					buildStructuredOutput2(sentence, writeToMongo);
-					//System.out.println(foo);
-				}
-				
-				cursor.close();
-				
-				writeLogs(buildReportPath(practice, study));
-			}
-			
-			//System.out.println(Constants.formatTime((Constants.getTime() - startTime)/1000.0));
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			Constants.MongoDB.INSTANCE.close();
-			try {
-				report.close();
-			} catch(Exception e) { e.printStackTrace(); }
-		}
-	}
-	
-	public void buildStructuredReportOnly(String practice, String study, int limit, boolean includeMeds, List<String> whitelist) {
-		CSVWriter structuredReport = null;
-		
-		try {
-			String fileId = practice + "_" + study + "_" + new SimpleDateFormat("MM-dd-yyyy-HH:mm").format(new Date());
-			
-			try {
-				structuredReport = new CSVWriter(new FileWriter(buildReportPath(practice, study) + "structured_" + fileId + ".csv"), ',');
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-			
-			String[] headers = new String[Headers.values().length];
-			int j = 0;
-			for(Headers header : Headers.values()) {
-				headers[j] = header.name();
-				j++;
-			}
-			structuredReport.writeNext(headers);
-			
-			if(includeMeds) {
-//				getMeds(practice);
-			}
-			
-			else {
-				DBCollection coll = Constants.MongoDB.INSTANCE.getCollection("structured");
-				
-				DBObject query = QueryBuilder.start()
-						.put("practice").is(practice)
-						.put("study").is(study)
-						.get();
-				
-				DBCursor cursor = null;
-				
-				if(limit == -1)
-					cursor = coll.find(query);
-				else
-					cursor = coll.find(query).limit(limit);
-				
-				int count = 0, cursorSize = cursor.size();
-				
-				while(cursor.hasNext()) {
-					if(count++ % 100 == 0)
-						System.out.println(count + " / " + cursorSize);
-					
-					BasicDBObject obj = (BasicDBObject) cursor.next();
-					StructuredData structured = gson.fromJson(obj.toString(), StructuredData.class);
-					
-					processStructuredEntry(structured, structuredReport, whitelist);
-				}
-				
-				cursor.close();
-			}
-					
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			//Constants.MongoDB.INSTANCE.close();
-			try {
-				structuredReport.close();
-			} catch(Exception e) { e.printStackTrace(); }
-		}
-	}
-	
-	private void processPrepPhraseST(ArrayList<WordToken> words, SentenceMetadata metadata, Multimap<String, MapValue> findings, List<Integer> processedTokens, int ppIdx, String fullSentence, boolean verbNegated, String verbST, String source, Set<String> negSource) {
-		// Processed as pairs relating to the preposition (ST1|ST2)
-		// The preposition is always ST1 and each successive token in the PP is ST2.
-		// E.g. "June is my favorite month [of the year]."
-		// Constructors will be queried with the corresponding STs for "of|year" ("of|the" will fail the test that requires ST2 to be an OBJ of the PP). 
-		// unless... e.g. "[with [prostate cancer]]"
-		// Constructors will be queried with the corresponding STs for "with|prostate cancer", i.e ST2 will represent the noun phrase rather than 
-		// the individual tokens of which it is comprised.
-		
-		List<PrepPhraseToken> prepPhrase = metadata.getPrepMetadata().get(ppIdx).getPhrase();
-		
-		String prepTokenST = words.get(prepPhrase.get(0).getPosition()).getSemanticType();
-		
-		//if(prepTokenST != null) {
-			// loop through each member of the prep phrase after the initial preposition
-			for(int i=1; i < prepPhrase.size(); i++) {
-				PrepPhraseToken ppToken = prepPhrase.get(i);
-				
-				if(!processedTokens.contains(ppToken.getPosition())) { // avoid re-processing a token
-					// is the token a prep phrase object or a member of a noun phrase?
-					int npIdx = ppToken.getNounPhraseIdx();
-					
-					if(words.get(ppToken.getPosition()).isPrepPhraseObject() || npIdx > -1) { 
-						String tokenST = words.get(ppToken.getPosition()).getSemanticType();
-						String token = words.get(ppToken.getPosition()).getToken();
-						source = npIdx > -1 ? "VB-NP" : source;
-						boolean negated = verbNegated;
-						
-						if(tokenST != null) {
-							String attribute = getAttributeFromRedis(tokenST);
-							if(attribute != null) {
-								//logFound(objToken, objTokenST, prepTokenST+"|"+objTokenST, prepPhrase.get(0).getToken()+"|"+objToken, "PP", fullSentence);
-								
-								if(metadata.getPrepMetadata().get(ppIdx).isNegated()) {
-									negSource.add("PP");
-									negated = true;
-								}
-								if(npIdx > -1 && metadata.getNounMetadata().get(npIdx).isNegated()) {
-									negSource.add("NP");
-									negated = true;
-								}
-								String temp = verbST + "|" + prepTokenST + "|" + tokenST;
-								findings.put(attribute, new MapValue(token, temp, temp, negated, source, Joiner.on(',').join(negSource)));
-								processedTokens.add(ppToken.getPosition());
-								
-							} else {
-								logMissing(relCounts, tokenST);
-								//logMissingEx(relByToken, prepPhrase.get(0).getToken(), objToken, prepTokenST, objTokenST, fullSentence, "PP");
-							}
-						} else {
-							logMissing(stCounts, ppToken.getToken()+"|"+words.get(ppToken.getPosition()).getPOS());
-							logMissingST(token, prepPhrase.get(0).getToken()+"|"+token, fullSentence, source);
-						}
-					}
-				}
-			}
-			
-		//} else {
-		//	logMissing(stCounts, prepPhrase.get(0).getToken()+"|"+words.get(prepPhrase.get(0).getPosition()).getPOS());
-		//	logMissingST(prepPhrase.get(0).getToken(), "", fullSentence, "PP");
-		//}
-		
-	}
-	
-	private void processPrepPhrase2_0(ArrayList<WordToken> words, SentenceMetadata metadata, List<Finding> findings, List<Integer> processedTokens, int ppIdx, String fullSentence, boolean verbNegated, String verbST, String source, Set<String> negSource) {
+	private List<Finding> processPrepPhrase2_0(ArrayList<WordToken> words, SentenceMetadata metadata, List<Finding> parents, List<Integer> processedTokens, int ppIdx, String fullSentence, boolean verbNegated, String verbST, String source, Set<String> negSource) {
 		// in 2.0, prep phrases kind of act like connective tissue between verb components and noun phrases
 		
 		List<PrepPhraseToken> prepPhrase = metadata.getPrepMetadata().get(ppIdx).getPhrase();
-		
-		String prepTokenST = words.get(prepPhrase.get(0).getPosition()).getSemanticType();
-		
-		// loop through each member of the prep phrase after the initial preposition
-		for(int i=1; i < prepPhrase.size(); i++) {
-			PrepPhraseToken ppToken = prepPhrase.get(i);
-			
-			if(!processedTokens.contains(ppToken.getPosition())) { // avoid re-processing a token
-				int npIdx = ppToken.getNounPhraseIdx();
-				// is the token within a noun phrase?
-				if(npIdx > -1) {
-					processNounPhrase2_0(words, metadata, findings, processedTokens, npIdx, fullSentence, null, false, "VB-NP", negSource);
-				} else if(words.get(ppToken.getPosition()).isPrepPhraseObject() || npIdx > -1) { 
-					String tokenST = words.get(ppToken.getPosition()).getSemanticType();
-					String token = words.get(ppToken.getPosition()).getToken();
-
-					if(tokenST != null) {
-						String attribute = getAttributeFromRedis(tokenST);
-						if(attribute != null) {
-							if(metadata.getPrepMetadata().get(ppIdx).isNegated()) {
-								negSource.add("PP");
-							}
-							
-							String temp = verbST + "|" + prepTokenST + "|" + tokenST;
-							String verb = null, verbTense = null;
-							if(verbST != null) {
-								String[] array = verbST.split("_");
-								verb = array[0];
-								verbTense = array[1];
-							}
-							Finding finding = new Finding(attribute, token, source, negSource, verb, verbTense, temp);
-							
-							//if(parent == null) {
-								findings.add(finding);
-							//} else {
-							//	parent.children.add(child);
-							//}
-							
-							processedTokens.add(ppToken.getPosition());
-							
-						} else {
-							logMissing(relCounts, tokenST);
-							//logMissingEx(relByToken, prepPhrase.get(0).getToken(), objToken, prepTokenST, objTokenST, fullSentence, "PP");
-						}
-					} else {
-						logMissing(stCounts, ppToken.getToken()+"|"+words.get(ppToken.getPosition()).getPOS());
-						logMissingST(token, prepPhrase.get(0).getToken()+"|"+token, fullSentence, source);
-					}
-				}
-			}
-		}	
-	}
-	
-	private List<Finding> processPrepPhrase2_1(ArrayList<WordToken> words, SentenceMetadata metadata, List<Finding> parents, List<Integer> processedTokens, int ppIdx, String fullSentence, boolean verbNegated, String verbST, String source, Set<String> negSource) {
-		// in 2.0, prep phrases kind of act like connective tissue between verb components and noun phrases
-		
-		List<PrepPhraseToken> prepPhrase = metadata.getPrepMetadata().get(ppIdx).getPhrase();
-		
-		String prepTokenST = words.get(prepPhrase.get(0).getPosition()).getSemanticType();
-		
-		List<Finding> newParents = new ArrayList<>();
-		
-		// loop through each member of the prep phrase after the initial preposition
-		for(int i=1; i < prepPhrase.size(); i++) {
-			PrepPhraseToken ppToken = prepPhrase.get(i);
-			
-			if(!processedTokens.contains(ppToken.getPosition())) { // avoid re-processing a token
-				int npIdx = ppToken.getNounPhraseIdx();
-				// is the token within a noun phrase?
-				if(npIdx > -1) {
-					//int oldCount = countFindings(parents);
-					
-					parents = processNounPhrase2_1(words, metadata, parents, processedTokens, npIdx, fullSentence, verbST, false, source, negSource);
-
-					// only add to newParents if processNounPhrase2_1() altered the parents list
-					//if(countFindings(parents) > oldCount) {
-						for(Finding parent : parents) {
-							newParents.add(parent);
-						}
-					//}
-				} else if(words.get(ppToken.getPosition()).isPrepPhraseObject()) {
-					String tokenST = words.get(ppToken.getPosition()).getSemanticType();
-					String token = words.get(ppToken.getPosition()).getToken();
-
-					if(tokenST != null) {
-						String type = getAttributeFromRedis(tokenST);
-						if(type != null) {
-							if(metadata.getPrepMetadata().get(ppIdx).isNegated()) {
-								negSource.add("PP");
-							}
-							
-							String temp = verbST + "|" + prepTokenST + "|" + tokenST;
-							
-							Finding child = new Finding(type, token, source, negSource, verbST.split("_")[0], verbST.split("_")[1], temp);
-							
-							if(parents.size() == 0) {
-								newParents.add(child);
-							} else {
-								for(Finding parent : parents) {
-									if(parentFindings.contains(type.toLowerCase())) { // PP object is a top-level finding
-										child.children.add(parent);
-										parent = child;
-									} else {
-										parent.children.add(child);
-									}
-									newParents.add(parent);
-								}
-							}
-							processedTokens.add(ppToken.getPosition());
-							
-						} else {
-							//logMissing(relCounts, tokenST);
-						}
-					} else {
-						//logMissing(stCounts, ppToken.getToken()+"|"+words.get(ppToken.getPosition()).getPOS());
-						//logMissingST(token, prepPhrase.get(0).getToken()+"|"+token, fullSentence, source);
-					}
-				}
-			}
-		}
-		
-		if(newParents.isEmpty())
-			return parents;
-		else
-			return newParents;
-	}
-	
-	private List<Finding> processPrepPhrase2_2(ArrayList<WordToken> words, SentenceMetadata metadata, List<Finding> parents, List<Integer> processedTokens, int ppIdx, String fullSentence, boolean verbNegated, String verbST, String source, Set<String> negSource) {
-		// in 2.0, prep phrases kind of act like connective tissue between verb components and noun phrases
-		
-		List<PrepPhraseToken> prepPhrase = metadata.getPrepMetadata().get(ppIdx).getPhrase();
-		
-		String prepTokenST = words.get(prepPhrase.get(0).getPosition()).getSemanticType();
-		
-		List<Finding> newParents = new ArrayList<>();
-		List<Integer> processedNounPhrases = new ArrayList<>();
 		
 		source = (source == null ? "PP" : source + "-PP");
 		
 		if(metadata.getVerbMetadata().size() == 0)
 			source += "-noVB";
+		
+		String prepTokenST = getSemanticType(words, prepPhrase.get(0).getPosition(), source);
+		
+		List<Finding> newParents = new ArrayList<>();
+		List<Integer> processedNounPhrases = new ArrayList<>();
 		
 		// loop through each member of the prep phrase after the initial preposition
 		for(int i=1; i < prepPhrase.size(); i++) {
@@ -1652,10 +891,10 @@ public class StructuredOutputHelper {
 				//int oldCount = countFindings(parents);
 				
 				//parents = processNounPhrase2_1(words, metadata, parents, processedTokens, npIdx, fullSentence, verbST, false, source, negSource);
-				List<Finding> temp = processNounPhrase2_1(words, metadata, parents, processedTokens, npIdx, fullSentence, verbST, false, source, negSource);
+				List<Finding> temp = processNounPhrase2_0(words, metadata, parents, processedTokens, npIdx, fullSentence, verbST, false, source, negSource);
 				processedNounPhrases.add(npIdx);
 				
-				// only add to newParents if processNounPhrase2_1() altered the parents list
+				// only add to newParents if processNounPhrase2_0() altered the parents list
 				//if(countFindings(parents) > oldCount) {
 					for(Finding item : temp) {
 						newParents.add(item);
@@ -1665,11 +904,11 @@ public class StructuredOutputHelper {
 				if(words.get(ppToken.getPosition()).isPrepPhraseObject() && // only process PP objects 
 				  !processedTokens.contains(ppToken.getPosition())) {       // avoid re-processing a token
 					
-					String tokenST = words.get(ppToken.getPosition()).getSemanticType();
+					String tokenST = getSemanticType(words, ppToken.getPosition(), source);
 					String token = words.get(ppToken.getPosition()).getToken();
 
 					if(tokenST != null) {
-						String type = getAttributeFromRedis(tokenST);
+						String type = getFindingType(tokenST);
 						if(type != null) {
 							if(metadata.getPrepMetadata().get(ppIdx).isNegated()) {
 								negSource.add("PP");
@@ -1696,13 +935,7 @@ public class StructuredOutputHelper {
 								}
 							}
 							processedTokens.add(ppToken.getPosition());
-							
-						} else {
-							//logMissing(relCounts, tokenST);
 						}
-					} else {
-						//logMissing(stCounts, ppToken.getToken()+"|"+words.get(ppToken.getPosition()).getPOS());
-						//logMissingST(token, prepPhrase.get(0).getToken()+"|"+token, fullSentence, source);
 					}
 				}
 			}
@@ -1731,106 +964,7 @@ public class StructuredOutputHelper {
 		return count;
 	}
 	
-	private void processNounPhrase2_0(ArrayList<WordToken> words, SentenceMetadata metadata, List<Finding> findings, List<Integer> processedTokens, int npIdx, String fullSentence, String leftST, boolean leftNegated, String source, Set<String> negSource) {
-
-		// leftST represents the ST for token(s) that may occur before this noun phrase
-		// the example used is "He is having abdominal pain."
-		// in this case, leftST would be supplied as the ST for "is having"
-		// for noun phrases floating off on their own, leftST will be null
-		
-		//if(!processedNounPhrases.contains(npIdx)) {
-			
-			//String npST = metadata.getNounMetadata().get(npIdx).getSemanticType();
-			//String npString = metadata.getNounMetadata().get(npIdx).getNounPhraseString();
-//			boolean negated = metadata.getNounMetadata().get(npIdx).isNegated() || leftNegated;
-			
-			if(metadata.getVerbMetadata().size() == 0)
-				source = "NP-noVB";
-			if(metadata.getNounMetadata().get(npIdx).isNegated())
-				negSource.add("NP");
-			
-			// first query constructors by ST of entire noun phrase, if present
-			// this is sort of another cross-border situation
-//			if(leftST != null && npST != null) {
-//				String[] attribute = getConstructor(leftST + "|" + npST);
-//				
-//				if(attribute != null) {
-//					list.put(attribute[0], new MapValue(npString, negated ? ABSENCE_QUALIFIER : attribute[1], leftST + "|" + npST, negated, source, Joiner.on(',').join(negSource)));
-//					processedNounPhrases.add(npIdx);
-//					logFound(npString, npST, leftST+"|"+npST, "", "NP", fullSentence);
-//				} else {
-//					// catch situation such as "no bone pain" fragment. on hold because there is no way to know which structured attribute to use (e.g. Clinical Finding).
-//					// possibly the only way to handle this is with a constructor.
-//					//if(metadata.getNounMetadata().get(npIdx).isNegated()) {
-//					//	list.put(attribute[0], new MapValue(npString, attribute[1], leftST + "|" + npST, true));
-//					//}
-//					logMissing(relCounts, leftST + "|" + npST);
-//					logMissingEx(relByToken, "", npString, leftST, npST, fullSentence, "NP");
-//				}
-				
-			// TODO should we first check leftST against phraseST and if no constructor hit then default to the below? 
-	//		} else {
-			
-				// log the fact that the entire NP did not have a semantic type
-				//if(npST == null) {
-				//	logMissing(stCounts, npString);
-					//logMissingST(npString, "", fullSentence, "NP"); // commented out for now as it could be very chatty
-				//}
-				
-				List<GenericToken> nounPhrase = metadata.getNounMetadata().get(npIdx).getPhrase();
-				Finding parent = null;
-				
-				GenericToken head = nounPhrase.get(nounPhrase.size()-1);
-				String headST = words.get(nounPhrase.get(nounPhrase.size()-1).getPosition()).getSemanticType();
-				
-				if(headST != null && !processedTokens.contains(head.getPosition())) {
-					String headType = getAttributeFromRedis(headST);
-					if(headType != null) {
-						// TODO verb and verbTense
-						parent = new Finding(headType, head.getToken(), source, negSource, "", "", headST);
-						
-						processedTokens.add(head.getPosition());
-					}
-				}
-
-				// process remaining non-head members of the noun phrase
-				for(int i=0; i < nounPhrase.size()-1; i++) {
-					GenericToken token = nounPhrase.get(i);
-					if(!processedTokens.contains(token.getPosition())) { // avoid re-processing a token
-						String tokenST = words.get(token.getPosition()).getSemanticType();
-						
-						if(tokenST != null) {
-							String type = getAttributeFromRedis(tokenST);
-							if(type != null) {
-								// TODO verb and verbTense
-								Finding child = new Finding(type, token.getToken(), source, negSource, "", "", tokenST);
-								
-								processedTokens.add(token.getPosition());
-								
-								if(parent == null) {
-									findings.add(child);
-								} else {
-									parent.children.add(child);
-								}
-								
-							} else {
-								logMissing(relCounts, tokenST);
-								//logMissingEx(relByToken, nounPhrase.get(i).getToken(), finalToken, tokenST, finalTokenST, fullSentence, "NP");
-							}
-						} else {
-							logMissing(stCounts, token+"|"+words.get(token.getPosition()).getPOS());
-							logMissingST(token.getToken(), token.getToken(), fullSentence, source);
-						}
-					}
-				}
-				
-				if(parent != null) {
-					findings.add(parent);
-				}
-
-	}
-	
-	private List<Finding> processNounPhrase2_1(ArrayList<WordToken> words, SentenceMetadata metadata, List<Finding> parents, List<Integer> processedTokens, int npIdx, String fullSentence, String verbST, boolean verbNegated, String source, Set<String> negSource) {
+	private List<Finding> processNounPhrase2_0(ArrayList<WordToken> words, SentenceMetadata metadata, List<Finding> parents, List<Integer> processedTokens, int npIdx, String fullSentence, String verbST, boolean verbNegated, String source, Set<String> negSource) {
 
 		if(metadata.getNounMetadata().get(npIdx).isNegated())
 			negSource.add("NP");
@@ -1866,10 +1000,10 @@ public class StructuredOutputHelper {
 		for(int i=nounPhrase.size()-1; i >= 0; i--) {
 			GenericToken token = nounPhrase.get(i);
 			if(!processedTokens.contains(token.getPosition())) { // avoid re-processing a token
-				String tokenST = words.get(token.getPosition()).getSemanticType();
+				String tokenST = getSemanticType(words, token.getPosition(), source);
 				
 				if(tokenST != null) {
-					String type = getAttributeFromRedis(tokenST);
+					String type = getFindingType(tokenST);
 					if(type != null) {
 						Finding child = new Finding(type, token.getToken(), source, negSource, verbST.split("_")[0], verbST.split("_")[1], tokenST);
 						
@@ -1916,111 +1050,7 @@ public class StructuredOutputHelper {
 		return parents;
 	}
 	
-	private void processNounPhraseST(ArrayList<WordToken> words, SentenceMetadata metadata, Multimap<String, MapValue> findings, List<Integer> processedTokens, int npIdx, String fullSentence, String leftST, boolean leftNegated, String source, Set<String> negSource) {
-
-		// leftST represents the ST for token(s) that may occur before this noun phrase
-		// the example used is "He is having abdominal pain."
-		// in this case, leftST would be supplied as the ST for "is having"
-		// for noun phrases floating off on their own, leftST will be null
-		
-		//if(!processedNounPhrases.contains(npIdx)) {
-			
-			//String npST = metadata.getNounMetadata().get(npIdx).getSemanticType();
-			//String npString = metadata.getNounMetadata().get(npIdx).getNounPhraseString();
-			boolean negated = metadata.getNounMetadata().get(npIdx).isNegated() || leftNegated;
-			
-			// first query constructors by ST of entire noun phrase, if present
-			// this is sort of another cross-border situation
-//			if(leftST != null && npST != null) {
-//				String[] attribute = getConstructor(leftST + "|" + npST);
-//				
-//				if(attribute != null) {
-//					list.put(attribute[0], new MapValue(npString, negated ? ABSENCE_QUALIFIER : attribute[1], leftST + "|" + npST, negated, source, Joiner.on(',').join(negSource)));
-//					processedNounPhrases.add(npIdx);
-//					logFound(npString, npST, leftST+"|"+npST, "", "NP", fullSentence);
-//				} else {
-//					// catch situation such as "no bone pain" fragment. on hold because there is no way to know which structured attribute to use (e.g. Clinical Finding).
-//					// possibly the only way to handle this is with a constructor.
-//					//if(metadata.getNounMetadata().get(npIdx).isNegated()) {
-//					//	list.put(attribute[0], new MapValue(npString, attribute[1], leftST + "|" + npST, true));
-//					//}
-//					logMissing(relCounts, leftST + "|" + npST);
-//					logMissingEx(relByToken, "", npString, leftST, npST, fullSentence, "NP");
-//				}
-				
-			// TODO should we first check leftST against phraseST and if no constructor hit then default to the below? 
-	//		} else {
-			
-				// log the fact that the entire NP did not have a semantic type
-				//if(npST == null) {
-				//	logMissing(stCounts, npString);
-					//logMissingST(npString, "", fullSentence, "NP"); // commented out for now as it could be very chatty
-				//}
-				
-				List<GenericToken> nounPhrase = metadata.getNounMetadata().get(npIdx).getPhrase();
-				// query every token of the NP against the final token
-			//	String finalTokenST = words.get(nounPhrase.get(nounPhrase.size()-1).getPosition()).getSemanticType();
-			//	String finalToken = nounPhrase.get(nounPhrase.size()-1).getToken();
-				
-				//if(finalTokenST != null) {
-					for(GenericToken token : nounPhrase) {
-						if(!processedTokens.contains(token.getPosition())) { // avoid re-processing a token
-							String tokenST = words.get(token.getPosition()).getSemanticType();
-							//String token = nounPhrase.get(i).getToken();
-							
-							if(tokenST != null) {
-								String attribute = getAttributeFromRedis(tokenST);
-								if(attribute != null) {
-									if(metadata.getNounMetadata().get(npIdx).isNegated())
-										negSource.add("NP");
-									
-									if(metadata.getVerbMetadata().size() == 0)
-										source = "NP-noVB";
-									
-									String temp = leftST + "|" + tokenST;
-									findings.put(attribute, new MapValue(token.getToken(), temp, temp, negated, source, Joiner.on(',').join(negSource)));
-									processedTokens.add(token.getPosition());
-									//logFound(token, tokenST, tokenST+"|"+finalTokenST, nounPhrase.get(i).getToken()+"|"+finalToken, "NP", fullSentence);
-								} else {
-									logMissing(relCounts, tokenST);
-									//logMissingEx(relByToken, nounPhrase.get(i).getToken(), finalToken, tokenST, finalTokenST, fullSentence, "NP");
-								}
-							} else {
-								logMissing(stCounts, token+"|"+words.get(token.getPosition()).getPOS());
-								logMissingST(token.getToken(), token.getToken(), fullSentence, source);
-							}
-						}
-					}
-				
-			//	} else {
-				//	logMissing(stCounts, finalToken+"|"+words.get(nounPhrase.get(nounPhrase.size()-1).getPosition()).getPOS());
-				//	logMissingST(finalToken, "", fullSentence, "NP");
-				//}
-				
-				// special case for fragments such as "Bone pain."
-				// query constructors for null|NP head ST when sentence does not contain a verb
-				// TODO should this function more like fragments with no metadata?
-				// ... "Bone pain." is handled correctly because bpoc|sympto exists. "Bone mets." leaves out Finding Site because no constructor exits.
-				// ... would doing the looping approach for null|ST be a better solution?
-//				if(metadata.getVerbMetadata().size() == 0) {					
-//					for(GenericToken npToken : nounPhrase) {
-//						String rightST = words.get(npToken.getPosition()).getSemanticType();
-//						
-//						if(rightST != null) {
-//							String[] attribute = getConstructor("|" + rightST);
-//							
-//							if(attribute != null) {
-//								findings.put(attribute[0], new MapValue(npToken.getToken(), negated ? ABSENCE_QUALIFIER : attribute[1], "|" + rightST, negated, source, Joiner.on(',').join(negSource)));
-//								processedNounPhrases.add(npIdx);
-//							}
-//						}
-//					}
-//				}
-		//	}
-		//}
-	}
-	
-	private void processPrepPhrase2(ArrayList<WordToken> words, SentenceMetadata metadata, Multimap<String, MapValue> results, List<Integer> processedNounPhrases, List<Integer> processedPrepPhrases, int ppIdx, String fullSentence, boolean verbNegated, String verbST, String source, Set<String> negSource) {
+	private void processPrepPhrase(ArrayList<WordToken> words, SentenceMetadata metadata, Multimap<String, MapValue> results, List<Integer> processedNounPhrases, List<Integer> processedPrepPhrases, int ppIdx, String fullSentence, boolean verbNegated, String verbST, String source, Set<String> negSource) {
 		// Processed as pairs relating to the preposition (ST1|ST2)
 		// The preposition is always ST1 and each successive token in the PP is ST2.
 		// E.g. "June is my favorite month [of the year]."
@@ -2155,7 +1185,7 @@ public class StructuredOutputHelper {
 		}
 	}
 	
-	private void processNounPhrase2(ArrayList<WordToken> words, SentenceMetadata metadata, Multimap<String, MapValue> list, List<Integer> processedNounPhrases, int npIdx, String fullSentence, String leftST, boolean leftNegated, String source, Set<String> negSource) {
+	private void processNounPhrase(ArrayList<WordToken> words, SentenceMetadata metadata, Multimap<String, MapValue> list, List<Integer> processedNounPhrases, int npIdx, String fullSentence, String leftST, boolean leftNegated, String source, Set<String> negSource) {
 
 		// leftST represents the ST for token(s) that may occur before this noun phrase
 		// the example used is "He is having abdominal pain."
@@ -2264,7 +1294,6 @@ public class StructuredOutputHelper {
 			}
 		}
 	}
-	
 	
 	public void processRegex2_0(List<Finding> findings, String sentence) {
 		// PSA/Gleason regex processing. Find instances that could not be picked up by a constructor.
@@ -2455,7 +1484,7 @@ public class StructuredOutputHelper {
 		}
 	}
 
-	public void processRegex2(List<Multimap<String, MapValue>> findings, String sentence) {
+	public void processRegex(List<Multimap<String, MapValue>> findings, String sentence) {
 		// PSA/Gleason regex processing. Find instances that could not be picked up by a constructor.
 		
 		Pattern psaRegex1 = Pattern.compile("PSA\\s*\\d\\d\\/\\d\\d\\/\\d\\d:?\\s*<?\\d\\d?\\.?\\d{1,2}"); //PSA 09/26/13: 0.46PSA 01/29/14: 0.18PSA 06/19/14: 0.05.
@@ -3064,48 +2093,29 @@ public class StructuredOutputHelper {
 	}	
 }
 
-/*						
-// Step 2: Determine which token associated with the verb phrase is the logical parent.
-//         This could be the subject, object, or noun/prep token related to either. Subj and SubjC trump parents that may exist in a NP or PP.
-//         It could also be compound, in the case of a subjc with two of the same ST. Ex. He is on Lupron and Xtandi.
-List<Finding> parents = new ArrayList<>();
-
-if(subjST != null) {
-	String type = getAttributeFromRedis(subjST);
-	if(type != null) {
-		Finding subject = new Finding(type, verbPhrase.getSubj().getToken(), "VB-SUBJ", negSource, verbST.split("_")[0], verbST.split("_")[1], subjST);
-		
-		// if the SUBJ's type is in the list of potential parent findings, it becomes a parent
-		if(parentFindings.contains(type.toLowerCase())) {
-			parents.add(subject);
-			
-			// store the position of the SUBJ so we don't process it again.
-			processedTokens.add(verbPhrase.getSubj().getPosition());
-		}
-	}
-}
-// Subj trumps SubjC so don't check SubjC is Subj has already been declared the logical parent
-if(parents.size() == 0) {
-	for(VerbPhraseToken subjc : verbPhrase.getSubjC()) {
-		String subjcST = words.get(subjc.getPosition()).getSemanticType();
-		
-		if(subjcST != null) {
-			String type = getAttributeFromRedis(subjcST);
-			if(type != null) {
-				Finding subjcFinding = new Finding(type, subjc.getToken(), "VB-OBJ", negSource, verbST.split("_")[0], verbST.split("_")[1], subjcST);
-				
-				if(parentFindings.contains(type.toLowerCase())) {
-					parents.add(subjcFinding);
-					
-					processedTokens.add(subjc.getPosition());
-				}
-			}
-		}
-	}
-}
-
-// 
-if(parents.size() == 0) {
-	
-}
-*/	
+//public StructuredData processST(Sentence sentence, boolean writeToMongo) {
+//// this is used by the camel process
+////System.out.println("Calling StructuredOutputHelper.process2() for sentence: " + sentence.getFullSentence());
+//
+//if(writeLogs) {
+//	initReports("scott", "test");
+//	
+//	String[] headers = new String[Headers.values().length];
+//	int j = 0;
+//	for(Headers header : Headers.values()) {
+//		headers[j] = header.name();
+//		j++;
+//	}
+//	report.writeNext(headers);
+//}
+//
+//StructuredData output = buildStructuredData(sentence, writeToMongo);
+//
+//if(writeLogs) {
+//	writeLogs(buildReportPath("scott", "test"));
+//	try {
+//		report.close();
+//	} catch(Exception e) { e.printStackTrace(); }
+//}
+//return output;
+//}

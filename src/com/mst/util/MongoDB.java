@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 import org.bson.BSONObject;
 import org.bson.types.ObjectId;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.mongodb.AggregationOutput;
 import com.mongodb.BasicDBList;
@@ -22,12 +24,13 @@ import com.mongodb.util.JSON;
 import com.mst.model.SemanticType;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
-import com.mst.model.ontology.SemanticObject;
 import com.mst.model.pubmed.PubMedArticleList;
 import com.mst.tools.NounHelper;
 import com.mst.tools.POSTagger;
 import com.mst.tools.PrepositionHelper;
 //import com.sun.tools.javac.code.Source;
+
+
 
 
 
@@ -54,7 +57,7 @@ public class MongoDB {
 			//else 
 			auth = true;
 			
-			gson = GsonFactory.build();
+			gson = GsonFactory.build(new GsonExclude());
 			
 			// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
 			// this complements a similar bit of functionality in PubMed.java, which keeps track of existing PMIDs and those which it inserts
@@ -216,52 +219,6 @@ public class MongoDB {
 			mongoClient.close();
 			auth = false;
 		}
-	}
-	
-	public ArrayList<SemanticObject> getSemanticObjects(String domain) {
-		ArrayList<SemanticObject> semanticObjects = new ArrayList<SemanticObject>();
-
-		try {
-			if(auth) {
-				DBCollection coll = db.getCollection("ontology_semantic");
-				DBCursor cursor = null;
-				BasicDBObject query = null;
-				BasicDBObject fields = new BasicDBObject("_id", 0); // don't return ObjectId;
-				Gson gson = new Gson();
-				
-				query = new BasicDBObject("domain", domain).append("concept", "Finding Site");
-				cursor = coll.find(query, fields);
-
-				while(cursor.hasNext()) {
-					BasicDBObject obj = (BasicDBObject) cursor.next();
-					System.out.println(obj.toString());
-					semanticObjects.add(gson.fromJson(obj.toString(), SemanticObject.class));
-//					SemanticObject so = new SemanticObject();
-//					
-//					so.concept = obj.getString("concept");
-//					so.category = obj.getString("category");
-//					so.domain = domain;
-//					
-//					BasicDBList rules = (BasicDBList) obj.get("rules");
-//
-//					if(rules != null) {
-//						for(BasicDBObject rule : rules.toArray(new BasicDBObject[0])) {
-//							Rule r = so.new Rule();
-//							r.type = rule.getString("type");
-//							r.target = rule.getString("target");
-//							r.position = rule.getInt("position");
-//							BasicDBList values = (BasicDBList) obj.get("values");
-//							//SemanticType st = gson.fromJson(o.toString(), SemanticType.class);
-//						}
-//					}
-				
-				}
-				cursor.close();
-			}
-		} catch(Exception e) {
-			logger.error("getAnnotatedSentences(): \n{}", e);
-		}
-		return semanticObjects;
 	}
 	
 	public String insertMetaMapData(String json) {
@@ -988,4 +945,39 @@ public class MongoDB {
 		return csvOut;
 	}
 	
+	class GsonExclude implements ExclusionStrategy {
+		// exclude unnecessary booleans from word json output. default value is false rather than null so they were always sent, 
+		// cluttering up the output
+        public boolean shouldSkipClass(Class<?> arg0) {
+            return false;
+        }
+
+        public boolean shouldSkipField(FieldAttributes f) {
+            return (f.getDeclaringClass() == WordToken.class && 
+            			(f.getName().equals("npHead") ||
+            			 f.getName().equals("npMod") ||
+            			 f.getName().equals("ppMember") ||
+            			 f.getName().equals("ppBegin") ||
+            			 f.getName().equals("ppObj") ||
+            			 f.getName().equals("infHead") ||
+            			 f.getName().equals("inf") ||
+            			 f.getName().equals("vob") ||
+            			 f.getName().equals("vobSubj") ||
+            			 f.getName().equals("vobSubjC") ||
+            			 f.getName().equals("lvSubj") ||
+            			 f.getName().equals("lv") ||
+            			 f.getName().equals("lvSubjC") ||
+            			 f.getName().equals("av") ||
+            			 f.getName().equals("avSubj") ||
+            			 f.getName().equals("avObj") ||
+            			 f.getName().equals("prepVerb") ||
+            			 f.getName().equals("mv") ||
+            			 f.getName().equals("mvSubj") ||
+            			 f.getName().equals("mvSubjC") ||
+            			 f.getName().equals("dpMember") ||
+            			 f.getName().equals("dpEnd") ||
+            			 f.getName().equals("coref") ||
+            			 f.getName().equals("conjAdv")));
+        }
+    }
 }

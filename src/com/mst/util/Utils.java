@@ -30,4 +30,15 @@ public class Utils {
 		
 		return sb.toString();
 	}
+	
+	public static boolean checkForNegation(ArrayList<WordToken> words, int index) {
+		boolean negated = false;
+		for(int i=index; i >= 0; i--) {
+			if(Constants.NEGATION.matcher(words.get(i).getToken()).matches()) {
+				negated = true;
+				break;
+			}
+		}
+		return negated;
+	}
 }

@@ -574,6 +574,7 @@ public class VerbHelper {
 					 token.isVerb() ||
 					 token.isModalAuxPOS() ||
 					 token.isPunctuation() ||
+					 //token.isAdverbPOS() || // SRD 1/15/2016 - to guard against "The patient currently/RB/SUBJ denies any hip pain."
 					 token.isNegationSignal())) { // SRD 7/10/15 - "... while risk factors do not include coronary artery disease,..."
 					
 					subjIndex = i;
@@ -609,11 +610,10 @@ public class VerbHelper {
 			// TODO need an example to explain why I took out !token.isNounPhraseModifier()
 			//  an example sentence that supports adding it back is: [He] [is having] [catheter related pain] and I wrote an Rx.
 			//  "She is having random wuperbupic pain and she has seen gyn and ruled out that as an etiology." <- pain, she are compound SUBJCs
-			// TODO should presence of a prep phrase short-circuit SUBJC detection?
-			// TODO should VB be prohibited?
 			// TODO check this sentence (pain and wrote are subjcs):
 			//   He is having catheter related pain and I wrote an Rx.
 			
+			// TODO what use case was this paren logic supposed to address?
 			if(PAREN_BEGIN_REGEX.matcher(token.getToken()).matches())
 				stack++;
 			else if(PAREN_END_REGEX.matcher(token.getToken()).matches())
@@ -657,30 +657,6 @@ public class VerbHelper {
 					if(!compoundSUBJC)
 						break;
 				}
-				
-//				if(token.isAdjectivePOS() || token.isAdverbPOS()) {
-//					if(nextToken != null) {
-//						// JJ/RB are allowed if the following token is .,(! or a prep token or a dependent signal or a conjunction
-//						if(ALLOWABLE_JJ_REGEX.matcher(nextToken.getToken()).matches() ||
-//							nextToken.isPreposition() ||
-//							nextToken.isDependentPhraseBegin() || 
-//							nextToken.isConjunctionPOS()) {
-//							
-//							scIndexes.add(i);
-//						}
-//						
-//					} else {
-//						// JJ/RB are allowed if not preceded by another token (period is missing)
-//						scIndexes.add(i);
-//					}
-//				} else {
-//					// some other POS came through
-//					scIndexes.add(i);
-//				}
-//				
-//				if(nextToken != null && !(nextToken.isConjunctionPOS() || nextToken.isAdverbPOS() || nextToken.getPOS().equalsIgnoreCase(",")))
-//					break;
-				
 			}
 		}
 		

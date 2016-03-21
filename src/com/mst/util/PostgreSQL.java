@@ -6,14 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -23,9 +21,6 @@ import com.google.gson.Gson;
 import com.mst.model.MetaMapToken;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
-import com.mst.model.ontology.SyntacticObject;
-import com.mst.model.sql.OntologyEntry;
-import com.mst.model.sql.SnomedTreeValue;
 
 public class PostgreSQL {
 
@@ -320,120 +315,6 @@ public class PostgreSQL {
         } else {
         	return null;
         }
-    }
-	
-	/* 3/11/2015 The queries below are deprecated and only provided for reference */
-	
-	public ArrayList<SyntacticObject> getOntologyEntryByToken(String token) {
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        ArrayList<SyntacticObject> list = new ArrayList<SyntacticObject>();
-        
-        try {
-        	StringBuilder query = new StringBuilder();
-
-        	query.append("select so.value, pos.value as pos, so.snomed_id, vb.value as \"verb class\", vi.value as infinitive, src.value as src, so.last_modified, so.modified_by ");
-        	query.append("from syn_object as so ");
-        	query.append("left join syn_part_of_speech_xref as pos_xref on so.id = pos_xref.object_id ");
-        	query.append("left join syn_part_of_speech as pos on pos_xref.part_of_speech_id = pos.id ");
-            query.append("left join syn_source_xref as src_xref on so.id = src_xref.object_id ");
-        	query.append("left join syn_source as src on src_xref.source_id = src.id ");
-        	query.append("left join syn_verb_class_xref as vb_xref on so.id = vb_xref.object_id ");
-            query.append("left join syn_verb_class as vb on vb_xref.verb_class_id = vb.id ");
-        	query.append("left join syn_verb_infinitive_xref as vi_xref on so.id = vi_xref.object_id ");
-            query.append("left join syn_verb_infinitives as vi on vi_xref.verb_infinitive_id = vi.id ");
-        	if(token != null)
-        		query.append("where so.value = ?");    
-        	
-        	st = con.prepareStatement(query.toString());
-        	if(token != null)
-        		st.setString(1, token);
-        	rs = st.executeQuery();
-        	
-            while(rs.next()) {
-            	SyntacticObject syn = new SyntacticObject();
-            	
-            	syn.value = rs.getString("value");
-            	syn.part_of_speech = rs.getString("pos");
-            	syn.snomed_id = rs.getString("snomed_id");
-            	if(rs.getString("verb class") != null)
-            		syn._class.add(rs.getString("verb class"));
-            	syn.infinitive = rs.getString("infinitive");
-            	if(rs.getString("src") != null)
-            		syn.source.add(rs.getString("src"));
-            	//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            	
-            	syn.last_modified = rs.getTimestamp("last_modified");
-            	syn.modified_by = rs.getString("modified_by");
-            	
-            	syn.snomed_tree = getOntologySnomedTree(syn.value);
-            	
-            	list.add(syn);
-            }
-            
-        } catch(Exception e) {
-        	logger.error("getOntologyEntryByToken(): \n{}", e);
-        	e.printStackTrace();
-
-        } finally {
-            try {
-                if(rs != null)
-                    rs.close();
-                if(st != null)
-                    st.close();
-                //if(con != null)
-                    //con.close();
-            } catch(Exception e) {
-            	logger.warn("getOntologyEntryByToken(): Error closing database objects. \n{}", e);
-            }
-        }
-        
-        return list;
-    }
-	
-	public ArrayList<SyntacticObject.SnomedTreeValue> getOntologySnomedTree(String token) {
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        ArrayList<SyntacticObject.SnomedTreeValue> tree = new ArrayList<SyntacticObject.SnomedTreeValue>();
-        
-        try {
-        	StringBuilder query = new StringBuilder();
-
-        	query.append("select tv.id, tv.value, t.tree_id, t.position from syn_snomed_tree as t ");
-        	query.append("join syn_snomed_tree_values as tv on t.snomed_tree_value_id = tv.id ");
-        	query.append("join syn_object as so on so.id = t.object_id ");
-        	query.append("and so.value = ? ");
-            query.append("order by tree_id, position");
-        	
-        	st = con.prepareStatement(query.toString());
-        	st.setString(1, token);
-        	rs = st.executeQuery();
-        	
-        	SyntacticObject syn = new SyntacticObject();
-        	
-            while(rs.next()) {
-            	tree.add(syn.new SnomedTreeValue(rs.getInt("tree_id"), rs.getInt("position"), rs.getString("id"), rs.getString("value")));
-            }
-            
-        } catch(Exception e) {
-        	logger.error("getOntologySnomedTree(): \n{}", e);
-        	e.printStackTrace();
-
-        } finally {
-            try {
-                if(rs != null)
-                    rs.close();
-                if(st != null)
-                    st.close();
-                //if(con != null)
-                    //con.close();
-            } catch(Exception e) {
-            	logger.warn("getOntologySnomedTree(): Error closing database objects. \n{}", e);
-            }
-        }
-        
-	    return tree;
-        
     }
 	
 	public String metamapSemTypeOnly(String jsonSentence) {
