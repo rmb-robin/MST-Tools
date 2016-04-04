@@ -43,6 +43,7 @@ public class GsonFactory {
         	SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
 	        JsonObject jo = new JsonObject();
 	        jo.addProperty("$date", format.format(d));
+	        
 			return jo;
 		}
 	};

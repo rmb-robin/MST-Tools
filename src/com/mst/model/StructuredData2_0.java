@@ -21,6 +21,7 @@ public class StructuredData2_0 {
 	public String practice;
 	public String study;
 	public Map<String, String> discreet = new HashMap<>();
+	public Map<String, Object> metadata = new HashMap<>();
 	public List<Finding> findings = new ArrayList<>();
 	//public Map<String, String> flat = new HashMap<>(); // a flat representation of the findings. used for reporting so one doesn't have to traverse the hierarchical List.
 	public Multimap<String, ?> flat = ArrayListMultimap.create(); // a flat representation of the findings. used for reporting so one doesn't have to traverse the hierarchical List.

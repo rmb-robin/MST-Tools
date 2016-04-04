@@ -210,6 +210,7 @@ public class MetadataParser {
 				for(VerbPhraseToken verb : phrase.getVerbs()) {
 					verb.setNegated(checkNegation(words, verb.getPosition()));
 					verb.setPrepPhrasesIdx(getModifyingPrepPhrases(verb.getPosition(), metadata.getPrepMetadata()));
+					verb.setDepPhraseIdx(getContainingDependentPhraseIdx(verb.getPosition(), metadata.getDependentMetadata()));
 				}
 				
 				// if verb consists of more than one token, query lexicon for semantic type
@@ -221,9 +222,11 @@ public class MetadataParser {
 				}
 				
 				if(phrase.getSubj() != null) {
-					phrase.getSubj().setPrepPhrasesIdx(getModifyingPrepPhrases(phrase.getSubj().getPosition(), metadata.getPrepMetadata()));
-					phrase.getSubj().setNounPhraseIdx(getContainingNounPhraseIdx(phrase.getSubj().getPosition(), metadata.getNounMetadata()));
-					phrase.getSubj().setNegated(checkSubjNegation(words, phrase.getSubj().getPosition()));
+					int subjPos = phrase.getSubj().getPosition();
+					phrase.getSubj().setPrepPhrasesIdx(getModifyingPrepPhrases(subjPos, metadata.getPrepMetadata()));
+					phrase.getSubj().setNounPhraseIdx(getContainingNounPhraseIdx(subjPos, metadata.getNounMetadata()));
+					phrase.getSubj().setNegated(checkSubjNegation(words, subjPos));
+					phrase.getSubj().setDepPhraseIdx(getContainingDependentPhraseIdx(subjPos, metadata.getDependentMetadata()));
 				}
 				
 				if(!phrase.getSubjC().isEmpty()) {
@@ -231,8 +234,9 @@ public class MetadataParser {
 						token.setPrepPhrasesIdx(getModifyingPrepPhrases(token.getPosition(), metadata.getPrepMetadata()));
 						token.setNounPhraseIdx(getContainingNounPhraseIdx(token.getPosition(), metadata.getNounMetadata()));
 						token.setNegated(checkSubjCNegation(words, token.getPosition()));
-						
-						token.setDepPhraseIdx(findModifyingDependentPhrase(words, token.getPosition(), metadata.getDependentMetadata()));
+						// ScottD - 3/29/16 - attempting to set depPhraseIdx of metadata properly
+						//token.setDepPhraseIdx(findModifyingDependentPhrase(words, token.getPosition(), metadata.getDependentMetadata()));
+						token.setDepPhraseIdx(getContainingDependentPhraseIdx(token.getPosition(), metadata.getDependentMetadata()));
 					}
 				}
 								
@@ -453,6 +457,24 @@ public class MetadataParser {
 		
 		for(int i=0; i < nounList.size(); i++) {
 			NounPhraseMetadata phrase = nounList.get(i);
+			for(GenericToken token : phrase.getPhrase()) {
+				if(token.getPosition() == sourcePos) {
+					idx = i;
+					break;
+				}
+			}
+			if(idx != -1)
+				break;
+		}
+		
+		return idx;
+	}
+	
+	private int getContainingDependentPhraseIdx(int sourcePos, List<DependentPhraseMetadata> dpMetadata) {
+		int idx = -1;
+		
+		for(int i=0; i < dpMetadata.size(); i++) {
+			DependentPhraseMetadata phrase = dpMetadata.get(i);
 			for(GenericToken token : phrase.getPhrase()) {
 				if(token.getPosition() == sourcePos) {
 					idx = i;

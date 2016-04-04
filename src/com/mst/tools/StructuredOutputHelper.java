@@ -544,16 +544,16 @@ public class StructuredOutputHelper {
 	public Set<String> getMissingFindingTypes() { return missingFTs; }
 	
 	private String getSemanticType(ArrayList<WordToken> words, int index, String source) {
-		String st = words.get(index).getSemanticType();
+		WordToken word = words.get(index);
+		String st = word.getSemanticType();
 		
-//		if(st == null) {
-//			//missingSTs.add(words.get(index).getToken() + "<>" + source);
-//			missingSTs.add(words.get(index).getToken());
-//		}
-		if(st == null) {
-			st = "unk";
+		if(word.isPunctuation() || word.isDeterminerPOS() || word.isPrepositionPOS() || word.isConjunctionPOS() || word.isNegationSignal()) {
+			st = null; // the purpose of this is to prevent Finding objects from being created for these token types, which clutter up the structured collection and results
+		} else {
+			if(st == null) {
+				st = "unk";
+			}
 		}
-		
 		return st;
 	}
 	
@@ -642,18 +642,18 @@ public class StructuredOutputHelper {
 						// Step 1: Do a little pre-work to store the semantic types for the verb phrase subject and verb.
 						//         Verb phrase subject and verb will each have, at most, one semantic type.
 						//         Because there can be more than one subject complement (object) in a verb phrase, each can have its own semantic type.
-						String subjST = (verbPhrase.getSubj() != null) ? getSemanticType(words, verbPhrase.getSubj().getPosition(), "VB-SUBJ") : null;
+						String subjST = (verbPhrase.getSubj() != null) ? getSemanticType(words, verbPhrase.getSubj().getPosition(), "") : null;
 						
 						String verbST = null;
 						// verbST will be either null, that of the only token, that of the entire phrase (if present), or that of
 						// the final token (if entire phrase has no ST)
 						if(verbPhrase.getVerbs().size() == 1) {
-							verbST = getSemanticType(words, verbPhrase.getVerbs().get(0).getPosition(), "VB");
+							verbST = getSemanticType(words, verbPhrase.getVerbs().get(0).getPosition(), "");
 						} else {
 							verbST = verbPhrase.getSemanticType();
 							
 							if(verbST == null)
-								verbST = getSemanticType(words, verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPosition(), "VB");
+								verbST = getSemanticType(words, verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPosition(), "");
 						}
 						if(verbST == null || verbST.indexOf('_') == -1) {
 							// TODO issue where our verb list (in Constants.java) contains a token that Stanford correctly tags as a non-verb based on context. Ex. "left nodule without change"
@@ -700,7 +700,7 @@ public class StructuredOutputHelper {
 
 						// 1b) generate finding for subjc(s)
 						for(VerbPhraseToken subjc : verbPhrase.getSubjC()) {
-							String subjcST = getSemanticType(words, subjc.getPosition(), "VB-OBJ");
+							String subjcST = getSemanticType(words, subjc.getPosition(), "");
 												
 							if(subjcST != null) {
 								String type = getFindingType(subjcST);
@@ -780,17 +780,18 @@ public class StructuredOutputHelper {
 				if(ppPos > 0 && !processedTokens.contains(ppPos-1)) {
 					// prep phrase does not begin the fragment AND we haven't already processed the preceding token (by virtue of it being within a noun phrase, for example)
 					String precedingToken = words.get(ppPos - 1).getToken();
-					String precedingTokenST = getSemanticType(words, ppPos - 1, "PP");
+					String precedingTokenST = getSemanticType(words, ppPos - 1, "");
 					
 					if(Utils.checkForNegation(words, i)) {
 						negSource.add("PP");
 					}
-					
-					String type = getFindingType(precedingTokenST);
-					if(type != null) {
-						Finding child = new Finding(type, precedingToken, "PP", negSource, null, null, precedingTokenST);
-						temp.add(child);
-						processedTokens.add(ppPos-1);
+					if(precedingTokenST != null) {
+						String type = getFindingType(precedingTokenST);
+						if(type != null) {
+							Finding child = new Finding(type, precedingToken, "PP", negSource, null, null, precedingTokenST);
+							temp.add(child);
+							processedTokens.add(ppPos-1);
+						}
 					}
 				}
 				
@@ -811,7 +812,7 @@ public class StructuredOutputHelper {
 				
 				for(int i=0; i < length; i++) {
 					if(!processedTokens.contains(i)) {
-						String tokenST = getSemanticType(words, i, "FRAG");
+						String tokenST = getSemanticType(words, i, "");
 	
 						// somewhat crude way to detect negation in a fragment.
 						// if a token matches a negation signal, note the fragment as negated
@@ -840,9 +841,7 @@ public class StructuredOutputHelper {
 			// 5) process various regex patterns
 			processRegex2_0(findings, sentence.getFullSentence());
 			
-			//structured.findings = findings;
-			
-			// quick and dirty way to multiple findings into distinct StructuredData2_0 objects
+			// quick and dirty way to put multiple findings into distinct StructuredData2_0 objects
 			for(Finding finding : findings) {
 				StructuredData2_0 struct = StructuredData2_0.getInstance(structured);
 				
@@ -854,6 +853,12 @@ public class StructuredOutputHelper {
 				struct.findings.add(finding);
 				struct.notation = finding.getNotationString(StructuredNotationReturnValue.VALUE);
 				struct.flat = finding.flatten();
+				
+				struct.metadata.put("verbPhraseCount", metadata.getVerbMetadata().size());
+				struct.metadata.put("nounPhraseCount", metadata.getNounMetadata().size());
+				struct.metadata.put("prepPhraseCount", metadata.getPrepMetadata().size());
+				struct.metadata.put("depPhraseCount", metadata.getDependentMetadata().size());
+				
 				structuredList.add(struct);
 			}
 			
@@ -875,8 +880,6 @@ public class StructuredOutputHelper {
 		
 		if(metadata.getVerbMetadata().size() == 0)
 			source += "-noVB";
-		
-		String prepTokenST = getSemanticType(words, prepPhrase.get(0).getPosition(), source);
 		
 		List<Finding> newParents = new ArrayList<>();
 		List<Integer> processedNounPhrases = new ArrayList<>();
@@ -901,10 +904,12 @@ public class StructuredOutputHelper {
 					}
 				//}
 			} else {
+				//String prepTokenST = getSemanticType(words, prepPhrase.get(0).getPosition(), source);
+				
 				if(words.get(ppToken.getPosition()).isPrepPhraseObject() && // only process PP objects 
 				  !processedTokens.contains(ppToken.getPosition())) {       // avoid re-processing a token
 					
-					String tokenST = getSemanticType(words, ppToken.getPosition(), source);
+					String tokenST = getSemanticType(words, ppToken.getPosition(), "");
 					String token = words.get(ppToken.getPosition()).getToken();
 
 					if(tokenST != null) {
@@ -914,7 +919,7 @@ public class StructuredOutputHelper {
 								negSource.add("PP");
 							}
 							
-							String temp = verbST + "|" + prepTokenST + "|" + tokenST;
+							String temp = verbST + "|" + prepPhrase.get(0).getToken().toLowerCase() + "|" + tokenST;
 							
 							Finding child = new Finding(type, token, source, negSource, verbST.split("_")[0], verbST.split("_")[1], temp);
 							
@@ -945,23 +950,6 @@ public class StructuredOutputHelper {
 			return parents;
 		else
 			return newParents;
-	}
-	
-	private int countFindings(List<Finding> findings) {
-		int count = 0;
-		for(Finding finding : findings) {
-			count++; // account for the parent
-			count += getChildCount(count, finding);
-		}
-		return count;
-	}
-	
-	private int getChildCount(int count, Finding finding) {
-		for(Finding child : finding.children) {
-			count++;
-			return getChildCount(count, child);
-		}
-		return count;
 	}
 	
 	private List<Finding> processNounPhrase2_0(ArrayList<WordToken> words, SentenceMetadata metadata, List<Finding> parents, List<Integer> processedTokens, int npIdx, String fullSentence, String verbST, boolean verbNegated, String source, Set<String> negSource) {
@@ -1000,7 +988,7 @@ public class StructuredOutputHelper {
 		for(int i=nounPhrase.size()-1; i >= 0; i--) {
 			GenericToken token = nounPhrase.get(i);
 			if(!processedTokens.contains(token.getPosition())) { // avoid re-processing a token
-				String tokenST = getSemanticType(words, token.getPosition(), source);
+				String tokenST = getSemanticType(words, token.getPosition(), "");
 				
 				if(tokenST != null) {
 					String type = getFindingType(tokenST);
@@ -1323,10 +1311,6 @@ public class StructuredOutputHelper {
 			if(val != null) {
 				val = val.trim();
 				
-				//Multimap<String, MapValue> mm = ArrayListMultimap.create();
-				//mm.put(DIAP_LABEL, new MapValue(GLEASON_LABEL, SOURCE));
-				//mm.put(ABSV_LABEL, new MapValue(parseGleasonValue(val), null, Constants.GLEASON_REGEX.toString(), SOURCE));
-				
 				Finding finding = new Finding(DIAP_LABEL, GLEASON_LABEL, SOURCE, null, null, null, Constants.GLEASON_REGEX.toString());
 				finding.children.add(new Finding(ABSV_LABEL, parseGleasonValue(val), SOURCE, null, null, null, null));
 				
@@ -1337,13 +1321,7 @@ public class StructuredOutputHelper {
 		matcher = chesapeakePSA1.matcher(sentence);
 
 		while(matcher.find()) {
-			//Multimap<String, MapValue> mm = ArrayListMultimap.create();
-			
-			if(matcher.groupCount() == 2) {
-				//mm.put(DIAP_LABEL, new MapValue(PSA_LABEL, SOURCE));
-				//mm.put(ABSV_LABEL, new MapValue(matcher.group(2), null, chesapeakePSA1.toString(), SOURCE));
-				//findings.add(mm);
-				
+			if(matcher.groupCount() == 2) {				
 				Finding finding = new Finding(DIAP_LABEL, PSA_LABEL, SOURCE, null, null, null, chesapeakePSA1.toString());
 				finding.children.add(new Finding(ABSV_LABEL, matcher.group(2).trim(), SOURCE, null, null, null, null));
 				
@@ -1354,13 +1332,6 @@ public class StructuredOutputHelper {
 		matcher = chesapeakePSA2.matcher(sentence);
 
 		while(matcher.find()) {
-			//Multimap<String, MapValue> mm = ArrayListMultimap.create();
-			
-			//mm.put(DIAP_LABEL, new MapValue(PSA_LABEL, SOURCE));
-			//mm.put(ABSV_LABEL, new MapValue(matcher.group(1), null, chesapeakePSA2.toString(), SOURCE));
-			//mm.put(DATE_LABEL, new MapValue(matcher.group(3), SOURCE));
-			//findings.add(mm);
-			
 			Finding finding = new Finding(DIAP_LABEL, PSA_LABEL, SOURCE, null, null, null, chesapeakePSA2.toString());
 			finding.children.add(new Finding(ABSV_LABEL, matcher.group(1).trim(), SOURCE, null, null, null, null));
 			finding.children.add(new Finding(DATE_LABEL, matcher.group(3).trim(), SOURCE, null, null, null, null));
@@ -1371,13 +1342,6 @@ public class StructuredOutputHelper {
 		matcher = chesapeakePSA3.matcher(sentence);
 
 		while(matcher.find()) {
-			//Multimap<String, MapValue> mm = ArrayListMultimap.create();
-			
-			//mm.put(DIAP_LABEL, new MapValue(PSA_LABEL, SOURCE));
-			//mm.put(ABSV_LABEL, new MapValue(matcher.group(3).trim(), null, chesapeakePSA3.toString(), SOURCE));
-			//mm.put(DATE_LABEL, new MapValue(matcher.group(1).trim(), SOURCE));
-			//findings.add(mm);
-			
 			Finding finding = new Finding(DIAP_LABEL, PSA_LABEL, SOURCE, null, null, null, chesapeakePSA3.toString());
 			finding.children.add(new Finding(ABSV_LABEL, matcher.group(3).trim(), SOURCE, null, null, null, null));
 			finding.children.add(new Finding(DATE_LABEL, matcher.group(1).trim(), SOURCE, null, null, null, null));
@@ -1387,19 +1351,7 @@ public class StructuredOutputHelper {
 
 		matcher = chesapeakePSA4.matcher(sentence);
 
-		while(matcher.find()) {
-//			Multimap<String, MapValue> mm = ArrayListMultimap.create();
-			
-//			mm.put(DIAP_LABEL, new MapValue(PSA_LABEL, SOURCE));
-//			mm.put(ABSV_LABEL, new MapValue(matcher.group(1).trim(), null, chesapeakePSA4.toString(), SOURCE));
-//			if(matcher.groupCount() > 2)
-//				mm.put(DATE_LABEL, new MapValue(matcher.group(matcher.groupCount()).trim(), SOURCE));
-//			//try {
-//			//	mm.put(DATE_LABEL, new MapValue(matcher.group(matcher.groupCount()).trim()));
-//			//} catch(Exception e) { System.out.println(e.toString() + "\n\t" + sentence + "\n\t" + chesapeakePSA4.toString()); }
-//			
-//			findings.add(mm);
-			
+		while(matcher.find()) {		
 			Finding finding = new Finding(DIAP_LABEL, PSA_LABEL, SOURCE, null, null, null, chesapeakePSA4.toString());
 			finding.children.add(new Finding(ABSV_LABEL, matcher.group(1).trim(), SOURCE, null, null, null, null));
 			if(matcher.groupCount() > 2)
@@ -1410,19 +1362,7 @@ public class StructuredOutputHelper {
 
 		matcher = chesapeakePSA5.matcher(sentence);
 
-		while(matcher.find()) {
-//			Multimap<String, MapValue> mm = ArrayListMultimap.create();
-//			
-//			mm.put(DIAP_LABEL, new MapValue(PSA_LABEL, SOURCE));
-//			mm.put(ABSV_LABEL, new MapValue(matcher.group(2).trim(), null, chesapeakePSA5.toString(), SOURCE));
-//			//for(int i=0; i <= matcher.groupCount(); i++) {
-//			//	System.out.println(i + " - " + matcher.group(i));
-//			//}
-//			if(matcher.group(matcher.groupCount()) != null)
-//				mm.put(DATE_LABEL, new MapValue(matcher.group(matcher.groupCount()).trim(), SOURCE));
-//			
-//			findings.add(mm);
-			
+		while(matcher.find()) {			
 			Finding finding = new Finding(DIAP_LABEL, PSA_LABEL, SOURCE, null, null, null, chesapeakePSA5.toString());
 			finding.children.add(new Finding(ABSV_LABEL, matcher.group(2).trim(), SOURCE, null, null, null, null));
 			if(matcher.group(matcher.groupCount()) != null)
@@ -1433,15 +1373,7 @@ public class StructuredOutputHelper {
 		
 		matcher = Constants.SKYLINE_PSA_1.matcher(sentence);
 
-		while(matcher.find()) {
-//			Multimap<String, MapValue> mm = ArrayListMultimap.create();
-//			
-//			mm.put(DIAP_LABEL, new MapValue(PSA_LABEL, SOURCE));
-//			mm.put(ABSV_LABEL, new MapValue(matcher.group(2).trim(), null, Constants.SKYLINE_PSA_1.toString(), SOURCE));
-//			mm.put(DATE_LABEL, new MapValue(matcher.group(1).trim(), SOURCE));
-//			
-//			findings.add(mm);
-			
+		while(matcher.find()) {			
 			Finding finding = new Finding(DIAP_LABEL, PSA_LABEL, SOURCE, null, null, null, Constants.SKYLINE_PSA_1.toString());
 			finding.children.add(new Finding(ABSV_LABEL, matcher.group(2).trim(), SOURCE, null, null, null, null));
 			finding.children.add(new Finding(DATE_LABEL, matcher.group(1).trim(), SOURCE, null, null, null, null));
@@ -1452,14 +1384,6 @@ public class StructuredOutputHelper {
 		matcher = Constants.SKYLINE_PSA_2.matcher(sentence);
 
 		while(matcher.find()) {
-//			Multimap<String, MapValue> mm = ArrayListMultimap.create();
-//			
-//			mm.put(DIAP_LABEL, new MapValue(PSA_LABEL, SOURCE));
-//			mm.put(ABSV_LABEL, new MapValue(matcher.group(2).trim(), null, Constants.SKYLINE_PSA_2.toString(), SOURCE));
-//			mm.put(DATE_LABEL, new MapValue(matcher.group(1).trim(), SOURCE));
-//			
-//			findings.add(mm);
-			
 			Finding finding = new Finding(DIAP_LABEL, PSA_LABEL, SOURCE, null, null, null, Constants.SKYLINE_PSA_2.toString());
 			finding.children.add(new Finding(ABSV_LABEL, matcher.group(2).trim(), SOURCE, null, null, null, null));
 			finding.children.add(new Finding(DATE_LABEL, matcher.group(1).trim(), SOURCE, null, null, null, null));
@@ -1467,21 +1391,21 @@ public class StructuredOutputHelper {
 			findings.add(finding);
 		}
 		
-		matcher = psaRegex1.matcher(sentence);
-
-		while(matcher.find()) {
-			String[] vals = matcher.group().split(" "); 
-			if(vals.length > 0) {
-				try {
-					//unrelated.put("Diagnostic Procedure", "PSA|" + vals[2] + "|" + (vals[1].indexOf(':') > -1 ? vals[1].substring(0, vals[1].length()-1) : vals[1].trim()));
-					//structured.unrelated.put("Diagnostic Procedure Value", vals[2]);
-					//structured.unrelated.put("Diagnostic Procedure Date", vals[1].indexOf(':') > -1 ? vals[1].substring(0, vals[1].length()-1) : vals[1].trim());
-					
-				} catch(Exception e) {
-					System.out.println(matcher.group());
-				}
-			}
-		}
+//		matcher = psaRegex1.matcher(sentence);
+//
+//		while(matcher.find()) {
+//			String[] vals = matcher.group().split(" "); 
+//			if(vals.length > 0) {
+//				try {
+//					//unrelated.put("Diagnostic Procedure", "PSA|" + vals[2] + "|" + (vals[1].indexOf(':') > -1 ? vals[1].substring(0, vals[1].length()-1) : vals[1].trim()));
+//					//structured.unrelated.put("Diagnostic Procedure Value", vals[2]);
+//					//structured.unrelated.put("Diagnostic Procedure Date", vals[1].indexOf(':') > -1 ? vals[1].substring(0, vals[1].length()-1) : vals[1].trim());
+//					
+//				} catch(Exception e) {
+//					System.out.println(matcher.group());
+//				}
+//			}
+//		}
 	}
 
 	public void processRegex(List<Multimap<String, MapValue>> findings, String sentence) {

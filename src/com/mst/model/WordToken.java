@@ -66,6 +66,10 @@ public class WordToken extends GenericToken {
 		return Constants.PREPOSITIONS.matcher(pos).matches();
 	}
 	
+	public boolean isPrepositionPOS() {	
+		return pos.matches("IN|TO");
+	}
+	
 	public boolean isArticle() {
 		//return getToken().matches(Constants.ARTICLE);
 		return Constants.ARTICLE.matcher(getToken()).matches();
