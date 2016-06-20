@@ -256,7 +256,7 @@ public class StructuredOutputHelper {
 		structured.sentence = sentence.getFullSentence();
 		structured.discreet = sentence.getDiscreet();
 		
-		// maintain lists of token indexes that have been processed to avoid duplicate findings.
+		// maintain 0-based list of token indexes that have been processed to avoid duplicate findings.
 		List<Integer> processedTokens = new ArrayList<Integer>();
 		List<Finding> findings = new ArrayList<>();
 		
@@ -366,7 +366,13 @@ public class StructuredOutputHelper {
 						for(int ppIdx : verbPhrase.getVerbs().get(verbPhrase.getVerbs().size()-1).getPrepPhrasesIdx()) {					
 							parents = processPrepPhrase2_0(words, metadata, parents, processedTokens, ppIdx, sentence.getFullSentence(), verbPhrase.isPhraseNegated(), verbST, "VB", negSource);
 						}
-
+						
+						// all all indexes of the (compound) verb phrase to processedTokens. This is to prevent any that might not have a 
+						// semantic type from being added as separate findings, e.g. "consisting"
+						for(VerbPhraseToken vb : verbPhrase.getVerbs()) {
+							processedTokens.add(vb.getPosition());
+						}
+						
 						// 1b) generate finding for subjc(s)
 						for(VerbPhraseToken subjc : verbPhrase.getSubjC()) {
 							String subjcST = getSemanticType(words, subjc.getPosition(), "");
@@ -457,33 +463,39 @@ public class StructuredOutputHelper {
 			// 3) loop through prep phrases to catch any that aren't grammatically-related to a verb phrase
 			negSource.clear();
 			for(int i=0; i < metadata.getPrepMetadata().size(); i++) {
-				List<Finding> temp = new ArrayList<>();
-				
 				// determine if token preceding the prep phrase is a finding candidate
 				List<PrepPhraseToken> prepPhrase = metadata.getPrepMetadata().get(i).getPhrase();
 				int ppPos = prepPhrase.get(0).getPosition();
 				
-				if(ppPos > 0 && !processedTokens.contains(ppPos-1)) {
-					// prep phrase does not begin the fragment AND we haven't already processed the preceding token (by virtue of it being within a noun phrase, for example)
-					String precedingToken = words.get(ppPos - 1).getToken();
-					String precedingTokenST = getSemanticType(words, ppPos - 1, "");
+				// the next check is a bit redundant because processPrepPhrase will do the same thing
+				// but there's no need to process the token preceding the prep phrase if the phrase 
+				// itself has already been processed.
+				if(!processedTokens.contains(ppPos)) {
+					List<Finding> temp = new ArrayList<>();
 					
-					if(Utils.checkForNegation(words, i)) {
-						negSource.add("PP");
-					}
-					if(precedingTokenST != null) {
-						String type = getFindingType(precedingTokenST);
-						if(type != null) {
-							Finding child = new Finding(type, precedingToken, "PP", negSource, null, null, precedingTokenST);
-							temp.add(child);
-							processedTokens.add(ppPos-1);
+					// process the token preceding the prep phrase to determine what the PP is modifying
+					// prep phrase does not begin the fragment AND we haven't already processed the preceding token (by virtue of it being within a noun phrase, for example)
+					if(ppPos > 0 && !processedTokens.contains(ppPos-1)) {
+						String precedingToken = words.get(ppPos - 1).getToken();
+						String precedingTokenST = getSemanticType(words, ppPos - 1, "");
+						
+						if(Utils.checkForNegation(words, i)) {
+							negSource.add("PP");
+						}
+						if(precedingTokenST != null) {
+							String type = getFindingType(precedingTokenST);
+							if(type != null) {
+								Finding child = new Finding(type, precedingToken, "PP", negSource, null, null, precedingTokenST);
+								temp.add(child);
+								processedTokens.add(ppPos-1);
+							}
 						}
 					}
+					
+					temp = processPrepPhrase2_0(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), false, "null_null", null, negSource);
+					for(Finding finding : temp)
+						findings.add(finding);
 				}
-				
-				temp = processPrepPhrase2_0(words, metadata, temp, processedTokens, i, sentence.getFullSentence(), false, "null_null", null, negSource);
-				for(Finding finding : temp)
-					findings.add(finding);
 			}
 
 			negSource.clear();
@@ -586,9 +598,6 @@ public class StructuredOutputHelper {
 		List<Finding> newParents = new ArrayList<>();
 		List<Integer> processedNounPhrases = new ArrayList<>();
 		
-//		Patients/NNS then/RB [receive/VBP] [high/JJ dose/NN chemotherapy/NN/SUBJC] [consisting/VBG] [of/IN cyclophosphamide/NN/OBJ IV/CD/OBJ] 
-//		[over/IN [1/CD/OBJ hour/NN/OBJ] and/CC cisplatin/NN/OBJ IV/CD/OBJ] [over/IN [72/CD/OBJ hours/NNS/OBJ]] [on/IN days/NNS/OBJ -6/CD/OBJ] [to/TO -4/CD/OBJ] ./.
-		
 		// loop through each member of the prep phrase after the initial preposition
 		for(int i=1; i < prepPhrase.size(); i++) {
 			PrepPhraseToken ppToken = prepPhrase.get(i);
@@ -630,6 +639,9 @@ public class StructuredOutputHelper {
 							
 							if(parents.size() == 0) {
 								newParents.add(child);
+								// band-aid to address issue where PP has multiple objects but they're not in a NP. with this addition,
+								// the execution will skip to the else clause below. "...consisting [of cyclophosphamide IV]."
+								parents.add(child);
 							} else {
 								for(Finding parent : parents) {
 									// the idea here is to reorganize parents/children ONLY if the PP object in question is a top-level finding AND
@@ -641,7 +653,7 @@ public class StructuredOutputHelper {
 									} else {
 										parent.children.add(child);
 									}
-									newParents.add(parent);
+									//newParents.add(parent); // possibly remove this to fix doubling up issue that sometimes occurs with prep phrases
 								}
 							}
 							processedTokens.add(ppToken.getPosition());
@@ -650,6 +662,9 @@ public class StructuredOutputHelper {
 				}
 			}
 		}
+		
+		// add the index of the preposition itself to prevent further processing of this prep phrase (e.g. during the PP sweep in buildStructuredData2_0)
+		processedTokens.add(prepPhrase.get(0).getPosition());
 		
 		if(newParents.isEmpty())
 			return parents;
