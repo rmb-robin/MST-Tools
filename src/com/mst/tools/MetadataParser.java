@@ -1,7 +1,9 @@
 package com.mst.tools;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -201,6 +203,8 @@ public class MetadataParser {
 			}
 		}
 		
+		Set<Integer> subjectIndexes = new HashSet<>();
+		
 		for(VerbPhraseMetadata phrase : metadata.getVerbMetadata()) {
 			if(phrase.getVerbClass() == Constants.VerbClass.ACTION ||
 				phrase.getVerbClass() == Constants.VerbClass.LINKING_VERB ||
@@ -211,6 +215,13 @@ public class MetadataParser {
 					verb.setNegated(checkNegation(words, verb.getPosition()));
 					verb.setPrepPhrasesIdx(getModifyingPrepPhrases(verb.getPosition(), metadata.getPrepMetadata()));
 					verb.setDepPhraseIdx(getContainingDependentPhraseIdx(verb.getPosition(), metadata.getDependentMetadata()));
+					
+					for(int j=verb.getPosition()-1; j>=0; j--) {
+						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
+							verb.getModifierList().add(j);
+						} else
+							break;
+					}
 				}
 				
 				// if verb consists of more than one token, query lexicon for semantic type
@@ -221,25 +232,59 @@ public class MetadataParser {
 					}
 				}
 				
+				// TODO remove when compound subjects fully implemented
 				if(phrase.getSubj() != null) {
 					int subjPos = phrase.getSubj().getPosition();
 					phrase.getSubj().setPrepPhrasesIdx(getModifyingPrepPhrases(subjPos, metadata.getPrepMetadata()));
 					phrase.getSubj().setNounPhraseIdx(getContainingNounPhraseIdx(subjPos, metadata.getNounMetadata()));
 					phrase.getSubj().setNegated(checkSubjNegation(words, subjPos));
 					phrase.getSubj().setDepPhraseIdx(getContainingDependentPhraseIdx(subjPos, metadata.getDependentMetadata()));
+					
+					for(int j=phrase.getSubj().getPosition()-1; j>=0; j--) {
+						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
+							phrase.getSubj().getModifierList().add(j);
+						} else
+							break;
+					}
+				}
+				
+				for(VerbPhraseToken token : phrase.getSubjects()) {
+					token.setPrepPhrasesIdx(getModifyingPrepPhrases(token.getPosition(), metadata.getPrepMetadata()));
+					token.setNounPhraseIdx(getContainingNounPhraseIdx(token.getPosition(), metadata.getNounMetadata()));
+					token.setNegated(checkSubjNegation(words, token.getPosition()));
+					token.setDepPhraseIdx(getContainingDependentPhraseIdx(token.getPosition(), metadata.getDependentMetadata()));
+					
+					subjectIndexes.add(token.getPosition());
+					
+					for(int j=token.getPosition()-1; j>=0; j--) {
+						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
+							token.getModifierList().add(j);
+						} else
+							break;
+					}
 				}
 				
 				if(!phrase.getSubjC().isEmpty()) {
 					for(VerbPhraseToken token : phrase.getSubjC()) {
+						if(subjectIndexes.contains(token.getPosition()))
+							metadata.addSimpleMetadataValue("subjSubjCEqual", true);
+						
 						token.setPrepPhrasesIdx(getModifyingPrepPhrases(token.getPosition(), metadata.getPrepMetadata()));
 						token.setNounPhraseIdx(getContainingNounPhraseIdx(token.getPosition(), metadata.getNounMetadata()));
 						token.setNegated(checkSubjCNegation(words, token.getPosition()));
 						// ScottD - 3/29/16 - attempting to set depPhraseIdx of metadata properly
 						//token.setDepPhraseIdx(findModifyingDependentPhrase(words, token.getPosition(), metadata.getDependentMetadata()));
 						token.setDepPhraseIdx(getContainingDependentPhraseIdx(token.getPosition(), metadata.getDependentMetadata()));
+						
+						for(int j=token.getPosition()-1; j>=0; j--) {
+							if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
+								token.getModifierList().add(j);
+							} else
+								break;
+						}
 					}
 				}
-								
+
 			} else if(phrase.getVerbClass() == Constants.VerbClass.PREPOSITIONAL) {
 				//phrase.getVerb().setPrepPhrasesIdx(getModifyingPrepPhrases(phrase.getVerb().getPosition(), metadata.getPrepMetadata()));
 				for(VerbPhraseToken verb : phrase.getVerbs()) {

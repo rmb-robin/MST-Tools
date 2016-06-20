@@ -48,24 +48,12 @@ public class MongoDB {
 	
 	public MongoDB() {
 		try {
-			//mongoClient = new MongoClient(Props.getProperty("mongo_host"));
-			
-			//db = mongoClient.getDB(Props.getProperty("mongo_db"));
-			
-			//if(Props.getProperty("mongo_host").equalsIgnoreCase("mongo01.medicalsearchtechnologies.com")) 
-			//	auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
-			//else 
 			auth = true;
 			
-			gson = GsonFactory.build(new GsonExclude());
+			// gson = GsonFactory.build(new GsonExclude());
+			// SRD - commented out the above on 4/5/16 to add all of the booleans back to the annotation data
+			gson = GsonFactory.build();
 			
-			// PMIDs that exist in the mongoDB collection. Use this to prevent adding duplicate PubMed articles.
-			// this complements a similar bit of functionality in PubMed.java, which keeps track of existing PMIDs and those which it inserts
-			// to prevent dupes from getting into the pipeline. Must duplicate here to account for processing lag time (possibly many hours)
-			//if(existingPMIDs == null) {
-				// TODO get this out of the constructor
-			//	existingPMIDs = getDistinctStringValues("id");
-			//}
 		} catch(Exception e) {
 			logger.error("Error establishing a connection to MongoDB. \n{}", e);
 		}
@@ -174,7 +162,6 @@ public class MongoDB {
 	
 	public String insertTaggedSentenceFull(Sentence sentence) {
 		if(!sentence.getWordList().isEmpty()) {
-			//Gson gson = GsonFactory.build();
 			try {
 				Constants.Source source = Constants.Source.valueOf(sentence.getSource());
 
@@ -219,31 +206,6 @@ public class MongoDB {
 			mongoClient.close();
 			auth = false;
 		}
-	}
-	
-	public String insertMetaMapData(String json) {
-//		if(auth) {
-//			try {
-//				Sentence sentence = gson.fromJson(json, Sentence.class);
-//				DBCollection coll = db.getCollection("processed_article_camel_metamap");
-//				
-//				for(MetaMapToken meta : sentence.getMetaMapList()) {
-//					BasicDBObject doc = new BasicDBObject("id", sentence.getId()).
-//			                append("sentence_id", sentence.getPosition()).
-//			                append("value", meta.getValue()).
-//			                append("concept_id", meta.getConceptID()).
-//			                append("concept_id", meta.getConceptName()).
-//			                append("preferred_name", meta.getPreferredName()).
-//							append("semantic_types", meta.getSemanticTypes()).
-//							append("sources", meta.getSources());
-//					
-//					coll.insert(doc);
-//				}
-//			} catch(Exception e) {
-//				logger.error("insertMetaMapData(): \n{}\n{}", json, e);
-//			}
-//		}
-		return "";
 	}
 	
 	public boolean insertPubMedAudit(String json) {

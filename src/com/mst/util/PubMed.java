@@ -5,8 +5,10 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -27,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 public class PubMed {
 
-	private final String Q_PUBMED = "qPubMed";
+	private final String Q_PUBMED = "qParagraphs";
     private final String Q_PUBMED_AUDIT = "qPubMedAudit";
     private String PUBMED_TOOL = "Medical Search Technologies";
     private String PUBMED_EMAIL = "eric.plumb@gmail.com";
@@ -48,7 +50,7 @@ public class PubMed {
 	private MongoDB mongo = null;
 	
 	public PubMed() { 
-		PUBMED_TOOL = Props.getProperty("pubmed_tool", PUBMED_TOOL);
+		PUBMED_TOOL = encode(Props.getProperty("pubmed_tool", PUBMED_TOOL));
         PUBMED_EMAIL = Props.getProperty("pubmed_email", PUBMED_EMAIL);
         MAX_ARTICLES_PER_ITERATION = Integer.parseInt(Props.getProperty("pubmed_articles_per_iteration", String.valueOf(MAX_ARTICLES_PER_ITERATION)));
         MAX_ARTICLES_TOTAL = Integer.parseInt(Props.getProperty("pubmed_articles_total", String.valueOf(MAX_ARTICLES_TOTAL)));
@@ -80,6 +82,9 @@ public class PubMed {
 		// Do the check here in addition to MongoDB.java to prevent unnecessary parsing/processing in the Camel processes. 
 		existingPMIDs = mongo.getDistinctStringValues("article_id");
 
+		// TODO stop gap for dealing with long PubMed queries
+		String[] query = searchTerm.split(" ");
+		
 		if(exactMatch)
             searchTerm = (new StringBuilder("\"")).append(searchTerm).append("\"").toString();
 		
@@ -93,7 +98,7 @@ public class PubMed {
 			StringBuilder listUrl = new StringBuilder();
 			
 			listUrl.append("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed")
-			   	   .append("&term=").append(searchTerm)
+			   	   .append("&term=").append(encode(searchTerm))
 			       .append("&retmax=").append(articlesPerIteration)
 			       .append("&retstart=").append(articlesProcessed + offset)
 			       .append("&mindate=").append(minYear)
@@ -144,7 +149,7 @@ public class PubMed {
                     }
 					
 					//writeArticleToFile(articles);
-					writeArticleToJMS(Q_PUBMED, articles, searchTerm);
+					writeArticleToJMS(Q_PUBMED, articles, query[0]);
 					articlesProcessed += articlesPerIteration; // increment based on number of articles actually processed
 					
 					for(PubMedArticle article : articles)
@@ -166,7 +171,19 @@ public class PubMed {
 		//logger.info("\"" + Joiner.on("\",\"").join(deletePMIDs) + "\"");
 		//System.out.println(articlesProcessed);
 	}
-		
+	
+	private String encode(String in) {
+		String out = "";
+		try {
+			out = URLEncoder.encode(in, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			out = in;
+			logger.error("encode(): in: {} \n{}", in, e);
+			//e.printStackTrace();
+		}
+		return out;
+	}
+	
 	private String getPubMedXML(String inUrl) {
 		String ret = null;
 		StringBuilder xml = new StringBuilder();
@@ -197,6 +214,7 @@ public class PubMed {
 	        
 		} catch(Exception e) {
 			logger.error("getPubMedXML(): URL: {} \n{}", inUrl, e);
+			//e.printStackTrace();
 	        ret = null;
 		}
 		finally {
@@ -453,10 +471,10 @@ public class PubMed {
 					}
 					
 					sentence.setFullSentence(sb.toString().trim());
-					sentence.setSource("PubMed_Abstract");
+					sentence.setSource("PUBMED_ABSTRACT");
 				} else {
 					sentence.setFullSentence(article.getFullArticleText());
-					sentence.setSource("PubMed_FullArticle");
+					sentence.setSource("PUBMED_FULLARTICLE");
 				}
 				
 				activeMQ.publishMessage(qName, gson.toJson(sentence));

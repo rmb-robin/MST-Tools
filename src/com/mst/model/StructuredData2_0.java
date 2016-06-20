@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
@@ -23,7 +25,6 @@ public class StructuredData2_0 {
 	public Map<String, String> discreet = new HashMap<>();
 	public Map<String, Object> metadata = new HashMap<>();
 	public List<Finding> findings = new ArrayList<>();
-	//public Map<String, String> flat = new HashMap<>(); // a flat representation of the findings. used for reporting so one doesn't have to traverse the hierarchical List.
 	public Multimap<String, ?> flat = ArrayListMultimap.create(); // a flat representation of the findings. used for reporting so one doesn't have to traverse the hierarchical List.
 	public String sentence;
 	public String notation;
@@ -43,6 +44,43 @@ public class StructuredData2_0 {
 		return out;
 	}
 	
+	public List<Finding> getFinding(Finding finding, String type, String value) {
+		List<Finding> result = new ArrayList<>();
+		
+		if(finding.type.equalsIgnoreCase(type) && String.valueOf(finding.value).matches("(?i)" + value)) {
+			result.add(finding);
+		}
+		getFindingChildren(result, finding, type, value);
+		
+		return result;
+	}
+	
+	public List<Finding> getFinding(String type, String value) {
+		// returns a list of Findings that match the supplied type and value
+		// empty list if no match
+		List<Finding> result = new ArrayList<>();
+		
+		for(Finding finding : findings) {
+			if(finding.type.equalsIgnoreCase(type) && String.valueOf(finding.value).matches("(?i)" + value)) {
+				result.add(finding);
+			}
+			getFindingChildren(result, finding, type, value);
+		}
+		
+		return result;
+	}
+	
+	private void getFindingChildren(List<Finding> result, Finding finding, String type, String value) {
+		for(int i=0; i < finding.children.size(); i++) {
+			Finding child = finding.children.get(i);
+			
+			if(child.type.equalsIgnoreCase(type) && String.valueOf(child.value).matches("(?i)" + value)) {
+				result.add(child);
+			}
+			getFindingChildren(result, child, type, value);
+		}
+	}
+	
 	public String getNotationStringForAllFindings(Constants.StructuredNotationReturnValue returnValue) {
 		String temp = "";
 		
@@ -53,19 +91,25 @@ public class StructuredData2_0 {
 		return temp;
 	}
 	
-	public void persist() throws Exception {
+	public ObjectId persist() throws Exception {
+		ObjectId id = null;
+		
 		try {
 			if(!this.findings.isEmpty()) {
 				Gson gson = GsonFactory.build();
 				String json = gson.toJson(this);
-				System.out.print(json);
+				//System.out.print(json);
 				DBCollection coll = Constants.MongoDB.INSTANCE.getCollection("structured");
 				DBObject dbObject = (DBObject) JSON.parse(json);
 				coll.insert(dbObject);
+				
+				id = (ObjectId) dbObject.get("_id");
 			}
 		} catch(Exception e) {
 			throw new Exception("StructuredData2_0.persist()", e);
 		}
+		
+		return id;
 	}
 	/*
 	public String getNotationStringOld() {

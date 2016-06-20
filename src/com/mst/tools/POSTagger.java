@@ -19,6 +19,7 @@ public class POSTagger {
 
 	private Map<String, String> translateMap = new HashMap<String, String>();
 	private static MaxentTagger tagger = null;
+	private VerbHelper verbHelper = new VerbHelper();
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
@@ -50,7 +51,7 @@ public class POSTagger {
 			if(words == null || words.isEmpty()) {
 				ret = false;
 			} else {
-				StanfordNLP stanford = new StanfordNLP(tagger);
+				StanfordNLP stanford = new StanfordNLP(tagger); // TODO will making this global improve performance?
 				sentence.setWordList(processPOSOverrides(stanford.identifyPartsOfSpeech(words)));				
 			}
 		} catch(Exception e) {
@@ -62,11 +63,11 @@ public class POSTagger {
 	
  	private ArrayList<WordToken> processPOSOverrides(ArrayList<WordToken> words) {
 		try {
-			//for(WordToken word : words) {
-			//	if(Constants.MEASUREMENT_REGEX.matcher(word.getToken()).matches()) {
-			//		word.setSemanticType(Constants.semanticTypes.get("[number]"));
-			//	}
-			//}
+			for(WordToken word : words) {
+				if(verbHelper.shouldOverride(word.getPosition()-1, words)) {
+					word.setPOS(Constants.verbOverrides.get(word.getToken().toLowerCase()));
+				}
+			}
 		} catch(Exception e) {
 			logger.error("processPOSOverrides(): {}", e);
 		}

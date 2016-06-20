@@ -8,6 +8,7 @@ import com.mst.util.Constants;
 public class VerbPhraseMetadata {
 	private Constants.VerbClass _class;
 	private VerbPhraseToken subj;
+	private List<VerbPhraseToken> subjs = new ArrayList<VerbPhraseToken>();
 	private List<VerbPhraseToken> verbs = new ArrayList<VerbPhraseToken>();
 	private List<VerbPhraseToken> subjc = new ArrayList<VerbPhraseToken>();
 	//private boolean compound;
@@ -53,6 +54,14 @@ public class VerbPhraseMetadata {
 		this.subjc.add(subjc);
 	}
 
+	public List<VerbPhraseToken> getSubjects() {
+		return subjs;
+	}
+
+	public void addSubj(VerbPhraseToken subj) {
+		this.subjs.add(subj);
+	}
+	
 //	public boolean isCompound() {
 //		return compound;
 //	}

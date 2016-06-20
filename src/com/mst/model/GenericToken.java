@@ -1,8 +1,8 @@
 package com.mst.model;
 
 public class GenericToken {
-	private String token;
-	private int idx; // position of the sentence/word within the paragraph/sentence
+	private String token = "";
+	private int idx; // position of the sentence/word within the paragraph/sentence; 1-based
 	
 	public GenericToken() {	}
 	

@@ -84,6 +84,10 @@ public class WordToken extends GenericToken {
 		return vobSubjC || lvSubjC || avObj || mvSubjC;
 	}
 	
+	public boolean isVerbPhraseSubject() {
+		return vobSubj || lvSubj || avSubj || mvSubj;
+	}
+	
 	public boolean isPronounPOS() {	
 		return pos.startsWith("PRP");
 	}
@@ -403,5 +407,22 @@ public class WordToken extends GenericToken {
 
 	public void setNormalizedForm(String val) {
 		normalizedForm = val;
+	}
+	
+	public boolean isWithinVerbPhrase() {
+		return infHead || inf || vob || vobSubj || vobSubjC || lvSubj || lv || lvSubjC || av || avSubj || avObj || prepVerb || mv || mvSubj || mvSubjC;
+	}
+	
+	public boolean isWithinNounPhrase() {
+		return isNounPhraseModifier() || isNounPhraseHead();
+	}
+	
+	public boolean isWithinPrepPhrase() {
+		return isPrepPhraseObject() || isPrepPhraseMember() || isPrepPhraseBegin();
+	}
+	
+	@Override
+	public String toString() {
+		return super.getToken();
 	}
 }

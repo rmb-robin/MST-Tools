@@ -29,7 +29,8 @@ public class Tokenizer {
 
 	private Pattern falseMatchRegex = Pattern.compile("(vs|v\\.s|i\\.v)\\.$");
 	private Pattern[] patterns = { Pattern.compile(regex1), Pattern.compile(regex2) };
-	private static Pattern singlePunc = Pattern.compile(",|:|@|#|\\$|%|&|\\?|\\!|\\[|\\]|\\(|\\)|\\{|\\}|<|>|;|--|\"|\\.\\.\\.");
+	private static Pattern singlePunc = Pattern.compile(",|:(?!\\d)|@|#|\\$|%|&|\\?|\\!|\\[|\\]|\\(|\\)|\\{|\\}|<|>|;|--|\"|\\.\\.\\.");
+//	private static Pattern singlePunc = Pattern.compile(",|:|@|#|\\$|%|&|\\?|\\!|\\[|\\]|\\(|\\)|\\{|\\}|<|>|;|--|\"|\\.\\.\\.");
 	private Pattern brackets = Pattern.compile("^[\"\\(\\[].*");
 	private Pattern trailingChars = Pattern.compile("(?<=\\.|\\?|!)([\\.|\\s\\?\\!;]*)$"); 
 	private Matcher trailingMatcher = trailingChars.matcher("");
@@ -328,31 +329,18 @@ public class Tokenizer {
 		    s = s.replace("<\"", "< \" ");
 		    
 		    Matcher matcher = singlePunc.matcher(s);
+//		    while(matcher.find()) {
+//		    	s = s.replace(matcher.group(), " " + matcher.group() + " ");
+//		    }
+		    int offset = 0;
 		    while(matcher.find()) {
-		    	s = s.replace(matcher.group(), " " + matcher.group() + " ");
+		    	//System.out.println(matcher.start() + "/" + matcher.end());
+		    	//System.out.println(matcher.group());
+		    	s = s.substring(0, matcher.start()+offset) + " " + matcher.group() + " " + s.substring(matcher.end()+offset);
+		    	//s = s.replace(matcher.group(), " " + matcher.group() + " ");
+		    	offset += 2; // account for the spaces we added
 		    }
-//		    s = s.replace("...", " ... ");
-//		    s = s.replace(",", " , ");
-//		    s = s.replace(":", " : ");
-//		    s = s.replace("@", " @ ");
-//		    s = s.replace("#", " # ");
-//		    s = s.replace("$", " $ ");
-//		    s = s.replace("%", " % ");
-//		    s = s.replace("&", " & ");
-//		    s = s.replace("?", " ? ");
-//		    s = s.replace("!", " ! ");
-//		    s = s.replace("[", " [ ");
-//		    s = s.replace("]", " ] ");
-//		    s = s.replace("(", " ( ");
-//		    s = s.replace(")", " ) ");
-//		    s = s.replace("{", " { ");
-//		    s = s.replace("}", " } ");
-//		    s = s.replace("<", " < ");
-//		    s = s.replace(">", " > ");
-//		    s = s.replace(";", " ; ");
-//		    s = s.replace("--", " -- ");
-//		    s = s.replace("\"", " \" ");
-		    
+
 		    // this was copied verbatim from the original python.
 		    // needs to be cleaned up. apparent goal is to add a space between final token and period ending sentence.
 		    // read through a sentence backwards, looking for a period only if it precedes certain chars

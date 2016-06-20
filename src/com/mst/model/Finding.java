@@ -47,7 +47,11 @@ public class Finding {
 		
 		String rv = getReturnValueString(this, returnValue);
 		
-		temp += normalizeType(this.type) + ":" + normalizeValue(rv);
+		if(returnValue.toString().endsWith("SOLO")) {
+			temp += normalizeValue(rv);
+		} else 
+			temp += normalizeType(this.type) + ":" + normalizeValue(rv);
+			
 		temp += processChildren("", this, returnValue);
 		
 		if(returnValue == Constants.StructuredNotationReturnValue.NONE) {
@@ -109,10 +113,16 @@ public class Finding {
 			if(i==0)
 				temp += "[";
 			Finding child = finding.children.get(i);
-			temp += normalizeType(child.type) + ":" + normalizeValue(getReturnValueString(child, returnValue)); 
+			
+			// do, or do not, append the Finding Type
+			if(returnValue.toString().endsWith("SOLO")) {
+				temp += normalizeValue(getReturnValueString(child, returnValue));
+			} else
+				temp += normalizeType(child.type) + ":" + normalizeValue(getReturnValueString(child, returnValue));
+			
 			temp = processChildren(temp, child, returnValue) + (i < finding.children.size()-1 ? "," : "]");
 		}
-		
+		//System.out.println(temp);
 		return temp;
 	}
 	
@@ -121,6 +131,7 @@ public class Finding {
 		
 		switch(returnValue) {
 			case SOURCE:
+			case SOURCE_SOLO:
 				rv = finding.source; // CF: vb-obj-np [FS: vb-obj-np]
 				break;
 			case VALUE:

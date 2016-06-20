@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bson.types.ObjectId;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.ExclusionStrategy;
@@ -25,7 +27,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
-import com.mst.model.MapValue;
 
 /*
  * Custom factory for Gson that registers a de/serializer that can handle MongoDB's ISODate type and Multimaps.
@@ -143,6 +144,25 @@ public class GsonFactory {
 		}
 	};
 	
+	private final static JsonDeserializer<ObjectId> oidDeserializer = new JsonDeserializer<ObjectId>() {
+		@Override
+		public ObjectId deserialize(JsonElement json, Type type, JsonDeserializationContext context) {
+			return new ObjectId(json.getAsJsonObject().get("$oid").getAsString());
+		}
+	};
+	
+	private final static JsonSerializer<ObjectId> oidSerializer = new JsonSerializer<ObjectId>() {
+		@Override
+		public JsonElement serialize(ObjectId id, Type type, JsonSerializationContext context) throws JsonParseException {
+		   try {
+			   JsonObject jo = new JsonObject();
+			   jo.addProperty("$oid", id.toString());
+			   return jo;
+		   }
+		   catch (Exception e) { return null; }
+		}
+	};
+	
 	public static Gson build() {
         GsonBuilder b = new GsonBuilder();
 		
@@ -150,6 +170,8 @@ public class GsonFactory {
 		b.registerTypeAdapter(Date.class, deser);
 		b.registerTypeAdapter(Multimap.class, mmSerializer);
 		b.registerTypeAdapter(Multimap.class, mmDeserializer);
+		b.registerTypeAdapter(ObjectId.class, oidDeserializer);
+		b.registerTypeAdapter(ObjectId.class, oidSerializer);
 		
         return b.create();
     }
@@ -162,6 +184,8 @@ public class GsonFactory {
 		b.registerTypeAdapter(Date.class, deser);
 		b.registerTypeAdapter(Multimap.class, mmSerializer);
 		b.registerTypeAdapter(Multimap.class, mmDeserializer);
+		b.registerTypeAdapter(ObjectId.class, oidDeserializer);
+		b.registerTypeAdapter(ObjectId.class, oidSerializer);
 		
         return b.create();
     }

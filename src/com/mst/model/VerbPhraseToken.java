@@ -5,10 +5,8 @@ import java.util.List;
 
 public class VerbPhraseToken extends GenericToken {
 	private boolean negated;
-	//private boolean inDP; // within a dependent phrase
-	//private List<PrepPhraseMetadata> prepPhrases = new ArrayList<PrepPhraseMetadata>();
-	//private NounPhraseMetadata nounPhrase = new NounPhraseMetadata();
 	private List<Integer> prepPhrasesIdx = new ArrayList<Integer>();
+	private List<Integer> modifierIdx = new ArrayList<Integer>();
 	private int nounPhraseIdx = -1;
 	private int depPhraseIdx = -1;
 	
@@ -16,29 +14,23 @@ public class VerbPhraseToken extends GenericToken {
 		super(token, position);
 	}
 	
+	public boolean hasModifiers() {
+		return !modifierIdx.isEmpty();
+	}
+	
 	public boolean isNegated() { return negated; }
 
 	public void setNegated(boolean negated) { this.negated = negated; }
-	
-	//public boolean isWithinDependentPhrase() { return inDP;	}
-
-	//public void setWithinDependentPhrase(boolean inDP) { this.inDP = inDP; }
-	
-	//public boolean addPrepPhrase(PrepPhraseMetadata val) { return prepPhrases.add(val); }
-	
-	//public void setPrepPhrases(List<PrepPhraseMetadata> val) { this.prepPhrases = val; }
-	
-	//public List<PrepPhraseMetadata> getPrepPhrases() { return prepPhrases; }
-	
-	//public void setNounPhrase(NounPhraseMetadata val) { this.nounPhrase = val; }
-	
-	//public NounPhraseMetadata getNounPhrase() { return nounPhrase; }
-	
+		
 	public boolean addPrepPhraseIdx(Integer val) { return prepPhrasesIdx.add(val); }
 	
 	public void setPrepPhrasesIdx(List<Integer> val) { this.prepPhrasesIdx = val; }
 		
 	public List<Integer> getPrepPhrasesIdx() { return prepPhrasesIdx; }	
+	
+	public void setModifierIdx(List<Integer> val) { this.modifierIdx = val; }
+	
+	public List<Integer> getModifierList() { return modifierIdx; }
 	
 	public int getNounPhraseIdx() {	return nounPhraseIdx; }
 	
@@ -47,4 +39,9 @@ public class VerbPhraseToken extends GenericToken {
 	public int getDepPhraseIdx() {	return depPhraseIdx; }
 	
 	public void setDepPhraseIdx(int idx) {	depPhraseIdx = idx; }
+	
+	@Override
+	public String toString() {
+		return this.getToken();
+	}
  }

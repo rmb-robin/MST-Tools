@@ -2,11 +2,12 @@ package com.mst.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.base.Joiner;
-import com.mst.util.Constants;
 
 // The purpose for metadata, in general, is to ease downstream processing when creating the structured output (JSON that represents Ontology/Snomed mapping).
 // The idea is to choose different processing paths based on features of the sentence, such as (really bad example)...
@@ -25,7 +26,6 @@ public class SentenceMetadata {
 	private List<NounPhraseMetadata> nounPhrases = new ArrayList<NounPhraseMetadata>();
 	private List<PrepPhraseMetadata> prepPhrases = new ArrayList<PrepPhraseMetadata>();
 	private List<DependentPhraseMetadata> dependentPhrases = new ArrayList<DependentPhraseMetadata>();
-		
 	
 	public int addVerbMetadata(VerbPhraseMetadata val) {
 		// return the index of the phrase just added
@@ -44,9 +44,6 @@ public class SentenceMetadata {
 	public boolean addDependentMetadata(DependentPhraseMetadata val) { return dependentPhrases.add(val); }
 	public List<DependentPhraseMetadata> getDependentMetadata() { return dependentPhrases; }
 	
-	//public void setBeginsWithPreposition(boolean val) { beginsWithPrep = val; };
-	//public boolean beginsWithPreposition() { return beginsWithPrep; };
-
 	public Map<String, Object> getSimpleMetadata() {
 		return this.simple;
 	}
@@ -73,6 +70,47 @@ public class SentenceMetadata {
 			ret = false;
 		}
 		return ret;
+	}
+	
+	// this was added to support the Grammatical Patterns report/functionality
+	// it returns a set of token indexes involved in all phrase types (excluding dependent),
+	// which is used to help determine if orphans exist in the sentence.
+	public Set<Integer> getIncludedIndexes() {
+		Set<Integer> indexes = new HashSet<>();
+		
+		for(VerbPhraseMetadata vpm : verbPhrases) {
+			if(vpm.getSubj() != null)
+				indexes.add(vpm.getSubj().getPosition());
+			for(VerbPhraseToken vpt : vpm.getVerbs()) {
+				indexes.add(vpt.getPosition());
+				try { // remove this try once data has been re-annotated
+					for(Integer mod : vpt.getModifierList())
+						indexes.add(mod);
+				} catch(Exception e) { }
+			}
+			if(vpm.getSubjC() != null)
+				for(VerbPhraseToken vpt : vpm.getSubjC()) {
+					indexes.add(vpt.getPosition());
+					try { // remove this try once data has been re-annotated
+						for(Integer mod : vpt.getModifierList())
+							indexes.add(mod);
+					} catch(Exception e) { }
+				}
+		}
+		
+		for(PrepPhraseMetadata ppm : prepPhrases) {
+			for(PrepPhraseToken ppt : ppm.getPhrase()) {
+				indexes.add(ppt.getPosition());
+			}
+		}
+		
+		for(NounPhraseMetadata npm : nounPhrases) {
+			for(GenericToken npt : npm.getPhrase()) {
+				indexes.add(npt.getPosition());
+			}
+		}
+		
+		return indexes;
 	}
 	
 	public String getAnnotatedMarkup(ArrayList<WordToken> words) {
@@ -134,8 +172,12 @@ public class SentenceMetadata {
 			
 			int idx = 0;
 			
-			if(vp.getSubj() != null) {
-				idx = vp.getSubj().getPosition();
+			//if(vp.getSubj() != null) {
+			//	idx = vp.getSubj().getPosition();
+			//	markup.set(idx, markup.get(idx) + openTag + subj + closeTag);
+			//}
+			for(VerbPhraseToken token : vp.getSubjects()) {
+				idx = token.getPosition();
 				markup.set(idx, markup.get(idx) + openTag + subj + closeTag);
 			}
 			
@@ -181,4 +223,5 @@ public class SentenceMetadata {
 		
 		return Joiner.on(" ").join(markup);
 	}
+	
 }

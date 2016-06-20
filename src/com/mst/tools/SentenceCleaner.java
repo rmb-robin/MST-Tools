@@ -106,10 +106,8 @@ public class SentenceCleaner {
 		}
 		
 		Matcher measu = Constants.MEASUREMENT_REGEX.matcher(sentence);
-		//System.out.println(sentence);
-		if(measu.find()) {
+		while(measu.find()) {
 			sentence = sentence.replace(measu.group(), measu.group().replace(" ", "") + " ");
-			//System.out.println(sentence);
 		}
 		
 		return sentence;
