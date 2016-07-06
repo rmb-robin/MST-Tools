@@ -3,6 +3,7 @@ package com.mst.tools;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
@@ -22,6 +23,8 @@ public class POSTagger {
 	private VerbHelper verbHelper = new VerbHelper();
 	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
+	
+	public final Pattern BRACKETS = Pattern.compile("\\[|\\]|\\{|\\}"); // Stanford POS does odd things with brackets
 	
 	public POSTagger() {
 		try {
@@ -66,6 +69,8 @@ public class POSTagger {
 			for(WordToken word : words) {
 				if(verbHelper.shouldOverride(word.getPosition()-1, words)) {
 					word.setPOS(Constants.verbOverrides.get(word.getToken().toLowerCase()));
+				} else if(BRACKETS.matcher(word.getToken()).matches()) {
+					word.setPOS(word.getToken());
 				}
 			}
 		} catch(Exception e) {

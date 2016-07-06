@@ -20,7 +20,7 @@ public class NounHelper {
 			//TODO don't mark as head if surrounded by parens?
 			for(int i=sentence.getWordList().size()-1; i >= 0; i--) {
 				WordToken word = sentence.getWordList().get(i);
-				if(word.isNounPOS() && !word.isPunctuation()) { // added isPunc because Stanford was tagging ( and ) as NN. This may catch other Stanford POS tagging of punc chars.
+				if((word.isNounPOS() || word.isNumericPOS()) && !word.isPunctuation()) { // added isPunc because Stanford was tagging ( and ) as NN. This may catch other Stanford POS tagging of punc chars.
 					if(headIndex == 0) {
 						headIndex = i;
 					} else {

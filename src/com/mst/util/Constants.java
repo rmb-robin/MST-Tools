@@ -1,6 +1,7 @@
 package com.mst.util;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
+import com.mst.model.WordToken;
 
 public class Constants {
 	
@@ -121,7 +123,7 @@ public class Constants {
 	
 	public static final Pattern VERB_SUBJ_SUBJC_EXCLUSIONS = Pattern.compile("a|also|an|and|another|as|be|but|cm|could|elsewhere|has|left|may|mm|otherwise|right|seen|to|which|would", Pattern.CASE_INSENSITIVE);
 	
-	public static final Pattern PREPOSITIONS = Pattern.compile("after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|that|through|to|while|with|within|without|off|since|until", Pattern.CASE_INSENSITIVE);
+	public static final Pattern PREPOSITIONS = Pattern.compile("after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|that|through|to|while|with|within|without|off|since|until|along|around|throughout|under|above|near|behind|across|into|upon|via", Pattern.CASE_INSENSITIVE);
 	
 	public static final Pattern DEPENDENT_SIGNALS = Pattern.compile("after|also|although|as|because|before|certainly|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why", Pattern.CASE_INSENSITIVE);
 	
@@ -243,5 +245,13 @@ public class Constants {
 		int seconds = (int) (totalSecs % 60);
 
 		return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+	}
+	
+	public static WordToken getToken(ArrayList<WordToken> wordList, int index) {
+		WordToken token = new WordToken();
+		try {
+			token = wordList.get(index);
+		} catch(IndexOutOfBoundsException oob) { }
+		return token;
 	}
 }

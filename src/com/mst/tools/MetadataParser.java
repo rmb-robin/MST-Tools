@@ -12,6 +12,7 @@ import redis.clients.jedis.Jedis;
 import com.google.common.collect.Lists;
 import com.mst.model.DependentPhraseMetadata;
 import com.mst.model.NounPhraseMetadata;
+import com.mst.model.OrphanMetadata;
 import com.mst.model.PrepPhraseMetadata;
 import com.mst.model.PrepPhraseToken;
 import com.mst.model.Sentence;
@@ -296,6 +297,81 @@ public class MetadataParser {
 		for(DependentPhraseMetadata phrase : metadata.getDependentMetadata()) {
 			phrase.setPrepPhrasesIdx(getModifyingPrepPhrases(phrase.getPhrase().get(phrase.getPhrase().size()-1).getPosition(), metadata.getPrepMetadata()));
 		}
+		
+		// determine orphaned tokens (those which do not fall within a known phrase type [with restrictions])
+		buildOrphanList(words, metadata);
+	}
+	
+	private void buildOrphanList(ArrayList<WordToken> words, SentenceMetadata metadata) {
+		Set<Integer> metadataIndexes = new HashSet<>(); // indexes of tokens contained within known phrases
+        Set<Integer> orphanedIndexes = new HashSet<>(); // indexes of tokens outside of phrases
+        
+        // add all token indexes within known phrase types to metadataIndexes
+        for(VerbPhraseMetadata vpm : metadata.getVerbMetadata()) {
+            if(vpm.getSubj() != null) {
+            	metadataIndexes.add(vpm.getSubj().getPosition());
+            	for(Integer mod : vpm.getSubj().getModifierList()) {
+            		metadataIndexes.add(mod);
+            	}
+            }
+            
+//            if(vpm.getSubjects() != null) { 
+//				for(VerbPhraseToken vpt : vpm.getSubjects()) {
+//					metadataIndexes.add(vpt.getPosition());
+//					for(Integer mod : vpt.getModifierList())
+//						metadataIndexes.add(mod);
+//				}
+//			}
+            
+            for(VerbPhraseToken vpt : vpm.getVerbs()) {
+				metadataIndexes.add(vpt.getPosition());
+				try { // remove this try once data has been re-annotated
+					for(Integer mod : vpt.getModifierList())
+						metadataIndexes.add(mod);
+				} catch(Exception e) { }
+			}
+			
+			if(vpm.getSubjC() != null) { 
+				for(VerbPhraseToken vpt : vpm.getSubjC()) {
+					metadataIndexes.add(vpt.getPosition());
+					try { // remove this try once data has been re-annotated
+						for(Integer mod : vpt.getModifierList())
+							metadataIndexes.add(mod);
+					} catch(Exception e) { }
+				}
+			}
+        }
+        for(NounPhraseMetadata npm : metadata.getNounMetadata()) {
+            for(GenericToken g : npm.getPhrase()) {
+                metadataIndexes.add(g.getPosition());
+            }
+        }
+        for(PrepPhraseMetadata ppm : metadata.getPrepMetadata()) {
+            for(GenericToken g : ppm.getPhrase()) {
+                metadataIndexes.add(g.getPosition());
+            }
+        }
+        //for(DependentPhraseMetadata dpm : metadata.getDependentMetadata()) {
+        //    for(GenericToken g : dpm.getPhrase()) {
+        //        metadataIndexes.add(g.getPosition());
+        //    }
+        //}
+        
+        // build a Set that represents orphaned tokens not accounted for within metadata
+		for(int i = 0; i < words.size(); i++) {
+			WordToken word = words.get(i);
+			if(!metadataIndexes.contains(i))
+				// added more restriction to make it match the grammatical patterns report
+				if(!(word.isPunctuation() || word.isDeterminerPOS() || word.isConjunctionPOS() || word.isNegationSignal()
+				  || word.isDependentPhraseBegin())) {
+					orphanedIndexes.add(i);
+				}
+		}
+		
+		for(Integer index : orphanedIndexes) {
+			metadata.addOrphan(new OrphanMetadata(new GenericToken(words.get(index).getToken(), index)));
+		}
+        
 	}
 	
 	private int findModifyingDependentPhrase(ArrayList<WordToken> words, int subjcPos, List<DependentPhraseMetadata> dpMetadata) {

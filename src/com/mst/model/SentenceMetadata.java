@@ -26,6 +26,7 @@ public class SentenceMetadata {
 	private List<NounPhraseMetadata> nounPhrases = new ArrayList<NounPhraseMetadata>();
 	private List<PrepPhraseMetadata> prepPhrases = new ArrayList<PrepPhraseMetadata>();
 	private List<DependentPhraseMetadata> dependentPhrases = new ArrayList<DependentPhraseMetadata>();
+	private List<OrphanMetadata> orphans = new ArrayList<OrphanMetadata>();
 	
 	public int addVerbMetadata(VerbPhraseMetadata val) {
 		// return the index of the phrase just added
@@ -43,6 +44,9 @@ public class SentenceMetadata {
 	
 	public boolean addDependentMetadata(DependentPhraseMetadata val) { return dependentPhrases.add(val); }
 	public List<DependentPhraseMetadata> getDependentMetadata() { return dependentPhrases; }
+	
+	public boolean addOrphan(OrphanMetadata val) { return orphans.add(val); }
+	public List<OrphanMetadata> getOrphans() { return orphans; }
 	
 	public Map<String, Object> getSimpleMetadata() {
 		return this.simple;
