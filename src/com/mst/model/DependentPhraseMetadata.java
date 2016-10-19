@@ -34,5 +34,14 @@ public class DependentPhraseMetadata {
 	
 	public void setPrepPhrasesIdx(List<Integer> val) { this.prepPhrasesIdx = val; }
 		
-	public List<Integer> getPrepPhrasesIdx() { return prepPhrasesIdx; }	
+	public List<Integer> getPrepPhrasesIdx() { return prepPhrasesIdx; }
+	
+	@Override
+	public String toString() {
+		StringBuilder pp = new StringBuilder();
+		for(GenericToken token : phrase) {
+			pp.append(token.getToken()).append(" ");
+		}
+		return pp.toString().trim();
+	}
 }

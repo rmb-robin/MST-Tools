@@ -22,9 +22,13 @@ public class POSTagger {
 	private static MaxentTagger tagger = null;
 	private VerbHelper verbHelper = new VerbHelper();
 	
+	private final Pattern PUNC = Pattern.compile(",|\\(|\\)|-|\\[|]|\\{|}|<|>|=");
+	private final Pattern SHOWS = Pattern.compile("shows?", Pattern.CASE_INSENSITIVE);
+	private final Pattern NOUN_OVERRIDES = Pattern.compile("ct|dexa", Pattern.CASE_INSENSITIVE);
+	
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
-	public final Pattern BRACKETS = Pattern.compile("\\[|\\]|\\{|\\}"); // Stanford POS does odd things with brackets
+	//public final Pattern BRACKETS = Pattern.compile("\\[|\\]|\\{|\\}"); // Stanford POS does odd things with brackets
 	
 	public POSTagger() {
 		try {
@@ -67,10 +71,34 @@ public class POSTagger {
  	private ArrayList<WordToken> processPOSOverrides(ArrayList<WordToken> words) {
 		try {
 			for(WordToken word : words) {
+				WordToken prevWord = Constants.getToken(words, word.getPosition()-2);
+				
 				if(verbHelper.shouldOverride(word.getPosition()-1, words)) {
 					word.setPOS(Constants.verbOverrides.get(word.getToken().toLowerCase()));
-				} else if(BRACKETS.matcher(word.getToken()).matches()) {
-					word.setPOS(word.getToken());
+				} else if(PUNC.matcher(word.getToken()).matches()) { // Stanford tags these as NN
+					word.setPOS(word.getToken()); // reset POS to match punctuation char
+				} else if(word.getToken().equalsIgnoreCase("scan")) {
+					// override the POS of scan (Stanford = VB) to NN if preceded by ST diap or token "bone"
+					if(prevWord.getToken().equalsIgnoreCase("bone")) {   // equalsIgnoreCase("bone") is faster than match on "(?i)bone"
+						word.setPOS("NN");
+					}
+				} else if(SHOWS.matcher(word.getToken()).matches()) {
+					word.setPOS("VB"); // ensure that show and shows are tagged as a verb
+				} else if(NOUN_OVERRIDES.matcher(word.getToken()).matches()) {
+					word.setPOS("NN"); // certain tokens should always be nouns
+				} else if(word.isVerb()) {
+					if(!prevWord.isToPOS()) {
+						// override tokens that Stanford possibly erroneously tags as verbs
+						// must be a verb that ends in -ed or -ing and preceded by a preposition
+						if(prevWord.isPreposition()) {
+							if(word.getToken().endsWith("ed") || word.getToken().endsWith("ing"))
+								word.setPOS("JJ");
+							else
+								word.setPOS("NN");
+						} else if(prevWord.isDeterminerPOS() && word.getPOS().matches("VBN|VBG")) {
+							word.setPOS("JJ");
+						}
+					}
 				}
 			}
 		} catch(Exception e) {

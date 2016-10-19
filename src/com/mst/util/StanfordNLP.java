@@ -36,8 +36,6 @@ public class StanfordNLP {
 	
 	public ArrayList<WordToken> identifyPartsOfSpeech(ArrayList<WordToken> wordList) {
 		
-		//ArrayList<WordToken> wordListOut = new ArrayList<WordToken>();
-		
 		try {
 			StringBuilder sb = new StringBuilder();
 			
@@ -45,20 +43,13 @@ public class StanfordNLP {
 				sb.append(word.getToken()); // was getNormalizedForm()
 				sb.append(" ");
 			}
-			//System.out.println(sb.toString());
+
 			String result = tagger.tagTokenizedString(sb.toString());
 			//System.out.println(result);
 			String[] tagged = result.split(" ");
 			
 			for(int i=0; i < wordList.size(); i++) {
 				String[] split = tagged[i].split("_");
-				//if(split[0].matches(",|\\(|\\)"))
-				//	wordList.get(i).setPOS(split[0]);
-				//else
-				//	if(split[0].matches("(?i)scan"))
-						
-				//	else
-				//wordList.get(i).setPOS(split[split.length-1]);
 				wordList.get(i).setPOS(split[1]);
 			}
 			

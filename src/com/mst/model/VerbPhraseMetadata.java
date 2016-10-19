@@ -13,7 +13,7 @@ public class VerbPhraseMetadata {
 	private List<VerbPhraseToken> subjc = new ArrayList<VerbPhraseToken>();
 	//private boolean compound;
 	//private boolean intransitive = true;
-	//private boolean infFollowsPP; // infinitive verb follows prep phrase
+	private boolean infFollowsPP; // infinitive verb follows prep phrase
 	private String st = null;
 
 	public VerbPhraseMetadata() {	}
@@ -78,13 +78,13 @@ public class VerbPhraseMetadata {
 //		this.compound = compound;
 //	}
 //	
-//	public void setInfFollowsPP(boolean infFollowsPP) {
-//		this.infFollowsPP = infFollowsPP;
-//	}
-//
-//	public boolean isInfFollowsPP() {
-//		return infFollowsPP;
-//	}
+	public void setInfFollowsPP(boolean infFollowsPP) {
+		this.infFollowsPP = infFollowsPP;
+	}
+
+	public boolean isInfFollowsPP() {
+		return infFollowsPP;
+	}
 	
 	public String getSemanticType() {
 		return st;

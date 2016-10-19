@@ -11,6 +11,7 @@ import redis.clients.jedis.Jedis;
 
 import com.google.common.collect.Lists;
 import com.mst.model.DependentPhraseMetadata;
+import com.mst.model.ModByPPMetadata;
 import com.mst.model.NounPhraseMetadata;
 import com.mst.model.OrphanMetadata;
 import com.mst.model.PrepPhraseMetadata;
@@ -31,7 +32,7 @@ public class MetadataParser {
 	public final Pattern hyphenPattern = Pattern.compile("-|�|�");
 	public final Pattern uppercasePattern = Pattern.compile("[A-Z]{2,}");
 	// regex that is numeric but also not part of a date
-	// digit not bookended by / but allowing decimal and possibly preceded by a digit (eg. T11)
+	// digit not bookended by / but allowing decimal and possibly preceded by a character (eg. T11)
 	public final Pattern numericPattern = Pattern.compile("(?<!\\/)\\b[A-Z]*\\d+\\.*\\d*\\b(?!\\/)");
 	
 	public void parseComplex(Sentence sentence) {
@@ -85,6 +86,28 @@ public class MetadataParser {
 						}
 					}
 					
+					try {
+						if(words.get(pp.getPhrase().get(0).getPosition()-1).isVerbPhraseVerb()) {
+							pp.setModifiesVerb(true);
+						}
+					} catch(Exception e) { }
+					
+					// first stab at a heuristics-based ST for PPs
+					if(pp.getPhrase().get(0).getToken().equalsIgnoreCase("in")) {
+						String finalST = words.get(pp.getPhrase().get(pp.getPhrase().size()-1).getPosition()).getSemanticType();
+						if(finalST != null) {
+							if(finalST.startsWith("bpoc") ) {
+								pp.setSemanticType("Finding Type");  // TODO possibly store in a var called 'frame' rather than 'st' but it's sort of functioning as an st
+							} else if(finalST.startsWith("tempor") ) {
+								pp.setSemanticType("Period of Time");
+							} else {
+								pp.setSemanticType("Location");
+							}
+						} else {
+							pp.setSemanticType("Location");
+						}
+					}
+					
 					metadata.addPrepMetadata(pp);
 				}
 
@@ -92,13 +115,18 @@ public class MetadataParser {
 				/* VERB phrases (not handled in VerbPhraseHelper) */
 				if(word.isInfinitiveVerb()) {
 					VerbPhraseMetadata vp = new VerbPhraseMetadata(Constants.VerbClass.INFINITIVE);
+					
+					// grab previous token, even though it'll always be "to"
+					WordToken prevToken = Constants.getToken(words, i-1);
+					
+					vp.addVerb(new VerbPhraseToken(prevToken.getToken(), i-1));
 					vp.addVerb(new VerbPhraseToken(word.getToken(), i));
 					
 					// infinitive follows prep phrase
-//					try {
-//						if(i > 0 && words.get(i-1).isPrepPhraseObject())
-//							vp.setInfFollowsPP(true);
-//					} catch(IndexOutOfBoundsException e) { }
+					WordToken prevPrevToken = Constants.getToken(words, i-2);
+					
+					if(prevPrevToken.isPrepPhraseObject())
+						vp.setInfFollowsPP(true);
 					
 					metadata.addVerbMetadata(vp);
 				}	
@@ -212,6 +240,8 @@ public class MetadataParser {
 				phrase.getVerbClass() == Constants.VerbClass.VERB_OF_BEING || 
 				phrase.getVerbClass() == Constants.VerbClass.MODAL_AUX) {
 				
+				boolean oneVerbNegated = false;
+				
 				for(VerbPhraseToken verb : phrase.getVerbs()) {
 					verb.setNegated(checkNegation(words, verb.getPosition()));
 					verb.setPrepPhrasesIdx(getModifyingPrepPhrases(verb.getPosition(), metadata.getPrepMetadata()));
@@ -223,6 +253,9 @@ public class MetadataParser {
 						} else
 							break;
 					}
+					
+					if(verb.isNegated())
+						oneVerbNegated = true;
 				}
 				
 				// if verb consists of more than one token, query lexicon for semantic type
@@ -230,6 +263,13 @@ public class MetadataParser {
 					//phrase.setSemanticType(Constants.semanticTypes.get(phrase.getVerbString()));
 					try(Jedis jedis = Constants.MyJedisPool.INSTANCE.getResource()) {
 						phrase.setSemanticType(jedis.get("st:"+phrase.getVerbString().toLowerCase()));
+					}
+					
+					// if one verb of the phrase is negated, set all to negated
+					if(oneVerbNegated) {
+						for(VerbPhraseToken verb : phrase.getVerbs()) {
+							verb.setNegated(true);
+						}
 					}
 				}
 				
@@ -300,6 +340,8 @@ public class MetadataParser {
 		
 		// determine orphaned tokens (those which do not fall within a known phrase type [with restrictions])
 		buildOrphanList(words, metadata);
+		
+		buildModByPPList(words, metadata);
 	}
 	
 	private void buildOrphanList(ArrayList<WordToken> words, SentenceMetadata metadata) {
@@ -372,6 +414,70 @@ public class MetadataParser {
 			metadata.addOrphan(new OrphanMetadata(new GenericToken(words.get(index).getToken(), index)));
 		}
         
+	}
+	
+	private void buildModByPPList(ArrayList<WordToken> words, SentenceMetadata metadata) {        
+        // 
+        for(VerbPhraseMetadata vpm : metadata.getVerbMetadata()) {
+            if(vpm.getSubj() != null) {
+            	int i = 0;
+            	for(Integer ppIdx : vpm.getSubj().getPrepPhrasesIdx()) {
+            		if(i == 0)
+            			metadata.addModByPPMetadata(new ModByPPMetadata(ppIdx, Constants.ModByPPClass.SUBJ));
+            		else
+            			metadata.addModByPPMetadata(new ModByPPMetadata(ppIdx, Constants.ModByPPClass.PP));
+            		i++;
+            	}
+            }
+            
+//            if(vpm.getSubjects() != null) { 
+//				for(VerbPhraseToken vpt : vpm.getSubjects()) {
+//					metadataIndexes.add(vpt.getPosition());
+//					for(Integer mod : vpt.getModifierList())
+//						metadataIndexes.add(mod);
+//				}
+//			}
+            
+            for(VerbPhraseToken vpt : vpm.getVerbs()) {
+            	int i = 0;
+            	for(Integer ppIdx : vpt.getPrepPhrasesIdx()) {
+            		if(i == 0)
+            			metadata.addModByPPMetadata(new ModByPPMetadata(ppIdx, Constants.ModByPPClass.VB));
+            		else
+            			metadata.addModByPPMetadata(new ModByPPMetadata(ppIdx, Constants.ModByPPClass.PP));
+            		i++;
+            	}
+			}
+			
+			if(vpm.getSubjC() != null) { 
+				for(VerbPhraseToken vpt : vpm.getSubjC()) {
+					int i = 0;
+	            	for(Integer ppIdx : vpt.getPrepPhrasesIdx()) {
+	            		if(i == 0)
+	            			metadata.addModByPPMetadata(new ModByPPMetadata(ppIdx, Constants.ModByPPClass.SUBJC));
+	            		else
+	            			metadata.addModByPPMetadata(new ModByPPMetadata(ppIdx, Constants.ModByPPClass.PP));
+	            		i++;
+	            	}
+				}
+			}
+        }
+        for(NounPhraseMetadata npm : metadata.getNounMetadata()) {
+        	int i = 0;
+        	for(Integer ppIdx : npm.getPrepPhrasesIdx()) {
+        		if(i == 0)
+        			metadata.addModByPPMetadata(new ModByPPMetadata(ppIdx, Constants.ModByPPClass.NP));
+        		else
+        			metadata.addModByPPMetadata(new ModByPPMetadata(ppIdx, Constants.ModByPPClass.PP));
+        		i++;
+        	}
+        }
+        
+        //for(DependentPhraseMetadata dpm : metadata.getDependentMetadata()) {
+        //    for(GenericToken g : dpm.getPhrase()) {
+        //        metadataIndexes.add(g.getPosition());
+        //    }
+        //}
 	}
 	
 	private int findModifyingDependentPhrase(ArrayList<WordToken> words, int subjcPos, List<DependentPhraseMetadata> dpMetadata) {

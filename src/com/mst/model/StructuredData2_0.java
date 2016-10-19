@@ -22,6 +22,7 @@ public class StructuredData2_0 {
 	public Date date = new Date(0);
 	public String practice;
 	public String study;
+	public int position;
 	public Map<String, String> discreet = new HashMap<>();
 	public Map<String, Object> metadata = new HashMap<>();
 	public List<Finding> findings = new ArrayList<>();
@@ -40,6 +41,7 @@ public class StructuredData2_0 {
 		out.date = in.date;
 		out.sentence = in.sentence;
 		out.discreet = in.discreet;
+		out.position = in.position;
 		
 		return out;
 	}

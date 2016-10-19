@@ -29,8 +29,11 @@ public class Constants {
 		semanticTypes.put("[date]","date");
 		semanticTypes.put("[tnm]","tnmstage");
 		semanticTypes.put("[time]","time");
+		semanticTypes.put("[gene_neg]","gene-neg");
+		semanticTypes.put("[gene_pos]","gene-pos");
 		
 		verbOverrides.put("left", "JJ");
+		verbOverrides.put("pelvis", "NN"); // why does Stanford EVER tag pelvis as a verb???
 	}
 	
 	public enum Source {
@@ -93,6 +96,22 @@ public class Constants {
 		SOURCE, VALUE, ST, NONE, SOURCE_SOLO;
 	}
 	
+	public enum ModByPPClass {
+		SUBJ, VB, SUBJC, NONE, PP, NP;
+	}
+	
+	public enum GraphClass {
+		Token, Source, Practice, Study, ID, Date, Sentence,
+		precedes, has_subj, has_subjc, has_pp_modifier, has_pp_object, has_source, has_study, has_id, has_date, has_sentence, has_practice,
+		has_token, has_pp_sibling, has_np_sibling, has_dp_sibling, within_dp, mod_by, within_np, has_np_object, has_vb_pp_modifier, has_subj_pp_modifier, has_subjc_pp_modifier,
+		f_laterality, f_finding_site, f_linear_uom, f_disease_quantity, f_header, f_imaging_procedure, f_measurement, f_presence, f_absence, f_procedure,
+		f_location;
+	}
+	
+	public enum GraphProperty {
+		pos, negated, st;
+	}
+	
 	public static final String MONGO_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	
 	// https://www.regex101.com/r/vL8jA2/2
@@ -105,7 +124,7 @@ public class Constants {
 	
 	public static final Pattern AGE_REGEX = Pattern.compile("\\d{1,3}-year-old");
 	
-	public static final Pattern PUNC = Pattern.compile("!|\"|#|\\$|%|&|'|\\(|\\)|\\*|\\+|,|-|\\.|/|:|;|<|=|>|\\?|@|\\[|\\]|\\^|_|`|\\{|\\||\\}|~");
+	public static final Pattern PUNC = Pattern.compile("!|\"|#|\\$|%|&|'|\\(|\\)|\\*|\\+|,|-|—|\\.|/|:|;|<|=|>|\\?|@|\\[|\\]|\\^|_|`|\\{|\\||\\}|~");
 	public static final Pattern NUMERIC = Pattern.compile("\\d*\\.?\\d*");
 	
 	public static final Pattern VERBS_OF_BEING = Pattern.compile("has|having|am|are|is|was|were|be|being|been|had|have", Pattern.CASE_INSENSITIVE);
@@ -125,7 +144,7 @@ public class Constants {
 	
 	public static final Pattern PREPOSITIONS = Pattern.compile("after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|that|through|to|while|with|within|without|off|since|until|along|around|throughout|under|above|near|behind|across|into|upon|via", Pattern.CASE_INSENSITIVE);
 	
-	public static final Pattern DEPENDENT_SIGNALS = Pattern.compile("after|also|although|as|because|before|certainly|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why", Pattern.CASE_INSENSITIVE);
+	public static final Pattern DEPENDENT_SIGNALS = Pattern.compile("after|although|as|because|before|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why", Pattern.CASE_INSENSITIVE);
 	
 	public static final Pattern CONJUNCTIVE_ADVERBS = Pattern.compile("furthermore|however|moreover|nevertheless|therefore", Pattern.CASE_INSENSITIVE); // left out "in contrast"
 
@@ -133,7 +152,7 @@ public class Constants {
 	
 	//public static final Pattern TNM_STAGING_REGEX =          Pattern.compile("(?i)p?T[0-4]\\s*[abcd]*(\\s*p?N[0-3abcdx iv])*(\\s*MX*[01]*[abc]*)*");
 	//public static final Pattern TNM_STAGING_REGEX_NO_SPACE = Pattern.compile("(?i)p?T[0-4][abc]*(p?N[0-3abcx iv])*(MX*[01]*[abc]*)*");
-	// https://www.regex101.com/r/xU1lA6/1
+	// https://www.regex101.com/r/xU1lA6/2
 	public static final Pattern TNM_STAGING_REGEX = Pattern.compile("(?i)p?T[0-4x][abcruy]*[\\s,]*(p?N[0-3x][abcruy]*)*[\\s*|,|&|and]*\\s*(M[01x])*[\\s,]*(R[0-2])*");
 	public static final Pattern TNM_STAGING_REGEX_NO_SPACE = Pattern.compile("(?i)p?T[0-4x][abcruy]*[,]*(p?N[0-3x][abcruy]*)*[|,|&|and]*(M[01x])*[,]*(R[0-2])*");
 	
@@ -141,6 +160,9 @@ public class Constants {
 	public static final Pattern MEASUREMENT_REGEX = Pattern.compile("\\d+\\.?\\d*\\s*[x|X]\\s*\\d+\\.?\\d*\\s*([x|X]\\s*\\d+\\.?\\d*)?");
 	
 	public static final Pattern SALUTATION_REGEX = Pattern.compile("Dr\\.|Mr\\.|Ms\\.|Mrs\\.");
+	
+	//public static final Pattern GENE_POS = Pattern.compile("(?i).*\\-(positive|pos)");
+	//public static final Pattern GENE_NEG = Pattern.compile("(?i).\\-(negative|neg)");
 	
 	// https://www.regex101.com/r/zA0iG2/1
 	public static final Pattern TIME_REGEX = Pattern.compile("\\b[0-2]?\\d(:[0-5]\\d){1,2}(\\s*[A|P]M)?\\b", Pattern.CASE_INSENSITIVE);

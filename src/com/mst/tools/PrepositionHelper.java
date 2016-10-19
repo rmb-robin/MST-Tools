@@ -22,6 +22,8 @@ public class PrepositionHelper {
 			for(int i=0; i < sentence.getWordList().size(); i++) {
 				WordToken thisWord = sentence.getWordList().get(i);
 				
+				boolean containsCC = false; // used in determining if multiple objects should be allowed
+				
 				// if token in prep list and NOT part of an infinitive phrase
 				if(thisWord.matchesPrepositionConstant() && !thisWord.isInfinitiveHead()) {
 					// loop through remaining words in the sentence
@@ -56,6 +58,9 @@ public class PrepositionHelper {
 						// no breaks; add index of current word to list of comprising tokens
 						// ## logic above this line EXCLUDES the token that caused the break ##
 						comprisingTokenIndex.add(j);
+						if(nextWord.isConjunctionPOS())
+							containsCC = true;
+						
 						// ## logic below this line INCLUDES the token that caused the break ##
 						
 						// stop on a noun/number...
@@ -74,7 +79,7 @@ public class PrepositionHelper {
 						
 						// this is a little convoluted.
 						// three booleans make up a PP token: ppBegin, ppMember, ppObj
-						// the final token will only have ppObj set = true (ppMember will = false). This is used in other routines to determine the end of the PP.
+						// the final token will only have ppObj set = true (ppMember will = false). This combo used in other routines to determine the end of the PP.
 						// the first token (the preposition) will have ppBegin = true and ppMember = true.
 						// all non-final members of the PP will have ppMember = true.
 						// all PP objects will have ppMember = true and ppObj = true.
@@ -87,7 +92,7 @@ public class PrepositionHelper {
 								ppWord.setPrepPhraseObject(true);
 							} else {
 								ppWord.setPrepPhraseMember(true);
-								if(ppWord.isNounPOS() || ppWord.isNumericPOS()) {
+								if(containsCC && (ppWord.isNounPOS() || ppWord.isNumericPOS())) {
 									// set as prep phrase object (nouns, cardinal numbers only)
 									ppWord.setPrepPhraseObject(true);
 								}

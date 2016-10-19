@@ -35,7 +35,7 @@ public class PrepPhraseToken extends GenericToken {
 		return isObject;
 	}
 	
-	public void isObject(boolean isObject) {
-		this.isObject = isObject;
-	}
+	//public void isObject(boolean isObject) {
+	//	this.isObject = isObject;
+	//}
 }

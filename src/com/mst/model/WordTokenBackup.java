@@ -5,50 +5,46 @@ import java.util.ArrayList;
 import com.mst.util.Constants;
 import com.mst.util.Constants.DependentPhraseClass;
 
-public class WordToken extends GenericToken {
+public class WordTokenBackup extends GenericToken {
 		
 	// the intent of the abbreviated member var names is to cut down on extraneous bytes in the JSON that gets
 	// passed around all over the place in the camel processes
-	
-	// 7/27/2016 - All booleans were converted to Booleans because they are, by default, null, and nulls
-	// don't get serialized by Gson. The end result is much cleaner JSON because booleans default to false,
-	// which DO get serialized.
 	
 	private String pos = "";  // part of speech
 	private String normalizedForm = null;
 	private ArrayList<SemanticType> semanticTypeList = null;
 	private String st = null;
-	private Boolean npHead; // noun phrase head
-	private Boolean npMod; // noun phrase modifier
-	private Boolean ppMember; // prep phrase member
-	private Boolean ppBegin; // prep phrase begin
-	private Boolean ppObj; // prep phrase object
-	private Boolean infHead; // infinitive verb head
-	private Boolean inf; // infinitive verb
-	private Boolean vob; // verb of being head
-	private Boolean vobSubj; // verb of being subject
-	private Boolean vobSubjC; // verb of being subject complement (aka Object)
-	private Boolean lvSubj; // linking verb subject
-	private Boolean lv; // linking verb 
-	private Boolean lvSubjC; // linking verb subject complement (aka Object)
-	private Boolean av; // action verb
-	private Boolean avSubj; // action verb subject
-	private Boolean avObj; // action verb object
-	private Boolean prepVerb; // prepositional verb
-	private Boolean mv; // modal auxiliary
-	private Boolean mvSubj;
-	private Boolean mvSubjC;
+	private boolean npHead; // noun phrase head
+	private boolean npMod; // noun phrase modifier
+	private boolean ppMember; // prep phrase member
+	private boolean ppBegin; // prep phrase begin
+	private boolean ppObj; // prep phrase object
+	private boolean infHead; // infinitive verb head
+	private boolean inf; // infinitive verb
+	private boolean vob; // verb of being head
+	private boolean vobSubj; // verb of being subject
+	private boolean vobSubjC; // verb of being subject complement (aka Object)
+	private boolean lvSubj; // linking verb subject
+	private boolean lv; // linking verb 
+	private boolean lvSubjC; // linking verb subject complement (aka Object)
+	private boolean av; // action verb
+	private boolean avSubj; // action verb subject
+	private boolean avObj; // action verb object
+	private boolean prepVerb; // prepositional verb
+	private boolean mv; // modal auxiliary
+	private boolean mvSubj;
+	private boolean mvSubjC;
 	private DependentPhraseClass dpBegin; // dependent phrase head
-	private Boolean dpMember; // dependent phrase member
-	private Boolean dpEnd; // dependent phrase member
-	private Boolean coref; // co-reference
-	private Boolean conjAdv; // conjunctive adverb 
+	private boolean dpMember; // dependent phrase member
+	private boolean dpEnd; // dependent phrase member
+	private boolean coref; // co-reference
+	private boolean conjAdv; // conjunctive adverb 
 	
-	public WordToken() {
+	public WordTokenBackup() {
 		super();
 	}
 	
-	public WordToken(String word, String normalizedForm, int position) {
+	public WordTokenBackup(String word, String normalizedForm, int position) {
 		super(word, position);
 		this.setNormalizedForm(normalizedForm);
 	}
@@ -61,10 +57,6 @@ public class WordToken extends GenericToken {
 			return normalizedForm;
 	}
 	*/
-	public boolean isNull() {
-		return this.getPosition() == 0;
-	}
-	
 	public boolean isVerb() {	
 		return pos.startsWith("VB");
 	}
@@ -93,15 +85,15 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isSubjectComplement() {
-		return vobSubjC != null || lvSubjC != null || avObj != null || mvSubjC != null;
+		return vobSubjC || lvSubjC || avObj || mvSubjC;
 	}
 	
 	public boolean isVerbPhraseSubject() {
-		return vobSubj != null || lvSubj != null || avSubj != null || mvSubj != null;
+		return vobSubj || lvSubj || avSubj || mvSubj;
 	}
 	
 	public boolean isVerbPhraseVerb() {
-		return vob != null || lv != null || av != null || mv != null;
+		return vob || lv || av || mv;
 	}
 	
 	public boolean isPronounPOS() {	
@@ -151,7 +143,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isModalAuxVerb() {
-		return mv != null;
+		return mv;
 	}
 
 	public void setModalAuxVerb(boolean val) {
@@ -159,7 +151,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isModalSubject() {
-		return mvSubj != null;
+		return mvSubj;
 	}
 
 	public void setModalSubject(boolean val) {
@@ -167,7 +159,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isModalSubjectComplement() {
-		return mvSubjC != null;
+		return mvSubjC;
 	}
 
 	public void setModalSubjectComplement(boolean val) {
@@ -175,7 +167,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isCorefernece() {
-		return coref != null;
+		return coref;
 	}
 
 	public void setCoreference(boolean val) {
@@ -183,7 +175,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isConjunctiveAdverb() {
-		return conjAdv != null;
+		return conjAdv;
 	}
 
 	public void setConjunctiveAdverb(boolean val) {
@@ -191,7 +183,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isInfinitiveVerb() {
-		return inf != null;
+		return inf;
 	}
 
 	public void setInfinitiveVerb(boolean val) {
@@ -199,7 +191,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isPrepositionalVerb() {
-		return prepVerb != null;
+		return prepVerb;
 	}
 
 	public void setPrepositionalVerb(boolean val) {
@@ -207,7 +199,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isVerbOfBeing() {
-		return vob != null;
+		return vob;
 	}
 
 	public void setVerbOfBeing(boolean val) {
@@ -215,7 +207,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isVerbOfBeingSubject() {
-		return vobSubj != null;
+		return vobSubj;
 	}
 
 	public void setVerbOfBeingSubject(boolean val) {
@@ -223,7 +215,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isVerbOfBeingSubjectComplement() {
-		return vobSubjC != null;
+		return vobSubjC;
 	}
 
 	public void setVerbOfBeingSubjectComplement(boolean val) {
@@ -231,7 +223,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isLinkingVerbSubject() {
-		return lvSubj != null;
+		return lvSubj;
 	}
 
 	public void setLinkingVerbSubject(boolean val) {
@@ -239,7 +231,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isLinkingVerb() {
-		return lv != null;
+		return lv;
 	}
 
 	public void setLinkingVerb(boolean val) {
@@ -247,7 +239,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isLinkingVerbSubjectComplement() {
-		return lvSubjC != null;
+		return lvSubjC;
 	}
 
 	public void setLinkingVerbSubjectComplement(boolean val) {
@@ -255,7 +247,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isActionVerb() {
-		return av != null;
+		return av;
 	}
 
 	public void setActionVerb(boolean val) {
@@ -263,7 +255,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isActionVerbSubject() {
-		return avSubj != null;
+		return avSubj;
 	}
 
 	public void setActionVerbSubject(boolean val) {
@@ -271,7 +263,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isActionVerbDirectObject() {
-		return avObj != null;
+		return avObj;
 	}
 
 	public void setActionVerbDirectObject(boolean val) {
@@ -326,7 +318,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public String getSemanticType() {
-		return st == null ? "" : st;
+		return st;
 	}
 
 	public void setSemanticType(String val) {
@@ -346,7 +338,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isNounPhraseHead() {
-		return npHead != null;
+		return npHead;
 	}
 	
 	public void setDependentPhraseBegin(DependentPhraseClass val) {
@@ -366,7 +358,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isDependentPhraseMember() {
-		return dpMember != null;
+		return dpMember;
 	}
 	
 	public void setDependentPhraseEnd(boolean val) {
@@ -374,7 +366,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isDependentPhraseEnd() {
-		return dpEnd != null;
+		return dpEnd;
 	}
 	
 	public void setInfinitiveHead(boolean val) {
@@ -382,7 +374,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isInfinitiveHead() {
-		return infHead != null;
+		return infHead;
 	}
 	
 	public void setNounPhraseModifier(boolean val) {
@@ -390,11 +382,11 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isNounPhraseModifier() {
-		return npMod != null;
+		return npMod;
 	}
 	
 	public boolean isPrepPhraseMember() {
-		return ppMember != null;
+		return ppMember;
 	}
 
 	public void setPrepPhraseMember(boolean val) {
@@ -402,7 +394,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public boolean isPrepPhraseBegin() {
-		return ppBegin != null;
+		return ppBegin;
 	}
 
 	public void setPrepPhraseBegin(boolean val) {
@@ -410,7 +402,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isPrepPhraseObject() {
-		return ppObj != null;
+		return ppObj;
 	}
 
 	public void setPrepPhraseObject(boolean val) {
@@ -426,7 +418,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isWithinVerbPhrase() {
-		return infHead != null || inf != null || vob != null || vobSubj != null || vobSubjC != null || lvSubj != null || lv != null || lvSubjC != null || av != null || avSubj != null || avObj != null || prepVerb != null || mv != null || mvSubj != null || mvSubjC != null;
+		return infHead || inf || vob || vobSubj || vobSubjC || lvSubj || lv || lvSubjC || av || avSubj || avObj || prepVerb || mv || mvSubj || mvSubjC;
 	}
 	
 	public boolean isWithinNounPhrase() {

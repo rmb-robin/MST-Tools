@@ -15,10 +15,7 @@ import com.mst.util.Constants;
 
 public class Annotator {
 
-	private final Pattern PUNC = Pattern.compile(",|\\(|\\)|-");
-	private final Pattern PROPN = Pattern.compile("^[A-Z][a-z]+");
-	private final Pattern SHOWS = Pattern.compile("shows?", Pattern.CASE_INSENSITIVE);
-	private final Pattern NOUN_OVERRIDES = Pattern.compile("ct|dexa", Pattern.CASE_INSENSITIVE);
+	private final Pattern PROPN = Pattern.compile("^[A-Z][a-z]+");	
 	private final String ST_PREFIX = "st:";
 	private final String STVB_PREFIX = "st:vb:";
 	
@@ -40,7 +37,7 @@ public class Annotator {
 			Tokenizer t = new Tokenizer();
 			SentenceCleaner cleaner = new SentenceCleaner();
 			
-			ArrayList<SentenceToken> sentenceTokens = t.splitSentences(text);
+			ArrayList<SentenceToken> sentenceTokens = t.splitSentencesNew(text);
 			int position = 0;
 			
 			for(SentenceToken sentenceToken : sentenceTokens) {
@@ -57,6 +54,7 @@ public class Annotator {
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
+			logger.error("Error in annotate method.", e);
 		}
 		
 		return output;
@@ -75,69 +73,54 @@ public class Annotator {
 			// 1. get parts of speech
 			if(tagger.identifyPartsOfSpeech(sentence)) {
 				for(WordToken word : sentence.getWordList()) {
-					WordToken prevWord = new WordToken();
-					
-					try {
-						prevWord = sentence.getWordList().get(word.getPosition()-2);
-					} catch(IndexOutOfBoundsException  e) { }
-					
-					// 1a. POS overrides
-					// TODO get POS overrides into POSTagger
-					if(PUNC.matcher(word.getToken()).matches()) { // Stanford tags these as NN
-						word.setPOS(word.getToken()); // reset POS to match punctuation char
-					} else if(word.getToken().equalsIgnoreCase("scan")) {
-						// override the POS of scan (Stanford = VB) to NN if preceded by ST diap or token "bone"
-						if(prevWord.getToken().equalsIgnoreCase("bone") ||  // equalsIgnoreCase("bone") is faster than match on "(?i)bone"
-						   (prevWord.getSemanticType() != null && prevWord.getSemanticType().equalsIgnoreCase("diap"))) {
+					WordToken prevWord = Constants.getToken(sentence.getWordList(), word.getPosition()-2);
+				
+					// POS override that makes use of ST
+					if(word.getToken().equalsIgnoreCase("scan")) {
+						// override the POS of scan (Stanford = VB) to NN if preceded by ST diap
+						if(prevWord.getSemanticType() != null && prevWord.getSemanticType().equalsIgnoreCase("diap")) {
 							word.setPOS("NN");
 						}
-					} else if(SHOWS.matcher(word.getToken()).matches()) {
-						word.setPOS("VB"); // ensure that show and shows are tagged as a verb
-					} else if(NOUN_OVERRIDES.matcher(word.getToken()).matches()) {
-						word.setPOS("NN"); // certain tokens should always be nouns
-					} else if(word.isVerb()) {
-						// override tokens that Stanford possibly erroneously tags as verbs
-						// must be a verb that ends in -ed or -ing and preceded by a preposition
-						if(prevWord.isPreposition()) {
-							if(word.getToken().endsWith("ed") || word.getToken().endsWith("ing"))
-								word.setPOS("JJ");
-							else
-								word.setPOS("NN");
-						}
 					}
 					
-					// 2. get semantic types from Redis
+					// get semantic types from Redis
 					String val;
 					try(Jedis jedis = Constants.MyJedisPool.INSTANCE.getResource()) {
-						val = jedis.get((word.isVerb() ? STVB_PREFIX : ST_PREFIX) + word.getToken().toLowerCase());
+						String query = (word.isVerb() ? STVB_PREFIX : ST_PREFIX) + word.getToken().toLowerCase();
+						val = jedis.get(query);
 					}
 					
-					// 2a. semantic type overrides/failovers
+					// semantic type overrides/failovers
 					if(val == null) {
 						// if token is a noun that begins with an uppercase letter followed by a lowercase letter and the preceding token is a salutation
-						if(word.isNounPOS() && PROPN.matcher(word.getToken()).matches())
+						if(word.isNounPOS() && PROPN.matcher(word.getToken()).matches()) {
 							if(Constants.SALUTATION_REGEX.matcher(prevWord.getToken()).matches())
 								val = Constants.semanticTypes.get("[proper noun]");
-						else if(Constants.AGE_REGEX.matcher(word.getToken()).matches())
+						} else if(Constants.AGE_REGEX.matcher(word.getToken()).matches()) {
 							val = Constants.semanticTypes.get("[age]");
-						else if(word.isNumericPOS())
+						} else if(word.isNumericPOS()) {
 							if(Constants.DATE_REGEX_ST.matcher(word.getToken()).matches())
 								val = Constants.semanticTypes.get("[date]");
 							else if(Constants.TIME_REGEX.matcher(word.getToken()).matches())
 								val = Constants.semanticTypes.get("[time]");
 							else
 								val = Constants.semanticTypes.get("[number]");
-						else if(Constants.DATE_REGEX_ST.matcher(word.getToken()).matches())
+						} else if(Constants.DATE_REGEX_ST.matcher(word.getToken()).matches()) {
 							// Stanford tags dates as CD. this is a fail-safe in case a format comes across that Stanford tags as something else.
 							val = Constants.semanticTypes.get("[date]");
-						else if(Constants.TNM_STAGING_REGEX_NO_SPACE.matcher(word.getToken()).matches())
+						} else if(Constants.TNM_STAGING_REGEX_NO_SPACE.matcher(word.getToken()).matches()) {
 							val = Constants.semanticTypes.get("[tnm]");
-						else if(Constants.MEASUREMENT_REGEX.matcher(word.getToken()).matches())
+						} else if(Constants.MEASUREMENT_REGEX.matcher(word.getToken()).matches()) {
 							val = Constants.semanticTypes.get("[number]");
-						else if(word.getToken().matches("(?i)AM|PM")) {
-							if(Constants.TIME_REGEX.matcher(prevWord.getToken()).matches())
+						} else if(word.getToken().matches("(?i)AM|PM")) {
+							if(Constants.TIME_REGEX.matcher(prevWord.getToken()).matches()) {
 								val = Constants.semanticTypes.get("[time]");
-						}
+							}
+						}// else if(Constants.GENE_NEG.matcher(word.getToken()).matches()) {
+						//	val = Constants.semanticTypes.get("[gene_neg]");
+						//} else if(Constants.GENE_POS.matcher(word.getToken()).matches()) {
+						//	val = Constants.semanticTypes.get("[gene_pos]");
+						//}
 					}
 					word.setSemanticType(val);
 				}
@@ -146,7 +129,7 @@ public class Annotator {
 				dep.processBeginningBoundaries(sentence);
 				
 				// infinitive phrase logic relies on POS
-				// verbs.identifyInfinitivePhrases(sentence);
+				verbs.identifyInfinitivePhrases(sentence);
 	
 				nouns.identifyNounPhrases(sentence);
 				// prep phrase logic ignores prepositions that have been identified as infinitive head
@@ -168,6 +151,17 @@ public class Annotator {
 				// AV requires POS, VOB, LV, InfV, PrepV (basically, if it's a verb but none of the other types, it's an action verb)
 				// modal aux used in identifying the subject
 				verbs.identifyActionVerbs(sentence);
+				
+				
+				// create a worthless list of tokens that are non-punctuation because jan said so
+				for(WordToken word : sentence.getWordList()) {
+					if(!word.isPunctuation()) {
+						sentence.getNonPuncWordList().add(word);
+					} else {
+						sentence.getPuncOnlyWordList().add(word);
+					}
+				}
+				
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

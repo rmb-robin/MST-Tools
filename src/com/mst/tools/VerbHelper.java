@@ -31,18 +31,10 @@ public class VerbHelper {
 		WordToken thisToken = words.get(i);
 		
 		if(Constants.verbOverrides.containsKey(thisToken.getToken().toLowerCase())) {
-			WordToken prevToken = null;
-			WordToken nextToken = new WordToken();
+			WordToken prevToken = Constants.getToken(words, thisToken.getPosition() - 2);
+			WordToken nextToken = Constants.getToken(words, thisToken.getPosition());
 			
-			try {
-				prevToken = words.get(thisToken.getPosition() - 2);
-			} catch(IndexOutOfBoundsException e) { }
-			
-			try {
-				nextToken = words.get(thisToken.getPosition());
-			} catch(IndexOutOfBoundsException e) { }
-			
-			if(prevToken == null) { // token begins the sentence and is followed by NN||JJ
+			if(prevToken.isNull()) { // token begins the sentence and is followed by NN||JJ
 				if(nextToken.isNounPOS() || nextToken.isAdjectivePOS())
 					ret = true;
 			} else if(prevToken.isDeterminerPOS() || prevToken.isAdjectivePOS()) // does not begin the sentence but is preceded by DT||JJ
@@ -100,13 +92,10 @@ public class VerbHelper {
 				 !(thisToken.isVerbOfBeing() || thisToken.isModalAuxVerb()) && // verb not marked as a verb of being or modal aux
 				 !(thisToken.isWithinPrepPhrase())) { // verb not part of a prep phrase) {
 					
-					WordToken nextToken = new WordToken();
+					WordToken nextToken = Constants.getToken(words, i+1);
 					
-					try {
-						nextToken = words.get(i+1);
-					} catch(IndexOutOfBoundsException e) { }
-								
-					if(!shouldOverride(i, words)) {		
+					if(thisToken.isVerb()) { // replaced shouldOverride with isVerb on 8/8/2016, after making POS override changes in POSTagger.java
+					//if(!shouldOverride(i, words)) {
 						// added RB on 5/5/15 to support sentences such as "PSA is now 1.34."
 						if(nextToken.getPOS().matches("RB|DT|JJ|NN(S|P|PS)?|CD")) { // verb's successor is determiner, adjective, noun or number
 							thisToken.setLinkingVerb(true);

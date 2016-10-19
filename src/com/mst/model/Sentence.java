@@ -14,11 +14,14 @@ import com.google.common.base.Joiner;
 public class Sentence {
 
 	private int position;
+	private long lineId;
 	private String origSentence;
 	private String normalizedSentence;
 	private Date processDate;
 	private Date procedureDate;
 	private ArrayList<WordToken> wordList;
+	private ArrayList<WordToken> nonPuncWordList = new ArrayList<>();
+	private ArrayList<WordToken> puncOnlyWordList = new ArrayList<>();
 	//private ArrayList<StanfordDependency> stanfordDependencyList;
 	private SentenceMetadata metadata = new SentenceMetadata();
 	private String id, source, practice, study;
@@ -259,7 +262,6 @@ public class Sentence {
 		return getEntityTokenCount(0, wordList.size());
 	}
 	
-	
 	private boolean ignoreToken(WordToken word) {
 		return word.isPunctuation() || 
 			   word.isDeterminerPOS() || 
@@ -267,9 +269,7 @@ public class Sentence {
 			   word.isNegationSignal();
 	}
 	
-	
 	public SentenceMetadata getMetadata() { return metadata; }
-	
 	
 	public void setMetadata(SentenceMetadata val) { metadata = val; }
 	
@@ -287,6 +287,14 @@ public class Sentence {
 	
 	public String getId() {
 		return id;
+	}
+	
+	public void setLineId(long lineId) {
+		this.lineId = lineId;
+	}
+	
+	public long getLineId() {
+		return lineId;
 	}
 	
 	public void setPractice(String practice) {
@@ -313,7 +321,6 @@ public class Sentence {
 		return source;
 	}
 	
-	
 	public int getPosition() {
 		return position;
 	}
@@ -325,6 +332,7 @@ public class Sentence {
 	public String getFullSentence() {
 		return normalizedSentence;
 	}
+	
 	public void setFullSentence(String sentence) {
 		this.normalizedSentence = sentence;
 	}
@@ -343,6 +351,22 @@ public class Sentence {
 	
 	public ArrayList<WordToken> getWordList() {
 		return this.wordList;
+	}
+	
+	public void setNonPuncWordList(ArrayList<WordToken> nonPuncWordList) {
+		this.nonPuncWordList = nonPuncWordList;
+	}
+	
+	public ArrayList<WordToken> getNonPuncWordList() {
+		return this.nonPuncWordList;
+	}
+	
+	public void setPuncOnlyWordList(ArrayList<WordToken> puncOnlyWordList) {
+		this.puncOnlyWordList = puncOnlyWordList;
+	}
+	
+	public ArrayList<WordToken> getPuncOnlyWordList() {
+		return this.puncOnlyWordList;
 	}
 	
 	public void setProcessDate(Date processDate) {
