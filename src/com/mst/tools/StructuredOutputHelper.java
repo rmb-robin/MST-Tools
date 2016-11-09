@@ -36,8 +36,8 @@ import com.mst.model.StructuredData2_0;
 import com.mst.model.VerbPhraseMetadata;
 import com.mst.model.VerbPhraseToken;
 import com.mst.model.WordToken;
-import com.mst.model.discreet.Meds;
-import com.mst.model.discreet.Patient;
+import com.mst.model.discrete.Meds;
+import com.mst.model.discrete.Patient;
 import com.mst.util.Constants;
 import com.mst.util.Constants.StructuredNotationReturnValue;
 import com.mst.util.GsonFactory;
@@ -255,7 +255,7 @@ public class StructuredOutputHelper {
 		structured.study = sentence.getStudy();
 		structured.date = sentence.getProcedureDate();
 		structured.sentence = sentence.getFullSentence();
-		structured.discreet = sentence.getDiscreet();
+		structured.discreet = sentence.getDiscrete();
 		
 		// maintain 0-based list of token indexes that have been processed to avoid duplicate findings.
 		List<Integer> processedTokens = new ArrayList<Integer>();
@@ -584,7 +584,7 @@ public class StructuredOutputHelper {
 		structured.study = sentence.getStudy();
 		structured.date = sentence.getProcedureDate();
 		structured.sentence = sentence.getFullSentence();
-		structured.discreet = sentence.getDiscreet();
+		structured.discreet = sentence.getDiscrete();
 		
 		// maintain 0-based list of token indexes that have been processed to avoid duplicate findings.
 		List<Integer> processedTokens = new ArrayList<Integer>();

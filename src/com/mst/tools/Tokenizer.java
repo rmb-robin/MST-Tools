@@ -367,6 +367,52 @@ public class Tokenizer {
 		return sentences;
 	}
 	
+	public ArrayList<WordToken> splitWordsMinimal(String s) {
+		ArrayList<WordToken> wordTokens = new ArrayList<WordToken>();
+		
+		// put spaces around certain characters
+		Matcher matcher = singlePunc.matcher(s);
+	    int offset = 0;
+	    while(matcher.find()) {
+	    	s = s.substring(0, matcher.start()+offset) + " " + matcher.group() + " " + s.substring(matcher.end()+offset);
+	    	offset += 2; // account for the spaces we added
+	    }
+		
+	    // *** This section needs to be reexamined from a usefulness perspective
+		// this was copied verbatim from the original python.
+	    // needs to be cleaned up. apparent goal is to add a space between final token and period ending sentence.
+	    // read through a sentence backwards, looking for a period only if it precedes certain chars
+	    int pos = s.length()-1;
+	    while(pos > 0) {
+	    	String c = String.valueOf(s.charAt(pos));
+	    	if(c.matches("\\[|\\]|\\)|}|>|\"|'")) // match any of [ ] ) } > " '
+	    		pos -= 1;
+	    	else
+	    		break;
+	    }
+	    // if a period is not preceded by another period, replace
+	    if(s.charAt(pos) == '.' && !(pos > 0 && s.charAt(pos-1) == '.'))
+	    	s = s.substring(0, s.length()-1) + " .";
+	    // ***
+	    
+	    s = s.replaceAll("\\s{2,}", " "); // trim multiple spaces
+	    
+	    String[] words = s.trim().split(" ");
+		
+		if(words.length > 0) {
+			int i=0;
+			
+			for(String word : words) {
+				wordTokens.add(new WordToken(word, null, ++i));
+			}
+		} else {
+			//logger.error("com.mst.tools.Tokenizer.replaceChars() produced an empty array. \n Input sentence: {}", sentence);
+			wordTokens = null;
+		}
+		
+		return wordTokens;
+	}
+	
 	public ArrayList<WordToken> splitWords(String sentence) {
 		ArrayList<WordToken> wordTokens = new ArrayList<WordToken>();
 		

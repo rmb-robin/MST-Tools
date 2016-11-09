@@ -11,3 +11,8 @@ Class-Path: /usr/local/classes/activemq-all-5.9.0.jar
   /usr/local/classes/stanford-corenlp-3.4-models.jar
   /usr/local/classes/stanford-corenlp-3.4.jar
   /usr/local/classes/commons-pool2-2.4.2.jar
+  /usr/local/classes/orientdb/blueprints-core-2.6.0.jar
+  /usr/local/classes/orientdb/concurrentlinkedhashmap-lru-1.4.1.jar
+  /usr/local/classes/orientdb/orientdb-client-2.2.7.jar
+  /usr/local/classes/orientdb/orientdb-core-2.2.7.jar
+  /usr/local/classes/orientdb/orientdb-graphdb-2.2.7.jar

@@ -11,7 +11,7 @@ import com.mst.util.DateNormalizer;
 
 public class SentenceCleaner {
 	
-	final Logger logger = LoggerFactory.getLogger(getClass());
+	final Logger LOG = LoggerFactory.getLogger(getClass());
 	
 	private Pattern YEAR_OLD_REGEX = Pattern.compile("(?<=\\d)((?i)[\\s-]*YEAR[\\s-]*OLD|\\s*yr?\\.?\\/?o\\.?)(?!m)"); 
 	private String YEAR_OLD_REPL = "-year-old"; 
@@ -80,11 +80,22 @@ public class SentenceCleaner {
 		EMPTY_PARENS = Pattern.compile(String.format("\\s*[(\\[]%1$s(and|respectively)?%1$s[)\\]]", "[\\s;,]*"));
 	}
 	
-	public String cleanSentence(String sentence) {
+	public String cleanSentenceMinimal(String sentence) {
+
+		sentence = processAge(sentence);
 		
-		// age regex replacements act upon split sentences
-		sentence = YEAR_OLD_REGEX.matcher(sentence).replaceAll(YEAR_OLD_REPL);
-		sentence = YEAR_OLD_SEX_REGEX.matcher(sentence).replaceAll(YEAR_OLD_SEX_REPL);
+		sentence = dateNormalizer.normalize(sentence);
+		
+		sentence = processTNM(sentence);
+		
+		sentence = processMeasurements(sentence);
+		
+		return sentence;
+	}	
+	
+	public String cleanSentence(String sentence) {	
+		// TODO does the order of these matter? can we call cleanSentenceMinimal then add the unique cleanup calls?
+		sentence = processAge(sentence);
 		
 		sentence = removeSectionHeader(sentence);
 
@@ -98,18 +109,48 @@ public class SentenceCleaner {
 		
 		sentence = dateNormalizer.normalize(sentence);
 		
-		Matcher tnm = Constants.TNM_STAGING_REGEX.matcher(sentence);
-		if(tnm.find()) {
-			if(!(tnm.group().equalsIgnoreCase("TX") || tnm.group().equalsIgnoreCase("TX."))) {
-				sentence = sentence.replace(tnm.group(), tnm.group().replace(" ", "").replace('t', 'T').replace('n', 'N').replace('m', 'M') + " ");
+		sentence = processTNM(sentence);
+		
+		sentence = processMeasurements(sentence);
+		
+		return sentence;
+	}
+	
+	private String processAge(String sentence) {
+		try {
+			// age regex replacements act upon split sentences
+			sentence = YEAR_OLD_REGEX.matcher(sentence).replaceAll(YEAR_OLD_REPL);
+			sentence = YEAR_OLD_SEX_REGEX.matcher(sentence).replaceAll(YEAR_OLD_SEX_REPL);
+		} catch(Exception e) {
+			LOG.error("processAge():\n{}\n{}", sentence, e);
+		}
+		return sentence;
+	}
+	
+	private String processTNM(String sentence) {
+		try {
+			Matcher tnm = Constants.TNM_STAGING_REGEX.matcher(sentence);
+			if(tnm.find()) {
+				if(!(tnm.group().equalsIgnoreCase("TX") || tnm.group().equalsIgnoreCase("TX."))) {
+					sentence = sentence.replace(tnm.group(), tnm.group().replace(" ", "").replace('t', 'T').replace('n', 'N').replace('m', 'M') + " ");
+				}
 			}
+		} catch(Exception e) {
+			LOG.error("processTNM():\n{}\n{}", sentence, e);
 		}
-		
-		Matcher measu = Constants.MEASUREMENT_REGEX.matcher(sentence);
-		while(measu.find()) {
-			sentence = sentence.replace(measu.group(), measu.group().replace(" ", "") + " ");
+		return sentence;
+	}
+	
+	private String processMeasurements(String sentence) {
+		try {
+			// patterns such as 1.8 x 2.4 x 1.5 cm
+			Matcher measu = Constants.MEASUREMENT_REGEX.matcher(sentence);
+			while(measu.find()) {
+				sentence = sentence.replace(measu.group(), measu.group().replace(" ", "") + " ");
+			}
+		} catch(Exception e) {
+			LOG.error("processMeasurements():\n{}\n{}", sentence, e);
 		}
-		
 		return sentence;
 	}
 	
@@ -136,7 +177,7 @@ public class SentenceCleaner {
 				}
 			}
 		} catch(Exception e) {
-			logger.error("removeSectionHeader(): {}", e);
+			LOG.error("removeSectionHeader():\n{}\n{}", sentence, e);
 		}
 		
 		return sentence;
@@ -151,7 +192,7 @@ public class SentenceCleaner {
 			sentence = EMPTY_PARENS.matcher(sentence).replaceAll("");
 			
 		} catch(Exception e) {
-			logger.error("removeProbabilityInfo(): {}", e);
+			LOG.error("removeProbabilityInfo():\n{}\n{}", sentence, e);
 		}
 		
 		return sentence;

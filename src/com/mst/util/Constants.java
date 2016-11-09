@@ -15,6 +15,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mst.model.WordToken;
+import com.tinkerpop.blueprints.impls.orient.OrientGraph;
 
 public class Constants {
 	
@@ -101,11 +102,12 @@ public class Constants {
 	}
 	
 	public enum GraphClass {
-		Token, Source, Practice, Study, ID, Date, Sentence,
+		Token, Source, Practice, Study, ID, Date, Sentence, Discrete,
 		precedes, has_subj, has_subjc, has_pp_modifier, has_pp_object, has_source, has_study, has_id, has_date, has_sentence, has_practice,
 		has_token, has_pp_sibling, has_np_sibling, has_dp_sibling, within_dp, mod_by, within_np, has_np_object, has_vb_pp_modifier, has_subj_pp_modifier, has_subjc_pp_modifier,
+		has_discrete, 
 		f_laterality, f_finding_site, f_linear_uom, f_disease_quantity, f_header, f_imaging_procedure, f_measurement, f_presence, f_absence, f_procedure,
-		f_location;
+		f_location, f_is_a, f_absolute_value;
 	}
 	
 	public enum GraphProperty {
@@ -170,6 +172,35 @@ public class Constants {
 	private static final String MONGO_DB_HOST = Props.getProperty("mongo_host");
 	private static final String MONGO_DB = Props.getProperty("mongo_db");
 	private static final String REDIS_DB_HOST = Props.getProperty("redis_host");
+	private static final String ORIENT_URI = Props.getProperty("orient_uri");
+	private static final String ORIENT_USER = Props.getProperty("orient_user");
+	private static final String ORIENT_PW = Props.getProperty("orient_pw");
+	
+	public enum OrientDB {
+	    INSTANCE;
+	    
+	    private OrientGraph graph;
+
+	    OrientDB() {
+	    	System.out.println("Established OrientDB connection");
+	    	System.out.println(ORIENT_URI + " / " + ORIENT_USER + " / " + ORIENT_PW);
+
+	        try {
+	            graph = new OrientGraph(ORIENT_URI, ORIENT_USER, ORIENT_PW);
+	        } catch(Exception e) {
+	            System.out.println("Error connecting to OrientDB");
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    public OrientGraph getODB() {
+	    	return graph;
+	    }
+	    
+	    public void close(){
+	    	graph.shutdown();
+	    }
+	}
 	
 	public enum MongoDB {
 	    INSTANCE;

@@ -25,7 +25,7 @@ public class Sentence {
 	//private ArrayList<StanfordDependency> stanfordDependencyList;
 	private SentenceMetadata metadata = new SentenceMetadata();
 	private String id, source, practice, study;
-	private HashMap<String, String> discreet = new HashMap<>();
+	private HashMap<String, String> discrete = new HashMap<>();
 	private List<ObjectId> structuredOIDs = new ArrayList<>();
 	
 	public Sentence() {	
@@ -273,12 +273,12 @@ public class Sentence {
 	
 	public void setMetadata(SentenceMetadata val) { metadata = val; }
 	
-	public HashMap<String, String> getDiscreet() {
-		return this.discreet;
+	public HashMap<String, String> getDiscrete() {
+		return this.discrete;
 	}
 	
-	public void setDiscreet(HashMap<String, String> map) {
-		this.discreet = map;
+	public void setDiscrete(HashMap<String, String> map) {
+		this.discrete = map;
 	}
 	
 	public void setId(String id) {

@@ -18,5 +18,10 @@
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/jedis-2.6.2.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/commons-pool2-2.4.2.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/metamap-api-1.0.0.jar"/>
+	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/orientdb/blueprints-core-2.6.0.jar"/>
+	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/orientdb/orientdb-client-2.2.7.jar"/>
+	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/orientdb/orientdb-core-2.2.7.jar"/>
+	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/orientdb/orientdb-graphdb-2.2.7.jar"/>
+	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/orientdb/concurrentlinkedhashmap-lru-1.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

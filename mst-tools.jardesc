@@ -11,15 +11,13 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=MST-Tools/src&lt;com"/>
-        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.ontology"/>
-        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.sql"/>
         <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.util"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.pubmed"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.discrete"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com"/>
         <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model"/>
-        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.extract"/>
+        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.graph"/>
         <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.tools"/>
         <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst"/>
-        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.pubmed"/>
-        <javaElement handleIdentifier="=MST-Tools/src&lt;com.mst.model.discreet"/>
     </selectedElements>
 </jardesc>

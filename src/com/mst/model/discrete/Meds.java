@@ -1,4 +1,4 @@
-package com.mst.model.discreet;
+package com.mst.model.discrete;
 
 import java.util.Date;
 import java.util.regex.Matcher;

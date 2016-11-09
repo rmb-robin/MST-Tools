@@ -14,9 +14,9 @@ import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.util.JSON;
 import com.mst.model.Sentence;
-import com.mst.model.discreet.Discreet;
-import com.mst.model.discreet.Meds;
-import com.mst.model.discreet.Patient;
+import com.mst.model.discrete.Discrete;
+import com.mst.model.discrete.Meds;
+import com.mst.model.discrete.Patient;
 import com.mst.util.Constants;
 import com.mst.util.GsonFactory;
 
@@ -53,7 +53,7 @@ import com.mst.util.GsonFactory;
 	}
  */
 
-public class DiscreetDataProcessor {
+public class DiscreteDataProcessor {
 
 	public void processPractice(String practice, Sentence sentence) {
 		
@@ -165,9 +165,9 @@ public class DiscreetDataProcessor {
 			}
 		}
 		
-		for(Discreet discreet : newPatient.discreet) {
-			if(!existingPatient.discreet.contains(discreet)) {
-				existingPatient.discreet.add(discreet);
+		for(Discrete discrete : newPatient.discrete) {
+			if(!existingPatient.discrete.contains(discrete)) {
+				existingPatient.discrete.add(discrete);
 				updated = true;
 			}
 		}
