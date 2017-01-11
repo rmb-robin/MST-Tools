@@ -5,7 +5,6 @@
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/activemq-all-5.9.0.jar" sourcepath="/Users/scottdaugherty/.m2/repository/org/apache/activemq/activemq-all/5.9.0/activemq-all-5.9.0-sources.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/gson-2.2.4.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/postgresql-9.3-1101.jdbc4.jar"/>
-	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/twilio-java-sdk-3.4.4-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/slf4j-api-1.7.7.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/log4j-api-2.0-rc1.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/prologbeans-1.0.0.jar"/>
@@ -17,7 +16,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/jedis-2.6.2.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/commons-pool2-2.4.2.jar"/>
-	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/metamap-api-1.0.0.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/orientdb/blueprints-core-2.6.0.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/orientdb/orientdb-client-2.2.7.jar"/>
 	<classpathentry kind="lib" path="/Users/scottdaugherty/Documents/MedicalSearchTech/shared_jars/orientdb/orientdb-core-2.2.7.jar"/>

@@ -106,6 +106,10 @@ public class VerbPhraseMetadata {
 		if(subj != null && subj.isNegated())
 			return true;
 		
+		for(VerbPhraseToken subj : subjs) 
+			if(subj.isNegated())
+				return true;
+		
 		for(VerbPhraseToken verb : verbs) 
 			if(verb.isNegated())
 				return true;

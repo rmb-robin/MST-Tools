@@ -107,7 +107,7 @@ public class Constants {
 		has_token, has_pp_sibling, has_np_sibling, has_dp_sibling, within_dp, mod_by, within_np, has_np_object, has_vb_pp_modifier, has_subj_pp_modifier, has_subjc_pp_modifier,
 		has_discrete, 
 		f_laterality, f_finding_site, f_linear_uom, f_disease_quantity, f_header, f_imaging_procedure, f_measurement, f_presence, f_absence, f_procedure,
-		f_location, f_is_a, f_absolute_value;
+		f_location, f_is_a, f_absolute_value, f_related
 	}
 	
 	public enum GraphProperty {
@@ -146,7 +146,7 @@ public class Constants {
 	
 	public static final Pattern PREPOSITIONS = Pattern.compile("after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|that|through|to|while|with|within|without|off|since|until|along|around|throughout|under|above|near|behind|across|into|upon|via", Pattern.CASE_INSENSITIVE);
 	
-	public static final Pattern DEPENDENT_SIGNALS = Pattern.compile("after|although|as|because|before|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why", Pattern.CASE_INSENSITIVE);
+	public static final Pattern DEPENDENT_SIGNALS = Pattern.compile("after|although|as|because|before|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why", Pattern.CASE_INSENSITIVE);
 	
 	public static final Pattern CONJUNCTIVE_ADVERBS = Pattern.compile("furthermore|however|moreover|nevertheless|therefore", Pattern.CASE_INSENSITIVE); // left out "in contrast"
 

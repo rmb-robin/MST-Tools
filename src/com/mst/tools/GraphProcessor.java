@@ -8,8 +8,12 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +41,28 @@ public class GraphProcessor {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 	
 	private SimpleDateFormat orientSDF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
 	private static MessageDigest md5Generator;
 	private Map<String, List<String>> qlco = new HashMap<>();
 	
+	private final String PLACEHOLDER = "{placeholder}";
+	private final Pattern LOCATION_PREP = Pattern.compile("in|of|within|at");
+	private final Pattern LATERALITY = Pattern.compile("left|right|bilateral"); // can't yet trust the 'latr' ST because of 'left'
+	private final Pattern POPULATION = Pattern.compile("children|adults|patients|child|people|childhood");
+	private final Pattern SPACIAL = Pattern.compile("below|above|behind|near|under|over");
+	private final Pattern PERIOD_TIME = Pattern.compile("before|after|since");
+	private final Pattern DOUBT = Pattern.compile("probable|probably|possibly");
+	
+	private final String PROP_EDGE_TYPE = "type";
+	private final String PROP_EDGE_STATE = "state";
+	private final String PROP_NEGATED = "negated";
+	private final String PROP_VB_TENSE = "vb_tense";
+	private final String PROP_VB_ST_NULL = "vb_st_null";
+	private final String STATE_UNKNOWN = "unknown";
+	private final String STATE_PRESENCE = "presence";
+	private final String STATE_ABSENCE = "absence";
+	private final String EDGE_UNKNOWN = "f_unknown";
+	private final String EDGE_DOUBT = "f_probable";  // TODO this will be changed to an ontology lookup
+		
 	public enum EdgeDirection {
 		incoming, outgoing;
 	}
@@ -112,23 +134,18 @@ public class GraphProcessor {
 		GraphData graphSentence = new GraphData();
 		// this list of vertices will be accessed to build GraphEntries while going through the metadata
 		List<Vertex> vertices = new ArrayList<>();
-		List<Edge> edges = new ArrayList<>();
+		Set<Edge> edges = new HashSet<>();
 		
-		Vertex newV = null;
-		
-		// sentence vertices
-		String sentenceUUID = md5(s.getPractice()+s.getStudy()+s.getFullSentence()); // TODO use mongo oid???
-		
+		// create a vertex for each token
 		for(WordToken word : s.getWordList()) {
-			//String uuid = md5(s.getFullSentence() + word.getPosition());   // TODO get hash from somewhere else (mongo oid + position?)
-			String uuid = md5(sentenceUUID + word.getPosition());
-			newV = new Vertex(GraphClass.Token, uuid, word.getToken().toLowerCase(), word.getPosition());
+			String uuid = md5(UUID.randomUUID().toString()); // TODO get hash from somewhere else (mongo oid + position?)
+			Vertex v = new Vertex(GraphClass.Token, uuid, word.getToken().toLowerCase(), word.getPosition());
 			
 			Map<String, Object> props = new HashMap<>();
 			
-			props.put(GraphProperty.pos.toString(), word.getPOS());
+			props.put(GraphProperty.pos.toString().toLowerCase(), word.getPOS());
 			if(word.getSemanticType() != null) {
-				props.put(GraphProperty.st.toString(), word.getSemanticType());
+				props.put(GraphProperty.st.toString().toLowerCase(), word.getSemanticType());
 			}
 			
 			// low-level boolean values from the WordToken object.
@@ -137,10 +154,12 @@ public class GraphProcessor {
 				props.put(bool, true);
 			}
 			
-			newV.setProps(props);
+			v.setProps(props);
 			
-			vertices.add(newV);
+			vertices.add(v);
 		}
+
+		String sentenceUUID = UUID.randomUUID().toString();
 		
 		Vertex vSource = new Vertex(GraphClass.Source, md5(s.getSource()), s.getSource(), 0);
 		Vertex vPractice = new Vertex(GraphClass.Practice, md5(s.getPractice()), s.getPractice(), 0);
@@ -150,20 +169,15 @@ public class GraphProcessor {
 		Vertex vProcedureDate = new Vertex(GraphClass.Date, md5(s.getPractice()+s.getStudy()+date.toString()), date.toString(), 0);
 		Vertex vSentence = new Vertex(GraphClass.Sentence, sentenceUUID, s.getFullSentence(), (int) s.getPosition());
 		Vertex vDiscrete = new Vertex(GraphClass.Discrete, md5(sentenceUUID + s.getId()), "", (int) 0);
+		// add a vertex to act as a placeholder for verbs that are missing a subj or subjc 
+		Vertex vPlaceholder = new Vertex(GraphClass.Token, md5(sentenceUUID + s.getWordList().size()), PLACEHOLDER, 0);
 		
+		// create properties for all simple metadata on Sentence vertex  
 		for(String key : s.getMetadata().getSimpleMetadata().keySet()) {
 			vSentence.getProps().put(key, s.getMetadata().getSimpleMetadata().get(key));
 		}
 				
 		// sentence edges
-		// old way
-		/*
-		edges.add(new Edge(GraphClass.has_source, vPractice, vSource));
-		edges.add(new Edge(GraphClass.has_study, vPractice, vStudy));
-		edges.add(new Edge(GraphClass.has_id, vStudy, vID));
-		edges.add(new Edge(GraphClass.has_date, vID, vProcedureDate));
-		edges.add(new Edge(GraphClass.has_sentence, vProcedureDate, vSentence));
-		*/
 		// new way - sentence links to everything
 		edges.add(new Edge(GraphClass.has_source, vSentence, vSource));
 		edges.add(new Edge(GraphClass.has_practice, vSentence, vPractice));
@@ -171,7 +185,7 @@ public class GraphProcessor {
 		edges.add(new Edge(GraphClass.has_id, vSentence, vID));
 		edges.add(new Edge(GraphClass.has_date, vSentence, vProcedureDate));
 		
-		Vertex oldV = null;
+		Vertex prevV = null;
 		
 		// link sentence to individual tokens via edges with idx property
 		for(Vertex v : vertices) {
@@ -179,13 +193,13 @@ public class GraphProcessor {
 			e.getProps().put("idx", v.getIdx());
 			edges.add(e);
 			
-			if(oldV != null) {
-				Edge e2 = new Edge(GraphClass.precedes, oldV, v);
+			if(prevV != null) {
+				Edge e2 = new Edge(GraphClass.precedes, prevV, v);
 				e2.getProps().put("idx", v.getIdx()-1);
 				edges.add(e2);
 			}
 			
-			oldV = v;
+			prevV = v;
 		}
 		
 		// add "global" vertices to list. Note this must occur after the above vertex loop or you'll add a bunch of junk edges
@@ -195,6 +209,7 @@ public class GraphProcessor {
 		vertices.add(vID);
 		vertices.add(vProcedureDate);
 		vertices.add(vSentence);
+		vertices.add(vPlaceholder);
 		
 		SentenceMetadata metadata = s.getMetadata();
 		
@@ -204,102 +219,82 @@ public class GraphProcessor {
 		vSentence.getProps().put("depPhraseCount", metadata.getDependentMetadata().size());
 		vSentence.getProps().put("orphanCount", metadata.getOrphans().size());
 		
-		// do other metadata processing
-		for(VerbPhraseMetadata vpm : metadata.getVerbMetadata()) {
-			for(VerbPhraseToken vb : vpm.getVerbs()) {
-				String verb = vb.getToken().toLowerCase();
-				Map<String, String> verbInfo = verbLookup.get(verb);
-				
-				// not sure yet how to model compound verb relationships so passing null for now
-				createVerbEdges(vb, vb.getPosition(), null, vertices, edges, metadata);
-				
-				VerbPhraseToken subj = vpm.getSubjects().isEmpty() ? null : vpm.getSubjects().get(0);
-				
-				// a bit of a hack until the orientdb ontology is ready
-				// grab the infinitive and tense from previous redis lookup
-				String st = s.getWordList().get(vb.getPosition()).getSemanticType();
-				String vbInf = null;
-				String vbTense = null;
-				if(st.length() > 0) {
-					String[] st2 = st.split("_");
-					vbInf = st2[0];
-					if(st2.length > 1)
-						vbTense = st2[1];
-					else
-						logger.debug("Verb has no tense: " + vbInf);
+		processVerbPhraseMetadata(edges, vertices, s.getWordList(), metadata, vPlaceholder);
+		
+		processPrepPhraseMetadata(edges, vertices, s.getWordList(), metadata.getPrepMetadata());
+		
+		createDependentPhraseStructureEdges(edges, vertices, metadata);
+		
+		// TODO move this into its own function
+		// Frames unbounded by a known phrase type
+		for(int i=0; i < s.getWordList().size(); i++) {
+			WordToken word = s.getWordList().get(i);
+			WordToken prev = Constants.getToken(s.getWordList(), i-1);
+			WordToken next = Constants.getToken(s.getWordList(), i+1);
+			
+			if(word.getSemanticType().equalsIgnoreCase("bpoc")) {
+				if(LATERALITY.matcher(prev.getToken()).matches()) {
+					//edges.add(new Edge(GraphClass.f_laterality, vertices.get(prev.getPosition()-1), vertices.get(word.getPosition()-1)));
+					Edge e = new Edge(GraphClass.f_related, vertices.get(prev.getPosition()-1), vertices.get(word.getPosition()-1));
+					setDefaultEdgeProps(e, GraphClass.f_laterality.toString(), STATE_UNKNOWN, false);
+					edges.add(e);
 				}
-					
-				for(VerbPhraseToken subjc : vpm.getSubjC()) {
-					String subjcST = s.getWordList().get(subjc.getPosition()).getSemanticType();
-					boolean subjcNumeric = s.getWordList().get(subjc.getPosition()).isNumericPOS();
-					
-					GraphClass gClass = null;
-					Edge e = null;
-					
-					// https://docs.google.com/spreadsheets/d/1aac5QCAUeiGR67FY9_vYE-ONEQ60oqMuf4XhrxSU77I/edit#gid=180671387
-					// 4a on google sheet
-					if(verb.matches("is|are|was|were|has|have") && subjcST.startsWith("qlco")) {
-						e = buildVerbFrameEdge(subjc.getToken(), vertices, subjc, subj);
-					
-					// 4b
-					} else if(verb.matches("is|are|was|were") && subjcNumeric) {
-						e = buildVerbFrameEdge(GraphClass.f_absolute_value.toString(), vertices, subjc, subj);
-						
-					// 1, 2a, 2b, 2c, 5a
-					} else if((verb.matches("is|are|was|were") && (subj != null && subj.getToken().equalsIgnoreCase("there"))) 
-							|| verb.matches("has|have")) {
-						gClass = (vb.isNegated() || subjc.isNegated()) ? GraphClass.f_absence : GraphClass.f_presence;
-
-						e = buildVerbFrameEdge(gClass.toString(), vertices, subjc, subj);
-						
-					// 3
-					} else if(verb.matches("is|are|was|were")) {
-						e = buildVerbFrameEdge(GraphClass.f_is_a.toString(), vertices, subjc, subj);
-						
-					// 6
-					} else if(verb.matches("appear|look|smell") && subjcST.startsWith("qlco")) {
-						e = buildVerbFrameEdge(verb, vertices, subjc, subj);
-						
-						if(e != null && vbTense != null)
-							e.getProps().put("verb_tense", vbTense);
-
-					} else if(verbInfo != null) {
-						String edge = verbInfo.get("has_synonym");
-						if(edge == null) {
-							edge = verbInfo.get("has_meaning");
-							if(edge == null) {
-								logger.debug("Verb has no 'has_synonym' or 'has_meaning' edges: " + verb);
-								// default the edge name to the current verb token
-								edge = vbInf != null ? vbInf : verb;
-							}
-						}
-
-						e = buildVerbFrameEdge(edge, vertices, subjc, subj);
-						
-						// TODO dealing with verbTense needs to be less redundant
-						if(e != null && vbTense != null)
-							e.getProps().put("verb_tense", vbTense);
-						
-					} else {
-						// default the edge name to the current verb token
-						logger.debug("Verb not found in ontology: " + verb);
-
-						e = buildVerbFrameEdge(vbInf != null ? vbInf : verb, vertices, subjc, subj);
-						
-						if(e != null && vbTense != null)
-							e.getProps().put("verb_tense", vbTense);
-					}
-					
-					if(e != null) {
-						e.getProps().put("negated", vb.isNegated() || (subj != null && subj.isNegated()) || subjc.isNegated());
-						edges.add(e);
-					}
+			} else if(word.getToken().equalsIgnoreCase(":")) {
+				//edges.add(new Edge(GraphClass.f_header, vertices.get(prev.getPosition()-1), vertices.get(word.getPosition()-1)));
+				Edge e = new Edge(GraphClass.f_related, vertices.get(prev.getPosition()-1), vertices.get(word.getPosition()-1));
+				setDefaultEdgeProps(e, GraphClass.f_header.toString(), STATE_UNKNOWN, false);
+				edges.add(e);
+			} else if(word.getToken().matches("measur.*")) {
+				if(next.getPOS().equalsIgnoreCase("CD") && !prev.isPrepPhraseObject()) {
+					//edges.add(new Edge(GraphClass.f_measurement, vertices.get(word.getPosition()-2), vertices.get(next.getPosition()-1)));
+					Edge e = new Edge(GraphClass.f_measurement, vertices.get(word.getPosition()-2), vertices.get(next.getPosition()-1));
+					setDefaultEdgeProps(e, GraphClass.f_header.toString(), STATE_UNKNOWN, false);
+					edges.add(e);
 				}
 			}
+		}
+		
+		processNounPhraseMetadata(edges, vertices, s.getWordList(), metadata);
+		
+		processDiscreteData(edges, vertices, s.getDiscrete(), vID, vDiscrete);
+		
+		graphSentence.setVertices(vertices);
+		graphSentence.setEdges(edges);
+		
+		return graphSentence;
+	}
+	
+	private Edge buildVerbFrameEdge(String name, List<Vertex> vertices, VerbPhraseToken subjc, VerbPhraseToken subj, Vertex placeholder) {
+		Edge edge = null;
+		
+		Vertex from = null;
+		Vertex to = null;
+		
+		if(!name.startsWith("f_"))
+			name = "f_" + name;
+		
+		if(subjc == null || subjc.getToken().equalsIgnoreCase(PLACEHOLDER))
+			from = placeholder;
+		else
+			from = vertices.get(subjc.getPosition());
+		
+		if(subj == null || subj.getToken().equalsIgnoreCase(PLACEHOLDER))
+			to = placeholder;
+		else
+			to = vertices.get(subj.getPosition());
+		
+		edge = new Edge(name.toLowerCase(), from, to);
+		
+		return edge;
+	}
+	
+	private void createVerbPhraseStructureEdges(Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
+		
+		for(VerbPhraseMetadata vpm : metadata.getVerbMetadata()) {
 			
 			// relate the first verb of the phrase to all subjects
-			for(VerbPhraseToken subj : vpm.getSubjects()) {
-				createVerbEdges(subj, vpm.getVerbs().get(0).getPosition(), GraphClass.has_subj, vertices, edges, metadata);
+			for(VerbPhraseToken vpt : vpm.getSubjects()) {
+				createVerbEdges(vpt, vpm.getVerbs().get(0).getPosition(), GraphClass.has_subj, vertices, edges, metadata);
 				
 				// Frame edge - first verb to subj
 				//GraphClass gClass = subj.isNegated() || vpm.getVerbs().get(0).isNegated() ? GraphClass.f_absence : GraphClass.f_presence;
@@ -321,68 +316,267 @@ public class GraphProcessor {
 				//edges.add(new Edge(gClass, vertices.get(lastVerb.getPosition()), vertices.get(subjc.getPosition())));
 			}
 		}
+	}
+	
+	private void createVerbPhraseFrameEdgesV2(Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
 		
-		processPrepPhrases(edges, vertices, s.getWordList(), metadata);
-		
-		processDependentPhrases(edges, vertices, metadata);
-		
-		// Frames unbounded by a known phrase type
-		for(int i=0; i < s.getWordList().size(); i++) {
-			WordToken word = s.getWordList().get(i);
-			WordToken prev = Constants.getToken(s.getWordList(), i-1);
-			WordToken next = Constants.getToken(s.getWordList(), i+1);
+		for(VerbPhraseMetadata vpm : metadata.getVerbMetadata()) {
+			boolean modByDoubt = modByDoubt(vpm, words);
 			
-			if(word.getSemanticType().equalsIgnoreCase("bpoc")) {
-				if(prev.getToken().matches("left|right|bilateral")) {
-					edges.add(new Edge(GraphClass.f_laterality, vertices.get(prev.getPosition()-1), vertices.get(word.getPosition()-1)));
+			VerbInfo vi = new VerbInfo(vpm, words);
+			
+			processPrepPhrasesModifyingVerbComponents(vpm, edges, vertices, words, metadata.getPrepMetadata(), placeholder);
+			
+			// add placeholder for missing subject
+			if(vpm.getSubjects().isEmpty()) {
+				vpm.getSubjects().add(new VerbPhraseToken(PLACEHOLDER, 0));
+			}
+			
+			// add placeholder for missing subject complement ONLY if the final verb isn't modified by a prep phrase (and would thus be acting as the subjc).
+			if(vpm.getSubjC().isEmpty() && vpm.getVerbs().get(vpm.getVerbs().size()-1).getPrepPhrasesIdx().isEmpty()) {
+				vpm.getSubjC().add(new VerbPhraseToken(PLACEHOLDER, 0));
+			}
+			
+			// frames pertaining to the subject complement
+			for(VerbPhraseToken subjc : vpm.getSubjC()) {
+				String subjcST = words.get(subjc.getPosition()).getSemanticType();
+				String frame = null;
+				boolean subjcNumeric = words.get(subjc.getPosition()).isNumericPOS();
+				
+				// https://docs.google.com/spreadsheets/d/1aac5QCAUeiGR67FY9_vYE-ONEQ60oqMuf4XhrxSU77I/edit#gid=180671387
+				// 4a
+				// TODO this will eventually do an ontology lookup and not just be limited to qlco
+				if(vi.infinitive.matches("is|are|was|were|has|have") && subjcST.startsWith("qlco")) {
+					frame = subjc.getToken();
+					
+				// 4b
+				} else if(vi.infinitive.matches("is|are|was|were") && subjcNumeric) {			
+					frame = GraphClass.f_absolute_value.toString();
+					
+				// 6
+				} else if(vi.infinitive.matches("appear|look|smell") && subjcST.startsWith("qlco")) {
+					frame = vi.infinitive;
 				}
-			} else if(word.getToken().equalsIgnoreCase(":")) {
-				edges.add(new Edge(GraphClass.f_header, vertices.get(prev.getPosition()-1), vertices.get(word.getPosition()-1)));				
-			} else if(word.getToken().matches("measur.*")) {
-				if(next.getPOS().equalsIgnoreCase("CD") && !prev.isPrepPhraseObject()) {
-					edges.add(new Edge(GraphClass.f_measurement, vertices.get(word.getPosition()-2), vertices.get(next.getPosition()-1)));
+				
+				// now build a frame edge between this subjc and each subj
+				for(VerbPhraseToken subj : vpm.getSubjects()) {
+					if(frame != null) {
+						// kind of a hack
+						//if(frame.equalsIgnoreCase("f_presence") && vpm.isPhraseNegated())
+						//	frame = "f_absence";
+				
+						if(frame.matches("f_presence|f_absence") && modByDoubt) {
+							frame = EDGE_DOUBT;
+						}
+						
+						Edge e = buildVerbFrameEdge(GraphClass.f_related.toString(), vertices, subjc, subj, placeholder);
+						
+						if(e != null) {
+							setDefaultEdgeProps(e, frame, vpm.isPhraseNegated() ? STATE_ABSENCE : STATE_PRESENCE, vpm.isPhraseNegated());
+							e.getProps().put(PROP_VB_TENSE, vi.tense);
+							if(vi.st.length() == 0)
+								e.getProps().put(PROP_VB_ST_NULL, vpm.getVerbString());
+							edges.add(e);
+						}
+					}
+				}
+			}
+			
+			// TODO subj = there, vb = is, subjc = PP; what two edges to link?
+			
+			// token following final verb
+			WordToken vbPlusOne = Constants.getToken(words, vpm.getVerbs().get(vpm.getVerbs().size()-1).getPosition()+1);
+			
+			String vbOntEdge = getOntologyVerbMeaning(vi.infinitive);
+			
+			// frames pertaining to the subject 
+			for(VerbPhraseToken subj : vpm.getSubjects()) {				
+				String frame = null;
+				
+				// https://docs.google.com/spreadsheets/d/1aac5QCAUeiGR67FY9_vYE-ONEQ60oqMuf4XhrxSU77I/edit#gid=180671387
+				// 1 on google sheet ("there is a...")
+				if(subj.getToken().equalsIgnoreCase("there")
+					&& vi.infinitive.equalsIgnoreCase("is|was") 
+					&& vbPlusOne.getToken().equalsIgnoreCase("a")) {
+
+					frame = vpm.isPhraseNegated() ? GraphClass.f_absence.toString() : GraphClass.f_presence.toString();
+					
+				// 2a, 2b, 2c ("there is fluid..." or "<any> has|have <any>")    not making any distinction for "evidence"
+				// 5a 
+				} else if((subj.getToken().equalsIgnoreCase("there") 
+						&& vi.infinitive.matches("is|are|was|were"))  
+						|| vi.infinitive.matches("has|have")) {
+					frame = vpm.isPhraseNegated() ? GraphClass.f_absence.toString() : GraphClass.f_presence.toString();
+
+				/* this frame logic that doesn't explicitly use either the subj or subjc value could exist in this loop or the subjc loop above */
+				// 9a and 9b
+				} else if(vi.isCompound && vpm.getVerbs().get(0).getToken().matches("is|are|was|were") && vi.infinitive.matches("identify|visualize|see")) {
+					frame = vpm.isPhraseNegated() ? GraphClass.f_absence.toString() : GraphClass.f_presence.toString();
+				
+				// 3 ("Fido is a dog")
+				} else if(vi.infinitive.matches("is|was") 
+					   && vbPlusOne.getToken().equalsIgnoreCase("a")) {
+
+					frame = GraphClass.f_is_a.toString();
+				
+				// verb ontology lookup
+				} else if(vbOntEdge != null) {
+					frame = vbOntEdge;		
+				} else {
+					// default the edge name to the current verb token
+					frame = vi.infinitive;
+				}
+				/* ----- */
+				
+				for(VerbPhraseToken subjc : vpm.getSubjC()) {
+					if(frame != null) {
+						// kind of a hack
+						//if(frame.equalsIgnoreCase("f_presence") && vpm.isPhraseNegated())
+						//	frame = "f_absence";
+						
+						if(frame.matches("f_presence|f_absence") && modByDoubt) {
+							frame = EDGE_DOUBT;
+						}
+						
+						Edge e = buildVerbFrameEdge(GraphClass.f_related.toString(), vertices, subjc, subj, placeholder);
+						
+						if(e != null) {
+							setDefaultEdgeProps(e, frame, vpm.isPhraseNegated() ? STATE_ABSENCE : STATE_PRESENCE, vpm.isPhraseNegated());
+							e.getProps().put(PROP_VB_TENSE, vi.tense);
+							if(vi.st.length() == 0)
+								e.getProps().put(PROP_VB_ST_NULL, vpm.getVerbString());
+							edges.add(e);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private void processPrepPhrasesModifyingVerbComponents(VerbPhraseMetadata vpm, Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, List<PrepPhraseMetadata> ppm, Vertex placeholder) {
+		// process prep phrases modifying each subject
+		for(VerbPhraseToken subj : vpm.getSubjects()) {
+			// If a subject has no modifying prep phrases, check for prep phrases modifying the *final* subject.
+			// What are the pitfalls of this?
+			// Examples:
+			//   "The man and woman in the garden are married."  -- relate garden to both man and woman
+			//   "The man in the garden and woman in the house are married."  -- relate garden to the man and house to the woman
+			//   "The man in the front room of the house and the woman in the garden are married."  -- relate room/house to the man and garden to the woman.
+			
+			// TODO how about PP chaining? Should house be related to room or man or both?
+			List<Integer> modifyingPrepPhrases = subj.getPrepPhrasesIdx(); 
+			
+			if(modifyingPrepPhrases.isEmpty() && vpm.getSubjects().size() > 1)
+				modifyingPrepPhrases = vpm.getSubjects().get(vpm.getSubjects().size()-1).getPrepPhrasesIdx();
+			
+			for(int ppIdx : modifyingPrepPhrases) {
+				// link each subject with each PP -- TODO how to handle chained prep phrases?
+				createPrepPhraseFrameEdgesV2(edges, vertices, words, ppm.get(ppIdx), vertices.get(subj.getPosition()));
+			}				
+		}
+		
+		// process prep phrases modifying the final verb of the phrase (probably acting as the SUBJC)
+		for(int ppIdx=0; ppIdx < vpm.getVerbs().get(vpm.getVerbs().size()-1).getPrepPhrasesIdx().size(); ppIdx++) {
+			if(vpm.getSubjects().isEmpty()) {
+				// no subjects, use placeholder
+				createPrepPhraseFrameEdgesV2(edges, vertices, words,ppm.get(ppIdx), placeholder);
+			} else {
+				for(VerbPhraseToken subj : vpm.getSubjects()) {
+					// link each subject with each PP -- TODO how to handle chained prep phrases?
+					createPrepPhraseFrameEdgesV2(edges, vertices, words, ppm.get(ppIdx), vertices.get(subj.getPosition()));
 				}
 			}
 		}
 		
-		processNounPhrases(edges, vertices, s.getWordList(), metadata);
-		
-		processDiscreteData(edges, vertices, s.getDiscrete(), vID, vDiscrete);
-		
-		graphSentence.setVertices(vertices);
-		graphSentence.setEdges(edges);
-		
-		return graphSentence;
-	}
-	
-	
-	private Edge buildVerbFrameEdge(String name, List<Vertex> vertices, VerbPhraseToken subjc, VerbPhraseToken subj) {
-		Edge edge = null;
-		
-		if(subjc != null && subj != null) {
-			if(!name.startsWith("f_"))
-				name = "f_" + name;
-			edge = new Edge(name.toLowerCase(), vertices.get(subjc.getPosition()), vertices.get(subj.getPosition()));
+		// process prep phrases modifying each subject complement
+		//// relate each subject complement to the final token of the verb phrase
+		for(VerbPhraseToken subjc : vpm.getSubjC()) {			
+			for(int ppIdx : subjc.getPrepPhrasesIdx()) {
+				createPrepPhraseFrameEdgesV2(edges, vertices, words, ppm.get(ppIdx), vertices.get(subjc.getPosition()));
+			}
 		}
-		return edge;
 	}
 	
+	private boolean modByDoubt(VerbPhraseMetadata vpm, List<WordToken> words) {
+		boolean ret = false;
+		
+		// incoming token is modified by a token that casts doubt
+		for(VerbPhraseToken vpt : vpm.getSubjects()) {
+			for(Integer idx : vpt.getModifierList()) {
+				if(DOUBT.matcher(words.get(idx).getToken()).matches()) {
+					ret = true;
+					break;
+				}
+			}
+		}
+		
+		if(ret == false) {
+			for(VerbPhraseToken vpt : vpm.getSubjC()) {
+				for(Integer idx : vpt.getModifierList()) {
+					if(DOUBT.matcher(words.get(idx).getToken()).matches()) {
+						ret = true;
+						break;
+					}
+				}
+			}
+		}
+		
+		if(ret == false) {
+			for(VerbPhraseToken vpt : vpm.getVerbs()) {
+				for(Integer idx : vpt.getModifierList()) {
+					if(DOUBT.matcher(words.get(idx).getToken()).matches()) {
+						ret = true;
+						break;
+					}
+				}
+			}
+		}
+		
+		return ret;
+	}
 	
-	private void processNounPhrases(List<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata) {
-		for(NounPhraseMetadata npm : metadata.getNounMetadata()) {
-			// TODO add slices frame 
-			
+	private String getOntologyVerbMeaning(String verb) {
+		String ret = null;
+		
+		Map<String, String> ont = verbLookup.get(verb);
+		
+		if(ont != null) {
+			String meaning = ont.get("has_meaning");
+			if(meaning != null)
+				ret = "f_" + meaning;
+			else {
+				String synonym = ont.get("has_synonym");
+				ret = getOntologyVerbMeaning(synonym);
+			}
+		}
+		
+		if(ret == null)
+			logger.warn("Verb has no 'has_meaning' defined: " + verb);
+		
+		return ret;
+	}
+	
+	private void processVerbPhraseMetadata(Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
+		createVerbPhraseStructureEdges(edges, vertices, words, metadata, placeholder);
+		createVerbPhraseFrameEdgesV2(edges, vertices, words, metadata, placeholder);
+	}
+	
+	private void processNounPhraseMetadata(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata) {
+		createNounPhraseStructureEdges(edges, vertices, words, metadata);
+		createNounPhraseFrameEdgesV2(edges, vertices, words, metadata);
+	}
+	
+	private void processPrepPhraseMetadata(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, List<PrepPhraseMetadata> metadata) {
+		createPrepPhraseStructureEdges(edges, vertices, words, metadata);
+		
+		for(PrepPhraseMetadata ppm : metadata) {
+			createPrepPhraseFrameEdgesV2(edges, vertices, words, ppm, null);
+		}
+	}
+	
+	private void createNounPhraseStructureEdges(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata) {
+		for(NounPhraseMetadata npm : metadata.getNounMetadata()) {		
 			GenericToken npHead = npm.getPhrase().get(npm.getPhrase().size()-1);
-			String npHeadST = words.get(npHead.getPosition()).getSemanticType();
-			
-			// Frame edges
-			// f_linear_uom needs to exist before f_disease_quantity, measuring
-			if(npHeadST.equalsIgnoreCase("qlco-uom")) {
-				// f_linear_uom frame
-				if(words.get(npHead.getPosition()-1).getPOS().equalsIgnoreCase("CD")) {
-					edges.add(new Edge(GraphClass.f_linear_uom, vertices.get(npHead.getPosition()-1), vertices.get(npHead.getPosition())));
-				}
-			}
 			
 			for(int i=0; i < npm.getPhrase().size(); i++) {
 				int idx = npm.getPhrase().get(i).getPosition();
@@ -400,36 +594,6 @@ public class GraphProcessor {
 					// edges between each np member and the np head
 					edges.add(new Edge(GraphClass.has_np_object, vertices.get(idx), vertices.get(npHead.getPosition())));
 				}
-				
-				// Frame edges
-				WordToken npMod = words.get(idx);
-				
-				if(npHeadST.matches("bpoc|neop.*") && npMod.getToken().matches("left|right|bilateral")) {
-					// f_laterality frame
-					Edge e = new Edge(GraphClass.f_laterality, vertices.get(idx), vertices.get(npHead.getPosition()));
-					if(!edges.contains(e)) {
-						edges.add(e);
-					}
-				} else if(npHeadST.matches("dysn|neop.*")) {
-					if(npMod.getSemanticType().equalsIgnoreCase("bpoc")) {
-						// f_finding_site frame
-						edges.add(new Edge(GraphClass.f_finding_site, vertices.get(idx), vertices.get(npHead.getPosition())));
-					} else if(npMod.getPOS().equalsIgnoreCase("CD")) {
-						// f_disease_quantity frame
-						// additional check for npMod not in f_linear_uom relationship
-						if(findEdge(edges, EdgeDirection.outgoing, GraphClass.f_linear_uom, vertices.get(idx)) == -1) {
-							edges.add(new Edge(GraphClass.f_disease_quantity, vertices.get(idx), vertices.get(npHead.getPosition())));
-						}
-					}
-				}
-				
-				// 10/10/2016 - dynamic NP frames
-				List<String> dynEdges = qlco.get(npMod.getToken());
-				if(dynEdges != null) {
-					for(String edge : dynEdges) {
-						edges.add(new Edge(edge, vertices.get(npHead.getPosition()), vertices.get(idx)));
-					}
-				}
 			}
 			
 			for(Integer ppIdx : npm.getPrepPhrasesIdx()) {
@@ -443,7 +607,101 @@ public class GraphProcessor {
 		}
 	}
 	
-	private void processDependentPhrases(List<Edge> edges, List<Vertex> vertices, SentenceMetadata metadata) {
+	private void createNounPhraseFrameEdgesV2(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata) {
+		for(NounPhraseMetadata npm : metadata.getNounMetadata()) {
+			// TODO add slices frame 
+			
+			GenericToken npHead = npm.getPhrase().get(npm.getPhrase().size()-1);
+			String npHeadST = words.get(npHead.getPosition()).getSemanticType();
+			Set<Integer> processedNPindexes = new HashSet<>();
+			
+			// Frame edges
+			// f_linear_uom needs to exist before f_disease_quantity, measuring
+//			if(npHeadST.equalsIgnoreCase("qlco-uom")) {
+//				// f_linear_uom frame
+//				if(words.get(npHead.getPosition()-1).getPOS().equalsIgnoreCase("CD")) {
+//					Edge e = new Edge(GraphClass.f_related, vertices.get(npHead.getPosition()-1), vertices.get(npHead.getPosition()));
+//					e.getProps().put(EDGE_TYPE, "f_linear_uom");
+//					e.getProps().put(EDGE_STATE, STATE_UNKNOWN);
+//					edges.add(e);
+//					processedNPindexes.add(npHead.getPosition());
+//					processedNPindexes.add(npHead.getPosition()-1);
+//				}
+//			}
+			
+			for(int i=0; i < npm.getPhrase().size(); i++) {
+				String frame = null;
+				int idx = npm.getPhrase().get(i).getPosition();
+				
+				// Frame edges
+				WordToken npMod = words.get(idx);
+				WordToken nextToken = words.get(idx+1);
+
+				// from/to default to npMod and npHead
+				int fromIdx = idx;
+				int toIdx = npHead.getPosition(); 
+				
+				if(npMod.getPOS().equalsIgnoreCase("CD") && nextToken.getSemanticType().equalsIgnoreCase("qlco-uom")) {
+					frame = "f_linear_uom";
+					toIdx = fromIdx+1;
+				} else if(npMod.getSemanticType().equalsIgnoreCase("qlco-uom")) {
+						frame = "f_size";
+				} else if(npHeadST.matches("bpoc|neop.*") && LATERALITY.matcher(npMod.getToken()).matches()) {
+					frame = "f_laterality";
+				} else if(npHeadST.matches("dysn|neop.*")) {
+					if(npMod.getSemanticType().equalsIgnoreCase("bpoc")) {
+						frame = "f_location frame";
+					} else if(npMod.getPOS().equalsIgnoreCase("CD")) {
+						// additional check for npMod not in f_linear_uom relationship
+						if(findEdgeByFrame(edges, EdgeDirection.outgoing, GraphClass.f_linear_uom, vertices.get(idx)) == -1) {
+							frame = "f_disease_quantity"; 
+						}
+					}
+				}
+				
+				if(frame != null ) {					
+					Edge e = new Edge(GraphClass.f_related, vertices.get(fromIdx), vertices.get(toIdx));
+					setDefaultEdgeProps(e, frame, STATE_UNKNOWN, npm.isNegated());
+					edges.add(e);
+					
+					processedNPindexes.add(idx);
+				}
+				
+				// 10/10/2016 - dynamic NP qlco frames
+				// TODO is this really working as desired?
+				List<String> dynFrames = qlco.get(npMod.getToken());
+				if(dynFrames != null) {
+					for(String f : dynFrames) {
+						Edge e = new Edge(GraphClass.f_related, vertices.get(npHead.getPosition()), vertices.get(idx));
+						setDefaultEdgeProps(e, f, STATE_UNKNOWN, npm.isNegated());
+						edges.add(e);
+						
+						processedNPindexes.add(idx);
+					}
+				}
+			}
+			
+			// create f_unknown frames
+			for(int i=0; i < npm.getPhrase().size()-1; i++) {
+				GenericToken npToken = npm.getPhrase().get(i);
+				if(!processedNPindexes.contains(npToken.getPosition())) {
+					Edge e = new Edge(GraphClass.f_related, vertices.get(npHead.getPosition()), vertices.get(npToken.getPosition()));
+					setDefaultEdgeProps(e, EDGE_UNKNOWN, STATE_UNKNOWN, npm.isNegated());
+					edges.add(e);
+				}
+			}
+		}
+	}
+	
+	private void setDefaultEdgeProps(Edge e, String edgeType, String edgeState, boolean negated) {
+		if(!edgeType.startsWith("f_"))
+			edgeType = "f_" + edgeType;
+		e.getProps().put(PROP_EDGE_TYPE, edgeType);
+		e.getProps().put(PROP_EDGE_STATE, edgeState);
+		e.getProps().put(PROP_NEGATED, negated);
+	}
+	
+	private void createDependentPhraseStructureEdges(Set<Edge> edges, List<Vertex> vertices, SentenceMetadata metadata) {
 		for(DependentPhraseMetadata dpm : metadata.getDependentMetadata()) {
 			// edges between each dp member
 			for(int i=1; i < dpm.getPhrase().size(); i++) {
@@ -453,14 +711,12 @@ public class GraphProcessor {
 		}
 	}
 	
-	
-	private void processPrepPhrases(List<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata) {
+	private void createPrepPhraseStructureEdges(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, List<PrepPhraseMetadata> metadata) {
 		// intra-prep phrase relationships
-		for(PrepPhraseMetadata ppm : metadata.getPrepMetadata()) {
+		for(PrepPhraseMetadata ppm : metadata) {
 			// prep term
 			int prepIdx = ppm.getPhrase().get(0).getPosition();
 			int precedingToken = prepIdx-1;
-			WordToken prep = words.get(prepIdx);
 			
 			int i = 0;
 			
@@ -484,31 +740,67 @@ public class GraphProcessor {
 					edges.add(new Edge(GraphClass.has_pp_sibling, vertices.get(idx-1), vertices.get(idx)));	
 				}
 				
-				// Frame edges
-				// prep is in|of|within, phrase obj is a bpoc, PP is modifying a dysn
-				if(prep.getToken().matches("in|of|within")) {
-					if(ppt.isObject()) {
-						edges.add(new Edge(GraphClass.f_location, vertices.get(prepIdx-1), vertices.get(idx)));
-					}
-					/*
-					if(ppt.isObject() && s.getWordList().get(idx).getSemanticType().equalsIgnoreCase("bpoc")) {
-						if(s.getWordList().get(prepIdx-1).getSemanticType().equalsIgnoreCase("dysn")) {
-							// f_finding_site frame
-							edges.add(new Edge(GraphClass.f_finding_site, vertices.get(prepIdx-1), vertices.get(idx)));
-						} else if(s.getWordList().get(prepIdx-1).getSemanticType().equalsIgnoreCase("diap")) {
-							// f_procedure frame
-							edges.add(new Edge(GraphClass.f_procedure, vertices.get(prepIdx-1), vertices.get(idx)));
-						}
-					}
-					*/
-				}
-				
 				i++;
 			}
 		}
 	}
 	
-	private void processDiscreteData(List<Edge> edges, List<Vertex> vertices, HashMap<String, String> discrete, Vertex fromVertex, Vertex toVertex) {
+	private void createPrepPhraseFrameEdgesV2(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, PrepPhraseMetadata ppm, Vertex modifiedToken) {
+		int prepIdx = ppm.getPhrase().get(0).getPosition();
+		String prep = words.get(prepIdx).getToken().toLowerCase(); // TODO add the token value to the metadata to make this cleaner
+		// default the from index to the token preceding the preposition
+		int fromIdx = modifiedToken == null ? prepIdx-1 : -1;
+				
+		for(PrepPhraseToken ppt : ppm.getPhrase()) {
+			String frame = null;
+			int toIdx = ppt.getPosition();
+			
+			if(ppt.isObject()) {
+				WordToken obj = words.get(toIdx);
+									
+				if(prep.equalsIgnoreCase("in") && POPULATION.matcher(ppt.getToken()).matches()) {
+					frame = "f_population";
+				} else if(prep.equalsIgnoreCase("in") && obj.getSemanticType().equalsIgnoreCase("tempor-month")) {
+					frame = "f_month";
+				} else if(prep.equalsIgnoreCase("for") && obj.getSemanticType().equalsIgnoreCase("tempor")) {
+					frame = "f_duration";
+				} else if(prep.equalsIgnoreCase("in") && obj.getSemanticType().equalsIgnoreCase("tempor")) {
+					frame = "f_future_event";
+				} else if(prep.equalsIgnoreCase("within") && obj.getSemanticType().equalsIgnoreCase("tempor")) {
+					frame = "f_within_time";
+				} else if(prep.equalsIgnoreCase("on") && obj.getSemanticType().startsWith("drug")) {
+					frame = "f_take";
+				} else if(prep.equalsIgnoreCase("at") && obj.getToken().equalsIgnoreCase("noon")) {
+					frame = "f_time";
+					fromIdx = prepIdx;
+				} else if(LOCATION_PREP.matcher(prep).matches()) {
+					frame = GraphClass.f_location.toString();
+				} else if(SPACIAL.matcher(prep).matches()) {
+					frame = "f_spacial_relationship";
+				} else if(PERIOD_TIME.matcher(prep).matches()) {
+					frame = "f_period_time";
+				} else {
+					frame = EDGE_UNKNOWN;
+				}
+			}
+			
+			if(frame != null ) {
+				if(fromIdx < 0)
+					fromIdx = 0; // prep phrase begins the sentence
+				Edge e = new Edge(GraphClass.f_related, modifiedToken == null ? vertices.get(fromIdx) : modifiedToken, vertices.get(toIdx));
+				setDefaultEdgeProps(e, frame, STATE_UNKNOWN, ppm.isNegated());
+				edges.add(e);
+			}
+		}
+		
+		// frame logic that must occur outside of the loop
+		if(prep.equalsIgnoreCase("at") && words.get(prepIdx+1).getToken().equalsIgnoreCase("least")) {
+			Edge e = new Edge("f_minimum", vertices.get(prepIdx), vertices.get(prepIdx+1));
+			edges.add(e);
+		}
+	}
+		
+	private void processDiscreteData(Set<Edge> edges, List<Vertex> vertices, HashMap<String, String> discrete, Vertex fromVertex, Vertex toVertex) {
 		for(String key : discrete.keySet()) {
 			toVertex.getProps().put(key, discrete.get(key));
 		}
@@ -516,14 +808,13 @@ public class GraphProcessor {
 		vertices.add(toVertex);
 	}
 	
-	private int findEdge(List<Edge> edges, EdgeDirection dir, GraphClass edgeClass, Vertex vertex) {
+	private int findEdgeByFrame(Set<Edge> edges, EdgeDirection dir, GraphClass edgeClass, Vertex vertex) {
 		int ret = -1;
+		int counter = 0;
 		
-		for(int i=0; i < edges.size(); i++) {
-			Edge e = edges.get(i);
-		
+		for(Edge e : edges) {	
 			String uuid = "";
-			
+
 			switch(dir) {
 				case incoming:
 					uuid = e.getToVertex();
@@ -535,17 +826,22 @@ public class GraphProcessor {
 			}
 			
 			if(uuid.equals(vertex.getUUID())) {
-				if(e.get_Class().equalsIgnoreCase(edgeClass.toString())) {
-					ret = i;
-					break;
+				if(e.get_Class().equalsIgnoreCase("f_related")) {
+					for(String key : e.getProps().keySet()) {
+						if(e.getProps().get(key).toString().equalsIgnoreCase(edgeClass.toString())) {
+							ret = counter;
+							break;
+						}
+					}
 				}
 			}
+			counter++;
 		}
 		
 		return ret;
 	}
 	
-	private void createVerbEdges(VerbPhraseToken token, int vbPos, GraphClass edge, List<Vertex> vertices, List<Edge> edges, SentenceMetadata metadata) {
+	private void createVerbEdges(VerbPhraseToken token, int vbPos, GraphClass edge, List<Vertex> vertices, Set<Edge> edges, SentenceMetadata metadata) {
 		// relate token to the vbPos, e.g. subj -> first vb token; subjc -> last vb token
 		if(edge != null)
 			edges.add(new Edge(edge, vertices.get(vbPos), vertices.get(token.getPosition())));
@@ -664,5 +960,41 @@ public class GraphProcessor {
 			out.add("conjAdv");
 		
 		return out;
+	}
+	
+	private class VerbInfo {
+		String infinitive;
+		String tense;
+		String st;
+		Boolean isCompound;
+		
+		public VerbInfo(VerbPhraseMetadata vpm, List<WordToken> words) {
+
+			isCompound = vpm.getVerbs().size() > 1;;
+			
+			if(isCompound) {
+				st = vpm.getSemanticType(); // ST comes from the metadata
+			} else {
+				st = words.get(vpm.getVerbs().get(0).getPosition()).getSemanticType(); // ST comes from the token
+			}
+			
+			if(st == null)
+				st = "";
+			
+			if(st != null && st.length() > 0) {
+				String[] st2 = st.split("_");
+				infinitive = st2[0]; // infinitive from the ST (inf_tense in Redis)
+				if(st2.length > 1)
+					tense = st2[1];
+				else {
+					logger.warn("Verb has no tense: " + vpm.getVerbString());
+					tense = "unknown";
+				}
+			} else {
+				logger.warn("Verb has no ST: " + vpm.getVerbString());
+				infinitive = vpm.getVerbs().get(vpm.getVerbs().size()-1).getToken(); // final verb of phrase
+				tense = "unknown";
+			}
+		}
 	}
 }

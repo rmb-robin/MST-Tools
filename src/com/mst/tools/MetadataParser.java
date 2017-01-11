@@ -1,6 +1,7 @@
 package com.mst.tools;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -123,10 +124,10 @@ public class MetadataParser {
 					vp.addVerb(new VerbPhraseToken(word.getToken(), i));
 					
 					// infinitive follows prep phrase
-					WordToken prevPrevToken = Constants.getToken(words, i-2);
+					//WordToken prevPrevToken = Constants.getToken(words, i-2);
 					
-					if(prevPrevToken.isPrepPhraseObject())
-						vp.setInfFollowsPP(true);
+					//if(prevPrevToken.isPrepPhraseObject())
+					//	vp.setInfFollowsPP(true);
 					
 					metadata.addVerbMetadata(vp);
 				}	
@@ -183,7 +184,7 @@ public class MetadataParser {
 		}
 		
 		// #####
-		// loop through word tokens to build phrases complete
+		// loop through word tokens to build phrases- complete
 		// now loop through phrases built in previous loop and construct additional metadata
 		// #####
 		
@@ -234,6 +235,9 @@ public class MetadataParser {
 		
 		Set<Integer> subjectIndexes = new HashSet<>();
 		
+		// sort verb metadata by verb's idx (so VerbMetadata entries are arranged as they appear in the sentence) 
+		Collections.sort(metadata.getVerbMetadata(), (a, b) -> a.getVerbs().get(0).getPosition() < b.getVerbs().get(0).getPosition() ? -1 : 0);
+		
 		for(VerbPhraseMetadata phrase : metadata.getVerbMetadata()) {
 			if(phrase.getVerbClass() == Constants.VerbClass.ACTION ||
 				phrase.getVerbClass() == Constants.VerbClass.LINKING_VERB ||
@@ -250,8 +254,8 @@ public class MetadataParser {
 					for(int j=verb.getPosition()-1; j>=0; j--) {
 						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
 							verb.getModifierList().add(j);
-						} else
-							break;
+						}// else // SD: 12/27/2016 - removed the break from these checks to support a sentence like "She has a probable 9 mm cyst."
+						//	break;
 					}
 					
 					if(verb.isNegated())
@@ -284,8 +288,8 @@ public class MetadataParser {
 					for(int j=phrase.getSubj().getPosition()-1; j>=0; j--) {
 						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
 							phrase.getSubj().getModifierList().add(j);
-						} else
-							break;
+						}// else
+						//	break;
 					}
 				}
 				
@@ -300,8 +304,8 @@ public class MetadataParser {
 					for(int j=token.getPosition()-1; j>=0; j--) {
 						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
 							token.getModifierList().add(j);
-						} else
-							break;
+						}// else
+						//	break;
 					}
 				}
 				
@@ -320,8 +324,8 @@ public class MetadataParser {
 						for(int j=token.getPosition()-1; j>=0; j--) {
 							if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
 								token.getModifierList().add(j);
-							} else
-								break;
+							}// else
+							//	break;
 						}
 					}
 				}

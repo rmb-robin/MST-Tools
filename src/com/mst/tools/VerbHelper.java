@@ -511,10 +511,11 @@ public class VerbHelper {
 				// RULE: verb SUBJ/SUBJC cannot exist outside the DP if the verb is in a DP, nor can a SUBJ exist in a DP
 				// RULE: verb SUBJ/SUBJC cannot be within parentheses.
 				if(wordList.get(verbIndex).isDependentPhraseMember() != token.isDependentPhraseMember())
-					break;
+					//break;
 				
-				if(token.isWithinVerbPhrase() ||  // this isn't as useful as once thought since verb phrase classes process in a certain order 
-				   token.isVerb())
+				// this isn't as useful as once thought since verb phrase classes process in a certain order
+				if(token.isWithinVerbPhrase() || token.isVerb()) 
+				   //&& !token.isDependentPhraseMember())
 					break; // TODO test this since making LV SUBJC fix
 				
 				// these are reversed from what is seen in identifySubjectComplement() because we're looping backwards.

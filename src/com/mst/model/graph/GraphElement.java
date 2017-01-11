@@ -41,7 +41,7 @@ public class GraphElement {
 	public void setProps(Map<String, Object> props) {
 		this.props = props;
 	}
-
+/*
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -72,4 +72,5 @@ public class GraphElement {
 			return false;
 		return true;
 	}
+*/
 }

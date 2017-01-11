@@ -1,5 +1,7 @@
 package com.mst.model.graph;
 
+import java.util.Objects;
+
 import com.mst.util.Constants.GraphClass;
 
 public class Edge extends GraphElement {
@@ -39,5 +41,24 @@ public class Edge extends GraphElement {
 
 	public void setToVertex(String toVertex) {
 		this.toVertexUUID = toVertex;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(fromVertexUUID, toVertexUUID, getProps().get("type"));
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		
+		if(o == this)
+			return true;
+		if(!(o instanceof Edge)) {
+			return false;
+		}
+		Edge edge = (Edge) o;
+		return Objects.equals(fromVertexUUID, edge.fromVertexUUID) &&
+			   Objects.equals(toVertexUUID, edge.toVertexUUID) &&
+			   Objects.equals(getProps().get("type"), edge.getProps().get("type"));
 	}
 }
