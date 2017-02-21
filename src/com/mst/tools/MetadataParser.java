@@ -184,7 +184,7 @@ public class MetadataParser {
 		}
 		
 		// #####
-		// loop through word tokens to build phrases- complete
+		// initial loop complete
 		// now loop through phrases built in previous loop and construct additional metadata
 		// #####
 		
@@ -233,10 +233,10 @@ public class MetadataParser {
 			}
 		}
 		
-		Set<Integer> subjectIndexes = new HashSet<>();
+		// add missing subjs and/or subjcs for verb phrases within a dependent phrase (based on lots of rules)
+		addDependentPhraseVerbComponents(metadata.getVerbMetadata(), words);
 		
-		// sort verb metadata by verb's idx (so VerbMetadata entries are arranged as they appear in the sentence) 
-		Collections.sort(metadata.getVerbMetadata(), (a, b) -> a.getVerbs().get(0).getPosition() < b.getVerbs().get(0).getPosition() ? -1 : 0);
+		Set<Integer> subjectIndexes = new HashSet<>();
 		
 		for(VerbPhraseMetadata phrase : metadata.getVerbMetadata()) {
 			if(phrase.getVerbClass() == Constants.VerbClass.ACTION ||
@@ -246,6 +246,8 @@ public class MetadataParser {
 				
 				boolean oneVerbNegated = false;
 				
+				// Verb of phrase
+				// set negation, modifying prep phrases, containing dependent phrases, adjective/adverb modifiers
 				for(VerbPhraseToken verb : phrase.getVerbs()) {
 					verb.setNegated(checkNegation(words, verb.getPosition()));
 					verb.setPrepPhrasesIdx(getModifyingPrepPhrases(verb.getPosition(), metadata.getPrepMetadata()));
@@ -288,11 +290,12 @@ public class MetadataParser {
 					for(int j=phrase.getSubj().getPosition()-1; j>=0; j--) {
 						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
 							phrase.getSubj().getModifierList().add(j);
-						}// else
-						//	break;
+						}
 					}
 				}
 				
+				// Subject(s) of phrase
+				// set negation, modifying prep phrases, containing dependent phrases, adjective/adverb modifiers
 				for(VerbPhraseToken token : phrase.getSubjects()) {
 					token.setPrepPhrasesIdx(getModifyingPrepPhrases(token.getPosition(), metadata.getPrepMetadata()));
 					token.setNounPhraseIdx(getContainingNounPhraseIdx(token.getPosition(), metadata.getNounMetadata()));
@@ -304,28 +307,22 @@ public class MetadataParser {
 					for(int j=token.getPosition()-1; j>=0; j--) {
 						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
 							token.getModifierList().add(j);
-						}// else
-						//	break;
+						}
 					}
 				}
 				
-				if(!phrase.getSubjC().isEmpty()) {
-					for(VerbPhraseToken token : phrase.getSubjC()) {
-						if(subjectIndexes.contains(token.getPosition()))
-							metadata.addSimpleMetadataValue("subjSubjCEqual", true);
-						
-						token.setPrepPhrasesIdx(getModifyingPrepPhrases(token.getPosition(), metadata.getPrepMetadata()));
-						token.setNounPhraseIdx(getContainingNounPhraseIdx(token.getPosition(), metadata.getNounMetadata()));
-						token.setNegated(checkSubjCNegation(words, token.getPosition()));
-						// ScottD - 3/29/16 - attempting to set depPhraseIdx of metadata properly
-						//token.setDepPhraseIdx(findModifyingDependentPhrase(words, token.getPosition(), metadata.getDependentMetadata()));
-						token.setDepPhraseIdx(getContainingDependentPhraseIdx(token.getPosition(), metadata.getDependentMetadata()));
-						
-						for(int j=token.getPosition()-1; j>=0; j--) {
-							if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
-								token.getModifierList().add(j);
-							}// else
-							//	break;
+				for(VerbPhraseToken token : phrase.getSubjC()) {
+					if(subjectIndexes.contains(token.getPosition()))
+						metadata.addSimpleMetadataValue("subjSubjCEqual", true);
+					
+					token.setPrepPhrasesIdx(getModifyingPrepPhrases(token.getPosition(), metadata.getPrepMetadata()));
+					token.setNounPhraseIdx(getContainingNounPhraseIdx(token.getPosition(), metadata.getNounMetadata()));
+					token.setNegated(checkSubjCNegation(words, token.getPosition()));
+					token.setDepPhraseIdx(getContainingDependentPhraseIdx(token.getPosition(), metadata.getDependentMetadata()));
+					
+					for(int j=token.getPosition()-1; j>=0; j--) {
+						if(words.get(j).isAdjectivePOS() || words.get(j).isAdverbPOS()) {
+							token.getModifierList().add(j);
 						}
 					}
 				}
@@ -346,6 +343,104 @@ public class MetadataParser {
 		buildOrphanList(words, metadata);
 		
 		buildModByPPList(words, metadata);
+	}
+	
+	private void addDependentPhraseVerbComponents(List<VerbPhraseMetadata> verbPhrases, ArrayList<WordToken> words) {
+		// Verb phrases within a dependent phrase are often missing a subject or subject complement because earlier
+		// logic in the process prevents subj/subjc detection from "crossing borders". There are cases, however,
+		// where the effective subject of a verb phrase within a DP is outside said DP so, for certain use cases,
+		// we want to detect that and duplicate the independent phrases' subj as the dependent phrases' subj.
+		
+		// loop backwards through all verb phrases
+		for(int i=verbPhrases.size()-1; i >= 0; i--) {
+			VerbPhraseMetadata thisVerb = verbPhrases.get(i);
+			
+			// verb is within a DP or ends with -ing 
+			if(thisVerb.isWithinDP() || thisVerb.getVerbs().get(thisVerb.getVerbs().size()-1).getToken().endsWith("ing")) {
+				// DP does not begin the sentence
+				if(i > 0) {
+					// get the independent phrase (assuming for now that INDP precedes DP)
+					VerbPhraseMetadata prevVerb = verbPhrases.get(i-1);
+					
+					// preceding verb phrase is NOT within a DP
+					if(!prevVerb.isWithinDP()) {
+						// DP has no subject
+						if(thisVerb.getSubjects().isEmpty()) {
+							// if subject = "there" or the DP signal = "which|that", set the DP subject to INDP's subjc
+							if((!prevVerb.getSubjects().isEmpty() && prevVerb.getSubjects().get(0).getToken().equalsIgnoreCase("there")) ||
+								(thisVerb.getDPSignal() != null && thisVerb.getDPSignal().matches("(?i)which|that"))) {
+								if(prevVerb.getSubjC().isEmpty()) {
+									// is a prep phrase acting as the INDP SUBJC?
+									// TODO this won't fire
+								} else {
+									copyVerbPhraseTokens(prevVerb.getSubjC(), thisVerb.getSubjects());
+								}
+							} else { 
+								// otherwise, set the DP's subject = to the INDP's subject
+								copyVerbPhraseTokens(prevVerb.getSubjects(), thisVerb.getSubjects());
+							}
+							i--;
+						} else {
+							// DP has a subject
+							// only one INDP subj and one DP subj; make them the same if DP subject is a pronoun
+							if(prevVerb.getSubjects().size() == 1 && thisVerb.getSubjects().size() == 1) {
+								if(words.get(thisVerb.getSubjects().get(0).getPosition()).isPronounPOS()) {
+									copyVerbPhraseTokens(prevVerb.getSubjects(), thisVerb.getSubjects());
+								}
+							} else {
+								// for each INDP subj that matches a DP subj based on string equality; 
+								// set DP's subj to the INDP's so graph edges will point to a single entity.
+								for(VerbPhraseToken indpSubj : prevVerb.getSubjects()) {
+									for(int j=0; j < thisVerb.getSubjects().size(); j++) {
+										VerbPhraseToken dpSubj = thisVerb.getSubjects().get(j);
+										 
+										if(indpSubj.getToken().equalsIgnoreCase(dpSubj.getToken())) {
+											thisVerb.getSubjects().set(j, copyVerbPhraseToken(indpSubj));
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private void copyVerbPhraseTokens(List<VerbPhraseToken> source, List<VerbPhraseToken> target) {
+		target.clear();
+		
+		for(VerbPhraseToken orig : source) {
+			VerbPhraseToken copy = copyVerbPhraseToken(orig);
+			/*
+			VerbPhraseToken copy = new VerbPhraseToken(orig.getToken(), orig.getPosition());
+			
+			copy.setNegated(orig.isNegated());
+			copy.setDepPhraseIdx(orig.getDepPhraseIdx());
+			copy.setNounPhraseIdx(orig.getNounPhraseIdx());
+			
+			copy.setModifierIdx(new ArrayList<Integer>(orig.getModifierList()));
+			copy.setPrepPhrasesIdx(new ArrayList<Integer>(orig.getPrepPhrasesIdx()));
+			*/
+			target.add(copy);
+		}
+	}
+	
+	private VerbPhraseToken copyVerbPhraseToken(VerbPhraseToken source) {
+		// I couldn't get Collections.copy() or new ArrayList<VerbPhraseToken>(indpVPM.getSubjects())
+		// to give me a deep copy so I just wrote the damn thing the hard way.
+		// Always ended up with dupe entries in the ModiferIdx and PrepPhrasesIdx lists.
+		
+		VerbPhraseToken copy = new VerbPhraseToken(source.getToken(), source.getPosition());
+		
+		copy.setNegated(source.isNegated());
+		copy.setDepPhraseIdx(source.getDepPhraseIdx());
+		copy.setNounPhraseIdx(source.getNounPhraseIdx());
+		
+		copy.setModifierIdx(new ArrayList<Integer>(source.getModifierList()));
+		copy.setPrepPhrasesIdx(new ArrayList<Integer>(source.getPrepPhrasesIdx()));
+		
+		return copy;
 	}
 	
 	private void buildOrphanList(ArrayList<WordToken> words, SentenceMetadata metadata) {

@@ -1,6 +1,7 @@
 package com.mst.tools;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -125,6 +126,8 @@ public class Annotator {
 					word.setSemanticType(val);
 				}
 				
+				// *** THE ORDER OF THE STATEMENTS BELOW IS IMPORTANT! ***
+				
 				// beginning dep phrases must be defined before prep phrases
 				dep.processBeginningBoundaries(sentence);
 				
@@ -152,6 +155,8 @@ public class Annotator {
 				// modal aux used in identifying the subject
 				verbs.identifyActionVerbs(sentence);
 				
+				// sort verb metadata by verb's idx (so VerbMetadata entries are arranged as they appear in the sentence) 
+				Collections.sort(sentence.getMetadata().getVerbMetadata(), (a, b) -> a.getVerbs().get(0).getPosition() < b.getVerbs().get(0).getPosition() ? -1 : 0);
 				
 				// create a worthless list of tokens that are non-punctuation because jan said so
 				for(WordToken word : sentence.getWordList()) {

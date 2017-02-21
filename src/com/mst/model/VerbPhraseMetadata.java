@@ -8,13 +8,14 @@ import com.mst.util.Constants;
 public class VerbPhraseMetadata {
 	private Constants.VerbClass _class;
 	private VerbPhraseToken subj;
-	private List<VerbPhraseToken> subjs = new ArrayList<VerbPhraseToken>();
-	private List<VerbPhraseToken> verbs = new ArrayList<VerbPhraseToken>();
-	private List<VerbPhraseToken> subjc = new ArrayList<VerbPhraseToken>();
+	private List<VerbPhraseToken> subjs = new ArrayList<>();
+	private List<VerbPhraseToken> verbs = new ArrayList<>();
+	private List<VerbPhraseToken> subjc = new ArrayList<>();
 	//private boolean compound;
 	//private boolean intransitive = true;
 	private boolean infFollowsPP; // infinitive verb follows prep phrase
 	private String st = null;
+	private String dpSignal = null; // if any part of phrase (subj, vb, obj) is within a dependent phrase this will represent the DP signal 
 
 	public VerbPhraseMetadata() {	}
 	
@@ -84,6 +85,18 @@ public class VerbPhraseMetadata {
 
 	public boolean isInfFollowsPP() {
 		return infFollowsPP;
+	}
+	
+	public void setDPSignal(String dpSignal) {
+		this.dpSignal = dpSignal;
+	}
+
+	public String getDPSignal() {
+		return dpSignal;
+	}
+	
+	public boolean isWithinDP() {
+		return dpSignal != null;
 	}
 	
 	public String getSemanticType() {

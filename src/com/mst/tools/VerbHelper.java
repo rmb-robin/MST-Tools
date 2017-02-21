@@ -103,21 +103,13 @@ public class VerbHelper {
 							int subjIdx = identifyVerbSubject(words, i);
 							List<Integer> subjIdxs = identifyVerbSubjectMulti(words, i);
 							
-							//if(subjIdx != -1)
-							//	words.get(subjIdx).setLinkingVerbSubject(subjIdx != -1);
-							if(!subjIdxs.isEmpty())
-								for(int idx : subjIdxs)
-									words.get(idx).setLinkingVerbSubject(true);
+							for(int idx : subjIdxs)
+								words.get(idx).setLinkingVerbSubject(true);
 	
 							List<Integer> subjcIdxs = identifySubjectComplement(words, i, false);
 							
-							if(!subjcIdxs.isEmpty())
-								for(int idx : subjcIdxs)
-									words.get(idx).setLinkingVerbSubjectComplement(true);
-									//words.get(idx).setVerbOfBeingSubjectComplement(true); // TODO This was wrong for months and didn't cause any issues
-																							// because subjcIdxs is passed to setVerbPhraseMetadata().
-																							// Should it be removed? Edit: it possibly fixed a cause of the
-																							// shared SUBJ/SUBJC issue.
+							for(int idx : subjcIdxs)
+								words.get(idx).setLinkingVerbSubjectComplement(true);
 	
 							sentence.getMetadata().addVerbMetadata(setVerbPhraseMetadata(Constants.VerbClass.LINKING_VERB, i, words, subjIdx, subjIdxs, subjcIdxs));
 							i++; // increment past the verb's successor
@@ -268,6 +260,17 @@ public class VerbHelper {
 				vpm.addSubjC(new VerbPhraseToken(words.get(idx).getToken(), idx));
 		}
 		
+		if(words.get(verbIdx).isDependentPhraseMember()) {
+			for(int i = verbIdx-1; i>=0; i--) {
+				if(!words.get(i).isDependentPhraseMember()) {
+					break;
+				} else if(words.get(i).isDependentPhraseBegin()) {
+					vpm.setDPSignal(words.get(i).getToken());
+					break;
+				}
+			}
+		}
+		
 		return vpm;
 	}
 	
@@ -392,60 +395,6 @@ public class VerbHelper {
 		return words;
 	}
 	
-	private int identifyActionVerbSubject(ArrayList<WordToken> wordList, int verbIndex) {
-	
-		int subjIndex = -1;
-		
-		try {
-			for(int i=verbIndex-1; i >= 0; i--) {
-				// loop backwards and break on noun + verb or noun + modal auxiliary + verb
-				if(wordList.get(i).isNounPOS() || wordList.get(i).isPronounPOS()) {
-					subjIndex = i;
-					break;
-				} else if(wordList.get(i).isModalAuxPOS()) {
-					continue;
-				} else {
-					break;
-				}
-			}
-		} catch(IndexOutOfBoundsException e) { }
-	
-		if(subjIndex > -1)
-			wordList.get(subjIndex).setActionVerbSubject(true);
-		
-		return subjIndex;
-	}
-	
-	private int identifyActionVerbDirectObject(ArrayList<WordToken> wordList, int verbIndex) {
-		// intransitive verbs do not have a direct object
-		int objIndex = - 1;
-			
-		try {
-			// if action verb followed by a noun
-			if(wordList.get(verbIndex+1).isNounPOS()) {
-				// verb + noun (direct object)
-				objIndex = verbIndex+1;
-			} else 
-				// action verb followed by an article
-				if(wordList.get(verbIndex+1).isArticle()) {
-					// verb + article + noun (direct object) + adj || prep
-					if(wordList.get(verbIndex+2).isNounPOS() && (wordList.get(verbIndex+3).isAdjectivePOS() || wordList.get(verbIndex+3).isPreposition())) {
-						objIndex = verbIndex+2;
-					} else
-						if(wordList.get(verbIndex+2).isNounPOS() && wordList.get(verbIndex+3).isArticle() && wordList.get(verbIndex+4).isNounPOS()) {
-							// verb + article + noun + article + noun (direct object)
-							objIndex = verbIndex+4;
-						}
-			}
-
-		} catch(IndexOutOfBoundsException e) { }
-	
-		if(objIndex > -1)
-			wordList.get(objIndex).setActionVerbDirectObject(true);
-		
-		return objIndex;
-	}
-	
 	private int identifyVerbSubject(ArrayList<WordToken> wordList, int verbIndex) {
 	
 		int subjIndex = -1;
@@ -511,11 +460,10 @@ public class VerbHelper {
 				// RULE: verb SUBJ/SUBJC cannot exist outside the DP if the verb is in a DP, nor can a SUBJ exist in a DP
 				// RULE: verb SUBJ/SUBJC cannot be within parentheses.
 				if(wordList.get(verbIndex).isDependentPhraseMember() != token.isDependentPhraseMember())
-					//break;
+					break;
 				
 				// this isn't as useful as once thought since verb phrase classes process in a certain order
 				if(token.isWithinVerbPhrase() || token.isVerb()) 
-				   //&& !token.isDependentPhraseMember())
 					break; // TODO test this since making LV SUBJC fix
 				
 				// these are reversed from what is seen in identifySubjectComplement() because we're looping backwards.
