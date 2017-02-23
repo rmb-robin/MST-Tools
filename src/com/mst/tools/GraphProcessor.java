@@ -139,7 +139,7 @@ public class GraphProcessor {
 		GraphData graphSentence = new GraphData();
 		// this list of vertices will be accessed to build GraphEntries while going through the metadata
 		List<Vertex> vertices = new ArrayList<>();
-		Set<Edge> edges = new TreeSet<>();
+		Set<Edge> edges = new HashSet<>();
 		
 		try {
 			// create a vertex for each token

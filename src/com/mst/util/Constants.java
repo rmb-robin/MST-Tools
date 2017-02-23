@@ -144,7 +144,7 @@ public class Constants {
 	
 	public static final Pattern VERB_SUBJ_SUBJC_EXCLUSIONS = Pattern.compile("a|also|an|and|another|as|be|but|cm|could|elsewhere|has|left|may|mm|otherwise|right|seen|to|which|would", Pattern.CASE_INSENSITIVE);
 	
-	public static final Pattern PREPOSITIONS = Pattern.compile("after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|that|through|to|while|with|within|without|off|since|until|along|around|throughout|under|above|near|behind|across|into|upon|via", Pattern.CASE_INSENSITIVE);
+	public static final Pattern PREPOSITIONS = Pattern.compile("after|although|among|as|at|before|between|by|during|for|from|in|of|on|over|per|than|through|to|while|with|within|without|off|since|until|along|around|throughout|under|above|near|behind|across|into|upon|via", Pattern.CASE_INSENSITIVE);
 	
 	public static final Pattern DEPENDENT_SIGNALS = Pattern.compile("after|although|as|because|before|consequently|finally|first|furthermore|how|however|if|indeed|later|meanwhile|moreover|nevertheless|otherwise|overall|provided|second|since|so|than|that|then|therefore|though|thus|unless|until|what|whatever|when|whence|whenever|where|whereas|wherever|whether|which|whichever|while|whither|who|whoever|whom|whomever|whomsoever|whose|whosoever|why", Pattern.CASE_INSENSITIVE);
 	

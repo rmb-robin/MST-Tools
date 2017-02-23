@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.mst.util.Constants.GraphClass;
 
-public class Edge extends GraphElement implements Comparable<Edge> {
+public class Edge extends GraphElement {//implements Comparable<Edge> {
 	// TODO this should store from and to Vertex objects rather than strings
 	
 	private String fromVertexUUID;
@@ -82,7 +82,7 @@ public class Edge extends GraphElement implements Comparable<Edge> {
 			   Objects.equals(toVertexUUID, edge.toVertexUUID) &&
 			   Objects.equals(getProps().get("type"), edge.getProps().get("type"));
 	}
-	
+	/*
 	@Override
 	public int compareTo(Edge o) {
 		//if(equals(o)) {
@@ -91,5 +91,5 @@ public class Edge extends GraphElement implements Comparable<Edge> {
 			return Integer.compare(this.getObjectId(), o.getObjectId());
 		//}
 	}
-	
+	*/
 }
