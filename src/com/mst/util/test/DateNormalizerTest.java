@@ -1,12 +1,10 @@
 package com.mst.util.test;
-
 import static org.junit.Assert.*;
-
-import java.security.NoSuchAlgorithmException;
 
 import org.junit.Test;
 
 import com.mst.util.DateNormalizer;
+
 
 public class DateNormalizerTest {
 	

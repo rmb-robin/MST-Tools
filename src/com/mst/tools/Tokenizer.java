@@ -154,11 +154,7 @@ public class Tokenizer {
 	}
 	
 	public ArrayList<SentenceToken> splitSentences(String article) {
-		// \xe2\x80\xa2 U+2022 = BULLET (•)
-		// \xe2\x80\x82 U+2002 = EN SPACE
-		// \xe2\x80\x9c U+201C = LEFT DOUBLE QUOTATION MARK (“)
-		// \xe2\x80\x9d U+201D = RIGHT DOUBLE QUOTATION MARK (”)
-		// U+00A0 = NO-BREAK SPACE
+		
 		
 		ArrayList<SentenceToken> sentences = new ArrayList<SentenceToken>();
 		int i = 0;
@@ -226,11 +222,7 @@ public class Tokenizer {
 	}
 	
 	public ArrayList<SentenceToken> splitSentencesNew(String article) {
-		// \xe2\x80\xa2 U+2022 = BULLET (•)
-		// \xe2\x80\x82 U+2002 = EN SPACE
-		// \xe2\x80\x9c U+201C = LEFT DOUBLE QUOTATION MARK (“)
-		// \xe2\x80\x9d U+201D = RIGHT DOUBLE QUOTATION MARK (”)
-		// U+00A0 = NO-BREAK SPACE
+
 		
 		ArrayList<SentenceToken> sentences = new ArrayList<SentenceToken>();
 		int i = 0;
@@ -303,11 +295,7 @@ public class Tokenizer {
 	}
 	
 	public ArrayList<SentenceToken> splitSentencesTest(String article) {
-		// \xe2\x80\xa2 U+2022 = BULLET (•)
-		// \xe2\x80\x82 U+2002 = EN SPACE
-		// \xe2\x80\x9c U+201C = LEFT DOUBLE QUOTATION MARK (“)
-		// \xe2\x80\x9d U+201D = RIGHT DOUBLE QUOTATION MARK (”)
-		// U+00A0 = NO-BREAK SPACE
+
 		
 		ArrayList<SentenceToken> sentences = new ArrayList<SentenceToken>();
 		int i = 0;
