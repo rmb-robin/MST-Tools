@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
+import com.mst.tools.NGramsSentenceProcessorImpl;
 import com.mst.tools.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.tools.Tokenizer;
 import static org.junit.Assert.*;
@@ -21,33 +22,24 @@ public class SemanticTypeAnnotatorTest {
 	
 	
 	@Test
-	public void foo(){
+	public void annotate(){
 		SemanticTypeSentenceAnnotatorImpl annotator = new SemanticTypeSentenceAnnotatorImpl();
-		Tokenizer tokenizer = new Tokenizer();
 		SemanticTypeHardCodedProvider provider = new SemanticTypeHardCodedProvider();
-		
+		NGramsSentenceProcessorImpl processor = new NGramsSentenceProcessorImpl();
 		
 		String fileText = TestDataProvider.getFileText(getTestDataPath());
 		List<Sentence> originalSentences = TestDataProvider.getSentence(fileText);
-		
+		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
 		int i = 1;
 		for(Sentence s: originalSentences){
-			List<WordToken> tokens = tokenizer.splitWords(s.getOrigSentence());
-			List<WordToken> modifiedTokens = annotator.annotate(tokens, provider.getSemanticTypes());
+			s = processor.process(s, ngramsProvider.getNGrams());
+			List<WordToken> modifiedTokens = annotator.annotate(s.getModifiedWordList(), provider.getSemanticTypes());
 			assertTokens(modifiedTokens, i);
 			i+=1;
 		}
 	}
 	
-	private void assertTokens(List<WordToken> modifiedTokens, int i){
-	
-		System.out.println(i);
-		if(i==8)
-		{
-		 String s = "";	
-		 s.split("");		 
-		}
-		
+	private void assertTokens(List<WordToken> modifiedTokens, int i){	
 		Map<String,String> expected = getExpectedResults();
 		for(WordToken wordToken : modifiedTokens){
 			if(expected.containsKey(wordToken.getToken()))
@@ -84,8 +76,8 @@ public class SemanticTypeAnnotatorTest {
 		result.put("cancer", "dysn");
 		result.put("brca", "gene");
 		
-		result.put("ultrasound guided biopsy", "proc");
-		result.put("bone marrow biopsy", "proc");
+		result.put("ultrasound-guided-biopsy", "proc");
+		result.put("bone-marrow-biopsy", "proc");
 		result.put("biopsy", "proc");
 		return result;
 	}

@@ -22,8 +22,8 @@ public class SemanticTypeHardCodedProvider implements SemanticTypeProvider {
 		result.put("biopsy","proc"); 
 		result.put("pap smear","proc"); 
 		result.put("mammogram","proc"); 
-		result.put("bone marrow biopsy","proc"); 
-		result.put("ultrasound guided biopsy","proc"); 
+		result.put("bone-marrow-biopsy","proc"); 
+		result.put("ultrasound-guided-biopsy","proc"); 
 		result.put("cancer panel","proc"); 
 		result.put("Magnetic resonance imaging","proc"); 
 		result.put("therapy","proc"); 

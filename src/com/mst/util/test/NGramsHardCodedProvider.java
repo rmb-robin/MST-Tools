@@ -19,6 +19,8 @@ public class NGramsHardCodedProvider implements NGramsProvider {
 		result.add(getEntity("prior to","before"));
 		result.add(getEntity("as a result of","because of"));
 		result.add(getEntity("due to","because of"));
+		result.add(getEntity("ultrasound guided biopsy","ultrasound-guided-biopsy"));
+		result.add(getEntity("Bone marrow biopsy","Bone-marrow-biopsy"));
 		return result;
 	}
 	
