@@ -75,7 +75,6 @@ public class SemanticTypeAnnotatorTest {
 		result.put("excisional biopsy", "proc");
 		result.put("cancer", "dysn");
 		result.put("brca", "gene");
-		
 		result.put("ultrasound-guided-biopsy", "proc");
 		result.put("bone-marrow-biopsy", "proc");
 		result.put("biopsy", "proc");

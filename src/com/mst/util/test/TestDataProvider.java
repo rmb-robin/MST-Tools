@@ -1,6 +1,7 @@
 package com.mst.util.test;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -23,6 +24,16 @@ public class TestDataProvider {
 			return null;
 		}
 	} 
+	
+	public static List<String> readLines(String path) {
+	    Charset charset = Charset.forName("ISO-8859-1");
+	    try {
+	      return Files.readAllLines(Paths.get(path), charset);
+	    } catch (IOException e) {
+	      System.out.println(e);
+	      return null;
+	    }
+	}
 	
 	public static List<Sentence> getSentence(String text){
 		Tokenizer t = new Tokenizer();
