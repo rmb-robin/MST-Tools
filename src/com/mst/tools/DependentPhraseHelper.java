@@ -22,7 +22,7 @@ public class DependentPhraseHelper {
 		boolean ret = true;
 
 		try {
-			ArrayList<WordToken> words = sentence.getWordList();
+			ArrayList<WordToken> words = sentence.getModifiedWordList();
 			
 			if(identifyCorefAndConjAdverb(sentence)) {
 				for(int i=0; i < words.size(); i++) {
@@ -68,7 +68,7 @@ public class DependentPhraseHelper {
 					}
 				}
 				
-				sentence.setWordList(words);
+				sentence.setModifiedWordList(words);
 			}
 			
 		} catch(Exception e) {
@@ -87,32 +87,32 @@ public class DependentPhraseHelper {
 			throw new Exception("Execute identifyCorefAndConjAdverb() and processBeginningBoundaries() before running unsetBeginningBoundaries().");
 		
 		try {
-			for(int i=0; i < sentence.getWordList().size(); i++) {
-				WordToken thisToken = sentence.getWordList().get(i);
+			for(int i=0; i < sentence.getModifiedWordList().size(); i++) {
+				WordToken thisToken = sentence.getModifiedWordList().get(i);
 
 				if(thisToken.isDependentPhraseBegin()) {
 					WordToken nextToken = new WordToken();
 					WordToken prevToken = new WordToken();
 					try {
-						nextToken = sentence.getWordList().get(i+1);
+						nextToken = sentence.getModifiedWordList().get(i+1);
 					} catch(IndexOutOfBoundsException e) { }
 					
 					try {
-						prevToken = sentence.getWordList().get(i-1);
+						prevToken = sentence.getModifiedWordList().get(i-1);
 					} catch(IndexOutOfBoundsException e) { }
 					
 					// token following dependent signal starts a prep phrase; unset dependent signal
 					if(!thisToken.isPrepPhraseMember() && nextToken.isPrepPhraseMember()) {
-						sentence.getWordList().get(i).setDependentPhraseBegin(null);
-						sentence.getWordList().get(i).setDependentPhraseMember(false);
+						sentence.getModifiedWordList().get(i).setDependentPhraseBegin(null);
+						sentence.getModifiedWordList().get(i).setDependentPhraseMember(false);
 						sentence.getMetadata().addSimpleMetadataValue("depSignalModByPP", true);
 						
 						sentence.getMetadata().removeSimpleMetadataValue("depSignalOther");
 						
 					} else if(thisToken.getToken().matches("(?i)that") && prevToken.isPreposition() && prevToken.isPrepPhraseMember()) {						
 						// token matches "that" and follows a preposition
-						sentence.getWordList().get(i).setDependentPhraseBegin(null);
-						sentence.getWordList().get(i).setDependentPhraseMember(false);
+						sentence.getModifiedWordList().get(i).setDependentPhraseBegin(null);
+						sentence.getModifiedWordList().get(i).setDependentPhraseMember(false);
 						sentence.getMetadata().addSimpleMetadataValue("prepPhraseContainsThat", true);
 						
 						// this is a band-aid put here to correct when the only instance of depSignalOther was 
@@ -139,7 +139,7 @@ public class DependentPhraseHelper {
 		boolean ret = true;
 
 		try {
-			ArrayList<WordToken> words = sentence.getWordList();
+			ArrayList<WordToken> words = sentence.getModifiedWordList();
 
 			for(int i=0; i < words.size(); i++) {
 				WordToken thisToken = words.get(i);
@@ -157,20 +157,20 @@ public class DependentPhraseHelper {
 							break;
 						// TODO perhaps break also on verbs?
 						
-						sentence.getWordList().get(j).setDependentPhraseMember(true);
+						sentence.getModifiedWordList().get(j).setDependentPhraseMember(true);
 						
 						if(nextToken.isVerb()) { containsVerb = true; }
 						if(nextToken.isModalAuxPOS()) { containsModal = true; }
 					}
 					
 					if(containsVerb || containsModal) {
-						sentence.getWordList().get(j-1).setDependentPhraseEnd(true);
+						sentence.getModifiedWordList().get(j-1).setDependentPhraseEnd(true);
 					} else {
 						// no verb found; unset dependent phrase
-						sentence.getWordList().get(i).setDependentPhraseBegin(null);
-						sentence.getWordList().get(i).setDependentPhraseMember(false);
+						sentence.getModifiedWordList().get(i).setDependentPhraseBegin(null);
+						sentence.getModifiedWordList().get(i).setDependentPhraseMember(false);
 						for(int k=i; k < words.size(); k++) {
-							sentence.getWordList().get(j).setDependentPhraseMember(false);	
+							sentence.getModifiedWordList().get(j).setDependentPhraseMember(false);	
 						}
 					}
 					
@@ -197,7 +197,7 @@ public class DependentPhraseHelper {
 		boolean ret = true;
 
 		try {
-			ArrayList<WordToken> words = sentence.getWordList();
+			ArrayList<WordToken> words = sentence.getModifiedWordList();
 			int thisTokenIdx = 0;
 			for(WordToken thisToken : words) {
 				
@@ -213,7 +213,7 @@ public class DependentPhraseHelper {
 							break;
 						// TODO perhaps break also on verbs?
 						
-						sentence.getWordList().get(nextTokenIdx).setDependentPhraseMember(true);
+						sentence.getModifiedWordList().get(nextTokenIdx).setDependentPhraseMember(true);
 						
 						if(nextToken.isVerb())
 							containsVerb = true;
@@ -223,12 +223,12 @@ public class DependentPhraseHelper {
 					}
 					
 					if(containsVerb || containsModal) {
-						sentence.getWordList().get(nextTokenIdx-1).setDependentPhraseEnd(true);
+						sentence.getModifiedWordList().get(nextTokenIdx-1).setDependentPhraseEnd(true);
 					} else {
 						// no verb found; unset dependent phrase and all members
-						sentence.getWordList().get(thisTokenIdx).setDependentPhraseBegin(null);
+						sentence.getModifiedWordList().get(thisTokenIdx).setDependentPhraseBegin(null);
 						for(int i=thisTokenIdx; i < words.size(); i++) {
-							sentence.getWordList().get(i).setDependentPhraseMember(false);	
+							sentence.getModifiedWordList().get(i).setDependentPhraseMember(false);	
 						}
 					}
 				}
@@ -255,20 +255,20 @@ public class DependentPhraseHelper {
 		boolean ret = true;
 		
 		try {
-			WordToken token = sentence.getWordList().get(0);
+			WordToken token = sentence.getModifiedWordList().get(0);
 
 			if(token.getToken().matches("(?i)this|that")) {
 				// if first token of the sentence is "this" or "that" and is followed by a verb
 				try {
-					if(sentence.getWordList().get(1).isVerb()) {
-						sentence.getWordList().get(0).setCoreference(true);
+					if(sentence.getModifiedWordList().get(1).isVerb()) {
+						sentence.getModifiedWordList().get(0).setCoreference(true);
 						sentence.getMetadata().addSimpleMetadataValue("coReference", true);
 					}
 				} catch(IndexOutOfBoundsException e) { }
 				
 			} else if(token.matchesConjunctiveAdverbConstant()) {
 				// if first token of the sentence is a conjunctive adverb
-				sentence.getWordList().get(0).setConjunctiveAdverb(true);
+				sentence.getModifiedWordList().get(0).setConjunctiveAdverb(true);
 				sentence.getMetadata().addSimpleMetadataValue("beginsWithConjAdverb", true);
 			}
 

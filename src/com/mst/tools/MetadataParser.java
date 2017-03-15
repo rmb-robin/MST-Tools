@@ -37,7 +37,7 @@ public class MetadataParser {
 	public final Pattern numericPattern = Pattern.compile("(?<!\\/)\\b[A-Z]*\\d+\\.*\\d*\\b(?!\\/)");
 	
 	public void parseComplex(Sentence sentence) {
-		ArrayList<WordToken> words = sentence.getWordList();
+		ArrayList<WordToken> words = sentence.getModifiedWordList();
 		SentenceMetadata metadata = sentence.getMetadata();
 		int i = 0;
 		

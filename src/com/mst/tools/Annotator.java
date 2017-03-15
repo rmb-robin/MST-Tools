@@ -43,7 +43,7 @@ public class Annotator {
 			
 			for(SentenceToken sentenceToken : sentenceTokens) {
 				String cs = cleaner.cleanSentence(sentenceToken.getToken());
-				Sentence sentence = new Sentence(id, position++, t.splitWords(cs));
+				Sentence sentence = new Sentence(id, position++);
 				
 				sentence.setPractice(clientId);
 				sentence.setSource(source.toString());
@@ -73,14 +73,14 @@ public class Annotator {
 			// begin annotation process
 			// 1. get parts of speech
 			if(tagger.identifyPartsOfSpeech(sentence)) {
-				for(WordToken word : sentence.getWordList()) {
-					WordToken prevWord = Constants.getToken(sentence.getWordList(), word.getPosition()-2);
+				for(WordToken word : sentence.getModifiedWordList()) {
+					WordToken prevWord = Constants.getToken(sentence.getModifiedWordList(), word.getPosition()-2);
 				
 					// POS override that makes use of ST
 					if(word.getToken().equalsIgnoreCase("scan")) {
 						// override the POS of scan (Stanford = VB) to NN if preceded by ST diap
 						if(prevWord.getSemanticType() != null && prevWord.getSemanticType().equalsIgnoreCase("diap")) {
-							word.setPOS("NN");
+							word.setPos("NN");
 						}
 					}
 					
@@ -159,7 +159,7 @@ public class Annotator {
 				Collections.sort(sentence.getMetadata().getVerbMetadata(), (a, b) -> a.getVerbs().get(0).getPosition() < b.getVerbs().get(0).getPosition() ? -1 : 0);
 				
 				// create a worthless list of tokens that are non-punctuation because jan said so
-				for(WordToken word : sentence.getWordList()) {
+				for(WordToken word : sentence.getModifiedWordList()) {
 					if(!word.isPunctuation()) {
 						sentence.getNonPuncWordList().add(word);
 					} else {

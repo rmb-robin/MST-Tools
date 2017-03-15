@@ -50,7 +50,7 @@ public class StanfordNLP {
 			
 			for(int i=0; i < wordList.size(); i++) {
 				String[] split = tagged[i].split("_");
-				wordList.get(i).setPOS(split[1]);
+				wordList.get(i).setPos(split[1]);
 			}
 			
 		} catch(Exception e) {

@@ -143,13 +143,13 @@ public class GraphProcessor {
 		
 		try {
 			// create a vertex for each token
-			for(WordToken word : s.getWordList()) {
+			for(WordToken word : s.getModifiedWordList()) {
 				String uuid = md5(UUID.randomUUID().toString()); // TODO get hash from somewhere else (mongo oid + position?)
 				Vertex v = new Vertex(GraphClass.Token, uuid, word.getToken().toLowerCase(), word.getPosition());
 				
 				Map<String, Object> props = new HashMap<>();
 				
-				props.put(GraphProperty.pos.toString().toLowerCase(), word.getPOS());
+				props.put(GraphProperty.pos.toString().toLowerCase(), word.getPos());
 				if(word.getSemanticType() != null) {
 					props.put(GraphProperty.st.toString().toLowerCase(), word.getSemanticType());
 				}
@@ -176,7 +176,7 @@ public class GraphProcessor {
 			Vertex vSentence = new Vertex(GraphClass.Sentence, sentenceUUID, s.getFullSentence(), (int) s.getPosition());
 			Vertex vDiscrete = new Vertex(GraphClass.Discrete, md5(sentenceUUID + s.getId()), "", (int) 0);
 			// add a vertex to act as a placeholder for verbs that are missing a subj or subjc 
-			Vertex vPlaceholder = new Vertex(GraphClass.Token, md5(sentenceUUID + s.getWordList().size()), PLACEHOLDER, 0);
+			Vertex vPlaceholder = new Vertex(GraphClass.Token, md5(sentenceUUID + s.getModifiedWordList().size()), PLACEHOLDER, 0);
 			
 			// create properties for all simple metadata on Sentence vertex  
 			for(String key : s.getMetadata().getSimpleMetadata().keySet()) {
@@ -225,19 +225,19 @@ public class GraphProcessor {
 			vSentence.getProps().put("depPhraseCount", metadata.getDependentMetadata().size());
 			vSentence.getProps().put("orphanCount", metadata.getOrphans().size());
 			
-			processVerbPhraseMetadata(edges, vertices, s.getWordList(), metadata, vPlaceholder);
+			processVerbPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata, vPlaceholder);
 			
 			// this picks up prep phrases that are not related to a verb phrase
-			processPrepPhraseMetadata(edges, vertices, s.getWordList(), metadata);
+			processPrepPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata);
 			
 			createDependentPhraseStructureEdges(edges, vertices, metadata);
 			
 			// TODO move this into its own function
 			// Frames unbounded by a known phrase type
-			for(int i=0; i < s.getWordList().size(); i++) {
-				WordToken word = s.getWordList().get(i);
-				WordToken prev = Constants.getToken(s.getWordList(), i-1);
-				WordToken next = Constants.getToken(s.getWordList(), i+1);
+			for(int i=0; i < s.getModifiedWordList().size(); i++) {
+				WordToken word = s.getModifiedWordList().get(i);
+				WordToken prev = Constants.getToken(s.getModifiedWordList(), i-1);
+				WordToken next = Constants.getToken(s.getModifiedWordList(), i+1);
 				
 				if(word.getSemanticType().equalsIgnoreCase("bpoc")) {
 					if(LATERALITY.matcher(prev.getToken()).matches()) {
@@ -252,7 +252,7 @@ public class GraphProcessor {
 					setDefaultEdgeProps(e, GraphClass.f_header.toString(), STATE_UNKNOWN, false, VB_INDEX_PROP_DEFAULT);
 					edges.add(e);
 				} else if(word.getToken().matches("measur.*")) {
-					if(next.getPOS().equalsIgnoreCase("CD") && !prev.isPrepPhraseObject()) {
+					if(next.getPos().equalsIgnoreCase("CD") && !prev.isPrepPhraseObject()) {
 						//edges.add(new Edge(GraphClass.f_measurement, vertices.get(word.getPosition()-2), vertices.get(next.getPosition()-1)));
 						Edge e = new Edge(GraphClass.f_measurement, vertices.get(word.getPosition()-2), vertices.get(next.getPosition()-1));
 						setDefaultEdgeProps(e, GraphClass.f_measurement.toString(), STATE_UNKNOWN, false, VB_INDEX_PROP_DEFAULT);
@@ -261,7 +261,7 @@ public class GraphProcessor {
 				}
 			}
 			
-			processNounPhraseMetadata(edges, vertices, s.getWordList(), metadata);
+			processNounPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata);
 			
 			processDiscreteData(edges, vertices, s.getDiscrete(), vID, vDiscrete);
 			
@@ -718,7 +718,7 @@ public class GraphProcessor {
 				int fromIdx = idx;
 				int toIdx = npHead.getPosition(); 
 				
-				if(npMod.getPOS().equalsIgnoreCase("CD") && nextToken.getSemanticType().equalsIgnoreCase("qlco-uom")) {
+				if(npMod.getPos().equalsIgnoreCase("CD") && nextToken.getSemanticType().equalsIgnoreCase("qlco-uom")) {
 					frame = "f_linear_uom";
 					toIdx = fromIdx+1;
 				} else if(npMod.getSemanticType().equalsIgnoreCase("qlco-uom")) {
@@ -728,7 +728,7 @@ public class GraphProcessor {
 				} else if(npHeadST.matches("dysn|neop.*")) {
 					if(npMod.getSemanticType().equalsIgnoreCase("bpoc")) {
 						frame = "f_location";
-					} else if(npMod.getPOS().equalsIgnoreCase("CD")) {
+					} else if(npMod.getPos().equalsIgnoreCase("CD")) {
 						// additional check for npMod not in f_linear_uom relationship
 						if(findEdgeByFrame(edges, EdgeDirection.outgoing, GraphClass.f_linear_uom, vertices.get(idx)) == -1) {
 							frame = "f_disease_quantity"; 

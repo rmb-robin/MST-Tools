@@ -19,16 +19,16 @@ public class PrepositionHelper {
 		try {
 			List<Integer> comprisingTokenIndex = new ArrayList<Integer>();
 			
-			for(int i=0; i < sentence.getWordList().size(); i++) {
-				WordToken thisWord = sentence.getWordList().get(i);
+			for(int i=0; i < sentence.getModifiedWordList().size(); i++) {
+				WordToken thisWord = sentence.getModifiedWordList().get(i);
 				
 				boolean containsCC = false; // used in determining if multiple objects should be allowed
 				
 				// if token in prep list and NOT part of an infinitive phrase
 				if(thisWord.matchesPrepositionConstant() && !thisWord.isInfinitiveHead()) {
 					// loop through remaining words in the sentence
-					for(int j=i+1; j < sentence.getWordList().size(); j++) {
-						WordToken nextWord = sentence.getWordList().get(j);
+					for(int j=i+1; j < sentence.getModifiedWordList().size(); j++) {
+						WordToken nextWord = sentence.getModifiedWordList().get(j);
 						
 						// end PP on preposition, verb, or DP head
 						if(nextWord.isPreposition() || nextWord.isVerb())
@@ -40,9 +40,9 @@ public class PrepositionHelper {
 							break;
 						else if(nextWord.isConjunctionPOS()) { // a a conjuction not followed by a noun/number
 							try {
-								if(!sentence.getWordList().get(j+1).getPOS().matches("^(CD|JJ|NN(S|P|PS)?)$")) {
+								if(!sentence.getModifiedWordList().get(j+1).getPos().matches("^(CD|JJ|NN(S|P|PS)?)$")) {
 									// deal with Oxford comma followed by a CC (remove comma hanging off the end)
-									if(sentence.getWordList().get(comprisingTokenIndex.get(comprisingTokenIndex.size()-1)).getPOS().matches(",")) {
+									if(sentence.getModifiedWordList().get(comprisingTokenIndex.get(comprisingTokenIndex.size()-1)).getPos().matches(",")) {
 										comprisingTokenIndex.remove(comprisingTokenIndex.get(comprisingTokenIndex.size()-1));
 									}
 									break;
@@ -51,7 +51,7 @@ public class PrepositionHelper {
 						} else if(nextWord.getToken().matches(",")) { // a comma stops the phrase
 							try {
 								// if it is NOT followed by one of these POS...
-								if(!sentence.getWordList().get(j+1).getPOS().matches("^(CD|CC|JJ|NN(S|P|PS)?)$"))
+								if(!sentence.getModifiedWordList().get(j+1).getPos().matches("^(CD|CC|JJ|NN(S|P|PS)?)$"))
 									break;
 							} catch(IndexOutOfBoundsException e) { }
 						}
@@ -67,15 +67,15 @@ public class PrepositionHelper {
 						if(nextWord.isNounPOS() || nextWord.isNumericPOS()) {
 							try {
 								// if it is NOT followed by one of these POS...
-								if(!sentence.getWordList().get(j+1).getPOS().matches("^(CD|CC|,|NN(S|P|PS)?)$"))
+								if(!sentence.getModifiedWordList().get(j+1).getPos().matches("^(CD|CC|,|NN(S|P|PS)?)$"))
 									break;
 							} catch(IndexOutOfBoundsException e) { }
 						} 
 					}
 	
 					if(comprisingTokenIndex.size() > 0) {
-						sentence.getWordList().get(i).setPrepPhraseBegin(true);
-						sentence.getWordList().get(i).setPrepPhraseMember(true);
+						sentence.getModifiedWordList().get(i).setPrepPhraseBegin(true);
+						sentence.getModifiedWordList().get(i).setPrepPhraseMember(true);
 						
 						// this is a little convoluted.
 						// three booleans make up a PP token: ppBegin, ppMember, ppObj
@@ -86,7 +86,7 @@ public class PrepositionHelper {
 						
 						// loop through list of indexes that make up the prep phrase
 						for(int j=0; j < comprisingTokenIndex.size(); j++) {
-							WordToken ppWord = sentence.getWordList().get(comprisingTokenIndex.get(j));
+							WordToken ppWord = sentence.getModifiedWordList().get(comprisingTokenIndex.get(j));
 							
 							if(j == comprisingTokenIndex.size()-1) { // last item in list
 								ppWord.setPrepPhraseObject(true);

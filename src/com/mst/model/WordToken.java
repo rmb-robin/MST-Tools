@@ -14,10 +14,18 @@ public class WordToken extends GenericToken {
 	// don't get serialized by Gson. The end result is much cleaner JSON because booleans default to false,
 	// which DO get serialized.
 	
+	//reference what can go away....
+	//staying
+	private String semanticType = null;
 	private String pos = "";  // part of speech
+	
+	
+	
+	//not sure if staying..
+
 	private String normalizedForm = null;
 	private ArrayList<SemanticType> semanticTypeList = null;
-	private String st = null;
+	
 	private Boolean npHead; // noun phrase head
 	private Boolean npMod; // noun phrase modifier
 	private Boolean ppMember; // prep phrase member
@@ -317,20 +325,20 @@ public class WordToken extends GenericToken {
 		return Constants.CONJUNCTIVE_ADVERBS.matcher(getToken()).matches();
 	}
 	
-	public String getPOS() {
+	public String getPos() {
 		return pos;
 	}
 
-	public void setPOS(String val) {
-		pos = val;
+	public void setPos(String pos) {
+		this.pos = pos;
 	}
 
 	public String getSemanticType() {
-		return st == null ? "" : st;
+		return semanticType == null ? "" : semanticType;
 	}
 
-	public void setSemanticType(String val) {
-		st = val;
+	public void setSemanticType(String semanticType) {
+		this.semanticType = semanticType;
 	}
 	
 	public ArrayList<SemanticType> getSemanticTypeList() {

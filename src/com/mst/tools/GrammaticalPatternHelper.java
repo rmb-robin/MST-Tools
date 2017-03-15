@@ -22,7 +22,7 @@ public class GrammaticalPatternHelper {
 	}
 	
 	private void generatePattern(Sentence s) {
-		List<GrammaticalPattern> patterns = s.getSentenceStructure(); 
+		List<GrammaticalPattern> patterns = null; // s.getSentenceStructure(); 
 
 		//int entityCount = 0; 
 		int entityCount2 = 0;
@@ -38,7 +38,7 @@ public class GrammaticalPatternHelper {
 			allPatterns.add(pattern.toString());
 		}
 		
-		for(WordToken word : s.getWordList())
+		for(WordToken word : s.getModifiedWordList())
 			if(word.isWithinNounPhrase() || word.isWithinPrepPhrase() || word.isWithinVerbPhrase())
 				if(!(word.isPunctuation() || word.isDeterminerPOS() || word.isConjunctionPOS() ||  word.isNegationSignal()))
 					entityCount2++;

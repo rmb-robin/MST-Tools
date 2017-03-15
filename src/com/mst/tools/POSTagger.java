@@ -53,13 +53,13 @@ public class POSTagger {
 		boolean ret = true;
 		
 		try {
-			ArrayList<WordToken> words = sentence.getWordList();
+			ArrayList<WordToken> words = sentence.getModifiedWordList();
 			
 			if(words == null || words.isEmpty()) {
 				ret = false;
 			} else {
 				StanfordNLP stanford = new StanfordNLP(tagger); // TODO will making this global improve performance?
-				sentence.setWordList(processPOSOverrides(stanford.identifyPartsOfSpeech(words)));				
+				sentence.setModifiedWordList(processPOSOverrides(stanford.identifyPartsOfSpeech(words)));				
 			}
 		} catch(Exception e) {
 			ret = false;
@@ -74,29 +74,29 @@ public class POSTagger {
 				WordToken prevWord = Constants.getToken(words, word.getPosition()-2);
 				
 				if(verbHelper.shouldOverride(word.getPosition()-1, words)) {
-					word.setPOS(Constants.verbOverrides.get(word.getToken().toLowerCase()));
+					word.setPos(Constants.verbOverrides.get(word.getToken().toLowerCase()));
 				} else if(PUNC.matcher(word.getToken()).matches()) { // Stanford tags these as NN
-					word.setPOS(word.getToken()); // reset POS to match punctuation char
+					word.setPos(word.getToken()); // reset POS to match punctuation char
 				} else if(word.getToken().equalsIgnoreCase("scan")) {
 					// override the POS of scan (Stanford = VB) to NN if preceded by ST diap or token "bone"
 					if(prevWord.getToken().equalsIgnoreCase("bone")) {   // equalsIgnoreCase("bone") is faster than match on "(?i)bone"
-						word.setPOS("NN");
+						word.setPos("NN");
 					}
 				} else if(SHOWS.matcher(word.getToken()).matches()) {
-					word.setPOS("VB"); // ensure that show and shows are tagged as a verb
+					word.setPos("VB"); // ensure that show and shows are tagged as a verb
 				} else if(NOUN_OVERRIDES.matcher(word.getToken()).matches()) {
-					word.setPOS("NN"); // certain tokens should always be nouns
+					word.setPos("NN"); // certain tokens should always be nouns
 				} else if(word.isVerb()) {
 					if(!prevWord.isToPOS()) {
 						// override tokens that Stanford possibly erroneously tags as verbs
 						// must be a verb that ends in -ed or -ing and preceded by a preposition
 						if(prevWord.isPreposition()) {
 							if(word.getToken().endsWith("ed") || word.getToken().endsWith("ing"))
-								word.setPOS("JJ");
+								word.setPos("JJ");
 							else
-								word.setPOS("NN");
-						} else if(prevWord.isDeterminerPOS() && word.getPOS().matches("VBN|VBG")) {
-							word.setPOS("JJ");
+								word.setPos("NN");
+						} else if(prevWord.isDeterminerPOS() && word.getPos().matches("VBN|VBG")) {
+							word.setPos("JJ");
 						}
 					}
 				}

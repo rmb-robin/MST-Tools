@@ -18,21 +18,21 @@ public class NounHelper {
 		int headIndex = 0;
 		try {
 			//TODO don't mark as head if surrounded by parens?
-			for(int i=sentence.getWordList().size()-1; i >= 0; i--) {
-				WordToken word = sentence.getWordList().get(i);
+			for(int i=sentence.getModifiedWordList().size()-1; i >= 0; i--) {
+				WordToken word = sentence.getModifiedWordList().get(i);
 				if((word.isNounPOS() || word.isNumericPOS()) && !word.isPunctuation()) { // added isPunc because Stanford was tagging ( and ) as NN. This may catch other Stanford POS tagging of punc chars.
 					if(headIndex == 0) {
 						headIndex = i;
 					} else {
-						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
-						sentence.getWordList().get(i).setNounPhraseModifier(true);
+						sentence.getModifiedWordList().get(headIndex).setNounPhraseHead(true);
+						sentence.getModifiedWordList().get(i).setNounPhraseModifier(true);
 					}
 				//} else if((word.isAdjectivePOS() || word.isAdverbPOS() || word.isPunctuation() || word.isNumericPOS() || word.isPronounPOS()) && !word.getToken().equalsIgnoreCase(",")) {
 				} else if((word.isAdjectivePOS() || word.isAdverbPOS() || word.isNumericPOS() || word.isPronounPOS())) { // SRD 7/17/15 removed all punc because parens were being included in two-token noun phrases
 					// SRD 7/10/15 - testing a fix for ex. "Followed for metastatic prostate cancer, urethral stricture, and BPH."
 					if(headIndex > 0) {
-						sentence.getWordList().get(headIndex).setNounPhraseHead(true);
-						sentence.getWordList().get(i).setNounPhraseModifier(true);
+						sentence.getModifiedWordList().get(headIndex).setNounPhraseHead(true);
+						sentence.getModifiedWordList().get(i).setNounPhraseModifier(true);
 					}
 				} else {
 					headIndex = 0;

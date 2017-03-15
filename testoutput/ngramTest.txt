@@ -1,2 +1,248 @@
-The ct scan shows a cyst.,The ct scan shows a cyst.
-No transformed lymphoma from indolent to aggressive.,No transformed lymphoma from indolent to aggressive.
+Original Sentence: She is pending radiation treatment and will follow up with Tamoxifen.
+Modified Sentence: She is pending radiation treatment and will follow-up with Tamoxifen.
+
+Original Tokens
+She
+is
+pending
+radiation
+treatment
+and
+will
+follow
+up
+with
+Tamoxifen
+.
+
+Modified Tokens
+She
+is
+pending
+radiation
+treatment
+and
+will
+follow-up
+with
+Tamoxifen
+.
+************************************************
+
+Original Sentence: She is status post bilateral mastectomy, no adjuvant therapy was required.
+Modified Sentence: She is after bilateral mastectomy, no adjuvant therapy was required.
+
+Original Tokens
+She
+is
+status
+post
+bilateral
+mastectomy
+,
+no
+adjuvant
+therapy
+was
+required
+.
+
+Modified Tokens
+She
+is
+after
+bilateral
+mastectomy
+,
+no
+adjuvant
+therapy
+was
+required
+.
+************************************************
+
+Original Sentence: She does not continue to get Pap smears or mammograms but is up to date on colonoscopies and has a 10-year follow up
+CT scans shows a hypodensity due to the stent.
+Modified Sentence: She does not continue to get Pap smears or mammograms but is current on colonoscopies and has a 10-year follow-up
+CT scans shows a hypodensity because of the stent.
+
+Original Tokens
+She
+does
+not
+continue
+to
+get
+Pap
+smears
+or
+mammograms
+but
+is
+up
+to
+date
+on
+colonoscopies
+and
+has
+a
+10-year
+follow
+up
+CT
+scans
+shows
+a
+hypodensity
+due
+to
+the
+stent
+.
+
+Modified Tokens
+She
+does
+not
+continue
+to
+get
+Pap
+smears
+or
+mammograms
+but
+is
+current
+on
+colonoscopies
+and
+has
+a
+10-year
+follow-up
+CT
+scans
+shows
+a
+hypodensity
+because
+of
+the
+stent
+.
+************************************************
+
+Original Sentence: She developed memory loss as a result of a lack of math.
+Modified Sentence: She developed memory loss because of a lack of math.
+
+Original Tokens
+She
+developed
+memory
+loss
+as
+a
+result
+of
+a
+lack
+of
+math
+.
+
+Modified Tokens
+She
+developed
+memory
+loss
+because
+of
+a
+lack
+of
+math
+.
+************************************************
+
+Original Sentence: He is caught up on all diagnostic procedures.
+Modified Sentence: He is caught-up on all diagnostic procedures.
+
+Original Tokens
+He
+is
+caught
+up
+on
+all
+diagnostic
+procedures
+.
+
+Modified Tokens
+He
+is
+caught-up
+on
+all
+diagnostic
+procedures
+.
+************************************************
+
+Original Sentence: The resulting blood loss does not add up.
+Modified Sentence: The resulting blood loss does not compute.
+
+Original Tokens
+The
+resulting
+blood
+loss
+does
+not
+add
+up
+.
+
+Modified Tokens
+The
+resulting
+blood
+loss
+does
+not
+compute
+.
+************************************************
+
+Original Sentence: He cannot drink water prior to the barium swallow.
+Modified Sentence: He cannot drink water before the barium swallow.
+
+Original Tokens
+He
+can
+not
+drink
+water
+prior
+to
+the
+barium
+swallow
+.
+
+Modified Tokens
+He
+can
+not
+drink
+water
+before
+the
+barium
+swallow
+.
+************************************************
+

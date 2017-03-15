@@ -91,14 +91,14 @@ public class MongoDB {
 				// article_id from being inserted. Need a way to protect against the situation where multiple data loads
 				// have been kicked off that contain the same PMID and the processing lag can't catch the dupe ID.
 				//if(!existingPMIDs.contains(sentence.getArticleId())) {
-					for(WordToken word : sentence.getWordList()) {
+					for(WordToken word : sentence.getModifiedWordList()) {
 						BasicDBObject doc = new BasicDBObject("id", sentence.getId()).
 								append("source", sentence.getSource()).								
 								append("sentence_id", sentence.getPosition()).
 				                append("position", word.getPosition()).
 				                append("token", word.getToken()).
 				                append("normalized", word.getNormalizedForm()).
-				                append("pos", word.getPOS());
+				                append("pos", word.getPos());
 						
 								if(sentence.getPractice() != null)
 									doc.append("client_id", sentence.getPractice());
@@ -161,7 +161,7 @@ public class MongoDB {
 	}
 	
 	public String insertTaggedSentenceFull(Sentence sentence) {
-		if(!sentence.getWordList().isEmpty()) {
+		if(!sentence.getModifiedWordList().isEmpty()) {
 			try {
 				Constants.Source source = Constants.Source.valueOf(sentence.getSource());
 
@@ -464,7 +464,7 @@ public class MongoDB {
 						}
 	
 						WordToken word = new WordToken(obj.getString("token"), obj.getString("normalized"), obj.getInt("position"));
-						word.setPOS(obj.getString("pos"));
+						word.setPos(obj.getString("pos"));
 						word.setNounPhraseHead(obj.getBoolean("npHead"));
 						word.setNounPhraseModifier(obj.getBoolean("npMod"));
 						word.setPrepPhraseMember(obj.getBoolean("ppMember"));
@@ -489,7 +489,7 @@ public class MongoDB {
 	
 						if(!thisArticleId.equals(prevArticleId) || thisSentenceId != prevSentenceId) { // TODO check also for article_id change to accomodate single sentences
 	
-							sentence.setWordList(wordList);
+							sentence.setModifiedWordList(wordList);
 							sentenceList.add(sentence);
 	
 							prevSentenceId = thisSentenceId;
@@ -503,7 +503,7 @@ public class MongoDB {
 					}
 	
 					// add final entries
-					sentence.setWordList(wordList);
+					sentence.setModifiedWordList(wordList);
 					sentenceList.add(sentence);
 	
 					cursor.close();
@@ -574,7 +574,7 @@ public class MongoDB {
 					}
 
 					WordToken word = new WordToken(obj.getString("token"), obj.getString("normalized"), obj.getInt("position"));
-					word.setPOS(obj.getString("pos"));
+					word.setPos(obj.getString("pos"));
 					word.setNounPhraseHead(obj.getBoolean("npHead"));
 					word.setNounPhraseModifier(obj.getBoolean("npMod"));
 					word.setPrepPhraseMember(obj.getBoolean("ppMember"));
@@ -591,7 +591,7 @@ public class MongoDB {
 
 					if(!thisId.equals(prevArticleId) || thisSentenceId != prevSentenceId) { // TODO check also for article_id change to accomodate single sentences
 
-						sentence.setWordList(wordList);
+						sentence.setModifiedWordList(wordList);
 						sentenceList.add(sentence);
 
 						prevSentenceId = thisSentenceId;
@@ -605,7 +605,7 @@ public class MongoDB {
 				}
 
 				// add final entries
-				sentence.setWordList(wordList);
+				sentence.setModifiedWordList(wordList);
 				sentenceList.add(sentence);
 
 				//String json = gson.toJson(sentenceList);

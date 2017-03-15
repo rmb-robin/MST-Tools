@@ -1,7 +1,9 @@
 package com.mst.tools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,7 +69,7 @@ public class Tokenizer {
 		translateMap.put("dx","diagnosed");
 		translateMap.put("d/w","discussed with");
 		translateMap.put("f/u","follow up");
-		translateMap.put("follow-up","follow up");
+	//	translateMap.put("follow-up","follow up");
 		translateMap.put("followup","follow up");
 		translateMap.put("gl","gleason");
 		translateMap.put("gleason's","gleason");
@@ -400,6 +402,12 @@ public class Tokenizer {
 		
 		return wordTokens;
 	}
+	
+	public List<String> splitWordsInStrings(String sentence){
+		String [] words = replaceChars(sentence, false, false);
+		return Arrays.asList(words);
+	}
+	
 	
 	public ArrayList<WordToken> splitWords(String sentence) {
 		ArrayList<WordToken> wordTokens = new ArrayList<WordToken>();

@@ -332,8 +332,8 @@ public class PostgreSQL {
         	StringBuilder entryList = new StringBuilder();
         	StringBuilder query = new StringBuilder();
         	
-        	for(WordToken word : sentence.getWordList()) {
-        		if(word.getPOS().matches("NN|NNS"))
+        	for(WordToken word : sentence.getModifiedWordList()) {
+        		if(word.getPos().matches("NN|NNS"))
         			entryList.append(",'").append(word.getToken()).append("'");
         	}
         	// TODO convert to parameterized query
@@ -388,7 +388,7 @@ public class PostgreSQL {
 	    }
         
         // remove WordList to cut down on json clutter
-	    sentence.setWordList(null);
+	    sentence.setModifiedWordList(null);
 	    
 	    return gson.toJson(sentence);
         
@@ -409,8 +409,8 @@ public class PostgreSQL {
         	StringBuilder entryList = new StringBuilder();
         	StringBuilder query = new StringBuilder();
         	
-        	for(WordToken word : sentence.getWordList()) {
-        		if(word.getPOS().matches("NN|NNS"))
+        	for(WordToken word : sentence.getModifiedWordList()) {
+        		if(word.getPos().matches("NN|NNS"))
         			entryList.append(",'").append(word.getToken()).append("'");
         	}
         	
@@ -465,7 +465,7 @@ public class PostgreSQL {
 	    }
         
         // remove WordList to cut down on json clutter
-	    sentence.setWordList(null);
+	    sentence.setModifiedWordList(null);
 	    
 	    return gson.toJson(sentence);
     }	

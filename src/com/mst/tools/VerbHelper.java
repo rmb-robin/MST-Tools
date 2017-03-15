@@ -50,17 +50,17 @@ public class VerbHelper {
 		
 		// TODO what checks need to occur to ensure that wordList is valid?
 		try {
-			for(int i=0; i < sentence.getWordList().size(); i++) {
-				if(sentence.getWordList().get(i).getToken().matches(INFINITIVE_HEAD_TERM)) {
+			for(int i=0; i < sentence.getModifiedWordList().size(); i++) {
+				if(sentence.getModifiedWordList().get(i).getToken().matches(INFINITIVE_HEAD_TERM)) {
 					// avoid an OOB exception on the +1
-					if(i < sentence.getWordList().size() - 1) {
+					if(i < sentence.getModifiedWordList().size() - 1) {
 						// TODO check if next word is punctuation, e.g. period or other end of sentence?
 						// if next word is a verb
-						if(sentence.getWordList().get(i+1).isVerb()) {
+						if(sentence.getModifiedWordList().get(i+1).isVerb()) {
 							// if first token of sentence, or preceding token is NOT a verb
-							if(i==0 || !sentence.getWordList().get(i-1).isVerb()) {
-								sentence.getWordList().get(i).setInfinitiveHead(true);
-								sentence.getWordList().get(i+1).setInfinitiveVerb(true);
+							if(i==0 || !sentence.getModifiedWordList().get(i-1).isVerb()) {
+								sentence.getModifiedWordList().get(i).setInfinitiveHead(true);
+								sentence.getModifiedWordList().get(i+1).setInfinitiveVerb(true);
 							}
 						}
 					}
@@ -78,7 +78,7 @@ public class VerbHelper {
 	//  must be preceded by POSTagger.identifyPartsOfSpeech(), POSTagger.identifyPrepPhrases(), identifyVerbsOfBeing(), identifyModalAuxiliaryVerbs
 	public ArrayList<WordToken> identifyLinkingVerbs(Sentence sentence) {
 		
-		ArrayList<WordToken> words = sentence.getWordList();
+		ArrayList<WordToken> words = sentence.getModifiedWordList();
 		
 		// TODO
 		// why didn't "has all been" come through here...?
@@ -97,7 +97,7 @@ public class VerbHelper {
 					if(thisToken.isVerb()) { // replaced shouldOverride with isVerb on 8/8/2016, after making POS override changes in POSTagger.java
 					//if(!shouldOverride(i, words)) {
 						// added RB on 5/5/15 to support sentences such as "PSA is now 1.34."
-						if(nextToken.getPOS().matches("RB|DT|JJ|NN(S|P|PS)?|CD")) { // verb's successor is determiner, adjective, noun or number
+						if(nextToken.getPos().matches("RB|DT|JJ|NN(S|P|PS)?|CD")) { // verb's successor is determiner, adjective, noun or number
 							thisToken.setLinkingVerb(true);
 							
 							int subjIdx = identifyVerbSubject(words, i);
@@ -129,7 +129,7 @@ public class VerbHelper {
 		int mvMetadataIndex = -1;
 		boolean mvFound = false;
 		
-		ArrayList<WordToken> words = sentence.getWordList();
+		ArrayList<WordToken> words = sentence.getModifiedWordList();
 		
 		try {
 			for(int i=0; i < words.size(); i++) {
@@ -195,7 +195,7 @@ public class VerbHelper {
 	// requires POSTagger.identifyPartsOfSpeech(), identifyVerbsOfBeing(), identifyLinkningVerbs(), identifyInfinitivePhrases(), identifyModalAuxVerbs()
 	public ArrayList<WordToken> identifyActionVerbs(Sentence sentence) {
 		
-		ArrayList<WordToken> words = sentence.getWordList();
+		ArrayList<WordToken> words = sentence.getModifiedWordList();
 		
 		try {
 			for(int i=0; i < words.size(); i++) {
@@ -279,20 +279,20 @@ public class VerbHelper {
 	public ArrayList<WordToken> identifyPrepositionalVerbs(Sentence sentence) {
 		
 		try {
-			for(int i=0; i < sentence.getWordList().size(); i++) {
-				WordToken thisToken = sentence.getWordList().get(i);
+			for(int i=0; i < sentence.getModifiedWordList().size(); i++) {
+				WordToken thisToken = sentence.getModifiedWordList().get(i);
 				
 				// token is a preposition and has been marked as being the head of a prep phrase (may be overkill)
 				if(thisToken.isPreposition() && thisToken.isPrepPhraseMember()) {
 					try {
 						// loop backwards looking for a verb, optionally separated by an adverb or token ending in 'ly'
 						for(int j=i-1; j >= 0; j--) {
-							WordToken prevToken = sentence.getWordList().get(j);
+							WordToken prevToken = sentence.getModifiedWordList().get(j);
 						
 							if(prevToken.isAdverbPOS() || prevToken.getToken().endsWith("(?i)ly")) {
 								continue;
 							} else if(prevToken.isVerb()) {
-								sentence.getWordList().get(j).setPrepositionalVerb(true);
+								sentence.getModifiedWordList().get(j).setPrepositionalVerb(true);
 								break;
 							} else {
 								break;
@@ -305,7 +305,7 @@ public class VerbHelper {
 			logger.error("identifyPrepositionalVerbs() {}", e);
 		}
 
-		return sentence.getWordList();
+		return sentence.getModifiedWordList();
 	}
 	
 	// must be preceded by POSTagger.identifyPartsOfSpeech(), POSTagger.identifyPrepPhrases(), identifyModalAuxVerbs()
@@ -314,7 +314,7 @@ public class VerbHelper {
 		int vobMetadataIndex = -1; // keeps track of which index in metadata.verbPhrases this entry has been added
 		boolean vobFound = false;
 		
-		ArrayList<WordToken> words = sentence.getWordList();
+		ArrayList<WordToken> words = sentence.getModifiedWordList();
 		
 		try {
 			SentenceMetadata metadata = sentence.getMetadata();
@@ -539,7 +539,7 @@ public class VerbHelper {
 				try {
 					nextToken = wordList.get(i+1);
 					// conjunction, comma, adverb, adjective following the current token allow the loop to continue
-					if(nextToken.isConjunctionPOS() || nextToken.getPOS().equalsIgnoreCase(",") || nextToken.isAdverbPOS() || nextToken.isAdjectivePOS())
+					if(nextToken.isConjunctionPOS() || nextToken.getPos().equalsIgnoreCase(",") || nextToken.isAdverbPOS() || nextToken.isAdjectivePOS())
 						compoundSUBJC = true;
 					
 				} catch(IndexOutOfBoundsException e) { }

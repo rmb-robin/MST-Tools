@@ -142,7 +142,7 @@ public class SentenceMetadata {
 		for(WordToken word : words) {
 			StringBuilder sb = new StringBuilder();
 			sb.append(word.getToken())
-			  .append(posOpen).append(word.getPOS()).append(posClose);
+			  .append(posOpen).append(word.getPos()).append(posClose);
 			if(word.getSemanticType() != null)
 			  sb.append(stOpen).append(word.getSemanticType()).append(stClose);
 			markup.add(sb.toString());

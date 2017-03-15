@@ -285,7 +285,7 @@ public class StructuredOutputHelper {
 //				}	
 //				/* End Structured Metadata */
 			
-			ArrayList<WordToken> words = sentence.getWordList();
+			ArrayList<WordToken> words = sentence.getModifiedWordList();
 		
 			// 1) loop through verb phrases
 			for(VerbPhraseMetadata verbPhrase : metadata.getVerbMetadata()) {
@@ -595,7 +595,7 @@ public class StructuredOutputHelper {
 		try {
 			SentenceMetadata metadata = sentence.getMetadata();
 			
-			ArrayList<WordToken> words = sentence.getWordList();
+			ArrayList<WordToken> words = sentence.getModifiedWordList();
 		
 			// 1) loop through verb phrases
 			for(VerbPhraseMetadata verbPhrase : metadata.getVerbMetadata()) {
@@ -1421,7 +1421,7 @@ public class StructuredOutputHelper {
 								logMissingEx(relByToken, prepPhrase.get(0).getToken(), objToken, prepTokenST, objTokenST, fullSentence, "PP");
 							}
 						} else {
-							logMissing(stCounts, ppToken.getToken()+"|"+words.get(ppToken.getPosition()).getPOS());
+							logMissing(stCounts, ppToken.getToken()+"|"+words.get(ppToken.getPosition()).getPos());
 							//logMissingST(missingSTByToken, prepPhrase.get(0).getToken(), objToken, null, null, fullSentence, "PP");
 							logMissingST(objToken, prepPhrase.get(0).getToken()+"|"+objToken, fullSentence, "PP");
 						}
@@ -1432,7 +1432,7 @@ public class StructuredOutputHelper {
 				//	list.add(results);
 				
 			} else {
-				logMissing(stCounts, prepPhrase.get(0).getToken()+"|"+words.get(prepPhrase.get(0).getPosition()).getPOS());
+				logMissing(stCounts, prepPhrase.get(0).getToken()+"|"+words.get(prepPhrase.get(0).getPosition()).getPos());
 				//logMissingST(missingSTByToken, prepPhrase.get(0).getToken(), "", null, null, fullSentence, "PP");
 				logMissingST(prepPhrase.get(0).getToken(), "", fullSentence, "PP");
 			}
@@ -1505,13 +1505,13 @@ public class StructuredOutputHelper {
 								logMissingEx(relByToken, nounPhrase.get(i).getToken(), finalToken, tokenST, finalTokenST, fullSentence, "NP");
 							}
 						} else {
-							logMissing(stCounts, nounPhrase.get(i).getToken()+"|"+words.get(nounPhrase.get(i).getPosition()).getPOS());
+							logMissing(stCounts, nounPhrase.get(i).getToken()+"|"+words.get(nounPhrase.get(i).getPosition()).getPos());
 							logMissingST(nounPhrase.get(i).getToken(), nounPhrase.get(i).getToken()+"|"+finalToken, fullSentence, "NP");
 						}
 					}
 				
 				} else {
-					logMissing(stCounts, finalToken+"|"+words.get(nounPhrase.get(nounPhrase.size()-1).getPosition()).getPOS());
+					logMissing(stCounts, finalToken+"|"+words.get(nounPhrase.get(nounPhrase.size()-1).getPosition()).getPos());
 					logMissingST(finalToken, "", fullSentence, "NP");
 				}
 				
