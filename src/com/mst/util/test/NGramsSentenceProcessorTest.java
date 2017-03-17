@@ -10,11 +10,11 @@ import java.util.List;
  
 import org.junit.Test;
 
-import com.mst.model.NGramsModifierEntity;
 import com.mst.model.Sentence;
 import com.mst.model.SentenceToken;
 import com.mst.model.WordToken;
-import com.mst.tools.NGramsSentenceProcessorImpl;
+import com.mst.model.gentwo.NGramsModifierEntity;
+import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.tools.SentenceCleaner;
 import com.mst.tools.Tokenizer;
 

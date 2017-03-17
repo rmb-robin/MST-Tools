@@ -334,7 +334,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public String getSemanticType() {
-		return semanticType == null ? "" : semanticType;
+		return semanticType;
 	}
 
 	public void setSemanticType(String semanticType) {

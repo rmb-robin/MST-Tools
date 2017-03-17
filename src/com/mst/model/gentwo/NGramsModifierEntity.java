@@ -1,4 +1,4 @@
-package com.mst.model;
+package com.mst.model.gentwo;
 
 import java.util.List;
 

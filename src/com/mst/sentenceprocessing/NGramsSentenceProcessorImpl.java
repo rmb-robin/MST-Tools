@@ -1,10 +1,12 @@
-package com.mst.tools;
+package com.mst.sentenceprocessing;
 
 import java.util.List;
 
 import com.mst.interfaces.NgramsSentenceProcessor;
-import com.mst.model.NGramsModifierEntity;
 import com.mst.model.Sentence;
+import com.mst.model.gentwo.NGramsModifierEntity;
+import com.mst.tools.SentenceCleaner;
+import com.mst.tools.Tokenizer;
 
 public class NGramsSentenceProcessorImpl implements NgramsSentenceProcessor  {
 	

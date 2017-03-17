@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mst.interfaces.NGramsProvider;
-import com.mst.model.NGramsModifierEntity;
+import com.mst.model.gentwo.NGramsModifierEntity;
 
 public class NGramsHardCodedProvider implements NGramsProvider {
 

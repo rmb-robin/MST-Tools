@@ -8,8 +8,8 @@ import org.junit.Test;
 
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
-import com.mst.tools.NGramsSentenceProcessorImpl;
-import com.mst.tools.SemanticTypeSentenceAnnotatorImpl;
+import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
+import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.tools.Tokenizer;
 import static org.junit.Assert.*;
 

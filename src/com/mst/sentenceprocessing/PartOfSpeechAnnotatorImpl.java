@@ -1,4 +1,4 @@
-package com.mst.tools;
+package com.mst.sentenceprocessing;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.mst.interfaces.PartOfSpeechAnnotator;
-import com.mst.model.PartOfSpeechAnnotatorEntity;
 import com.mst.model.WordToken;
+import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
 
 public class PartOfSpeechAnnotatorImpl implements PartOfSpeechAnnotator {
 

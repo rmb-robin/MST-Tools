@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.HashSet;
 
 import com.mst.interfaces.PartOfSpeechAnnotatorEntityProvider;
-import com.mst.model.PartOfSpeechAnnotatorEntity;
+import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
 
 
 public class PartOfSpeechHardcodedAnnotatorEntityProvider implements PartOfSpeechAnnotatorEntityProvider {

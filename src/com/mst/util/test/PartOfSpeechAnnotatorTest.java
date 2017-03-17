@@ -2,7 +2,7 @@ package com.mst.util.test;
 
 import org.junit.Test;
 
-import com.mst.model.PartOfSpeechAnnotatorEntity;
+import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
 
 public class PartOfSpeechAnnotatorTest {
 
