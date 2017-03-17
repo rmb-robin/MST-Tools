@@ -1,15 +1,20 @@
 package com.mst.model.gentwo;
 
+import org.joda.time.DateTime;
+
 import com.mst.model.WordToken;
 
 public class TokenRelationship {
 
 	private String edgeName; 
 	private String frameName; 
+	private DateTime createdTime; 
+	
 	
 	//should reference Ids maybe...
 	private WordToken toToken; 
 	private WordToken fromToken;
+	
 	
 	
 	public String getEdgeName() {
@@ -35,6 +40,12 @@ public class TokenRelationship {
 	}
 	public void setFromToken(WordToken fromToken) {
 		this.fromToken = fromToken;
+	}
+	public DateTime getCreatedTime() {
+		return createdTime;
+	}
+	public void setCreatedTime(DateTime createdTime) {
+		this.createdTime = createdTime;
 	} 
 	
 	

@@ -1,0 +1,26 @@
+cancer,f,panel,f,null,assay type
+cancer ,f,stage,f,null,disease severity
+current,f,criteria,f,null,parameters
+genedx,f,panel,f,null,assay brand
+stable,f,appearing,f,null,appearance
+testing,f,criteria,f,null,diagnostic parameters
+benign,f,dysn,t,null,disease severity
+malignant,f,dysn,t,null,disease severity
+breast,f,dysn,t,null,location
+mm,f,dysn,t,null,measurement
+cm,f,dysn,t,null,measurement
+invasive,f,neop,t,null,disease severity
+noninvasive,f,neop,t,null,disease severity
+left,f,bpoc,t,null,laterality
+bilateral,f,bpoc,t,null,laterality
+right,f,dysn,t,null,types
+diag,t,diagnosis,f,null,diagnosis
+cd,t,cm,f,0,unit of measure
+cd,t,mm,f,0,unit of measure
+bpoc,t,proc,t,null,procedure location
+stable,f,dysn,t,null,disease stability
+total,f,proc,t,null,degree of procedure
+partial,f,proc,t,null,degree of procedure
+mr.,f,*,f,0,pii
+mrs.,f,*,f,0,pii
+ms.,f,*,f,0,pii

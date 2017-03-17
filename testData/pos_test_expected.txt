@@ -1,0 +1,9 @@
+IN= within, DP=which
+IN= since,  CC= or
+IN= due to
+DP= although ,   IN=with;although
+DPl= than, IN=of;at;in, CC= and
+NEG= no
+NEG= not
+NEG= no,IN=with;in;of, CC= and
+NEG= none;nor, CC= nor;and, IN= of

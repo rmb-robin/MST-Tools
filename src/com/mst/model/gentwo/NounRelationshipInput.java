@@ -1,50 +1,31 @@
 package com.mst.model.gentwo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NounRelationshipInput {
-	
-	private String fromToken;
-	private String toToken;
-	private int maxDistance;
-	private String edgeName;
 
-	private boolean isFromSemanticType;
-	private boolean isToSemanticType;
+	private String frameName;
+	private List<NounRelationship> nounRelationships;
 	
+	public NounRelationshipInput(){
+		nounRelationships = new ArrayList<>();
+	}
 
-	public String getFromToken() {
-		return fromToken;
+	public String getFrameName() {
+		return frameName;
 	}
-	public void setFromToken(String fromToken) {
-		this.fromToken = fromToken;
+
+	public void setFrameName(String frameName) {
+		this.frameName = frameName;
 	}
-	public String getToToken() {
-		return toToken;
+
+	public List<NounRelationship> getNounRelationships() {
+		return nounRelationships;
 	}
-	public void setToToken(String toToken) {
-		this.toToken = toToken;
+
+	public void setNounRelationships(List<NounRelationship> nounRelationships) {
+		this.nounRelationships = nounRelationships;
 	}
-	public int getMaxDistance() {
-		return maxDistance;
-	}
-	public void setMaxDistance(int maxDistance) {
-		this.maxDistance = maxDistance;
-	}
-	public String getEdgeName() {
-		return edgeName;
-	}
-	public void setEdgeName(String edgeName) {
-		this.edgeName = edgeName;
-	}
-	public boolean getIsFromSemanticType() {
-		return isFromSemanticType;
-	}
-	public void setFromSemanticType(boolean isFromSemanticType) {
-		this.isFromSemanticType = isFromSemanticType;
-	}
-	public boolean getIsToSemanticType() {
-		return isToSemanticType;
-	}
-	public void setToSemanticType(boolean isToSemanticType) {
-		this.isToSemanticType = isToSemanticType;
-	}
+	
 }

@@ -48,7 +48,7 @@ public class SemanticTypeAnnotatorTest {
 			}
 			else 
 			{
-				assertEquals("", wordToken.getSemanticType());
+				assertEquals(null, wordToken.getSemanticType());
 			}
 		}
 		

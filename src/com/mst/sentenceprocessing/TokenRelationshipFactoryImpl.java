@@ -1,5 +1,7 @@
 package com.mst.sentenceprocessing;
 
+import org.joda.time.DateTime;
+
 import com.mst.interfaces.TokenRelationshipFactory;
 import com.mst.model.WordToken;
 import com.mst.model.gentwo.TokenRelationship;
@@ -13,6 +15,7 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 		tokenRelationship.setFrameName(frameName);
 		tokenRelationship.setFromToken(fromToken);
 		tokenRelationship.setToToken(toToken);
+		tokenRelationship.setCreatedTime(DateTime.now());
 		return tokenRelationship;
 	}
 }

@@ -8,6 +8,6 @@ import com.mst.model.gentwo.TokenRelationship;
 
 public interface NounRelationshipProcessor {
 
-	List<TokenRelationship> process(List<WordToken> tokens,List<NounRelationshipInput> inputs);
+	List<TokenRelationship> process(List<WordToken> tokens,NounRelationshipInput input);
 	
 }

@@ -17,7 +17,7 @@ public class WordToken extends GenericToken {
 	//reference what can go away....
 	//staying
 	private String semanticType = null;
-	private String pos = "";  // part of speech
+	private String pos = null;  // part of speech
 	
 	
 	
