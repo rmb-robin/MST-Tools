@@ -1,4 +1,4 @@
-package com.mst.util.test;
+package com.mst.testcases;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -15,8 +15,10 @@ import com.mst.model.SentenceToken;
 import com.mst.model.WordToken;
 import com.mst.model.gentwo.NGramsModifierEntity;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
-import com.mst.tools.SentenceCleaner;
-import com.mst.tools.Tokenizer;
+import com.mst.sentenceprocessing.SentenceCleaner;
+import com.mst.sentenceprocessing.Tokenizer;
+import com.mst.testHelpers.NGramsHardCodedProvider;
+import com.mst.testHelpers.TestDataProvider;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,4 @@
-package com.mst.tools;
+package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
 import java.util.Arrays;

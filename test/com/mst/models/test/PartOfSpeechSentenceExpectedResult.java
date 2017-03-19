@@ -1,4 +1,4 @@
-package com.mst.util.test;
+package com.mst.models.test;
 
 import java.util.List;
 import java.util.Map;

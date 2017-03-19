@@ -1,4 +1,4 @@
-package com.mst.util.test;
+package com.mst.testcases;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +10,11 @@ import com.mst.model.Sentence;
 import com.mst.model.WordToken;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
-import com.mst.tools.Tokenizer;
+import com.mst.sentenceprocessing.Tokenizer;
+import com.mst.testHelpers.NGramsHardCodedProvider;
+import com.mst.testHelpers.SemanticTypeHardCodedProvider;
+import com.mst.testHelpers.TestDataProvider;
+
 import static org.junit.Assert.*;
 
 public class SemanticTypeAnnotatorTest {

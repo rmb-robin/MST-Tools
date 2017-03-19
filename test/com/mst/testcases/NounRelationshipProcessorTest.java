@@ -1,9 +1,10 @@
-package com.mst.util.test;
+package com.mst.testcases;
 
 import org.junit.Test;
 
 import com.mst.model.gentwo.NounRelationship;
 import com.mst.model.gentwo.NounRelationshipInput;
+import com.mst.testHelpers.NounRelationshipInputProviderFileImpl;
 
 public class NounRelationshipProcessorTest {
 

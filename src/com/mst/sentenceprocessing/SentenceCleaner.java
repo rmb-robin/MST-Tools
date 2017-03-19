@@ -1,4 +1,4 @@
-package com.mst.tools;
+package com.mst.sentenceprocessing;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,4 +1,4 @@
-package com.mst.util.test;
+package com.mst.oldcases;
 import static org.junit.Assert.*;
 
 import org.junit.Test;

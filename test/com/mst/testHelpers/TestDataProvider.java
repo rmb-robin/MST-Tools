@@ -1,4 +1,4 @@
-package com.mst.util.test;
+package com.mst.testHelpers;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -9,8 +9,8 @@ import java.util.List;
 
 import com.mst.model.Sentence;
 import com.mst.model.SentenceToken;
-import com.mst.tools.SentenceCleaner;
-import com.mst.tools.Tokenizer;
+import com.mst.sentenceprocessing.SentenceCleaner;
+import com.mst.sentenceprocessing.Tokenizer;
 
 public class TestDataProvider {
 

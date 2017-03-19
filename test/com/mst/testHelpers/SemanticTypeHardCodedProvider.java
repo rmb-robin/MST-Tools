@@ -1,4 +1,4 @@
-package com.mst.util.test;
+package com.mst.testHelpers;
 
 import java.util.HashMap;
 import java.util.Map;

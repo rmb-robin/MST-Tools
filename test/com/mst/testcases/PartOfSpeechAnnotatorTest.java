@@ -1,4 +1,4 @@
-package com.mst.util.test;
+package com.mst.testcases;
 
 import java.util.List;
 import java.util.Map;
@@ -6,8 +6,14 @@ import org.junit.Test;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
 import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
+import com.mst.models.test.PartOfSpeechSentenceExpectedResult;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
+import com.mst.testHelpers.NGramsHardCodedProvider;
+import com.mst.testHelpers.PartOfSpeechExpectedResultsProvider;
+import com.mst.testHelpers.PartOfSpeechHardcodedAnnotatorEntityProvider;
+import com.mst.testHelpers.TestDataProvider;
+
 import static org.junit.Assert.*;
 
 public class PartOfSpeechAnnotatorTest {
