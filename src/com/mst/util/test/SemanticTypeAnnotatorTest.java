@@ -28,7 +28,7 @@ public class SemanticTypeAnnotatorTest {
 		NGramsSentenceProcessorImpl processor = new NGramsSentenceProcessorImpl();
 		
 		String fileText = TestDataProvider.getFileText(getTestDataPath());
-		List<Sentence> originalSentences = TestDataProvider.getSentence(fileText);
+		List<Sentence> originalSentences = TestDataProvider.getSentences(fileText);
 		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
 		int i = 1;
 		for(Sentence s: originalSentences){

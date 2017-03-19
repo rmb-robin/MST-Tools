@@ -43,10 +43,10 @@ public class NGramsSentenceProcessorTest {
 		List<String> output = new ArrayList<>();
 		NGramsSentenceProcessorImpl processor = new NGramsSentenceProcessorImpl();
 		String fileText = TestDataProvider.getFileText(getTestDataPath());
-		List<Sentence> originalSentences = TestDataProvider.getSentence(fileText);
+		List<Sentence> originalSentences = TestDataProvider.getSentences(fileText);
 		
 		fileText = TestDataProvider.getFileText(getNGramsExpectedPath());
-		List<Sentence> expectedSentences = TestDataProvider.getSentence(fileText);
+		List<Sentence> expectedSentences = TestDataProvider.getSentences(fileText);
 		
 		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
 		

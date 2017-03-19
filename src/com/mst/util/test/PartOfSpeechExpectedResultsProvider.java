@@ -32,7 +32,7 @@ public class PartOfSpeechExpectedResultsProvider {
 		for(String pos:components){
 			String[] posSplit = pos.split("=");
 			List<String> values = Arrays.asList(posSplit[1].split(";"));
-			result.getPosValues().put(posSplit[0], values);
+			result.getPosValues().put(posSplit[0].trim(), values);
 		}
 		return result;
 	}

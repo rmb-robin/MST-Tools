@@ -35,7 +35,7 @@ public class TestDataProvider {
 	    }
 	}
 	
-	public static List<Sentence> getSentence(String text){
+	public static List<Sentence> getSentences(String text){
 		Tokenizer t = new Tokenizer();
 		SentenceCleaner cleaner = new SentenceCleaner();
 		List<Sentence> sentences = new ArrayList<Sentence>();
