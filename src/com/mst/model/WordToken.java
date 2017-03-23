@@ -2,6 +2,7 @@ package com.mst.model;
 
 import java.util.ArrayList;
 
+import com.mst.model.gentwo.Verb;
 import com.mst.util.Constants;
 import com.mst.util.Constants.DependentPhraseClass;
 
@@ -18,7 +19,7 @@ public class WordToken extends GenericToken {
 	//staying
 	private String semanticType = null;
 	private String pos = null;  // part of speech
-	
+	private Verb verb;
 	
 	
 	//not sure if staying..
@@ -448,5 +449,13 @@ public class WordToken extends GenericToken {
 	@Override
 	public String toString() {
 		return super.getToken();
+	}
+
+	public Verb getVerb() {
+		return verb;
+	}
+
+	public void setVerb(Verb verb) {
+		this.verb = verb;
 	}
 }

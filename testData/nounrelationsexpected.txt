@@ -1,0 +1,36 @@
+0,appearing,cyst,appearance
+0,stable,cyst,disease stability
+0,hepatic,lobe,disease location
+0,left,hepatic,laterality
+1,benign,polyp,disease severity
+1,one,polyp,disease quantity
+2,breast,cancer,disease location
+2,very,small,intensifer
+2,small,finding,relative degree
+2,adjuvant,therapy,therapy type
+3,ovarian,cancer,disease location
+3,cancer,panel,assay type
+3,breast,cancer,disease location
+3,Genedx,panel,assay brand
+4,abdominal,hysterectomy,procedure location
+4,total,hysterectomy,degree of procedure
+4,bilateral,salpingo-oophorectomy,laterality
+5,complicated,cyst,disease type
+5,mildly,complicated,relative degree
+5,left,ovarian,laterality
+5,ovarian,cyst,disease location
+5,hemorrhagic,cyst,disease type
+6,previous,malignancy,general time
+6,curatively,treated,treatment state
+6,cervical,cancer,disease location
+6,cancer,stage,disease severity
+6,stage,1,disease severity
+6,non-melanotic,cancer,disease location
+6,skin,cancer,disease location
+6,minimal,risk,relative degree
+7,curatively,treated,treatment state
+7,treated,cancer,treatment state
+7,prior,cancer,general time
+7,breast,cancer,disease location
+8,invasive,carcinoma,disease severity
+8,ductal,carcinoma,disease location

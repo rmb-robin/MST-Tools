@@ -45,6 +45,52 @@ public class SemanticTypeHardCodedProvider implements SemanticTypeProvider {
 		result.put("mass", "dysn");
 		result.put("lesion", "dysn");
 		result.put("excisional biopsy",	"proc");
+		result.put("hepatic",	"bpoc");
+		
+		result.put("polyp",	"dysn");
+		result.put("one",	"number");
+		result.put("mildly",	"qlco");
+		result.put("complicated",	"qlco");
+		result.put("left",	"laterality");
+		result.put("stable",	"qlco");
+		result.put("lobe",	"bpoc");
+		result.put("hysterectomy",	"bpoc");
+		result.put("bilateral",	"laterality");
+		result.put("benign",	"neop-stage");
+		result.put("stable",	"qlco");
+		result.put("mass",	"dysn");
+		result.put("cm",	"unit of measure");
+		result.put("indeterminate",	"qlco");
+		result.put("hemorrhagic",	"qlco");
+		result.put("endometrioma",	"dysn");
+		result.put("findings",	"dysn");
+		result.put("salpingo-oophorectomy",	"proc");
+		result.put("appearing",	"appearance");
+		result.put("invasive", 	"qlco");
+		result.put("1",	"cardinal number");
+		result.put("adjuvant",	"qlco");
+		result.put("carcinoma",	"dysn");
+		result.put("cervical",	"bpoc");
+		result.put("curatively",	"qlco");
+		result.put("ductal",	"bpoc");
+		result.put("Genedx",	"co name");
+		result.put("left",	"laterality");
+		result.put("malignancy",	"neop-stage");
+		result.put("minimal","qlco");
+		result.put("non-melanotic",	"dysn");
+		result.put("panel",	"proc");
+		result.put("previous",	"temporal");
+		result.put("prior",	"temporal");
+		result.put("risk",	"risk");
+		result.put("skin",	"bpoc");
+		result.put("small",	"qlco");
+		result.put("stage",	"neop-stage");
+		result.put("total",	"qlco");
+		result.put("very",  "qlco");
+		
+			
+		
+		
 		return result;
 	}
 

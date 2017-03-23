@@ -36,7 +36,11 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 		this.frameName = input.getFrameName();
 		setrelationshipMaps(input.getNounRelationships());
 	
+		String word = "breast";
 		for(WordToken wordToken: wordTokens){
+			if(wordToken.getToken().toLowerCase().equals(word))
+				System.out.println("Stop");
+			
 			List<TokenRelationship> singleTokenResult = processSingleToken(wordToken);
 			if(!singleTokenResult.isEmpty())
 				result.addAll(singleTokenResult);
@@ -67,14 +71,14 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 			}
 		}
 
-		if(nounRelationshipMap.containsKey(wordToken.getToken())) 
+		if(nounRelationshipMap.containsKey(wordToken.getToken().toLowerCase())) 
 			return true;
 		return false;
 	}
 	
 	private NounRelationship checkForWildcardsFrom(WordToken wordToken){
 		List<NounRelationship> nounRelationships = nounRelationshipMap.get(wildcard);
-		
+		if(nounRelationships==null) return null;
 		for(NounRelationship relationship: nounRelationships){
 			if(relationship.getToToken().equals(wordToken.getToken()))
 					return relationship;
@@ -84,14 +88,31 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 	
 	
 	private List<TokenRelationship> getRelationshipsForToken(WordToken wordToken){
-		List<TokenRelationship> result = new ArrayList<TokenRelationship>();
+		List<TokenRelationship> result = new ArrayList<TokenRelationship>(); 
+		String key = wordToken.getToken().toLowerCase();
+		Map<String,List<NounRelationship>> map = nounRelationshipMap;
+		result.addAll(iterateMap(map,key,wordToken));
+		if(wordToken.getSemanticType()!=null)
+		{
+			map = semanticTypeNounRelationshipMap;
+			key = wordToken.getSemanticType();
+			result.addAll(iterateMap(map,key,wordToken));
+		}
+		return result;
+	}
+	
+	private List<TokenRelationship> iterateMap(Map<String,List<NounRelationship>> map, String key, WordToken wordToken){
+		List<TokenRelationship> result = new ArrayList<TokenRelationship>(); 
+		if(!map.containsKey(key)) return result;
 		int startIndex = wordTokens.indexOf(wordToken);
-		for(NounRelationship relationship: nounRelationshipMap.get(wordToken.getToken())){
+				
+		for(NounRelationship relationship: map.get(key)){
 			List<TokenRelationship> collection = processSingleNounRelationship(relationship,startIndex);
 			result.addAll(collection);
 		}
 		return result;
 	}
+
 	
 	private List<TokenRelationship> processSingleNounRelationship(NounRelationship nounRelationships, int index){
 		List<TokenRelationship> result = new ArrayList<TokenRelationship>();
@@ -101,13 +122,14 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 			return result;
 		}
 		
-		int endIndex = index+nounRelationships.getMaxDistance();
+		int endIndex =  Math.min(index+nounRelationships.getMaxDistance(),wordTokens.size()-1); //modified max of list or distance...
 		boolean isToSemanticType = nounRelationships.getIsToSemanticType();
-		for(int i = index+1; index<=endIndex;i++){
+		for(int i = index+1; i<endIndex;i++){
 			String tokenCompareVlaue = wordTokens.get(i).getToken();
 			if(isToSemanticType)
 				tokenCompareVlaue = wordTokens.get(i).getSemanticType();
 			
+			if(tokenCompareVlaue==null) continue;
 			if(!tokenCompareVlaue.equals(nounRelationships.getToToken())) continue;
 			result.add(tokenRelationshipFactory.create(nounRelationships.getEdgeName(), this.frameName, wordTokens.get(index),wordTokens.get(i)));
 		}		
@@ -127,7 +149,7 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 	
 	private void setRelationshipMap(Map<String, List<NounRelationship>> map,NounRelationship nounRelationship){
 		if(!map.containsKey(nounRelationship.getFromToken()))
-			map.put(nounRelationship.getFromToken(), new ArrayList<NounRelationship>());
+			map.put(nounRelationship.getFromToken().toLowerCase(), new ArrayList<NounRelationship>());
 		map.get(nounRelationship.getFromToken()).add(nounRelationship);
 	}
 }

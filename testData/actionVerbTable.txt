@@ -1,0 +1,6 @@
+compare,compares,compared,comparing,compare
+complete,completes,completed,completing,complete
+complicate,complicates,complicated,complicating,compliace
+compose,composes,composed,composing,build
+measure,measures,measured,measuring,measure
+get,gets,got,gotten

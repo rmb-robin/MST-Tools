@@ -24,3 +24,7 @@ partial,f,proc,t,null,degree of procedure
 mr.,f,*,f,0,pii
 mrs.,f,*,f,0,pii
 ms.,f,*,f,0,pii
+appearing,f,dysn,t,null,appearance
+number,t,dysn,t,null,appearance
+very,f,small,f,null,intensifier
+very,f,large,f,null,intensifier
