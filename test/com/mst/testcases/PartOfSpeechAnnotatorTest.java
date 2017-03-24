@@ -36,6 +36,7 @@ public class PartOfSpeechAnnotatorTest {
 		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
 		NGramsSentenceProcessorImpl processor = new NGramsSentenceProcessorImpl();
 		PartOfSpeechAnnotatorImpl annotatorImpl = new PartOfSpeechAnnotatorImpl();		
+			
 		
 		int index = 0;
 		for(Sentence sentence: sentences){
@@ -56,10 +57,13 @@ public class PartOfSpeechAnnotatorTest {
 	
 	private void assertSinglePOS(String posSymbol, List<String> expectedannotations,List<WordToken> words,int index)
 	{
+		String failedIndex = "Index " + index;
+		words.forEach((a)-> a.setToken(a.getToken().toLowerCase()));
+		
 		for(String word: expectedannotations){
 			for(WordToken token: words){
-				if(token.getToken().equals(word))
-					assertEquals(posSymbol, token.getPos());				
+				if(token.getToken().equals(word.toLowerCase()))
+					assertEquals(failedIndex,posSymbol, token.getPos());				
 			}
 		}
 	}
@@ -73,5 +77,7 @@ public class PartOfSpeechAnnotatorTest {
 		}
 		System.out.println("*******************************");
 	}
+	
+	
 	
 }

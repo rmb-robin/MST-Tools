@@ -52,6 +52,11 @@ public class VerbProcessorTest {
 		verbProcessor.process(new ArrayList<WordToken>(), null);
 	}
 
+	@Test(expected = Exception.class)
+	public void test_nullwordTokens() throws Exception{
+		verbProcessor.process(null, new VerbProcessingInput());
+	}
+	
 	private void testSentence(String sentenceText, VerbTense tense){
 		Sentence sentence = TestDataProvider.getSentences(sentenceText).get(0);
 		processor.process(sentence, new NGramsHardCodedProvider().getNGrams());

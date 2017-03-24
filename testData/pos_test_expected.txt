@@ -6,4 +6,9 @@ DP=than,IN=of;at;in,CC=and
 NEG=no
 NEG=not
 NEG=no,IN=with;in;of,CC=and
-NEG=none;nor,CC=nor;and,IN= of
+NEG=none;nor,CC=and,IN=of
+DET=I;the
+DET=i;the
+DET=this;a
+DET=This;a
+DET=we;the

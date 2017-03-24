@@ -19,6 +19,9 @@ public class VerbProcessorImpl implements VerbProcessor {
 		if(verbProcessingInput==null) 
 			throw new Exception("VerbProcessingInput is null");
 			
+		if(wordTokens==null)
+			throw new Exception("wordTokens are null");
+		
 		this.verbProcessingInput = verbProcessingInput;
 		wordTokens.forEach((a)-> processToken(a));
 		return wordTokens;

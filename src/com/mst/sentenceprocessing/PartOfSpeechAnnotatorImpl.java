@@ -24,7 +24,7 @@ public class PartOfSpeechAnnotatorImpl implements PartOfSpeechAnnotator {
 		
 		for (Map.Entry<String, HashSet<String>> entry : entity.getAnnotators().entrySet())
 		{
-		   if(entry.getValue().contains(token.getToken()))
+		   if(entry.getValue().contains(token.getToken().toLowerCase()))
 		   {
 			   token.setPos(entry.getKey());
 			   return;

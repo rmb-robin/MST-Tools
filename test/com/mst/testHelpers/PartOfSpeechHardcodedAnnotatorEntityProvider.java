@@ -18,7 +18,7 @@ public class PartOfSpeechHardcodedAnnotatorEntityProvider implements PartOfSpeec
 		populatePartOfSpeech(getFullFilePath("pos_ds.txt"), "DP");
 		populatePartOfSpeech(getFullFilePath("pos_nt.txt"), "NEG");
 		populatePartOfSpeech(getFullFilePath("pos_cc.txt"), "CC");
-//		populatePartOfSpeech(getFullFilePath("pos_prepsignal.txt"), "");	
+		populatePartOfSpeech(getFullFilePath("pos_DET.txt"), "DET");
 		return entity;
 	}
 
