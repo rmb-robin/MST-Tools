@@ -1,3 +1,5 @@
+infuse,lv,present,existence
+take,lv,present,existence
 am,lv,present,existence
 is,lv,present,
 are,lv,present,

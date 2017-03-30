@@ -38,18 +38,23 @@ public class VerbProcessorTest {
 	
 	@Test 
 	public void infinitivePhraseTest() throws Exception{
-		testInfinitiveVerbs("She recently had a breast ultrasound; however, she does not continue to get mammograms.","IN","infinitiveSignal");	
-		testInfinitiveVerbs("She cannot continue to have hormone injections following the allergic reaction.","IN","infinitiveSignal");	
-		testInfinitiveVerbs("To do an MRI next is the next step.","IN","infinitiveSignal");	
-		//testInfinitiveVerbs("Her physician may start to infuse the therapy so I will have to take her to her doctor's office tomorrow.","IN","infinitiveSignal");	
-		testInfinitiveVerbs("The patient has been taken to the operating room","IN","IN");	
+		HashSet<String> verbs = new HashSet<>();
+		verbs.add("get");
 		
+		testInfinitiveVerbs("She recently had a breast ultrasound; however, she does not continue to get mammograms.","IN","infinitiveSignal",verbs);	
+		verbs.clear();
+		verbs.add("have");
+		testInfinitiveVerbs("She cannot continue to have hormone injections following the allergic reaction.","IN","infinitiveSignal",verbs);	
+		verbs.clear();
+		verbs.add("do");
+		testInfinitiveVerbs("To do an MRI next is the next step.","IN","infinitiveSignal",verbs);	
 		
-	
-				 
-			//		to=IN, infuse=action verb; to=IN, take=action verb	to=infinitive signal, infuse=infinitive verb; to=infinitive signal, take=infinitive verb
-		
-		
+		verbs.clear();
+		verbs.add("infuse");
+		verbs.add("take");
+		testInfinitiveVerbs("Her physician may start to infuse the therapy so I will have to take her to her doctor's office tomorrow.","IN","infinitiveSignal",verbs);	
+		verbs.clear();
+		testInfinitiveVerbs("The patient has been taken to the operating room","IN","IN",verbs);
 	}
 	
 	@Test 
@@ -94,7 +99,7 @@ public class VerbProcessorTest {
 	}
 	
 	
-	private void testInfinitiveVerbs(String sentenceText,String posBefore, String posAfter) throws Exception{
+	private void testInfinitiveVerbs(String sentenceText,String posBefore, String posAfter,HashSet<String> verbWords) throws Exception{
 		Sentence sentence = TestDataProvider.getSentences(sentenceText).get(0);
 		sentence = processor.process(sentence, new NGramsHardCodedProvider().getNGrams());
 	
@@ -111,24 +116,27 @@ public class VerbProcessorTest {
 	
 		WordToken token=null;
 		int index = 0;
+		int verbCount = 0;
 		for(WordToken w : result)
 		{
 			if(w.getToken().toLowerCase().equals("to")){
-				assertInfinitivePhrase(posAfter, w);
 				token = result.get(index+1);
 				if(token.getVerb()==null)
 				{
 					index+=1;
 					continue;
 				}
-				
+				assertInfinitivePhrase(posAfter, w);
+				verbCount+=1;
 				assertEquals("IV",token.getPos());
 				Verb verb = token.getVerb();
-				assertEquals("IV",token.getPos());;
+				assertEquals("IV",token.getPos());
 				assertEquals(VerbType.IV, verb.getVerbType());
+				assertTrue(verbWords.contains(token.getToken()));
 			}
 			index +=1;
 		}
+		assertEquals(verbWords.size(),verbCount);
 	}
 
 	private void assertInfinitivePhrase(String pos, WordToken token){
