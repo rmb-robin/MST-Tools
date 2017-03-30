@@ -4,5 +4,6 @@ public enum VerbTense {
 	InfinitivePresent,
 	PluralInfinitivePresent,
 	Present,
-	Past
+	Past, 
+	Future
 };

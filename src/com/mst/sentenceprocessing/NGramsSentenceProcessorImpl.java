@@ -1,6 +1,8 @@
 package com.mst.sentenceprocessing;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.mst.interfaces.NgramsSentenceProcessor;
 import com.mst.model.Sentence;
@@ -13,6 +15,7 @@ public class NGramsSentenceProcessorImpl implements NgramsSentenceProcessor  {
 	
 	public Sentence process(Sentence sentence, List<NGramsModifierEntity> ngramsModifierEntities) {
 		String modifiedSentence = sentence.getOrigSentence();
+		ngramsModifierEntities = sort(ngramsModifierEntities);
 		for(NGramsModifierEntity entity : ngramsModifierEntities){
 			modifiedSentence = modifiedSentence.replaceAll(entity.getOriginalStatement(), entity.getModifiedStatement());
 		}
@@ -20,5 +23,12 @@ public class NGramsSentenceProcessorImpl implements NgramsSentenceProcessor  {
 		sentence.setModifiedWordList(tokenizer.splitWords(modifiedSentence));
 		sentence.setFullSentence(modifiedSentence);
 		return sentence;
+	}
+	
+	//to do.. move to a more generic location..
+	private  List<NGramsModifierEntity> sort( List<NGramsModifierEntity> ngramsModifierEntities){
+		Comparator<NGramsModifierEntity> byValueSize = (e1, e2) -> Integer.compare(
+	            e1.getOriginalStatement().length(), e2.getOriginalStatement().length());
+		return ngramsModifierEntities.stream().sorted(byValueSize.reversed()).collect(Collectors.toList());					
 	}
 }
