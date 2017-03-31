@@ -46,13 +46,14 @@ public class SemanticTypeAnnotatorTest {
 	private void assertTokens(List<WordToken> modifiedTokens, int i){	
 		Map<String,String> expected = getExpectedResults();
 		for(WordToken wordToken : modifiedTokens){
+			
 			if(expected.containsKey(wordToken.getToken()))
 			{
 				assertEquals(expected.get(wordToken.getToken()), wordToken.getSemanticType());
 			}
 			else 
 			{
-				assertEquals(null, wordToken.getSemanticType());
+				assertEquals(wordToken.getToken(),null, wordToken.getSemanticType());
 			}
 		}
 		
@@ -82,6 +83,46 @@ public class SemanticTypeAnnotatorTest {
 		result.put("ultrasound-guided-biopsy", "proc");
 		result.put("bone-marrow-biopsy", "proc");
 		result.put("biopsy", "proc");
+		result.put("polyp",	"dysn");
+		result.put("one",	"number");
+		result.put("mildly",	"qlco");
+		result.put("complicated",	"qlco");
+		result.put("left",	"laterality");
+		result.put("stable",	"qlco");
+		result.put("lobe",	"bpoc");
+		result.put("hysterectomy",	"bpoc");
+		result.put("bilateral",	"laterality");
+		result.put("benign",	"neop-stage");
+		result.put("stable",	"qlco");
+		result.put("mass",	"dysn");
+		result.put("cm",	"unit of measure");
+		result.put("indeterminate",	"qlco");
+		result.put("hemorrhagic",	"qlco");
+		result.put("endometrioma",	"dysn");
+		result.put("findings",	"dysn");
+		result.put("salpingo-oophorectomy",	"proc");
+		result.put("appearing",	"appearance");
+		result.put("invasive", 	"qlco");
+		result.put("1",	"cardinal number");
+		result.put("adjuvant",	"qlco");
+		result.put("carcinoma",	"dysn");
+		result.put("cervical",	"bpoc");
+		result.put("curatively",	"qlco");
+		result.put("ductal",	"bpoc");
+		result.put("Genedx",	"co name");
+		result.put("left",	"laterality");
+		result.put("malignancy",	"neop-stage");
+		result.put("minimal","qlco");
+		result.put("non-melanotic",	"dysn");
+		result.put("panel",	"proc");
+		result.put("previous",	"temporal");
+		result.put("prior",	"temporal");
+		result.put("risk",	"risk");
+		result.put("skin",	"bpoc");
+		result.put("small",	"qlco");
+		result.put("stage",	"neop-stage");
+		result.put("total",	"qlco");
+		result.put("very",  "qlco");
 		return result;
 	}
 	

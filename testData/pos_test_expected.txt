@@ -12,3 +12,4 @@ DET=i;the
 DET=this;a
 DET=This;a
 DET=we;the
+PUNCTUATION=.

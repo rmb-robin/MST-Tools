@@ -19,6 +19,7 @@ public class PartOfSpeechHardcodedAnnotatorEntityProvider implements PartOfSpeec
 		populatePartOfSpeech(getFullFilePath("pos_nt.txt"), "NEG");
 		populatePartOfSpeech(getFullFilePath("pos_cc.txt"), "CC");
 		populatePartOfSpeech(getFullFilePath("pos_DET.txt"), "DET");
+		populatePartOfSpeech(getFullFilePath("pos_punction.txt"), "PUNCTUATION");
 		return entity;
 	}
 
@@ -37,3 +38,4 @@ public class PartOfSpeechHardcodedAnnotatorEntityProvider implements PartOfSpeec
 	}
 
 }
+

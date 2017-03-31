@@ -55,7 +55,7 @@ public class NounRelationshipProcessorTest {
 			
 			Sentence ngramsProcessedSentence = ngramsProcessor.process(sentence,ngramsProvider.getNGrams());
 			List<WordToken> modifiedTokens = annotator.annotate(ngramsProcessedSentence.getModifiedWordList(), provider.getSemanticTypes());
-			if(index==2){
+			if(index==1){
 				System.out.println("STOP");
 			}
 			List<TokenRelationship> relationships =  processor.process(modifiedTokens, input);

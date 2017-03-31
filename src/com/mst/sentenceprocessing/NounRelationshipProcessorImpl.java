@@ -36,11 +36,7 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 		this.frameName = input.getFrameName();
 		setrelationshipMaps(input.getNounRelationships());
 	
-		String word = "breast";
-		for(WordToken wordToken: wordTokens){
-			if(wordToken.getToken().toLowerCase().equals(word))
-				System.out.println("Stop");
-			
+		for(WordToken wordToken: wordTokens){	
 			List<TokenRelationship> singleTokenResult = processSingleToken(wordToken);
 			if(!singleTokenResult.isEmpty())
 				result.addAll(singleTokenResult);

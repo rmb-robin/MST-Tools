@@ -40,6 +40,8 @@ public class PartOfSpeechAnnotatorTest {
 		
 		int index = 0;
 		for(Sentence sentence: sentences){
+			if(index==14)
+				System.out.println("S");
 			Sentence ngramsProcessedSentence = processor.process(sentence,ngramsProvider.getNGrams());
 			List<WordToken> words = annotatorImpl.annotate(ngramsProcessedSentence.getModifiedWordList(), entity);
 			assertSentences(words,index, expectedResults);
