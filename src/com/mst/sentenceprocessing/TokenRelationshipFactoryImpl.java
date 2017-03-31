@@ -4,6 +4,7 @@ import org.joda.time.DateTime;
 
 import com.mst.interfaces.TokenRelationshipFactory;
 import com.mst.model.WordToken;
+import com.mst.model.gentwo.PropertyValueTypes;
 import com.mst.model.gentwo.TokenRelationship;
 
 public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {

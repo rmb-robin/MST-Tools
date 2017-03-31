@@ -10,6 +10,7 @@ import com.mst.interfaces.TokenRelationshipFactory;
 import com.mst.model.WordToken;
 import com.mst.model.gentwo.NounRelationship;
 import com.mst.model.gentwo.NounRelationshipInput;
+import com.mst.model.gentwo.PropertyValueTypes;
 import com.mst.model.gentwo.TokenRelationship;
 
 import jdk.nashorn.internal.parser.TokenKind;
@@ -51,7 +52,7 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 		{
 		 	NounRelationship nounRelationship =  checkForWildcardsFrom(wordToken);
 			if(nounRelationship!=null)
-				tokenRelationships.add(tokenRelationshipFactory.create(nounRelationship.getEdgeName(),this.frameName, wordTokens.get(index-1),wordToken));
+				tokenRelationships.add(createRelationshipAndAnnotateWordTokens(nounRelationship.getEdgeName(), wordTokens.get(index-1),wordToken));
 		}
 
 		if(shouldGetRelationshipsForToken(wordToken))
@@ -114,7 +115,7 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 		List<TokenRelationship> result = new ArrayList<TokenRelationship>();
 		if(nounRelationships.getIsToWildcard())
 		{
-			result.add(tokenRelationshipFactory.create(nounRelationships.getEdgeName(), this.frameName, wordTokens.get(index),wordTokens.get(index+1)));
+			result.add(createRelationshipAndAnnotateWordTokens(nounRelationships.getEdgeName(), wordTokens.get(index),wordTokens.get(index+1)));
 			return result;
 		}
 		
@@ -127,9 +128,15 @@ public class NounRelationshipProcessorImpl implements NounRelationshipProcessor 
 			
 			if(tokenCompareVlaue==null) continue;
 			if(!tokenCompareVlaue.equals(nounRelationships.getToToken())) continue;
-			result.add(tokenRelationshipFactory.create(nounRelationships.getEdgeName(), this.frameName, wordTokens.get(index),wordTokens.get(i)));
+			result.add(createRelationshipAndAnnotateWordTokens(nounRelationships.getEdgeName(), wordTokens.get(index),wordTokens.get(i)));
 		}		
 		return result;
+	}
+	
+	private TokenRelationship createRelationshipAndAnnotateWordTokens(String edgeName,WordToken fromToken,WordToken toToken){
+		fromToken.setPropertyValueType(PropertyValueTypes.NounPhraseBegin);
+		toToken.setPropertyValueType(PropertyValueTypes.NounPhraseEnd);
+		return tokenRelationshipFactory.create(edgeName, this.frameName, fromToken,toToken);
 	}
 	
 	private void setrelationshipMaps(List<NounRelationship> nounRelationships){

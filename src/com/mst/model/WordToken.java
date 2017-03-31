@@ -2,6 +2,7 @@ package com.mst.model;
 
 import java.util.ArrayList;
 
+import com.mst.model.gentwo.PropertyValueTypes;
 import com.mst.model.gentwo.Verb;
 import com.mst.util.Constants;
 import com.mst.util.Constants.DependentPhraseClass;
@@ -20,6 +21,7 @@ public class WordToken extends GenericToken {
 	private String semanticType = null;
 	private String pos = null;  // part of speech
 	private Verb verb;
+	private PropertyValueTypes propertyValueType;
 	
 	
 	//not sure if staying..
@@ -457,5 +459,13 @@ public class WordToken extends GenericToken {
 
 	public void setVerb(Verb verb) {
 		this.verb = verb;
+	}
+
+	public PropertyValueTypes getPropertyValueType() {
+		return propertyValueType;
+	}
+
+	public void setPropertyValueType(PropertyValueTypes propertyValueType) {
+		this.propertyValueType = propertyValueType;
 	}
 }
