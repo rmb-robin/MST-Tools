@@ -1,6 +1,6 @@
 package com.mst.model.gentwo;
 
-public class NounRelationship {
+public class RelationshipMapping {
 	
 	private String fromToken;
 	private String toToken;

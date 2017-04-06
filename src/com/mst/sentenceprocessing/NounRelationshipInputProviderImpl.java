@@ -1,12 +1,12 @@
 package com.mst.sentenceprocessing;
 
 import com.mst.interfaces.NounRelationshipInputProvider;
-import com.mst.model.gentwo.NounRelationshipInput;
+import com.mst.model.gentwo.RelationshipInput;
 
 public class NounRelationshipInputProviderImpl implements NounRelationshipInputProvider {
 
  
-	public NounRelationshipInput get(String frameName, int maxDistance) {
+	public RelationshipInput get(String frameName, int maxDistance) {
 		return null;
 	}
 

@@ -3,8 +3,8 @@ package com.mst.testHelpers;
 import java.util.List;
 
 import com.mst.interfaces.NounRelationshipInputProvider;
-import com.mst.model.gentwo.NounRelationship;
-import com.mst.model.gentwo.NounRelationshipInput;
+import com.mst.model.gentwo.RelationshipMapping;
+import com.mst.model.gentwo.RelationshipInput;
 
 public class NounRelationshipInputProviderFileImpl implements NounRelationshipInputProvider {
 
@@ -13,21 +13,21 @@ public class NounRelationshipInputProviderFileImpl implements NounRelationshipIn
 	}
 	
 	private int maxDistance;
-	public NounRelationshipInput get(String frameName, int maxDistance) {
+	public RelationshipInput get(String frameName, int maxDistance) {
 		this.maxDistance = maxDistance;
-		NounRelationshipInput nounRelationshipInput = new NounRelationshipInput();
+		RelationshipInput nounRelationshipInput = new RelationshipInput();
 		nounRelationshipInput.setFrameName(frameName);
 		List<String> lines = TestDataProvider.readLines(getFullFilePath());
 		for(String line: lines){
-			nounRelationshipInput.getNounRelationships().add(getNounRelationship(line));
+			nounRelationshipInput.getRelationshipMappings().add(getNounRelationship(line));
 		}
 		return nounRelationshipInput;
 	}
 	
-	private NounRelationship getNounRelationship(String line)
+	private RelationshipMapping getNounRelationship(String line)
 	{
 		String[] values = line.split(",");
-		NounRelationship nounRelationship = new NounRelationship();
+		RelationshipMapping nounRelationship = new RelationshipMapping();
 		nounRelationship.setFromToken(values[0]);
 		nounRelationship.setFromSemanticType(isSemantic(values[1]));
 		

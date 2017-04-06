@@ -77,7 +77,7 @@ public class WordToken extends GenericToken {
 	}
 	
 	public boolean isVerb() {	
-		return pos.startsWith("VB");
+		return verb != null;
 	}
 	
 	public boolean isPreposition() {	

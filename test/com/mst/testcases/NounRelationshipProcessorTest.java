@@ -5,14 +5,14 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.mst.interfaces.NounRelationshipProcessor;
+import com.mst.interfaces.RelationshipProcessor;
 import com.mst.model.Sentence;
 import com.mst.model.WordToken;
-import com.mst.model.gentwo.NounRelationship;
-import com.mst.model.gentwo.NounRelationshipInput;
+import com.mst.model.gentwo.RelationshipMapping;
+import com.mst.model.gentwo.RelationshipInput;
 import com.mst.model.gentwo.TokenRelationship;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
-import com.mst.sentenceprocessing.NounRelationshipProcessorImpl;
+import com.mst.sentenceprocessing.NounRelationshipProcessor;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.testHelpers.NGramsHardCodedProvider;
@@ -38,13 +38,13 @@ public class NounRelationshipProcessorTest {
 	public void process(){
 		List<Sentence> sentences = getSentences();
 		
-		NounRelationshipInput input = new NounRelationshipInputProviderFileImpl().get("f_related",7);
+		RelationshipInput input = new NounRelationshipInputProviderFileImpl().get("f_related",7);
 		Map<Integer, List<TokenRelationship>> expectedMap = new NounrRelationshipExpectedProvider().get();
 		
 		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
 		NGramsSentenceProcessorImpl ngramsProcessor = new NGramsSentenceProcessorImpl();
 		 
-		NounRelationshipProcessor processor = new NounRelationshipProcessorImpl();
+		RelationshipProcessor processor = new NounRelationshipProcessor();
 
 		
 		SemanticTypeSentenceAnnotatorImpl annotator = new SemanticTypeSentenceAnnotatorImpl();
@@ -82,8 +82,8 @@ public class NounRelationshipProcessorTest {
 		assertEquals(failMessage,expected.size(),actual.size());
 	}
 
-	private void WriteInput(NounRelationshipInput input ){
-		for(NounRelationship r : input.getNounRelationships()){
+	private void WriteInput(RelationshipInput input ){
+		for(RelationshipMapping r : input.getRelationshipMappings()){
 			System.out.println(r.getFromToken());
 			System.out.println(r.getIsFromSemanticType());
 		

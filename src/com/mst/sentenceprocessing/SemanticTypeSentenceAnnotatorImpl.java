@@ -12,8 +12,8 @@ public class SemanticTypeSentenceAnnotatorImpl implements SemanticTypeSentenceAn
 	public List<WordToken> annotate(List<WordToken> tokens,Map<String,String> semanticTypes) {
 		
 		for(WordToken token : tokens){
-			if(!semanticTypes.containsKey(token.getToken())) continue;
-			token.setSemanticType(semanticTypes.get(token.getToken()));
+			if(!semanticTypes.containsKey(token.getToken().toLowerCase())) continue;
+			token.setSemanticType(semanticTypes.get(token.getToken().toLowerCase()));
 		}
 		return tokens;
 	}

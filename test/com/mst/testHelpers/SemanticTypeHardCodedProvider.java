@@ -12,9 +12,13 @@ public class SemanticTypeHardCodedProvider implements SemanticTypeProvider {
 		result.put("liver","bpoc");
 		result.put("breast","bpoc");
 		result.put("kidney","bpoc");
+		result.put("spine","bpoc");
+		result.put("stomach","bpoc");
 		result.put("t cell","bpoc-cell");
 		result.put("Myriad Genetic Laboratories"," co name");
 		result.put("lupron","drugpr");
+		result.put("xtandi","drugpr");
+		result.put("zytiga","drugpr");
 		result.put("tamoxifen",	"drugpr");
 		result.put("abdominal aortic aneurysm",	"dysn");
 		result.put("ct scan","proc"); 

@@ -1,8 +1,8 @@
 package com.mst.interfaces;
 
-import com.mst.model.gentwo.NounRelationshipInput;
+import com.mst.model.gentwo.RelationshipInput;
 
 public interface NounRelationshipInputProvider {
 
-	NounRelationshipInput get(String frameName, int maxDistance);
+	RelationshipInput get(String frameName, int maxDistance);
 }
