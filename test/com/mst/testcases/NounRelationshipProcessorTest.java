@@ -16,7 +16,7 @@ import com.mst.sentenceprocessing.NounRelationshipProcessor;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.testHelpers.NGramsHardCodedProvider;
-import com.mst.testHelpers.NounRelationshipInputProviderFileImpl;
+import com.mst.testHelpers.RelationshipInputProviderFileImpl;
 import com.mst.testHelpers.NounrRelationshipExpectedProvider;
 import com.mst.testHelpers.SemanticTypeHardCodedProvider;
 import com.mst.testHelpers.TestDataProvider;
@@ -38,7 +38,7 @@ public class NounRelationshipProcessorTest {
 	public void process(){
 		List<Sentence> sentences = getSentences();
 		
-		RelationshipInput input = new NounRelationshipInputProviderFileImpl().get("f_related",7);
+		RelationshipInput input = new RelationshipInputProviderFileImpl().getNounRelationships("f_related",7);
 		Map<Integer, List<TokenRelationship>> expectedMap = new NounrRelationshipExpectedProvider().get();
 		
 		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();

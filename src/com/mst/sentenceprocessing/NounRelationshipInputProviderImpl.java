@@ -6,7 +6,7 @@ import com.mst.model.gentwo.RelationshipInput;
 public class NounRelationshipInputProviderImpl implements NounRelationshipInputProvider {
 
  
-	public RelationshipInput get(String frameName, int maxDistance) {
+	public RelationshipInput getNounRelationships(String frameName, int maxDistance) {
 		return null;
 	}
 

@@ -11,6 +11,26 @@ import com.mst.model.gentwo.PropertyValueTypes;
 
 public class PrepositionPhraseProcessorImpl implements PrepositionPhraseProcessor {
 
+	private class StAnnotion{
+		private WordToken wordToken; 
+		private int index;
+		
+		public WordToken getWordToken() {
+			return wordToken;
+		}
+		public void setWordToken(WordToken wordToken) {
+			this.wordToken = wordToken;
+		}
+		public int getIndex() {
+			return index;
+		}
+		public void setIndex(int index) {
+			this.index = index;
+		} 
+		
+	}
+	
+	
 	private List<WordToken> tokens;
 	private HashSet<String> punctuations;
 	private HashSet<String> stLookups;
@@ -38,13 +58,13 @@ public class PrepositionPhraseProcessorImpl implements PrepositionPhraseProcesso
 		int currentIterations=0;
 		boolean phraseFound = false;
 		List<WordToken> nounPhraseEndTokens = new ArrayList<WordToken>();
+		List<StAnnotion> sTTokens = new ArrayList<StAnnotion>();
+		
 		for(int i = startTokenIndex+1; i<tokens.size();i++){
 			WordToken wordToken = tokens.get(i);
-			if(wordToken.getPropertyValueType() == PropertyValueTypes.NounPhraseEnd)
-				nounPhraseEndTokens.add(wordToken);
-			
+		
 			boolean checkNext = false;
-			if(shouldAnnotateWithPrepPhraseEnd(wordToken)){
+			if(shouldAnnotateWithPrepPhraseEnd(wordToken,nounPhraseEndTokens,sTTokens,i)){
 				wordToken.setPropertyValueType(PropertyValueTypes.PrepPhraseEnd);
 				checkNext = true;
 				phraseFound = true;
@@ -64,10 +84,23 @@ public class PrepositionPhraseProcessorImpl implements PrepositionPhraseProcesso
 			
 			if(shouldEndLoop(i, endIndex, checkNext,currentIterations)) break;
 		}
-		cleanNonLastNounPhraseEndTokens(nounPhraseEndTokens);
+		cleanTokens(nounPhraseEndTokens);
+		cleanSTTokens(sTTokens);
 	}
 	
-	private void cleanNonLastNounPhraseEndTokens(List<WordToken> wordTokens){
+	private void cleanSTTokens(List<StAnnotion> stAnnotations){
+		if(stAnnotations.size()<2) return;
+		for(int i =1; i<stAnnotations.size();i++){
+			
+			StAnnotion current = stAnnotations.get(i);
+			StAnnotion previous = stAnnotations.get(i-1);
+			
+			if(current.index-previous.index == 1)
+				previous.getWordToken().setPropertyValueType(null);
+		}
+	}
+	
+	private void cleanTokens(List<WordToken> wordTokens){
 		for(int i = 0;i<wordTokens.size();i++){
 			WordToken wordToken = wordTokens.get(i);
 			if(i!=wordTokens.size()-1)
@@ -89,9 +122,21 @@ public class PrepositionPhraseProcessorImpl implements PrepositionPhraseProcesso
 		return false;			
 	 }
 	
-	private boolean shouldAnnotateWithPrepPhraseEnd(WordToken wordToken){
-		if(wordToken.getPropertyValueType() == PropertyValueTypes.NounPhraseEnd) return true;
-		if(stLookups.contains(wordToken.getSemanticType())) return true;
+	private boolean shouldAnnotateWithPrepPhraseEnd(WordToken wordToken, List<WordToken> nounPhraseEndTokens, List<StAnnotion> stTokens, int index){
+		if(wordToken.getPropertyValueType() == PropertyValueTypes.NounPhraseEnd) 
+		{
+			nounPhraseEndTokens.add(wordToken);
+			return true;
+		}
+		
+		if(stLookups.contains(wordToken.getSemanticType()))
+		{
+			StAnnotion annotion = new StAnnotion();
+			annotion.setIndex(index);
+			annotion.setWordToken(wordToken);
+			stTokens.add(annotion);
+			return true;
+		}
 		return false;
 	}
 	

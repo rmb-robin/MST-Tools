@@ -1,0 +1,8 @@
+in,f,f,dysn,t,f,bpoc,t,f,disease location
+within,f,f,dysn,t,f,bpoc,t,f,disease location
+of,f,f,dysn,t,f,bpoc,t,f,disease location
+in,f,f,*,f,f,gene,f,f,gene location
+after,f,f,therapy,f,f,surgery,f,f,sequence of events
+of,f,f,history,f,f,bpoc,t,f,diagnosis
+with,f,f,consistent,f,f,dysn,t,f,diagnose
+on,f,f,LV,f,t,drugpr,t,f,take
