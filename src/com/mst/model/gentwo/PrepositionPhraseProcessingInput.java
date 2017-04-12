@@ -11,21 +11,8 @@ public class PrepositionPhraseProcessingInput {
 	public PrepositionPhraseProcessingInput(){
 		punctuations = new HashSet<>();
 		stLookups = new HashSet<>();
-		
-		
-		punctuations.add(";");
-		punctuations.add(".");
-		
-		//should be inputs.
-		stLookups = new HashSet<>();
-		stLookups.add("dysn");
-		stLookups.add("drugpr");
-		stLookups.add("proc");
-		stLookups.add("bpoc");
-		range=7;
 	}
-	
-	
+
 	public HashSet<String> getPunctuations() {
 		return punctuations;
 	}

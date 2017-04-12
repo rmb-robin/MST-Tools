@@ -4,5 +4,7 @@ public enum PropertyValueTypes {
 
 	NounPhraseBegin, 
 	NounPhraseEnd,
-	PrepPhraseEnd
+	PrepPhraseEnd, 
+	Subject, 
+	SubjectComplement
 }

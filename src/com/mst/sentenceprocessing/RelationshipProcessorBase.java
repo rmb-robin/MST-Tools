@@ -1,18 +1,12 @@
 package com.mst.sentenceprocessing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import com.mst.interfaces.TokenRelationshipFactory;
 import com.mst.model.WordToken;
-import com.mst.model.gentwo.RelationshipMapping;
 
 public abstract class RelationshipProcessorBase {
 
 	protected TokenRelationshipFactory tokenRelationshipFactory; 
-	protected String frameName;
 	protected final String wildcard = "*";
 	protected List<WordToken> wordTokens; 
 

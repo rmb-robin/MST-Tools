@@ -38,7 +38,7 @@ public class NounRelationshipProcessorTest {
 	public void process(){
 		List<Sentence> sentences = getSentences();
 		
-		RelationshipInput input = new RelationshipInputProviderFileImpl().getNounRelationships("f_related",7);
+		RelationshipInput input = new RelationshipInputProviderFileImpl().getNounRelationships(7);
 		Map<Integer, List<TokenRelationship>> expectedMap = new NounrRelationshipExpectedProvider().get();
 		
 		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();

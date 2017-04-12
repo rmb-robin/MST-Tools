@@ -15,10 +15,9 @@ public class RelationshipInputProviderFileImpl implements NounRelationshipInputP
 	}
 	
 	private int maxDistance;
-	public RelationshipInput getNounRelationships(String frameName, int maxDistance) {
+	public RelationshipInput getNounRelationships(int maxDistance) {
 		this.maxDistance = maxDistance;
 		RelationshipInput nounRelationshipInput = new RelationshipInput();
-		nounRelationshipInput.setFrameName(frameName);
 		List<String> lines = TestDataProvider.readLines(getFullFilePath("nounrelationships.txt"));
 		for(String line: lines){
 			nounRelationshipInput.getRelationshipMappings().add(getNounRelationship(line));

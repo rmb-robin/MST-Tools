@@ -25,7 +25,6 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 		List<TokenRelationship> result = new ArrayList<TokenRelationship>();
 		
 		this.wordTokens = tokens;
-		this.frameName = input.getFrameName();
 		setrelationshipMaps(input.getRelationshipMappings());
 	
 		for(WordToken wordToken: wordTokens){	
@@ -140,7 +139,7 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 	private TokenRelationship createRelationshipAndAnnotateWordTokens(String edgeName,WordToken fromToken,WordToken toToken){
 		fromToken.setPropertyValueType(PropertyValueTypes.NounPhraseBegin);
 		toToken.setPropertyValueType(PropertyValueTypes.NounPhraseEnd);
-		return tokenRelationshipFactory.create(edgeName, this.frameName, fromToken,toToken);
+		return tokenRelationshipFactory.create(edgeName, EdgeTypes.related, fromToken,toToken);
 	}
 	
 	protected RelationshipMapping findRelationWildcardFrom(WordToken wordToken){
