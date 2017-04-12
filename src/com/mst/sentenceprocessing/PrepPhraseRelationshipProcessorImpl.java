@@ -20,9 +20,8 @@ public class PrepPhraseRelationshipProcessorImpl extends RelationshipProcessorBa
 	
 	private Map<String, List<PrepPhraseRelationshipMapping>> relationshipMap; 
 	private Map<String, List<PrepPhraseRelationshipMapping>> semanticTypeRelationshipMap;
-	private String modifierFrameName = "f_modifier";
-	private String relatedFrameName = "f_related";
-	
+
+		
 	public List<TokenRelationship> process(List<WordToken> tokens, List<PrepPhraseRelationshipMapping> prepPhraseRelationshipMappings) {
 		this.wordTokens = tokens;
 		setrelationshipMaps(prepPhraseRelationshipMappings);
@@ -70,16 +69,16 @@ public class PrepPhraseRelationshipProcessorImpl extends RelationshipProcessorBa
 			
 			PrepPhraseRelationshipMapping relationshipMapping = findMapping(this.relationshipMap, token,previousToken, prepToken);
 			if(relationshipMapping!=null){
-				result.add(createTokenRelationship(relationshipMapping.getEdgeName(),this.relatedFrameName, previousToken, prepToken));
+				result.add(createTokenRelationship(relationshipMapping.getEdgeName(),EdgeTypes.related, previousToken, prepToken));
 				continue;
 			}
 			 relationshipMapping = findMapping(this.semanticTypeRelationshipMap, token,previousToken, prepToken);
 			if(relationshipMapping!=null) 
 			{
-				result.add(createTokenRelationship(relationshipMapping.getEdgeName(),this.relatedFrameName, previousToken, prepToken));	
+				result.add(createTokenRelationship(relationshipMapping.getEdgeName(),EdgeTypes.related, previousToken, prepToken));	
 				continue;
 			}
-			result.add(createTokenRelationship(null,this.modifierFrameName,previousToken,prepToken));
+			result.add(createTokenRelationship(null,EdgeTypes.modifier,previousToken,prepToken));
 		}
 		return result;
 	}

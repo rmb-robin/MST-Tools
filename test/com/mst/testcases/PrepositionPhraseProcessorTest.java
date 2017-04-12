@@ -21,6 +21,7 @@ import com.mst.model.gentwo.VerbType;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.NounRelationshipProcessor;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
+import com.mst.sentenceprocessing.PrepositionPhraseProcessingInputFactory;
 import com.mst.sentenceprocessing.PrepositionPhraseProcessorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.sentenceprocessing.VerbProcessorImpl;
@@ -41,7 +42,7 @@ public class PrepositionPhraseProcessorTest {
 	
 	SemanticTypeSentenceAnnotatorImpl stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
 	SemanticTypeHardCodedProvider stprovider = new SemanticTypeHardCodedProvider();
-	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getNounRelationships("f_related",7);
+	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getNounRelationships(7);
 	RelationshipProcessor nounrelationshipProcessor = new NounRelationshipProcessor();
 
 	@Test
@@ -72,6 +73,7 @@ public class PrepositionPhraseProcessorTest {
 		expected.clear();
 		expected.add("spine");
 		expected.add("lobe");
+		expected.add("hepatic");
 		runAssert("She has a cyst in the lumbar spine and upper left hepatic lobe.", expected);
 		
 		expected.clear();
@@ -117,7 +119,7 @@ public class PrepositionPhraseProcessorTest {
 		List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(), stprovider.getSemanticTypes());
 		tokens = partOfSpeechAnnotator.annotate(tokens, entity);
 		nounrelationshipProcessor.process(tokens, relationshipInput);
-		tokens = prepPhraseProcessor.process(tokens, new PrepositionPhraseProcessingInput());
+		tokens = prepPhraseProcessor.process(tokens, new PrepositionPhraseProcessingInputFactory().create());
 	    
 		List<WordToken> annotatedTokens = tokens.stream().filter(a -> a.getPropertyValueType()== PropertyValueTypes.PrepPhraseEnd).collect(Collectors.toList());
 		

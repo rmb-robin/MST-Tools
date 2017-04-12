@@ -26,6 +26,7 @@ import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.NounRelationshipProcessor;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
 import com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl;
+import com.mst.sentenceprocessing.PrepositionPhraseProcessingInputFactory;
 import com.mst.sentenceprocessing.PrepositionPhraseProcessorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.testHelpers.NGramsHardCodedProvider;
@@ -39,8 +40,6 @@ import edu.stanford.nlp.ling.Word;
 
 public class PrepPhraseRelationshipProcessorTest {
 
-	
-	
 	NGramsSentenceProcessorImpl ngramProcessor = new NGramsSentenceProcessorImpl();
 	PrepositionPhraseProcessorImpl prepPhraseProcessor = new PrepositionPhraseProcessorImpl();
 	NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
@@ -50,7 +49,7 @@ public class PrepPhraseRelationshipProcessorTest {
 	
 	SemanticTypeSentenceAnnotatorImpl stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
 	SemanticTypeHardCodedProvider stprovider = new SemanticTypeHardCodedProvider();
-	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getNounRelationships("f_related",7);
+	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getNounRelationships(7);
 	RelationshipProcessor nounrelationshipProcessor = new NounRelationshipProcessor();
 
 	PrepPhraseRelationshipProcessorImpl prepRelationshipProcessor = new PrepPhraseRelationshipProcessorImpl();
@@ -121,8 +120,6 @@ public class PrepPhraseRelationshipProcessorTest {
 		tokenRelationship = getExpectedTokenRelationship("modified", "recommended", "patient");
 		addToMap(tokenRelationship);
 		runAssert(true,"No follow up ultrasound recommended in this postmenopausal post ovarian cancer treated patient as new labs negative for ca125.", relationships);
-		
-		
 	}
 	
 	
@@ -197,7 +194,7 @@ public class PrepPhraseRelationshipProcessorTest {
 		List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(), stprovider.getSemanticTypes());
 		tokens = partOfSpeechAnnotator.annotate(tokens, entity);
 		nounrelationshipProcessor.process(tokens, relationshipInput);
-		tokens = prepPhraseProcessor.process(tokens, new PrepositionPhraseProcessingInput());
+		tokens = prepPhraseProcessor.process(tokens, new PrepositionPhraseProcessingInputFactory().create());
 
 		List<TokenRelationship> relationships = prepRelationshipProcessor.process(tokens, relationshipMappings );
 		
