@@ -20,10 +20,11 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 	public List<TokenRelationship>  process(List<WordToken> tokens,VerbPhraseInput input) {
 		this.wordTokens = tokens;
 		this.verbPhraseInput = input;
-		return createRelationships();
+		createAnnotations();
+		return null;
 	}
 	
-	private List<TokenRelationship> createRelationships(){
+	private void createAnnotations(){
 		for(int i =0;i<wordTokens.size();i++){
 			WordToken wordToken = wordTokens.get(i);
 			if(isVerb(wordToken))
@@ -35,10 +36,8 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 				WordToken subjectComplement = findSubjectComplement(verbIndexes.get(verbIndexes.size()-1));
 				if(subjectComplement!=null)
 					annotateWordToken(subjectComplement,PropertyValueTypes.SubjectComplement);
-			
 			}
 		}
-		return new ArrayList<TokenRelationship>();
 	}
 	
 	
@@ -51,8 +50,7 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 		if(verbIndex==1){
 			WordToken firstWord = wordTokens.get(0);
 			if(verbPhraseInput.getFirstWordSubjects().contains(firstWord.getToken()))return firstWord;
-			if(firstWord.getSemanticType()==null)return null;
-			if(verbPhraseInput.getStTypes().contains(firstWord.getSemanticType())) return firstWord;
+			if(isSemanticTypeMatch(firstWord)) return firstWord;
 			return null;
 		}
 	
@@ -62,15 +60,67 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 			
 			if(lookForPos && wordToken.getPos()==PartOfSpeachTypes.IN){
 				WordToken subject = findSubjectAfterPosIn(i, wordToken);
+				WordToken subjectPrevious = findSubjectCompound(i-2);
 				if(subject!=null) return subject;
 				lookForPos = false;
 			}
 			
-			if(wordToken.getPropertyValueType()==PropertyValueTypes.NounPhraseEnd) return wordToken;
-			if(wordToken.getSemanticType()!=null && verbPhraseInput.getStTypes().contains(wordToken.getSemanticType())) return wordToken;
+			if(wordToken.getPropertyValueType()==PropertyValueTypes.NounPhraseEnd)
+			{
+					int compoundSubjectIndex = findCompoundSubjectFromNounPhrase(i);
+					return wordToken;
+			}
+			if(isSemanticTypeMatch(wordToken)) {
+				int compoundSubjectIndex = findCompoundSubjectFromSemanticType(i) + 2;
+				return wordToken;
+			}
 		
 			if(wordToken.getPropertyValueType()==PropertyValueTypes.PrepPhraseEnd)
 				lookForPos = true;
+		}
+		return null;
+	}
+	
+	
+	
+	
+	private boolean isSemanticTypeMatch(WordToken wordToken){
+		return wordToken.getSemanticType()!=null && verbPhraseInput.getStTypes().contains(wordToken.getSemanticType());
+	}
+	
+	
+	private int findCompoundSubjectFromSemanticType(int stIndex){
+		for(int i = stIndex-1; i>= 0;i--){
+			WordToken wordToken = wordTokens.get(i);
+			if(!isSemanticTypeMatch(wordToken))
+				return stIndex;
+			stIndex = i;
+		}
+		return stIndex;
+	}
+	
+
+	
+	private int findCompoundSubjectFromNounPhrase(int nounPhraseEndIndex){
+		for(int i = nounPhraseEndIndex-1; i>= 0;i--){
+			WordToken wordToken = wordTokens.get(i);
+			if(wordToken.getPropertyValueType()== PropertyValueTypes.NounPhraseBegin) return i+2;
+		}
+		return -1;
+	}
+
+	
+	
+//	C2. If the preceding token is POS=coordinating conjunction, then loop through the tokens using the B3 logic above.
+//			Keep looping through the tokens until the condition in C1 is no longer met. In other words, once another subject which 
+//			is at the beginning of the sentence is identified, we can stop looking for another subject.
+
+	private WordToken findSubjectCompound(int index){
+		if(index<=0)return null;
+		WordToken wordToken = wordTokens.get(index);
+		if(wordToken.getPos()== PartOfSpeachTypes.CC)
+		{
+			//do soemthign.
 		}
 		return null;
 	}
@@ -92,6 +142,11 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 				if(wordToken.getPos() == PartOfSpeachTypes.IN)
 					return wordToken;
 			}
+			
+			if(wordToken.getToken().equals(".")) return null;
+			
+			
+			
 			if(wordToken.getPropertyValueType()==PropertyValueTypes.NounPhraseEnd)
 				return wordToken;
 		}
