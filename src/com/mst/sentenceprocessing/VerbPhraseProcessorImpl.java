@@ -15,6 +15,9 @@ import edu.stanford.nlp.ling.Word;
 
 public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
  
+	private final int maxIterationsForSubjectComplement = 3;
+	private final int stOffset = 2;
+	
 	private List<WordToken> wordTokens;
 	VerbPhraseInput verbPhraseInput; 
 	public List<TokenRelationship>  process(List<WordToken> tokens,VerbPhraseInput input) {
@@ -30,28 +33,16 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 			if(isVerb(wordToken))
 			{
 				List<Integer> verbIndexes = findVerbIndexs(wordToken,i,7);
-				WordToken subject = findSubject(verbIndexes.get(0));
-				if(subject!=null) 
-					annotateWordToken(subject, PropertyValueTypes.Subject);
-				WordToken subjectComplement = findSubjectComplement(verbIndexes.get(verbIndexes.size()-1));
-				if(subjectComplement!=null)
-					annotateWordToken(subjectComplement,PropertyValueTypes.SubjectComplement);
+				annotateSubjects(verbIndexes.get(0));
+				annotateSubjectComplement(verbIndexes.get(verbIndexes.size()-1));
 			}
 		}
 	}
-	
-	
-	private void annotateWordToken(WordToken wordToken, PropertyValueTypes propertyValueType){
-		wordToken.setPropertyValueType(propertyValueType);
-	}
-	
-	private WordToken findSubject(int verbIndex){
-		if(verbIndex==0) return null;
+
+	private void annotateSubjects(int verbIndex){
+		if(verbIndex==0) return;
 		if(verbIndex==1){
-			WordToken firstWord = wordTokens.get(0);
-			if(verbPhraseInput.getFirstWordSubjects().contains(firstWord.getToken()))return firstWord;
-			if(isSemanticTypeMatch(firstWord)) return firstWord;
-			return null;
+			if(annotateSubjectsFirstWord()) return;
 		}
 	
 		boolean lookForPos = false;
@@ -60,71 +51,80 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 			
 			if(lookForPos && wordToken.getPos()==PartOfSpeachTypes.IN){
 				WordToken subject = findSubjectAfterPosIn(i, wordToken);
-				WordToken subjectPrevious = findSubjectCompound(i-2);
-				if(subject!=null) return subject;
+				if(subject!=null) 
+				{
+					annotateWordToken(subject, PropertyValueTypes.Subject);
+					return;
+				}
 				lookForPos = false;
 			}
 			
 			if(wordToken.getPropertyValueType()==PropertyValueTypes.NounPhraseEnd)
 			{
-					int compoundSubjectIndex = findCompoundSubjectFromNounPhrase(i);
-					return wordToken;
+					findAndAnnotateCompoundSubjectFromNounPhrase(i);
+					annotateWordToken(wordToken, PropertyValueTypes.Subject);
+					return;
 			}
 			if(isSemanticTypeMatch(wordToken)) {
-				int compoundSubjectIndex = findCompoundSubjectFromSemanticType(i) + 2;
-				return wordToken;
+				findAndAnnotateCompoundSubjectFromSemanticType(i);
+				annotateWordToken(wordToken, PropertyValueTypes.Subject);
+				return;
 			}
 		
 			if(wordToken.getPropertyValueType()==PropertyValueTypes.PrepPhraseEnd)
 				lookForPos = true;
 		}
-		return null;
+		return;
 	}
 	
 	
-	
-	
-	private boolean isSemanticTypeMatch(WordToken wordToken){
-		return wordToken.getSemanticType()!=null && verbPhraseInput.getStTypes().contains(wordToken.getSemanticType());
+	private boolean annotateSubjectsFirstWord(){
+		WordToken firstWord = wordTokens.get(0);
+		if(verbPhraseInput.getFirstWordSubjects().contains(firstWord.getToken()))
+		{
+			annotateWordToken(firstWord, PropertyValueTypes.Subject);
+			return true;
+		}
+		if(isSemanticTypeMatch(firstWord))
+		{
+			annotateWordToken(firstWord, PropertyValueTypes.Subject);
+			return true;
+		}
+		return false;
 	}
 	
+
 	
-	private int findCompoundSubjectFromSemanticType(int stIndex){
+	
+	private void findAndAnnotateCompoundSubjectFromSemanticType(int stIndex){
 		for(int i = stIndex-1; i>= 0;i--){
 			WordToken wordToken = wordTokens.get(i);
 			if(!isSemanticTypeMatch(wordToken))
-				return stIndex;
+			{
+				WordToken subjectCompound = wordTokens.get(stIndex+stOffset);
+				annotateWordToken(subjectCompound, PropertyValueTypes.Subject);
+				return;
+			}
 			stIndex = i;
 		}
-		return stIndex;
+		WordToken subjectCompound = wordTokens.get(stIndex+stOffset);
+		annotateWordToken(subjectCompound, PropertyValueTypes.Subject);
 	}
-	
 
-	
-	private int findCompoundSubjectFromNounPhrase(int nounPhraseEndIndex){
+	private void findAndAnnotateCompoundSubjectFromNounPhrase(int nounPhraseEndIndex){
 		for(int i = nounPhraseEndIndex-1; i>= 0;i--){
 			WordToken wordToken = wordTokens.get(i);
-			if(wordToken.getPropertyValueType()== PropertyValueTypes.NounPhraseBegin) return i+2;
+			if(wordToken.getPropertyValueType()== PropertyValueTypes.NounPhraseBegin) 
+			{
+				if(i<2) return;
+				WordToken compoundSubject =  wordTokens.get(i+2);
+				annotateWordToken(compoundSubject, PropertyValueTypes.Subject);
+				return;
+			}
 		}
-		return -1;
 	}
 
-	
-	
-//	C2. If the preceding token is POS=coordinating conjunction, then loop through the tokens using the B3 logic above.
-//			Keep looping through the tokens until the condition in C1 is no longer met. In other words, once another subject which 
-//			is at the beginning of the sentence is identified, we can stop looking for another subject.
 
-	private WordToken findSubjectCompound(int index){
-		if(index<=0)return null;
-		WordToken wordToken = wordTokens.get(index);
-		if(wordToken.getPos()== PartOfSpeachTypes.CC)
-		{
-			//do soemthign.
-		}
-		return null;
-	}
-	
 	private WordToken findSubjectAfterPosIn(int index, WordToken posInToken){
 		if(index==0) return null;  //change that to nto return.
 		WordToken previous = wordTokens.get(index-1);
@@ -133,24 +133,71 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 		return previous;
 	}
 	
+	private void annotateWordToken(WordToken wordToken, PropertyValueTypes propertyValueType){
+		wordToken.setPropertyValueType(propertyValueType);
+	}
 	
 	
-	private WordToken findSubjectComplement(int verbIndex){
-		for(int i=verbIndex+1;i<wordTokens.size();i++){
-			WordToken wordToken = wordTokens.get(i);
-			if(i-verbIndex==1){
-				if(wordToken.getPos() == PartOfSpeachTypes.IN)
-					return wordToken;
-			}
-			
-			if(wordToken.getToken().equals(".")) return null;
-			
-			
-			
-			if(wordToken.getPropertyValueType()==PropertyValueTypes.NounPhraseEnd)
-				return wordToken;
+	private boolean isSemanticTypeMatch(WordToken wordToken){
+		return wordToken.getSemanticType()!=null && verbPhraseInput.getStTypes().contains(wordToken.getSemanticType());
+	}
+	
+	
+	private void annotateSubjectComplement(int verbIndex){
+		int nextIndex = verbIndex + 1;
+		WordToken nextToken = wordTokens.get(nextIndex);
+		if(nextToken.getToken().equals(".")) return;
+		if(nextToken.getPos() == PartOfSpeachTypes.IN) return;
+		if(processSubjectComplementSTandNounPhrase(nextIndex)) 
+			return;
+		
+		int startIndex = nextIndex + 1;
+		int endIndex = startIndex + maxIterationsForSubjectComplement;
+		
+		for(int i = startIndex;i<=endIndex;i++){
+			if(processSubjectComplementSTandNounPhrase(i)) 
+				return;
 		}
-		return null;	
+	}
+	
+	
+	private boolean processSubjectComplementSTandNounPhrase(int currentIndex){
+		WordToken nextToken = wordTokens.get(currentIndex);
+		if(nextToken.getPropertyValueType() == PropertyValueTypes.NounPhraseBegin){
+			WordToken lastNounToken = getLastTokenInNounPhrase(currentIndex);
+			if(lastNounToken!=null)
+				annotateWordToken(lastNounToken, PropertyValueTypes.SubjectComplement);
+				return true;
+		}
+			
+		if(isSemanticTypeMatch(nextToken)){
+			WordToken lastStTypeToken = getLastSemanticType(currentIndex);
+			annotateWordToken(lastStTypeToken, PropertyValueTypes.SubjectComplement);
+			return true;
+		}
+		return false;
+	}
+	 
+	
+	
+	private WordToken getLastTokenInNounPhrase(int index){
+		for(int i=index+1;i<wordTokens.size();i++){
+			WordToken nextToken = wordTokens.get(i);
+			if(nextToken.getPropertyValueType()==PropertyValueTypes.NounPhraseEnd)
+				return nextToken;
+		}
+		return null;
+	}
+	
+	private WordToken getLastSemanticType(int index){
+		WordToken lastKnownSt = wordTokens.get(index);
+		for(int i=index+1;i<wordTokens.size();i++){
+			WordToken nextToken = wordTokens.get(i);
+			if(!isSemanticTypeMatch(nextToken))
+				return lastKnownSt;
+			lastKnownSt = nextToken;
+		}
+		return lastKnownSt;
 	}
 	
 	private boolean isVerb(WordToken wordToken){
