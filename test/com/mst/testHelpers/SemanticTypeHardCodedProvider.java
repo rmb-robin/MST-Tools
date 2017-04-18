@@ -72,8 +72,8 @@ public class SemanticTypeHardCodedProvider implements SemanticTypeProvider {
 		result.put("salpingo-oophorectomy",	"proc");
 		result.put("appearing",	"appearance");
 		result.put("invasive", 	"qlco");
-		result.put("1",	"cardinal number");
-		result.put("10",	"cardinal number");
+//		result.put("1",	"cardinal number");
+//		result.put("10",	"cardinal number");
 		result.put("adjuvant",	"qlco");
 		result.put("carcinoma",	"dysn");
 		result.put("cervical",	"bpoc");

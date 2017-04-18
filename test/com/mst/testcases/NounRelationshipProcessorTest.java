@@ -1,5 +1,6 @@
 package com.mst.testcases;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,11 +52,18 @@ public class NounRelationshipProcessorTest {
 		SemanticTypeHardCodedProvider provider = new SemanticTypeHardCodedProvider();
 		
 		int index = 0;
+		List<Integer> excludeList = new ArrayList<>();
 		for(Sentence sentence: sentences){
-			
+
+//			if(excludeList.contains(index)) 
+//				{
+//					index+=1;
+//					continue;
+//				}
+				
 			Sentence ngramsProcessedSentence = ngramsProcessor.process(sentence,ngramsProvider.getNGrams());
 			List<WordToken> modifiedTokens = annotator.annotate(ngramsProcessedSentence.getModifiedWordList(), provider.getSemanticTypes());
-			if(index==1){
+			if(index==0){
 				System.out.println("STOP");
 			}
 			List<TokenRelationship> relationships =  processor.process(modifiedTokens, input);
@@ -69,10 +77,9 @@ public class NounRelationshipProcessorTest {
 				System.out.println(tr.getEdgeName());
 				System.out.println("**********************************************");
 			}
-			
-			
 			assertRelations(index, relationships,expectedMap.get(index));
 			index+=1;
+			 
 		}
 	}
 	
