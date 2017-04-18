@@ -18,8 +18,12 @@ public class VerbPhraseInput {
 		firstWordSubjects.add("it");
 		
 		stTypes.add("dysn");
-		stTypes.add("dysn"); //fix
+		stTypes.add("proc"); 
 		stTypes.add("drugpr");		
+		stTypes.add("cardinal number"); 
+		stTypes.add("bpoc"); 
+		
+		
 	}
 	
 	public HashSet<String> getFirstWordSubjects() {

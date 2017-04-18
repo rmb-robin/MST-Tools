@@ -22,9 +22,12 @@ public class WordToken extends GenericToken {
 	private String pos = null;  // part of speech
 	private Verb verb;
 	private PropertyValueTypes propertyValueType;
+	private boolean isSubjectSetFromWildCard;
 	
 	
 	//not sure if staying..
+
+
 
 	private String normalizedForm = null;
 	private ArrayList<SemanticType> semanticTypeList = null;
@@ -467,5 +470,13 @@ public class WordToken extends GenericToken {
 
 	public void setPropertyValueType(PropertyValueTypes propertyValueType) {
 		this.propertyValueType = propertyValueType;
+	}
+	
+	public boolean isSubjectSetFromWildCard() {
+		return isSubjectSetFromWildCard;
+	}
+
+	public void setSubjectSetFromWildCard(boolean isSubjectSetFromWildCard) {
+		this.isSubjectSetFromWildCard = isSubjectSetFromWildCard;
 	}
 }

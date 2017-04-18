@@ -17,7 +17,7 @@ public class NGramsSentenceProcessorImpl implements NgramsSentenceProcessor  {
 		String modifiedSentence = sentence.getOrigSentence();
 		ngramsModifierEntities = sort(ngramsModifierEntities);
 		for(NGramsModifierEntity entity : ngramsModifierEntities){
-			modifiedSentence = modifiedSentence.replaceAll(entity.getOriginalStatement(), entity.getModifiedStatement());
+			modifiedSentence = modifiedSentence.toLowerCase().replaceAll(entity.getOriginalStatement(), entity.getModifiedStatement());
 		}
 		modifiedSentence = cleaner.cleanSentence(modifiedSentence);
 		sentence.setModifiedWordList(tokenizer.splitWords(modifiedSentence));

@@ -35,6 +35,7 @@ public class SemanticTypeHardCodedProvider implements SemanticTypeProvider {
 		result.put("triple negative", "qlco");
 		result.put("radiation",	"proc"); 
 		result.put("colonoscopies",	"proc"); 
+		result.put("ct-scan",	"proc"); 
 		result.put("ovary","bpoc");
 		result.put("cyst","dysn");
 		result.put("treatment",	"proc"); 
@@ -72,6 +73,7 @@ public class SemanticTypeHardCodedProvider implements SemanticTypeProvider {
 		result.put("appearing",	"appearance");
 		result.put("invasive", 	"qlco");
 		result.put("1",	"cardinal number");
+		result.put("10",	"cardinal number");
 		result.put("adjuvant",	"qlco");
 		result.put("carcinoma",	"dysn");
 		result.put("cervical",	"bpoc");

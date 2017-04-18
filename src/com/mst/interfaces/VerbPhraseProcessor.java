@@ -7,5 +7,5 @@ import com.mst.model.gentwo.TokenRelationship;
 import com.mst.model.gentwo.VerbPhraseInput;
 
 public interface VerbPhraseProcessor {
-	List<TokenRelationship> process(List<WordToken> tokens, VerbPhraseInput input);
+	List<WordToken> process(List<WordToken> tokens, VerbPhraseInput input);
 }

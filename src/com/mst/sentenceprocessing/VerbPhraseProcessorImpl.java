@@ -20,11 +20,11 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 	
 	private List<WordToken> wordTokens;
 	VerbPhraseInput verbPhraseInput; 
-	public List<TokenRelationship>  process(List<WordToken> tokens,VerbPhraseInput input) {
+	public List<WordToken>  process(List<WordToken> tokens,VerbPhraseInput input) {
 		this.wordTokens = tokens;
 		this.verbPhraseInput = input;
 		createAnnotations();
-		return null;
+		return this.wordTokens;
 	}
 	
 	private void createAnnotations(){
@@ -65,7 +65,7 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 					annotateWordToken(wordToken, PropertyValueTypes.Subject);
 					return;
 			}
-			if(isSemanticTypeMatch(wordToken)) {
+			if(isSemanticTypeMatch(wordToken) && wordToken.getPropertyValueType()!= PropertyValueTypes.PrepPhraseEnd) {
 				findAndAnnotateCompoundSubjectFromSemanticType(i);
 				annotateWordToken(wordToken, PropertyValueTypes.Subject);
 				return;
@@ -79,36 +79,39 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 	
 	
 	private boolean annotateSubjectsFirstWord(){
-		WordToken firstWord = wordTokens.get(0);
-		if(verbPhraseInput.getFirstWordSubjects().contains(firstWord.getToken()))
+		WordToken firstToken = wordTokens.get(0);
+		if(verbPhraseInput.getFirstWordSubjects().contains(firstToken.getToken().toLowerCase()))
 		{
-			annotateWordToken(firstWord, PropertyValueTypes.Subject);
+			annotateWordToken(firstToken, PropertyValueTypes.Subject);
 			return true;
 		}
-		if(isSemanticTypeMatch(firstWord))
+		if(isSemanticTypeMatch(firstToken))
 		{
-			annotateWordToken(firstWord, PropertyValueTypes.Subject);
+			annotateWordToken(firstToken, PropertyValueTypes.Subject);
 			return true;
 		}
-		return false;
+		
+		annotateWordToken(firstToken, PropertyValueTypes.Subject);
+		firstToken.setSubjectSetFromWildCard(true);
+		return true;
 	}
 	
 
-	
-	
 	private void findAndAnnotateCompoundSubjectFromSemanticType(int stIndex){
 		for(int i = stIndex-1; i>= 0;i--){
 			WordToken wordToken = wordTokens.get(i);
-			if(!isSemanticTypeMatch(wordToken))
-			{
-				WordToken subjectCompound = wordTokens.get(stIndex+stOffset);
-				annotateWordToken(subjectCompound, PropertyValueTypes.Subject);
+			if(isSemanticTypeMatch(wordToken)){
+				annotateWordToken(wordToken, PropertyValueTypes.Subject);
+				if(i>1){
+					if(wordTokens.get(i-1).getToken().equals(",")) 
+						continue;
+				}
 				return;
 			}
 			stIndex = i;
 		}
-		WordToken subjectCompound = wordTokens.get(stIndex+stOffset);
-		annotateWordToken(subjectCompound, PropertyValueTypes.Subject);
+	//	WordToken subjectCompound = wordTokens.get(stIndex+stOffset);
+	//	annotateWordToken(subjectCompound, PropertyValueTypes.Subject);
 	}
 
 	private void findAndAnnotateCompoundSubjectFromNounPhrase(int nounPhraseEndIndex){
@@ -116,8 +119,8 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 			WordToken wordToken = wordTokens.get(i);
 			if(wordToken.getPropertyValueType()== PropertyValueTypes.NounPhraseBegin) 
 			{
-				if(i<2) return;
-				WordToken compoundSubject =  wordTokens.get(i+2);
+				//if(i<2) return;
+				WordToken compoundSubject =  wordTokens.get(i);
 				annotateWordToken(compoundSubject, PropertyValueTypes.Subject);
 				return;
 			}
@@ -144,18 +147,30 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 	
 	
 	private void annotateSubjectComplement(int verbIndex){
+		int twoTokensAwayIndex = verbIndex+2;
+		if(twoTokensAwayIndex >=wordTokens.size()) return;
+		WordToken twoTokensAway = wordTokens.get(twoTokensAwayIndex);
+		if(twoTokensAway.getToken().equals("."))
+		{
+			annotateWordToken(wordTokens.get(verbIndex+1), PropertyValueTypes.SubjectComplement);
+			return;
+		}
+		
 		int nextIndex = verbIndex + 1;
+		if(nextIndex>= wordTokens.size()) return;
 		WordToken nextToken = wordTokens.get(nextIndex);
 		if(nextToken.getToken().equals(".")) return;
 		if(nextToken.getPos() == PartOfSpeachTypes.IN) return;
-		if(processSubjectComplementSTandNounPhrase(nextIndex)) 
-			return;
+	
+		int endIndex = Math.min(nextIndex + maxIterationsForSubjectComplement+1, wordTokens.size()-1);
 		
-		int startIndex = nextIndex + 1;
-		int endIndex = startIndex + maxIterationsForSubjectComplement;
-		
-		for(int i = startIndex;i<=endIndex;i++){
+		for(int i = nextIndex;i<=endIndex;i++){
 			if(processSubjectComplementSTandNounPhrase(i)) 
+				return;
+		}
+		
+		for(int i = nextIndex;i<=endIndex;i++){
+			if(processSubjectComplementForPosIn(i)) 
 				return;
 		}
 	}
@@ -163,6 +178,7 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 	
 	private boolean processSubjectComplementSTandNounPhrase(int currentIndex){
 		WordToken nextToken = wordTokens.get(currentIndex);
+		if(nextToken.getToken().equals(".")) return false;
 		if(nextToken.getPropertyValueType() == PropertyValueTypes.NounPhraseBegin){
 			WordToken lastNounToken = getLastTokenInNounPhrase(currentIndex);
 			if(lastNounToken!=null)
@@ -178,6 +194,20 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 		return false;
 	}
 	 
+	
+	private boolean processSubjectComplementForPosIn(int currentIndex){
+		
+		int nextindex = currentIndex + 1;
+		if(nextindex >= wordTokens.size()) return false;
+		
+		WordToken nextToken = wordTokens.get(nextindex);
+		if(nextToken.getPos()==PartOfSpeachTypes.IN)
+		{
+			annotateWordToken(wordTokens.get(currentIndex), PropertyValueTypes.SubjectComplement);
+			return true;
+		} 
+		return false;
+	}
 	
 	
 	private WordToken getLastTokenInNounPhrase(int index){

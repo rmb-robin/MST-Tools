@@ -5,10 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
@@ -18,8 +16,6 @@ import com.mst.model.Sentence;
 import com.mst.model.WordToken;
 import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
 import com.mst.model.gentwo.PrepPhraseRelationshipMapping;
-import com.mst.model.gentwo.PrepositionPhraseProcessingInput;
-import com.mst.model.gentwo.PropertyValueTypes;
 import com.mst.model.gentwo.RelationshipInput;
 import com.mst.model.gentwo.TokenRelationship;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
@@ -34,9 +30,7 @@ import com.mst.testHelpers.RelationshipInputProviderFileImpl;
 import com.mst.testHelpers.PartOfSpeechHardcodedAnnotatorEntityProvider;
 import com.mst.testHelpers.SemanticTypeHardCodedProvider;
 import com.mst.testHelpers.TestDataProvider;
-import com.sun.corba.se.impl.oa.toa.TOA;
-
-import edu.stanford.nlp.ling.Word;
+ 
 
 public class PrepPhraseRelationshipProcessorTest {
 
@@ -160,8 +154,6 @@ public class PrepPhraseRelationshipProcessorTest {
 		addToMap(tokenRelationship);
 	//	runAssert(false,"He is on Lupron, Xtandi, and Zytiga and is also taking a zinc supplement", relationships);
 //		
-		
-		
 //		expected.clear();
 //		expected.add("patient");
 //		

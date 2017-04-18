@@ -20,8 +20,7 @@ public class NGramsHardCodedProvider implements NGramsProvider {
 		result.add(getEntity("as a result of","because of"));
 		result.add(getEntity("due to","because of"));
 		result.add(getEntity("ultrasound guided biopsy","ultrasound-guided-biopsy"));
-		result.add(getEntity("Bone marrow biopsy","Bone-marrow-biopsy"));
-		
+		result.add(getEntity("bone marrow biopsy","bone-marrow-biopsy"));		
 		result.add(getEntity("can have","can-have"));
 		result.add(getEntity("did be","did-be"));
 		result.add(getEntity("did have","did-have"));
@@ -95,6 +94,8 @@ public class NGramsHardCodedProvider implements NGramsProvider {
 		result.add(getEntity("would have been","would-have-been"));
 		result.add(getEntity("would have had","would-have-had"));
 		result.add(getEntity("will have had","will-have-had"));
+		result.add(getEntity("pap smear","pap-smear"));
+		result.add(getEntity("ct scan","ct-scan"));
 		return result;
 	}
 	

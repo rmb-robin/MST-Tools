@@ -4,3 +4,5 @@ complicate,complicates,complicated,complicating,compliace
 compose,composes,composed,composing,build
 measure,measures,measured,measuring,measure
 get,gets,got,gotten
+demonstrate,demonstrates,demonstrated,demonstrating, demonstrate
+appear,appears,appeared,appearing,appear
