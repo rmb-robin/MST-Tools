@@ -21,6 +21,7 @@ import com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl;
 import com.mst.sentenceprocessing.PrepositionPhraseProcessingInputFactory;
 import com.mst.sentenceprocessing.PrepositionPhraseProcessorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
+import com.mst.sentenceprocessing.VerbPhraseInputFactoryImpl;
 import com.mst.sentenceprocessing.VerbPhraseProcessorImpl;
 import com.mst.sentenceprocessing.VerbProcessorImpl;
 import com.mst.testHelpers.NGramsHardCodedProvider;
@@ -199,7 +200,7 @@ public class VerbPhraseProcessorTest {
 		tokens = verbProcessor.process(tokens, verbProcessingInput);
 		nounrelationshipProcessor.process(tokens, relationshipInput);
 		tokens = prepPhraseProcessor.process(tokens, new PrepositionPhraseProcessingInputFactory().create());
-		tokens = verbPhraseProcessor.process(tokens, new VerbPhraseInput());
+		tokens = verbPhraseProcessor.process(tokens, new VerbPhraseInputFactoryImpl().create());
 
 		List<WordToken> subjectResult = tokens.stream().filter(a-> a.getPropertyValueType()==PropertyValueTypes.Subject).collect(Collectors.toList());	
 		runAssertForSubjectOrComplement(subjects,subjectResult);

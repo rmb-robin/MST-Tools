@@ -55,12 +55,6 @@ public class NounRelationshipProcessorTest {
 		List<Integer> excludeList = new ArrayList<>();
 		for(Sentence sentence: sentences){
 
-//			if(excludeList.contains(index)) 
-//				{
-//					index+=1;
-//					continue;
-//				}
-				
 			Sentence ngramsProcessedSentence = ngramsProcessor.process(sentence,ngramsProvider.getNGrams());
 			List<WordToken> modifiedTokens = annotator.annotate(ngramsProcessedSentence.getModifiedWordList(), provider.getSemanticTypes());
 			if(index==0){

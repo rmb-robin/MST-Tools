@@ -7,11 +7,8 @@ import com.mst.interfaces.VerbPhraseProcessor;
 import com.mst.model.WordToken;
 import com.mst.model.gentwo.PartOfSpeachTypes;
 import com.mst.model.gentwo.PropertyValueTypes;
-import com.mst.model.gentwo.TokenRelationship;
 import com.mst.model.gentwo.VerbPhraseInput;
 import com.mst.model.gentwo.VerbType;
-
-import edu.stanford.nlp.ling.Word;
 
 public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
  
@@ -38,6 +35,28 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 			}
 		}
 	}
+	
+	private void annotateSubjectComplement(int verbIndex){
+		int twoTokensAwayIndex = verbIndex+2;
+		if(twoTokensAwayIndex >=wordTokens.size()) return;
+		WordToken twoTokensAway = wordTokens.get(twoTokensAwayIndex);
+		if(twoTokensAway.getToken().equals("."))
+		{
+			annotateWordToken(wordTokens.get(verbIndex+1), PropertyValueTypes.SubjectComplement);
+			return;
+		}
+		
+		int nextIndex = verbIndex + 1;
+		if(nextIndex>= wordTokens.size()) return;
+		WordToken nextToken = wordTokens.get(nextIndex);
+		if(nextToken.getToken().equals(".")) return;
+		if(nextToken.getPos() == PartOfSpeachTypes.IN) return;
+		int subjectComplementIndex = findSubjectComplement(nextIndex);
+		if(subjectComplementIndex==-1) return;
+		if(doesSubjectComplementCompoundExist(verbIndex,subjectComplementIndex))
+			findSubjectComplement(subjectComplementIndex+1);
+	}
+	
 
 	private void annotateSubjects(int verbIndex){
 		if(verbIndex==0) return;
@@ -146,35 +165,39 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 	}
 	
 	
-	private void annotateSubjectComplement(int verbIndex){
-		int twoTokensAwayIndex = verbIndex+2;
-		if(twoTokensAwayIndex >=wordTokens.size()) return;
-		WordToken twoTokensAway = wordTokens.get(twoTokensAwayIndex);
-		if(twoTokensAway.getToken().equals("."))
-		{
-			annotateWordToken(wordTokens.get(verbIndex+1), PropertyValueTypes.SubjectComplement);
-			return;
-		}
-		
-		int nextIndex = verbIndex + 1;
-		if(nextIndex>= wordTokens.size()) return;
-		WordToken nextToken = wordTokens.get(nextIndex);
-		if(nextToken.getToken().equals(".")) return;
-		if(nextToken.getPos() == PartOfSpeachTypes.IN) return;
+
 	
-		int endIndex = Math.min(nextIndex + maxIterationsForSubjectComplement+1, wordTokens.size()-1);
+	private int findSubjectComplement(int startIndex){
+		int endIndex = Math.min(startIndex + maxIterationsForSubjectComplement+1, wordTokens.size()-1);
 		
-		for(int i = nextIndex;i<=endIndex;i++){
+		for(int i = startIndex;i<=endIndex;i++){
 			if(processSubjectComplementSTandNounPhrase(i)) 
-				return;
+				return i;
 		}
 		
-		for(int i = nextIndex;i<=endIndex;i++){
+		for(int i = startIndex;i<=endIndex;i++){
 			if(processSubjectComplementForPosIn(i)) 
-				return;
+				return i;
 		}
+		return -1;
 	}
 	
+	private boolean doesSubjectComplementCompoundExist(int verbIndex, int subjectComplementIndex){
+		if(verbIndex+1 >= wordTokens.size())return false;
+		WordToken nextToken = wordTokens.get(verbIndex+1);
+		if(nextToken.getPos()!=null){
+			if(nextToken.getPos().equals(PartOfSpeachTypes.IN) || nextToken.getPos().equals(PartOfSpeachTypes.PUNCTUATION)) 
+				return false;
+		}
+		if(subjectComplementIndex>= wordTokens.size())return false;
+		nextToken = wordTokens.get(subjectComplementIndex+1);
+		if(nextToken.getPos()!=null){
+			if(nextToken.getPos().equals(PartOfSpeachTypes.CC) || nextToken.getToken().equals(","))
+			return true; 
+		}
+		return false;
+		
+	}
 	
 	private boolean processSubjectComplementSTandNounPhrase(int currentIndex){
 		WordToken nextToken = wordTokens.get(currentIndex);

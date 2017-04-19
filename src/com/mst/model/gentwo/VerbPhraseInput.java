@@ -12,18 +12,6 @@ public class VerbPhraseInput {
 	public VerbPhraseInput(){
 		firstWordSubjects = new HashSet<>();
 		stTypes = new HashSet<>();
-		
-		firstWordSubjects.add("there");
-		firstWordSubjects.add("this");
-		firstWordSubjects.add("it");
-		
-		stTypes.add("dysn");
-		stTypes.add("proc"); 
-		stTypes.add("drugpr");		
-		stTypes.add("cardinal number"); 
-		stTypes.add("bpoc"); 
-		
-		
 	}
 	
 	public HashSet<String> getFirstWordSubjects() {
