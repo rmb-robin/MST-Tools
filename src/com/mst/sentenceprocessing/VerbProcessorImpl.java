@@ -2,13 +2,13 @@ package com.mst.sentenceprocessing;
 
 import java.util.List;
 import com.mst.interfaces.VerbProcessor;
+import com.mst.model.metadataTypes.VerbTense;
+import com.mst.model.metadataTypes.VerbType;
 import com.mst.model.sentenceProcessing.ActionVerbItem;
 import com.mst.model.sentenceProcessing.ActionVerbTable;
 import com.mst.model.sentenceProcessing.LinkingModalVerbItem;
 import com.mst.model.sentenceProcessing.Verb;
 import com.mst.model.sentenceProcessing.VerbProcessingInput;
-import com.mst.model.sentenceProcessing.VerbTense;
-import com.mst.model.sentenceProcessing.VerbType;
 import com.mst.model.sentenceProcessing.WordToken;
 
 public class VerbProcessorImpl implements VerbProcessor {

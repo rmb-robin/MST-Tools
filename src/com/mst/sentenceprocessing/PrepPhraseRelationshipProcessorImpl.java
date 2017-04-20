@@ -7,9 +7,9 @@ import java.util.Map;
 
 import com.mst.interfaces.PrepPhraseRelationshipProcessor;
 import com.mst.interfaces.RelationshipProcessor;
-import com.mst.model.sentenceProcessing.PartOfSpeachTypes;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
+import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.sentenceProcessing.PrepPhraseRelationshipMapping;
-import com.mst.model.sentenceProcessing.PropertyValueTypes;
 import com.mst.model.sentenceProcessing.RelationshipInput;
 import com.mst.model.sentenceProcessing.RelationshipMapping;
 import com.mst.model.sentenceProcessing.TokenRelationship;

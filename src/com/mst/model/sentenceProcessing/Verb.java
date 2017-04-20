@@ -1,5 +1,8 @@
 package com.mst.model.sentenceProcessing;
 
+import com.mst.model.metadataTypes.VerbTense;
+import com.mst.model.metadataTypes.VerbType;
+
 public class Verb {
 
 	private VerbType verbType; 

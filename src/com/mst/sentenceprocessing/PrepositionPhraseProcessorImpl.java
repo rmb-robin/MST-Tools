@@ -3,9 +3,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import com.mst.interfaces.PrepositionPhraseProcessor;
-import com.mst.model.sentenceProcessing.PartOfSpeachTypes;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
+import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.sentenceProcessing.PrepositionPhraseProcessingInput;
-import com.mst.model.sentenceProcessing.PropertyValueTypes;
 import com.mst.model.sentenceProcessing.WordToken;
 
 

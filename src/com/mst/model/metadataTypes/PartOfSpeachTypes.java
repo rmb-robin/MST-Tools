@@ -1,4 +1,4 @@
-package com.mst.model.sentenceProcessing;
+package com.mst.model.metadataTypes;
 
 public class PartOfSpeachTypes {
 

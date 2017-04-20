@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mst.interfaces.VerbPhraseProcessor;
-import com.mst.model.sentenceProcessing.PartOfSpeachTypes;
-import com.mst.model.sentenceProcessing.PropertyValueTypes;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
+import com.mst.model.metadataTypes.PropertyValueTypes;
+import com.mst.model.metadataTypes.VerbType;
 import com.mst.model.sentenceProcessing.VerbPhraseInput;
-import com.mst.model.sentenceProcessing.VerbType;
 import com.mst.model.sentenceProcessing.WordToken;
 
 public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {

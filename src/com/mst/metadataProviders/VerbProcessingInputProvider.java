@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.UUID;
 
 import com.mst.interfaces.LinkingModalVerbItemFactory;
+import com.mst.model.metadataTypes.VerbTense;
 import com.mst.model.sentenceProcessing.ActionVerbItem;
 import com.mst.model.sentenceProcessing.ActionVerbTable;
 import com.mst.model.sentenceProcessing.LinkingModalVerbItem;
 import com.mst.model.sentenceProcessing.VerbProcessingInput;
-import com.mst.model.sentenceProcessing.VerbTense;
 import com.mst.sentenceprocessing.LinkingModalVerbItemFactoryImpl;
 
 public class VerbProcessingInputProvider {

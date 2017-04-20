@@ -2,6 +2,8 @@ package com.mst.model.sentenceProcessing;
 
 import java.util.UUID;
 
+import com.mst.model.metadataTypes.VerbTense;
+
 public class ActionVerbItem {
 
 	private UUID id; 

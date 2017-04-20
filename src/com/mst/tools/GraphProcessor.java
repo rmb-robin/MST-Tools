@@ -371,7 +371,7 @@ public class GraphProcessor {
 			for(VerbPhraseToken subjc : vpm.getSubjC()) {
 				String subjcST = words.get(subjc.getPosition()).getSemanticType();
 				String frame = null;
-				boolean subjcNumeric = words.get(subjc.getPosition()).isNumericPOS();
+				boolean subjcNumeric = false; //words.get(subjc.getPosition()).isNumericPOS();
 				
 				// https://docs.google.com/spreadsheets/d/1aac5QCAUeiGR67FY9_vYE-ONEQ60oqMuf4XhrxSU77I/edit#gid=180671387
 				// 4a
