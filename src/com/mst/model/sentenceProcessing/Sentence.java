@@ -55,31 +55,6 @@ public class Sentence {
 		this.processDate = new Date();
 	}
 	
-	private int getEntityTokenCount(int start, int end) {
-		int count = 0;
-		
-		// certain types of tokens do not get considered when tallying the token count
-		
-		for(int i=start; i < start+end; i++) {
-			WordToken word = modifiedWordList.get(i); 
-			if(!ignoreToken(word))
-				count++;
-		}
-		
-		return count;
-	}
-	
-	public int getCuratedTokenCount() {
-		return getEntityTokenCount(0, modifiedWordList.size());
-	}
-	
-	private boolean ignoreToken(WordToken word) {
-		return word.isPunctuation() || 
-			   word.isDeterminerPOS() || 
-			   word.isConjunctionPOS() || 
-			   word.isNegationSignal();
-	}
-	
 	public SentenceMetadata getMetadata() { return metadata; }
 	
 	public void setMetadata(SentenceMetadata val) { metadata = val; }

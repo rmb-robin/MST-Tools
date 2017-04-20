@@ -269,11 +269,6 @@ public class WordToken extends GenericToken {
 		avObj = val;
 	}
 	
-	//togo.
-	public boolean containsSemanticType(String regex) {
-		return true;
-	}
-	
 	public boolean isPunctuation() {
 		// !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
 		//return getToken().matches(Constants.PUNC);
