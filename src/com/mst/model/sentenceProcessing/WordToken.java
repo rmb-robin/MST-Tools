@@ -16,34 +16,6 @@ public class WordToken extends GenericToken {
 	private boolean isSubjectSetFromWildCard;
 	
 	
-
-	
-	private Boolean npHead; // noun phrase head
-	private Boolean npMod; // noun phrase modifier
-	private Boolean ppMember; // prep phrase member
-	private Boolean ppBegin; // prep phrase begin
-	private Boolean ppObj; // prep phrase object
-	private Boolean infHead; // infinitive verb head
-	private Boolean inf; // infinitive verb
-	private Boolean vob; // verb of being head
-	private Boolean vobSubj; // verb of being subject
-	private Boolean vobSubjC; // verb of being subject complement (aka Object)
-	private Boolean lvSubj; // linking verb subject
-	private Boolean lv; // linking verb 
-	private Boolean lvSubjC; // linking verb subject complement (aka Object)
-	private Boolean av; // action verb
-	private Boolean avSubj; // action verb subject
-	private Boolean avObj; // action verb object
-	private Boolean prepVerb; // prepositional verb
-	private Boolean mv; // modal auxiliary
-	private Boolean mvSubj;
-	private Boolean mvSubjC;
-	private DependentPhraseClass dpBegin; // dependent phrase head
-	private Boolean dpMember; // dependent phrase member
-	private Boolean dpEnd; // dependent phrase member
-	private Boolean coref; // co-reference
-	private Boolean conjAdv; // conjunctive adverb 
-	
 	public WordToken() {
 		super();
 	}
@@ -82,19 +54,7 @@ public class WordToken extends GenericToken {
 		//return getToken().matches(Constants.VERB_SUBJ_SUBJC_EXCLUSIONS);
 		return Constants.VERB_SUBJ_SUBJC_EXCLUSIONS.matcher(getToken()).matches();
 	}
-	
-	public boolean isSubjectComplement() {
-		return vobSubjC != null || lvSubjC != null || avObj != null || mvSubjC != null;
-	}
-	
-	public boolean isVerbPhraseSubject() {
-		return vobSubj != null || lvSubj != null || avSubj != null || mvSubj != null;
-	}
-	
-	public boolean isVerbPhraseVerb() {
-		return vob != null || lv != null || av != null || mv != null;
-	}
-	
+		
 	public boolean isPronounPOS() {	
 		return pos.startsWith("PRP");
 	}
@@ -141,133 +101,6 @@ public class WordToken extends GenericToken {
 		return Constants.MODAL_AUX_VERB.matcher(getToken()).matches();
 	}
 
-	public boolean isModalAuxVerb() {
-		return mv != null;
-	}
-
-	public void setModalAuxVerb(boolean val) {
-		mv = val;
-	}
-
-	public boolean isModalSubject() {
-		return mvSubj != null;
-	}
-
-	public void setModalSubject(boolean val) {
-		mvSubj = val;
-	}
-	
-	public boolean isModalSubjectComplement() {
-		return mvSubjC != null;
-	}
-
-	public void setModalSubjectComplement(boolean val) {
-		mvSubjC = val;
-	}
-	
-	public boolean isCorefernece() {
-		return coref != null;
-	}
-
-	public void setCoreference(boolean val) {
-		coref = val;
-	}
-	
-	public boolean isConjunctiveAdverb() {
-		return conjAdv != null;
-	}
-
-	public void setConjunctiveAdverb(boolean val) {
-		conjAdv = val;
-	}
-	
-	public boolean isInfinitiveVerb() {
-		return inf != null;
-	}
-
-	public void setInfinitiveVerb(boolean val) {
-		inf = val;
-	}
-
-	public boolean isPrepositionalVerb() {
-		return prepVerb != null;
-	}
-
-	public void setPrepositionalVerb(boolean val) {
-		prepVerb = val;
-	}
-	
-	public boolean isVerbOfBeing() {
-		return vob != null;
-	}
-
-	public void setVerbOfBeing(boolean val) {
-		vob = val;
-	}
-
-	public boolean isVerbOfBeingSubject() {
-		return vobSubj != null;
-	}
-
-	public void setVerbOfBeingSubject(boolean val) {
-		vobSubj = val;
-	}
-
-	public boolean isVerbOfBeingSubjectComplement() {
-		return vobSubjC != null;
-	}
-
-	public void setVerbOfBeingSubjectComplement(boolean val) {
-		vobSubjC = val;
-	}
-
-	public boolean isLinkingVerbSubject() {
-		return lvSubj != null;
-	}
-
-	public void setLinkingVerbSubject(boolean val) {
-		lvSubj = val;
-	}
-
-	public boolean isLinkingVerb() {
-		return lv != null;
-	}
-
-	public void setLinkingVerb(boolean val) {
-		lv = val;
-	}
-
-	public boolean isLinkingVerbSubjectComplement() {
-		return lvSubjC != null;
-	}
-
-	public void setLinkingVerbSubjectComplement(boolean val) {
-		lvSubjC = val;
-	}
-
-	public boolean isActionVerb() {
-		return av != null;
-	}
-
-	public void setActionVerb(boolean val) {
-		av = val;
-	}
-
-	public boolean isActionVerbSubject() {
-		return avSubj != null;
-	}
-
-	public void setActionVerbSubject(boolean val) {
-		avSubj = val;
-	}
-	
-	public boolean isActionVerbDirectObject() {
-		return avObj != null;
-	}
-
-	public void setActionVerbDirectObject(boolean val) {
-		avObj = val;
-	}
 	
 	public boolean isPunctuation() {
 		// !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
@@ -311,97 +144,6 @@ public class WordToken extends GenericToken {
 		this.semanticType = semanticType;
 	}
 	
-
-	
-	public void setNounPhraseHead(boolean val) {
-		npHead = val;
-	}
-	
-	public boolean isNounPhraseHead() {
-		return npHead != null;
-	}
-	
-	public void setDependentPhraseBegin(DependentPhraseClass val) {
-		dpBegin = val;
-	}
-	
-	public boolean isDependentPhraseBegin() {
-		return getDependentPhraseBegin() != null;
-	}
-	
-	public DependentPhraseClass getDependentPhraseBegin() {
-		return dpBegin;
-	}
-	
-	public void setDependentPhraseMember(boolean val) {
-		dpMember = val;
-	}
-	
-	public boolean isDependentPhraseMember() {
-		return dpMember != null;
-	}
-	
-	public void setDependentPhraseEnd(boolean val) {
-		dpEnd = val;
-	}
-	
-	public boolean isDependentPhraseEnd() {
-		return dpEnd != null;
-	}
-	
-	public void setInfinitiveHead(boolean val) {
-		infHead = val;
-	}
-	
-	public boolean isInfinitiveHead() {
-		return infHead != null;
-	}
-	
-	public void setNounPhraseModifier(boolean val) {
-		npMod = val;
-	}
-	
-	public boolean isNounPhraseModifier() {
-		return npMod != null;
-	}
-	
-	public boolean isPrepPhraseMember() {
-		return ppMember != null;
-	}
-
-	public void setPrepPhraseMember(boolean val) {
-		ppMember = val;
-	}
-
-	public boolean isPrepPhraseBegin() {
-		return ppBegin != null;
-	}
-
-	public void setPrepPhraseBegin(boolean val) {
-		ppBegin = val;
-	}
-	
-	public boolean isPrepPhraseObject() {
-		return ppObj != null;
-	}
-
-	public void setPrepPhraseObject(boolean val) {
-		ppObj = val;
-	}
-	
-
-	
-	public boolean isWithinVerbPhrase() {
-		return infHead != null || inf != null || vob != null || vobSubj != null || vobSubjC != null || lvSubj != null || lv != null || lvSubjC != null || av != null || avSubj != null || avObj != null || prepVerb != null || mv != null || mvSubj != null || mvSubjC != null;
-	}
-	
-	public boolean isWithinNounPhrase() {
-		return isNounPhraseModifier() || isNounPhraseHead();
-	}
-	
-	public boolean isWithinPrepPhrase() {
-		return isPrepPhraseObject() || isPrepPhraseMember() || isPrepPhraseBegin();
-	}
 	
 	@Override
 	public String toString() {

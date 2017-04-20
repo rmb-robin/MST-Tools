@@ -252,7 +252,7 @@ public class GraphProcessor {
 					setDefaultEdgeProps(e, GraphClass.f_header.toString(), STATE_UNKNOWN, false, VB_INDEX_PROP_DEFAULT);
 					edges.add(e);
 				} else if(word.getToken().matches("measur.*")) {
-					if(next.getPos().equalsIgnoreCase("CD") && !prev.isPrepPhraseObject()) {
+					if(next.getPos().equalsIgnoreCase("CD")){ // && !prev.isPrepPhraseObject()) {
 						//edges.add(new Edge(GraphClass.f_measurement, vertices.get(word.getPosition()-2), vertices.get(next.getPosition()-1)));
 						Edge e = new Edge(GraphClass.f_measurement, vertices.get(word.getPosition()-2), vertices.get(next.getPosition()-1));
 						setDefaultEdgeProps(e, GraphClass.f_measurement.toString(), STATE_UNKNOWN, false, VB_INDEX_PROP_DEFAULT);
@@ -994,56 +994,56 @@ public class GraphProcessor {
 	private List<String> getTokenBooleans(WordToken word) {
 		List<String> out = new ArrayList<>();
 
-		if(word.isNounPhraseHead())
-			out.add("npHead");
-		if(word.isNounPhraseModifier())
-			out.add("npMod");
-		if(word.isPrepPhraseMember())
-			out.add("ppMember");
-		if(word.isPrepPhraseBegin())
-			out.add("ppBegin");
-		if(word.isPrepPhraseObject())
-			out.add("ppObj");
-		if(word.isInfinitiveHead())
-			out.add("infHead");
-		if(word.isInfinitiveVerb())
-			out.add("inf");
-		if(word.isVerbOfBeing())
-			out.add("vob");
-		if(word.isVerbOfBeingSubject())
-			out.add("vobSubj");
-		if(word.isVerbOfBeingSubjectComplement())
-			out.add("vobSubjC");
-		if(word.isLinkingVerb())
-			out.add("lv");
-		if(word.isLinkingVerbSubject())
-			out.add("lvSubj");
-		if(word.isLinkingVerbSubjectComplement())
-			out.add("lvSubjC");
-		if(word.isActionVerb())
-			out.add("av");
-		if(word.isActionVerbSubject())
-			out.add("avSubj");
-		if(word.isActionVerbDirectObject())
-			out.add("avSubjC");
-		if(word.isPrepositionalVerb())
-			out.add("prepVerb");
-		if(word.isModalAuxVerb())
-			out.add("mv");
-		if(word.isModalSubject())
-			out.add("mvSubj");
-		if(word.isModalSubjectComplement())
-			out.add("mvSubjC");
-		if(word.isDependentPhraseBegin())
-			out.add("dpBegin");
-		if(word.isDependentPhraseMember())
-			out.add("dpMember");
-		if(word.isDependentPhraseEnd())
-			out.add("dpEnd");
-		if(word.isCorefernece())
-			out.add("coref");
-		if(word.isConjunctiveAdverb())
-			out.add("conjAdv");
+//		if(word.isNounPhraseHead())
+//			out.add("npHead");
+//		if(word.isNounPhraseModifier())
+//			out.add("npMod");
+//		if(word.isPrepPhraseMember())
+//			out.add("ppMember");
+//		if(word.isPrepPhraseBegin())
+//			out.add("ppBegin");
+//		if(word.isPrepPhraseObject())
+//			out.add("ppObj");
+//		if(word.isInfinitiveHead())
+//			out.add("infHead");
+//		if(word.isInfinitiveVerb())
+//			out.add("inf");
+//		if(word.isVerbOfBeing())
+//			out.add("vob");
+//		if(word.isVerbOfBeingSubject())
+//			out.add("vobSubj");
+//		if(word.isVerbOfBeingSubjectComplement())
+//			out.add("vobSubjC");
+//		if(word.isLinkingVerb())
+//			out.add("lv");
+//		if(word.isLinkingVerbSubject())
+//			out.add("lvSubj");
+//		if(word.isLinkingVerbSubjectComplement())
+//			out.add("lvSubjC");
+//		if(word.isActionVerb())
+//			out.add("av");
+//		if(word.isActionVerbSubject())
+//			out.add("avSubj");
+//		if(word.isActionVerbDirectObject())
+//			out.add("avSubjC");
+//		if(word.isPrepositionalVerb())
+//			out.add("prepVerb");
+//		if(word.isModalAuxVerb())
+//			out.add("mv");
+//		if(word.isModalSubject())
+//			out.add("mvSubj");
+//		if(word.isModalSubjectComplement())
+//			out.add("mvSubjC");
+//		if(word.isDependentPhraseBegin())
+//			out.add("dpBegin");
+//		if(word.isDependentPhraseMember())
+//			out.add("dpMember");
+//		if(word.isDependentPhraseEnd())
+//			out.add("dpEnd");
+//		if(word.isCorefernece())
+//			out.add("coref");
+//		if(word.isConjunctiveAdverb())
+//			out.add("conjAdv");
 		
 		return out;
 	}
