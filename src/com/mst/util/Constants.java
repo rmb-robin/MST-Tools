@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import redis.clients.jedis.Jedis;
@@ -270,7 +271,7 @@ public class Constants {
 		return String.format("%02d:%02d:%02d", hours, minutes, seconds);
 	}
 	
-	public static WordToken getToken(ArrayList<WordToken> wordList, int index) {
+	public static WordToken getToken(List<WordToken> wordList, int index) {
 		WordToken token = new WordToken();
 		try {
 			token = wordList.get(index);

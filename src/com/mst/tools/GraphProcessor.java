@@ -171,7 +171,7 @@ public class GraphProcessor {
 			Vertex vPractice = new Vertex(GraphClass.Practice, md5(s.getPractice()), s.getPractice(), 0);
 			Vertex vStudy = new Vertex(GraphClass.Study, md5(s.getPractice()+s.getStudy()), s.getStudy(), 0);
 			Vertex vID = new Vertex(GraphClass.ID, md5(s.getPractice()+s.getStudy()+s.getId()), s.getId(), 0);
-			String date = orientSDF.format(s.getProcedureDate());
+			String date = orientSDF.format(s.getProcessDate());
 			Vertex vProcedureDate = new Vertex(GraphClass.Date, md5(s.getPractice()+s.getStudy()+date.toString()), date.toString(), 0);
 			Vertex vSentence = new Vertex(GraphClass.Sentence, sentenceUUID, s.getFullSentence(), (int) s.getPosition());
 			Vertex vDiscrete = new Vertex(GraphClass.Discrete, md5(sentenceUUID + s.getId()), "", (int) 0);
@@ -179,9 +179,7 @@ public class GraphProcessor {
 			Vertex vPlaceholder = new Vertex(GraphClass.Token, md5(sentenceUUID + s.getModifiedWordList().size()), PLACEHOLDER, 0);
 			
 			// create properties for all simple metadata on Sentence vertex  
-			for(String key : s.getMetadata().getSimpleMetadata().keySet()) {
-				vSentence.getProps().put(key, s.getMetadata().getSimpleMetadata().get(key));
-			}
+			 
 					
 			// sentence edges
 			// new way - sentence links to everything
@@ -217,21 +215,21 @@ public class GraphProcessor {
 			vertices.add(vSentence);
 			vertices.add(vPlaceholder);
 			
-			SentenceMetadata metadata = s.getMetadata();
+//			SentenceMetadata metadata = s.getMetadata();
+//			
+//			vSentence.getProps().put("nounPhraseCount", metadata.getNounMetadata().size());
+//			vSentence.getProps().put("prepPhraseCount", metadata.getPrepMetadata().size());
+//			vSentence.getProps().put("verbPhraseCount", metadata.getVerbMetadata().size());
+//			vSentence.getProps().put("depPhraseCount", metadata.getDependentMetadata().size());
+//			vSentence.getProps().put("orphanCount", metadata.getOrphans().size());
 			
-			vSentence.getProps().put("nounPhraseCount", metadata.getNounMetadata().size());
-			vSentence.getProps().put("prepPhraseCount", metadata.getPrepMetadata().size());
-			vSentence.getProps().put("verbPhraseCount", metadata.getVerbMetadata().size());
-			vSentence.getProps().put("depPhraseCount", metadata.getDependentMetadata().size());
-			vSentence.getProps().put("orphanCount", metadata.getOrphans().size());
-			
-			processVerbPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata, vPlaceholder);
-			
-			// this picks up prep phrases that are not related to a verb phrase
-			processPrepPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata);
-			
-			createDependentPhraseStructureEdges(edges, vertices, metadata);
-			
+//		
+			//	processVerbPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata, vPlaceholder);
+//			
+//			// this picks up prep phrases that are not related to a verb phrase
+//			processPrepPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata);
+//			
+//			createDependentPhraseStructureEdges(edges, vertices, metadata);
 			// TODO move this into its own function
 			// Frames unbounded by a known phrase type
 			for(int i=0; i < s.getModifiedWordList().size(); i++) {
@@ -261,9 +259,9 @@ public class GraphProcessor {
 				}
 			}
 			
-			processNounPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata);
-			
-			processDiscreteData(edges, vertices, s.getDiscrete(), vID, vDiscrete);
+//			processNounPhraseMetadata(edges, vertices, s.getModifiedWordList(), metadata);
+//			
+//			processDiscreteData(edges, vertices, s.getDiscrete(), vID, vDiscrete);
 			
 			//List<Edge> list = new ArrayList<>(edges);
 			//list.sort(Comparator.comparing(e -> e.getId()));
@@ -315,7 +313,7 @@ public class GraphProcessor {
 		return edge;
 	}
 	
-	private void createVerbPhraseStructureEdges(Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
+	private void createVerbPhraseStructureEdges(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
 		
 		for(VerbPhraseMetadata vpm : metadata.getVerbMetadata()) {
 			
@@ -345,7 +343,7 @@ public class GraphProcessor {
 		}
 	}
 	
-	private void createVerbPhraseFrameEdgesV2(Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
+	private void createVerbPhraseFrameEdgesV2(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
 		
 		int vbIndex = 0;
 		
@@ -493,7 +491,7 @@ public class GraphProcessor {
 		}
 	}
 	
-	private void processPrepPhrasesModifyingVerbComponents(VerbPhraseMetadata vpm, Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, SentenceMetadata metadata, Vertex placeholder, int vbIndex) {
+	private void processPrepPhrasesModifyingVerbComponents(VerbPhraseMetadata vpm, Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata, Vertex placeholder, int vbIndex) {
 		
 		List<PrepPhraseMetadata> ppm = metadata.getPrepMetadata();
 		
@@ -628,12 +626,12 @@ public class GraphProcessor {
 		return ret;
 	}
 	
-	private void processVerbPhraseMetadata(Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
+	private void processVerbPhraseMetadata(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata, Vertex placeholder) {
 		createVerbPhraseStructureEdges(edges, vertices, words, metadata, placeholder);
 		createVerbPhraseFrameEdgesV2(edges, vertices, words, metadata, placeholder);
 	}
 	
-	private void processNounPhraseMetadata(Set<Edge> edges, List<Vertex> vertices, ArrayList<WordToken> words, SentenceMetadata metadata) {
+	private void processNounPhraseMetadata(Set<Edge> edges, List<Vertex> vertices, List<WordToken> words, SentenceMetadata metadata) {
 		createNounPhraseStructureEdges(edges, vertices, words, metadata);
 		
 		for(NounPhraseMetadata npm : metadata.getNounMetadata()) {

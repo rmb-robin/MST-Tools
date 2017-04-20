@@ -20,24 +20,11 @@ public class Sentence {
 	private String origSentence;
 	private String normalizedSentence;
 	private Date processDate;
-	private Date procedureDate;
-	//private ArrayList<WordToken> wordList;
 	
 	private List<String> originalWords;
-	private ArrayList<WordToken> modifiedWordList = new ArrayList<>();
-	
-	// a period is counted as token id.... leave them for now..might remove..
-	private ArrayList<WordToken> nonPuncWordList = new ArrayList<>();
-	private ArrayList<WordToken> puncOnlyWordList = new ArrayList<>();
-	
-	
-
-	
-	//is going away.. need to find code references...
-	private SentenceMetadata metadata = new SentenceMetadata();
+	private List<WordToken> modifiedWordList = new ArrayList<>();
+	private List<TokenRelationship> tokenRelationships = new ArrayList<>();
 	private String id, source, practice, study;
-	private HashMap<String, String> discrete = new HashMap<>();
-	private List<ObjectId> structuredOIDs = new ArrayList<>();
 	
 	public Sentence() {	
 		this.processDate = new Date();
@@ -53,18 +40,6 @@ public class Sentence {
 		this.origSentence = fullSentence;
 		this.normalizedSentence = fullSentence;
 		this.processDate = new Date();
-	}
-	
-	public SentenceMetadata getMetadata() { return metadata; }
-	
-	public void setMetadata(SentenceMetadata val) { metadata = val; }
-	
-	public HashMap<String, String> getDiscrete() {
-		return this.discrete;
-	}
-	
-	public void setDiscrete(HashMap<String, String> map) {
-		this.discrete = map;
 	}
 	
 	public void setId(String id) {
@@ -130,24 +105,7 @@ public class Sentence {
 	public void setOrigSentence(String sentence) {
 		this.origSentence = sentence;
 	}
-	
-	
-	public void setNonPuncWordList(ArrayList<WordToken> nonPuncWordList) {
-		this.nonPuncWordList = nonPuncWordList;
-	}
-	
-	public ArrayList<WordToken> getNonPuncWordList() {
-		return this.nonPuncWordList;
-	}
-	
-	public void setPuncOnlyWordList(ArrayList<WordToken> puncOnlyWordList) {
-		this.puncOnlyWordList = puncOnlyWordList;
-	}
-	
-	public ArrayList<WordToken> getPuncOnlyWordList() {
-		return this.puncOnlyWordList;
-	}
-	
+
 	public void setProcessDate(Date processDate) {
 		this.processDate = processDate;
 	}
@@ -156,27 +114,11 @@ public class Sentence {
 		return this.processDate;
 	}
 
-	public void setProcedureDate(Date procedureDate) {
-		this.procedureDate = procedureDate;
-	}
-	
-	public Date getProcedureDate() {
-		return this.procedureDate;
-	}
-	
-	public List<ObjectId> getStructuredOIDs() {
-		return structuredOIDs;
-	}
-	
-	public void setStructuredOIDs(List<ObjectId> structuredOIDs) {
-		this.structuredOIDs = structuredOIDs;
-	}
- 
-	public ArrayList<WordToken> getModifiedWordList() {
+	public List<WordToken> getModifiedWordList() {
 		return modifiedWordList;
 	}
 
-	public void setModifiedWordList(ArrayList<WordToken> modifiedWordList) {
+	public void setModifiedWordList(List<WordToken> modifiedWordList) {
 		this.modifiedWordList = modifiedWordList;
 	}
 
@@ -186,5 +128,13 @@ public class Sentence {
 
 	public void setOriginalWords(List<String> originalWords) {
 		this.originalWords = originalWords;
+	}
+
+	public List<TokenRelationship> getTokenRelationships() {
+		return tokenRelationships;
+	}
+
+	public void setTokenRelationships(List<TokenRelationship> tokenRelationships) {
+		this.tokenRelationships = tokenRelationships;
 	}
 }
