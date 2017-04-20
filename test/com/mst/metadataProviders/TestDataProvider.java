@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mst.model.SentenceToken;
-import com.mst.model.gentwo.Sentence;
+import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.sentenceprocessing.SentenceCleaner;
 import com.mst.sentenceprocessing.Tokenizer;
 

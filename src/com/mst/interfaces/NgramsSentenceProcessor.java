@@ -2,8 +2,8 @@ package com.mst.interfaces;
 
 import java.util.List;
 
-import com.mst.model.gentwo.NGramsModifierEntity;
-import com.mst.model.gentwo.Sentence;
+import com.mst.model.sentenceProcessing.NGramsModifierEntity;
+import com.mst.model.sentenceProcessing.Sentence;
 
 public interface NgramsSentenceProcessor {
 

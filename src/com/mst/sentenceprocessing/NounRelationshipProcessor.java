@@ -7,11 +7,11 @@ import java.util.HashMap;
 
 import com.mst.interfaces.RelationshipProcessor;
 import com.mst.interfaces.TokenRelationshipFactory;
-import com.mst.model.gentwo.RelationshipMapping;
-import com.mst.model.gentwo.RelationshipInput;
-import com.mst.model.gentwo.PropertyValueTypes;
-import com.mst.model.gentwo.TokenRelationship;
-import com.mst.model.gentwo.WordToken;
+import com.mst.model.sentenceProcessing.PropertyValueTypes;
+import com.mst.model.sentenceProcessing.RelationshipInput;
+import com.mst.model.sentenceProcessing.RelationshipMapping;
+import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.model.sentenceProcessing.WordToken;
 
 import jdk.nashorn.internal.parser.TokenKind;
 

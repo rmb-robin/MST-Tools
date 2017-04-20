@@ -1,6 +1,6 @@
 package com.mst.interfaces;
 
-import com.mst.model.gentwo.LinkingModalVerbItem;
+import com.mst.model.sentenceProcessing.LinkingModalVerbItem;
 
 public interface LinkingModalVerbItemFactory {
 

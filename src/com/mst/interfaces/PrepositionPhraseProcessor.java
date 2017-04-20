@@ -2,8 +2,8 @@ package com.mst.interfaces;
 
 import java.util.List;
 
-import com.mst.model.gentwo.PrepositionPhraseProcessingInput;
-import com.mst.model.gentwo.WordToken;
+import com.mst.model.sentenceProcessing.PrepositionPhraseProcessingInput;
+import com.mst.model.sentenceProcessing.WordToken;
 
 
 public interface PrepositionPhraseProcessor {

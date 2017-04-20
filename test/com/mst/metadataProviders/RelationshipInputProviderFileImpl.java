@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mst.interfaces.NounRelationshipInputProvider;
-import com.mst.model.gentwo.RelationshipMapping;
-import com.mst.model.gentwo.PrepPhraseRelationshipMapping;
-import com.mst.model.gentwo.RelationshipInput;
+import com.mst.model.sentenceProcessing.PrepPhraseRelationshipMapping;
+import com.mst.model.sentenceProcessing.RelationshipInput;
+import com.mst.model.sentenceProcessing.RelationshipMapping;
 
 public class RelationshipInputProviderFileImpl implements NounRelationshipInputProvider {
 

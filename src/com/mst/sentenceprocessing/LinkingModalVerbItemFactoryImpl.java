@@ -1,9 +1,9 @@
 package com.mst.sentenceprocessing;
 
 import com.mst.interfaces.LinkingModalVerbItemFactory;
-import com.mst.model.gentwo.LinkingModalVerbItem;
-import com.mst.model.gentwo.VerbTense;
-import com.mst.model.gentwo.VerbType;
+import com.mst.model.sentenceProcessing.LinkingModalVerbItem;
+import com.mst.model.sentenceProcessing.VerbTense;
+import com.mst.model.sentenceProcessing.VerbType;
 
 public class LinkingModalVerbItemFactoryImpl implements LinkingModalVerbItemFactory {
 

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mst.model.gentwo.*;
+import com.mst.model.sentenceProcessing.*;
 
 import edu.stanford.nlp.ling.Word;
 

@@ -1,7 +1,7 @@
 package com.mst.sentenceprocessing;
 
 import com.mst.interfaces.NounRelationshipInputProvider;
-import com.mst.model.gentwo.RelationshipInput;
+import com.mst.model.sentenceProcessing.RelationshipInput;
 
 public class NounRelationshipInputProviderImpl implements NounRelationshipInputProvider {
 

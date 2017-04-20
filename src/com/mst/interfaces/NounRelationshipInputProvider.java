@@ -1,6 +1,6 @@
 package com.mst.interfaces;
 
-import com.mst.model.gentwo.RelationshipInput;
+import com.mst.model.sentenceProcessing.RelationshipInput;
 
 public interface NounRelationshipInputProvider {
 

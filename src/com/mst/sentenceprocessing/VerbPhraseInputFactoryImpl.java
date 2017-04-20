@@ -3,7 +3,7 @@ package com.mst.sentenceprocessing;
 import java.util.HashSet;
 
 import com.mst.interfaces.VerbPhraseInputFactory;
-import com.mst.model.gentwo.VerbPhraseInput;
+import com.mst.model.sentenceProcessing.VerbPhraseInput;
 
 public class VerbPhraseInputFactoryImpl implements VerbPhraseInputFactory {
 

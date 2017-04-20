@@ -3,9 +3,9 @@ package com.mst.sentenceprocessing;
 import org.joda.time.DateTime;
 
 import com.mst.interfaces.TokenRelationshipFactory;
-import com.mst.model.gentwo.PropertyValueTypes;
-import com.mst.model.gentwo.TokenRelationship;
-import com.mst.model.gentwo.WordToken;
+import com.mst.model.sentenceProcessing.PropertyValueTypes;
+import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.model.sentenceProcessing.WordToken;
 
 public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 

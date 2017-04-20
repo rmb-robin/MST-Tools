@@ -13,7 +13,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.mst.model.gentwo.WordToken;
+import com.mst.model.sentenceProcessing.WordToken;
 
 public class Constants {
 	

@@ -1,7 +1,7 @@
 package com.mst.interfaces;
 
-import com.mst.model.gentwo.TokenRelationship;
-import com.mst.model.gentwo.WordToken;
+import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.model.sentenceProcessing.WordToken;
 
 public interface TokenRelationshipFactory {
 

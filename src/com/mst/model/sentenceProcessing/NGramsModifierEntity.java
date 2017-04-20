@@ -1,4 +1,4 @@
-package com.mst.model.gentwo;
+package com.mst.model.sentenceProcessing;
 
 import java.util.List;
 

@@ -2,8 +2,8 @@ package com.mst.interfaces;
 
 import java.util.List;
 
-import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
-import com.mst.model.gentwo.WordToken;
+import com.mst.model.sentenceProcessing.PartOfSpeechAnnotatorEntity;
+import com.mst.model.sentenceProcessing.WordToken;
 
 public interface PartOfSpeechAnnotator {
 

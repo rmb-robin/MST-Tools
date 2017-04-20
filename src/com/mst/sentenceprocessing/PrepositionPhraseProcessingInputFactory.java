@@ -2,7 +2,7 @@ package com.mst.sentenceprocessing;
 
 import java.util.HashSet;
 
-import com.mst.model.gentwo.PrepositionPhraseProcessingInput;
+import com.mst.model.sentenceProcessing.PrepositionPhraseProcessingInput;
 
 public class PrepositionPhraseProcessingInputFactory {
 

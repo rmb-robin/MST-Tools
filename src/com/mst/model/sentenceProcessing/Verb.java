@@ -1,16 +1,17 @@
-package com.mst.model.gentwo;
+package com.mst.model.sentenceProcessing;
 
-public class LinkingModalVerbItem {
-	private String token; 
-	private VerbType verbType;
-	private VerbTense verbTense; 
+public class Verb {
+
+	private VerbType verbType; 
+	private VerbTense verbTense;
 	private String verbState;
+	private String verbNetClass;
 	
-	public String getToken() {
-		return token;
+	public String getVerbNetClass() {
+		return verbNetClass;
 	}
-	public void setToken(String token) {
-		this.token = token;
+	public void setVerbNetClass(String verbNetClass) {
+		this.verbNetClass = verbNetClass;
 	}
 	public VerbType getVerbType() {
 		return verbType;
@@ -30,5 +31,4 @@ public class LinkingModalVerbItem {
 	public void setVerbState(String verbState) {
 		this.verbState = verbState;
 	}
-
 }

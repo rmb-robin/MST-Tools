@@ -1,6 +1,6 @@
 package com.mst.interfaces;
 
-import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
+import com.mst.model.sentenceProcessing.PartOfSpeechAnnotatorEntity;
 
 public interface PartOfSpeechAnnotatorEntityProvider {
 
