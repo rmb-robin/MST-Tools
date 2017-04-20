@@ -1,5 +1,5 @@
 Original Sentence: She is pending radiation treatment and will follow up with Tamoxifen.
-Modified Sentence: She is pending radiation treatment and will follow-up with Tamoxifen.
+Modified Sentence: she is pending radiation treatment and will follow-up with tamoxifen.
 
 Original Tokens
 She
@@ -16,7 +16,7 @@ Tamoxifen
 .
 
 Modified Tokens
-She
+she
 is
 pending
 radiation
@@ -25,12 +25,12 @@ and
 will
 follow-up
 with
-Tamoxifen
+tamoxifen
 .
 ************************************************
 
 Original Sentence: She is status post bilateral mastectomy, no adjuvant therapy was required.
-Modified Sentence: She is after bilateral mastectomy, no adjuvant therapy was required.
+Modified Sentence: she is after bilateral mastectomy, no adjuvant therapy was required.
 
 Original Tokens
 She
@@ -48,7 +48,7 @@ required
 .
 
 Modified Tokens
-She
+she
 is
 after
 bilateral
@@ -64,8 +64,8 @@ required
 
 Original Sentence: She does not continue to get Pap smears or mammograms but is up to date on colonoscopies and has a 10-year follow up
 CT scans shows a hypodensity due to the stent.
-Modified Sentence: She does not continue to get Pap smears or mammograms but is current on colonoscopies and has a 10-year follow-up
-CT scans shows a hypodensity because of the stent.
+Modified Sentence: she does not continue to get pap-smears or mammograms but is current on colonoscopies and has a 10-year follow-up
+ct-scans shows a hypodensity because of the stent.
 
 Original Tokens
 She
@@ -103,14 +103,13 @@ stent
 .
 
 Modified Tokens
-She
+she
 does
 not
 continue
 to
 get
-Pap
-smears
+pap-smears
 or
 mammograms
 but
@@ -123,8 +122,7 @@ has
 a
 10-year
 follow-up
-CT
-scans
+ct-scans
 shows
 a
 hypodensity
@@ -136,7 +134,7 @@ stent
 ************************************************
 
 Original Sentence: She developed memory loss as a result of a lack of math.
-Modified Sentence: She developed memory loss because of a lack of math.
+Modified Sentence: she developed memory loss because of a lack of math.
 
 Original Tokens
 She
@@ -154,7 +152,7 @@ math
 .
 
 Modified Tokens
-She
+she
 developed
 memory
 loss
@@ -168,7 +166,7 @@ math
 ************************************************
 
 Original Sentence: He is caught up on all diagnostic procedures.
-Modified Sentence: He is caught-up on all diagnostic procedures.
+Modified Sentence: he is caught-up on all diagnostic procedures.
 
 Original Tokens
 He
@@ -182,7 +180,7 @@ procedures
 .
 
 Modified Tokens
-He
+he
 is
 caught-up
 on
@@ -193,7 +191,7 @@ procedures
 ************************************************
 
 Original Sentence: The resulting blood loss does not add up.
-Modified Sentence: The resulting blood loss does not compute.
+Modified Sentence: the resulting blood loss does not compute.
 
 Original Tokens
 The
@@ -207,7 +205,7 @@ up
 .
 
 Modified Tokens
-The
+the
 resulting
 blood
 loss
@@ -218,7 +216,7 @@ compute
 ************************************************
 
 Original Sentence: He cannot drink water prior to the barium swallow.
-Modified Sentence: He cannot drink water before the barium swallow.
+Modified Sentence: he cannot drink water before the barium swallow.
 
 Original Tokens
 He
@@ -234,7 +232,7 @@ swallow
 .
 
 Modified Tokens
-He
+he
 can
 not
 drink
