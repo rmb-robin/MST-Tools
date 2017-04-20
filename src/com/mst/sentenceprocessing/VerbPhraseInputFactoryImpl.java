@@ -30,5 +30,4 @@ public class VerbPhraseInputFactoryImpl implements VerbPhraseInputFactory {
 		input.setStTypes(stTypes);
 		return input;	
 	}
-
 }

@@ -66,16 +66,21 @@ public class VerbProcessingInputProvider {
 	
 	private void processActionVerbLine(String line){
 		String[] contents = line.split(",");
-		ActionVerbItem infinitivePresentItem = createActionVerbItem(VerbTense.InfinitivePresent, null,contents[0]);
+		
+		String verbNetClass = null;
+		if(contents.length==5)
+			verbNetClass = contents[4];
+
+		ActionVerbItem infinitivePresentItem = createActionVerbItem(VerbTense.InfinitivePresent, null,contents[0], verbNetClass);
 		UUID infinitivePresentItemId = infinitivePresentItem.getId();
 		acttionVerbTable.addValue(infinitivePresentItem);
 	
-		acttionVerbTable.addValue(createActionVerbItem(VerbTense.PluralInfinitivePresent,infinitivePresentItemId, contents[1]));
-		acttionVerbTable.addValue(createActionVerbItem(VerbTense.Past,infinitivePresentItemId, contents[2]));
-		acttionVerbTable.addValue(createActionVerbItem(VerbTense.Present,infinitivePresentItemId, contents[3]));
+		acttionVerbTable.addValue(createActionVerbItem(VerbTense.PluralInfinitivePresent,infinitivePresentItemId, contents[1],verbNetClass));
+		acttionVerbTable.addValue(createActionVerbItem(VerbTense.Past,infinitivePresentItemId, contents[2],verbNetClass));
+		acttionVerbTable.addValue(createActionVerbItem(VerbTense.Present,infinitivePresentItemId, contents[3],verbNetClass));
 	}
 	
-	private ActionVerbItem createActionVerbItem(VerbTense tense, UUID infinitivePresentId, String verb){
+	private ActionVerbItem createActionVerbItem(VerbTense tense, UUID infinitivePresentId, String verb, String verbNetClass){
 		ActionVerbItem item = new ActionVerbItem();
 		if(infinitivePresentId ==null){
 			UUID id = UUID.randomUUID();
@@ -87,6 +92,7 @@ public class VerbProcessingInputProvider {
 		
 		item.setInfinitivePresentId(infinitivePresentId);
 		
+		item.setVerbNetClass(verbNetClass);
 		item.setVerb(verb);
 		item.setVerbTense(tense);
 		return item;

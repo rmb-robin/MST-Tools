@@ -182,7 +182,7 @@ public class VerbProcessorTest {
 			assertEquals(1, count);
 			assertEquals("AV",token.getPos());
 			assertEquals("measure", token.getToken());
-			
+			assertEquals("measure", token.getVerb().getVerbNetClass());
 			Verb verb = token.getVerb();
 			assertEquals("AV",token.getPos());
 			assertEquals("AV",token.getPos());

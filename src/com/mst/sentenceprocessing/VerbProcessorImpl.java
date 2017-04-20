@@ -1,8 +1,6 @@
 package com.mst.sentenceprocessing;
 
-import java.util.HashSet;
 import java.util.List;
-
 import com.mst.interfaces.VerbProcessor;
 import com.mst.model.WordToken;
 import com.mst.model.gentwo.ActionVerbItem;
@@ -12,8 +10,6 @@ import com.mst.model.gentwo.Verb;
 import com.mst.model.gentwo.VerbProcessingInput;
 import com.mst.model.gentwo.VerbTense;
 import com.mst.model.gentwo.VerbType;
-
-import edu.stanford.nlp.ling.Word;
 
 public class VerbProcessorImpl implements VerbProcessor {
 
@@ -62,7 +58,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		
 		LinkingModalVerbItem item = verbProcessingInput.getLinkingModalVerbMap().get(key);
 		wordToken.setPos(item.getVerbType().toString());
-		Verb verb = createVerb(item.getVerbTense(),item.getVerbType(),item.getVerbState());
+		Verb verb = createVerb(item.getVerbTense(),item.getVerbType(),item.getVerbState(),null);
 		wordToken.setVerb(verb);
 		return true;
 	}
@@ -76,7 +72,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		
 		ActionVerbItem item = actionVerbTable.getVerbsByWord().get(key);
 		wordToken.setPos(VerbType.AV.toString());	
-		Verb verb = createVerb(item.getVerbTense(), VerbType.AV,null);
+		Verb verb = createVerb(item.getVerbTense(), VerbType.AV,null,item.getVerbNetClass());
 		wordToken.setVerb(verb);
 		
 		if(item.getId()== item.getInfinitivePresentId()) return true;
@@ -85,17 +81,15 @@ public class VerbProcessorImpl implements VerbProcessor {
 			item = actionVerbTable.getVerbyById().get(item.getInfinitivePresentId());
 			wordToken.setToken(item.getVerb());
 		}
-	
 		return true;
-		
-		
 	}
 	
-	private Verb createVerb(VerbTense verbTense, VerbType verbType, String state){
+	private Verb createVerb(VerbTense verbTense, VerbType verbType, String state, String verbNetClass){
 		Verb verb = new Verb();
 		verb.setVerbTense(verbTense);
 		verb.setVerbType(verbType);
 		verb.setVerbState(state);
+		verb.setVerbNetClass(verbNetClass);
 		return verb;
 	}
 

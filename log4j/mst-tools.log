@@ -4684,3 +4684,21 @@
 	at java.io.FileInputStream.open(Unknown Source)
 	at java.io.FileInputStream.<init>(Unknown Source)
 	at java.io.FileInputStream.<init>(Unknown Source)
+2017-04-19 19:41:17.363 ERROR com.mst.util.Props: Error loading properties file. {}
+ java.io.FileNotFoundException: C:\Users\user1\Documents\MST-tools\MST-Tools\target\mst-tools.properties (The system cannot find the file specified)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+2017-04-19 19:49:11.937 ERROR com.mst.util.Props: Error loading properties file. {}
+ java.io.FileNotFoundException: C:\Users\user1\Documents\MST-tools\MST-Tools\target\mst-tools.properties (The system cannot find the file specified)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+2017-04-19 19:50:12.822 ERROR com.mst.util.Props: Error loading properties file. {}
+ java.io.FileNotFoundException: C:\Users\user1\Documents\MST-tools\MST-Tools\target\mst-tools.properties (The system cannot find the file specified)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)

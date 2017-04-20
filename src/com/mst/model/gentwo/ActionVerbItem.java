@@ -8,8 +8,14 @@ public class ActionVerbItem {
 	private UUID InfinitivePresentId;
 	private String verb;
 	private VerbTense verbTense;
+	private String verbNetClass;
 	
-	
+	public String getVerbNetClass() {
+		return verbNetClass;
+	}
+	public void setVerbNetClass(String verbNetClass) {
+		this.verbNetClass = verbNetClass;
+	}
 	public UUID getId() {
 		return id;
 	}

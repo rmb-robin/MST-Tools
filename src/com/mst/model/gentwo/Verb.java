@@ -5,7 +5,14 @@ public class Verb {
 	private VerbType verbType; 
 	private VerbTense verbTense;
 	private String verbState;
-
+	private String verbNetClass;
+	
+	public String getVerbNetClass() {
+		return verbNetClass;
+	}
+	public void setVerbNetClass(String verbNetClass) {
+		this.verbNetClass = verbNetClass;
+	}
 	public VerbType getVerbType() {
 		return verbType;
 	}
