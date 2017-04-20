@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.mst.interfaces.SemanticTypeSentenceAnnotator;
 import com.mst.model.SemanticType;
-import com.mst.model.SemanticTypes;
-import com.mst.model.WordToken;
+import com.mst.model.gentwo.SemanticTypes;
+import com.mst.model.gentwo.WordToken;
 
 import edu.stanford.nlp.ling.Word;
  

@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.mst.interfaces.PartOfSpeechAnnotator;
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
+import com.mst.model.gentwo.WordToken;
 
 public class PartOfSpeechAnnotatorImpl implements PartOfSpeechAnnotator {
 

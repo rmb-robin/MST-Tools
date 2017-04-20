@@ -7,20 +7,21 @@ import java.util.Map;
 import org.junit.Test;
 
 import com.mst.interfaces.RelationshipProcessor;
-import com.mst.model.Sentence;
-import com.mst.model.WordToken;
+import com.mst.metadataProviders.NGramsHardCodedProvider;
+import com.mst.metadataProviders.NounrRelationshipExpectedProvider;
+import com.mst.metadataProviders.RelationshipInputProviderFileImpl;
+import com.mst.metadataProviders.SemanticTypeHardCodedProvider;
+import com.mst.metadataProviders.TestDataProvider;
 import com.mst.model.gentwo.RelationshipMapping;
+import com.mst.model.gentwo.Sentence;
 import com.mst.model.gentwo.RelationshipInput;
 import com.mst.model.gentwo.TokenRelationship;
+import com.mst.model.gentwo.WordToken;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.NounRelationshipProcessor;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
-import com.mst.testHelpers.NGramsHardCodedProvider;
-import com.mst.testHelpers.RelationshipInputProviderFileImpl;
-import com.mst.testHelpers.NounrRelationshipExpectedProvider;
-import com.mst.testHelpers.SemanticTypeHardCodedProvider;
-import com.mst.testHelpers.TestDataProvider;
+
 import static org.junit.Assert.*;
 
 public class NounRelationshipProcessorTest {
@@ -35,7 +36,7 @@ public class NounRelationshipProcessorTest {
 		return TestDataProvider.getSentences(fileText);
 	}
 	
-	@Test
+	//@Test
 	public void process(){
 		List<Sentence> sentences = getSentences();
 		

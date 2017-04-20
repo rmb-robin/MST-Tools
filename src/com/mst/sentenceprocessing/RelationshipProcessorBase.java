@@ -2,7 +2,7 @@ package com.mst.sentenceprocessing;
 
 import java.util.List;
 import com.mst.interfaces.TokenRelationshipFactory;
-import com.mst.model.WordToken;
+import com.mst.model.gentwo.WordToken;
 
 public abstract class RelationshipProcessorBase {
 

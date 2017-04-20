@@ -2,8 +2,6 @@ package com.mst.model.gentwo;
 
 import org.joda.time.DateTime;
 
-import com.mst.model.WordToken;
-
 public class TokenRelationship {
 
 	private String edgeName; 

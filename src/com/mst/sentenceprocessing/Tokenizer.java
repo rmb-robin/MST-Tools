@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mst.model.SentenceToken;
-import com.mst.model.WordToken;
+import com.mst.model.gentwo.WordToken;
 import com.mst.util.Constants;
 
 public class Tokenizer {
@@ -393,7 +393,7 @@ public class Tokenizer {
 			int i=0;
 			
 			for(String word : words) {
-				wordTokens.add(new WordToken(word, null, ++i));
+				wordTokens.add(new WordToken(word, ++i));
 			}
 		} else {
 			//logger.error("com.mst.tools.Tokenizer.replaceChars() produced an empty array. \n Input sentence: {}", sentence);
@@ -420,10 +420,10 @@ public class Tokenizer {
 			for(String word : words) {
 				String xlate = translateMap.get(word.toLowerCase());
 				if(xlate == null)
-					wordTokens.add(new WordToken(word, null, ++i));
+					wordTokens.add(new WordToken(word, ++i));
 				else {
 					for(String token : xlate.split(" "))
-						wordTokens.add(new WordToken(token, null, ++i));
+						wordTokens.add(new WordToken(token, ++i));
 				}
 			}
 		} else {

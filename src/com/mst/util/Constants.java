@@ -13,7 +13,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.mst.model.WordToken;
+import com.mst.model.gentwo.WordToken;
 
 public class Constants {
 	
@@ -170,35 +170,7 @@ public class Constants {
 	private static final String MONGO_DB_HOST = Props.getProperty("mongo_host");
 	private static final String MONGO_DB = Props.getProperty("mongo_db");
 	private static final String REDIS_DB_HOST = Props.getProperty("redis_host");
-	private static final String ORIENT_URI = Props.getProperty("orient_uri");
-	private static final String ORIENT_USER = Props.getProperty("orient_user");
-	private static final String ORIENT_PW = Props.getProperty("orient_pw");
-	
-//	public enum OrientDB {
-//	    INSTANCE;
-	    
-//	    private OrientGraph graph;
-//
-//	    OrientDB() {
-//	    	System.out.println("Established OrientDB connection");
-//	    	System.out.println(ORIENT_URI + " / " + ORIENT_USER + " / " + ORIENT_PW);
-//
-//	        try {
-//	            graph = new OrientGraph(ORIENT_URI, ORIENT_USER, ORIENT_PW);
-//	        } catch(Exception e) {
-//	            System.out.println("Error connecting to OrientDB");
-//	            e.printStackTrace();
-//	        }
-//	    }
-//	    
-//	    public OrientGraph getODB() {
-//	    	return graph;
-//	    }
-//	    
-//	    public void close(){
-//	    	graph.shutdown();
-//	    }
-//	}
+
 	
 	public enum MongoDB {
 	    INSTANCE;

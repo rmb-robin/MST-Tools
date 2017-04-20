@@ -1,4 +1,4 @@
-package com.mst.testHelpers;
+package com.mst.metadataProviders;
 
 import java.util.ArrayList;
 import java.util.Arrays;

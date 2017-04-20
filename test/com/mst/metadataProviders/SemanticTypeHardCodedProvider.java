@@ -1,4 +1,4 @@
-package com.mst.testHelpers;
+package com.mst.metadataProviders;
 
 import java.util.HashMap;
 import java.util.Map;

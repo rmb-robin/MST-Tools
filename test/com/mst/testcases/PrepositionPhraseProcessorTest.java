@@ -9,15 +9,20 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 
 import com.mst.interfaces.RelationshipProcessor;
-import com.mst.model.Sentence;
-import com.mst.model.WordToken;
+import com.mst.metadataProviders.NGramsHardCodedProvider;
+import com.mst.metadataProviders.PartOfSpeechHardcodedAnnotatorEntityProvider;
+import com.mst.metadataProviders.RelationshipInputProviderFileImpl;
+import com.mst.metadataProviders.SemanticTypeHardCodedProvider;
+import com.mst.metadataProviders.TestDataProvider;
 import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
 import com.mst.model.gentwo.PrepositionPhraseProcessingInput;
 import com.mst.model.gentwo.PropertyValueTypes;
 import com.mst.model.gentwo.RelationshipInput;
+import com.mst.model.gentwo.Sentence;
 import com.mst.model.gentwo.Verb;
 import com.mst.model.gentwo.VerbTense;
 import com.mst.model.gentwo.VerbType;
+import com.mst.model.gentwo.WordToken;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.NounRelationshipProcessor;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
@@ -25,11 +30,6 @@ import com.mst.sentenceprocessing.PrepositionPhraseProcessingInputFactory;
 import com.mst.sentenceprocessing.PrepositionPhraseProcessorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.sentenceprocessing.VerbProcessorImpl;
-import com.mst.testHelpers.NGramsHardCodedProvider;
-import com.mst.testHelpers.RelationshipInputProviderFileImpl;
-import com.mst.testHelpers.PartOfSpeechHardcodedAnnotatorEntityProvider;
-import com.mst.testHelpers.SemanticTypeHardCodedProvider;
-import com.mst.testHelpers.TestDataProvider;
 
 public class PrepositionPhraseProcessorTest {
 
@@ -83,9 +83,9 @@ public class PrepositionPhraseProcessorTest {
 		runAssert("She has a cyst in the liver, kidney, and stomach.", expected);
 		
 		expected.clear();
-		expected.add("Lupron");
-		expected.add("Xtandi");
-		expected.add("Zytiga");
+		expected.add("lupron");
+		expected.add("xtandi");
+		expected.add("zytiga");
 		runAssert("He is on Lupron, Xtandi, and Zytiga and is also taking a zinc supplement", expected);
 		
 		expected.clear();

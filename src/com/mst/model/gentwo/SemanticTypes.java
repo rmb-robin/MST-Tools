@@ -1,4 +1,4 @@
-package com.mst.model;
+package com.mst.model.gentwo;
 
 public class SemanticTypes {
 	

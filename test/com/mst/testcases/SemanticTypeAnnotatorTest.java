@@ -6,14 +6,14 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.mst.model.Sentence;
-import com.mst.model.WordToken;
+import com.mst.metadataProviders.NGramsHardCodedProvider;
+import com.mst.metadataProviders.SemanticTypeHardCodedProvider;
+import com.mst.metadataProviders.TestDataProvider;
+import com.mst.model.gentwo.Sentence;
+import com.mst.model.gentwo.WordToken;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.sentenceprocessing.Tokenizer;
-import com.mst.testHelpers.NGramsHardCodedProvider;
-import com.mst.testHelpers.SemanticTypeHardCodedProvider;
-import com.mst.testHelpers.TestDataProvider;
 
 import static org.junit.Assert.*;
 
@@ -123,6 +123,11 @@ public class SemanticTypeAnnotatorTest {
 		result.put("stage",	"neop-stage");
 		result.put("total",	"qlco");
 		result.put("very",  "qlco");
+		result.put("10", "cardinal number");
+		result.put("11", "cardinal number");
+		result.put("67", "cardinal number");
+		result.put("2", "cardinal number");
+		result.put("4", "cardinal number");
 		return result;
 	}
 	

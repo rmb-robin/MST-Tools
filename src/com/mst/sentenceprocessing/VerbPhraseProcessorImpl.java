@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mst.interfaces.VerbPhraseProcessor;
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.PartOfSpeachTypes;
 import com.mst.model.gentwo.PropertyValueTypes;
 import com.mst.model.gentwo.VerbPhraseInput;
 import com.mst.model.gentwo.VerbType;
+import com.mst.model.gentwo.WordToken;
 
 public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
  

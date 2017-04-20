@@ -2,7 +2,6 @@ package com.mst.sentenceprocessing;
 
 import java.util.List;
 import com.mst.interfaces.VerbProcessor;
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.ActionVerbItem;
 import com.mst.model.gentwo.ActionVerbTable;
 import com.mst.model.gentwo.LinkingModalVerbItem;
@@ -10,6 +9,7 @@ import com.mst.model.gentwo.Verb;
 import com.mst.model.gentwo.VerbProcessingInput;
 import com.mst.model.gentwo.VerbTense;
 import com.mst.model.gentwo.VerbType;
+import com.mst.model.gentwo.WordToken;
 
 public class VerbProcessorImpl implements VerbProcessor {
 

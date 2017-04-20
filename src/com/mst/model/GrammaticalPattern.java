@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Joiner;
+import com.mst.model.gentwo.WordToken;
 
 public class GrammaticalPattern {
 	private List<GrammaticalPatternEntity> entities = new ArrayList<>();

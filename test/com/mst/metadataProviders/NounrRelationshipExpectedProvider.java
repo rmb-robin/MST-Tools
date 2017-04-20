@@ -1,11 +1,10 @@
-package com.mst.testHelpers;
+package com.mst.metadataProviders;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.*;
 
 import edu.stanford.nlp.ling.Word;

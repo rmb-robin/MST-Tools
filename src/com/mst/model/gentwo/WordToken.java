@@ -1,23 +1,14 @@
-package com.mst.model;
+package com.mst.model.gentwo;
 
 import java.util.ArrayList;
 
-import com.mst.model.gentwo.PropertyValueTypes;
-import com.mst.model.gentwo.Verb;
+import com.mst.model.GenericToken;
+import com.mst.model.SemanticType;
 import com.mst.util.Constants;
 import com.mst.util.Constants.DependentPhraseClass;
 
 public class WordToken extends GenericToken {
 		
-	// the intent of the abbreviated member var names is to cut down on extraneous bytes in the JSON that gets
-	// passed around all over the place in the camel processes
-	
-	// 7/27/2016 - All booleans were converted to Booleans because they are, by default, null, and nulls
-	// don't get serialized by Gson. The end result is much cleaner JSON because booleans default to false,
-	// which DO get serialized.
-	
-	//reference what can go away....
-	//staying
 	private String semanticType = null;
 	private String pos = null;  // part of speech
 	private Verb verb;
@@ -25,12 +16,7 @@ public class WordToken extends GenericToken {
 	private boolean isSubjectSetFromWildCard;
 	
 	
-	//not sure if staying..
 
-
-
-	private String normalizedForm = null;
-	private ArrayList<SemanticType> semanticTypeList = null;
 	
 	private Boolean npHead; // noun phrase head
 	private Boolean npMod; // noun phrase modifier
@@ -62,19 +48,10 @@ public class WordToken extends GenericToken {
 		super();
 	}
 	
-	public WordToken(String word, String normalizedForm, int position) {
+	public WordToken(String word, int position) {
 		super(word, position);
-		this.setNormalizedForm(normalizedForm);
 	}
-	/*
-	@Override
-	public String getToken() {
-		if(normalizedForm == null)
-			return super.getToken();
-		else
-			return normalizedForm;
-	}
-	*/
+
 	public boolean isNull() {
 		return this.getPosition() == 0;
 	}
@@ -292,17 +269,9 @@ public class WordToken extends GenericToken {
 		avObj = val;
 	}
 	
+	//togo.
 	public boolean containsSemanticType(String regex) {
-		boolean ret = false;
-		for(SemanticType st : semanticTypeList) {
-			if(st.getToken().equalsIgnoreCase(this.getToken())) {
-				if(st.getSemanticType().matches(regex)) {
-					ret = true;
-					break;
-				}
-			}
-		}
-		return ret;
+		return true;
 	}
 	
 	public boolean isPunctuation() {
@@ -347,13 +316,7 @@ public class WordToken extends GenericToken {
 		this.semanticType = semanticType;
 	}
 	
-	public ArrayList<SemanticType> getSemanticTypeList() {
-		return semanticTypeList;
-	}
-	
-	public void setSemanticTypeList(ArrayList<SemanticType> val) {
-		semanticTypeList = val;
-	}
+
 	
 	public void setNounPhraseHead(boolean val) {
 		npHead = val;
@@ -431,13 +394,7 @@ public class WordToken extends GenericToken {
 		ppObj = val;
 	}
 	
-	public String getNormalizedForm() {
-		return normalizedForm;
-	}
 
-	public void setNormalizedForm(String val) {
-		normalizedForm = val;
-	}
 	
 	public boolean isWithinVerbPhrase() {
 		return infHead != null || inf != null || vob != null || vobSubj != null || vobSubjC != null || lvSubj != null || lv != null || lvSubjC != null || av != null || avSubj != null || avObj != null || prepVerb != null || mv != null || mvSubj != null || mvSubjC != null;

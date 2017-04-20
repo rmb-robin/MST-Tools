@@ -1,4 +1,4 @@
-package com.mst.model;
+package com.mst.model.gentwo;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +11,7 @@ import java.util.Set;
 import org.bson.types.ObjectId;
 
 import com.google.common.base.Joiner;
+import com.mst.model.SentenceMetadata;
 
 public class Sentence {
 

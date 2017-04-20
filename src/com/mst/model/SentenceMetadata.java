@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Joiner;
+import com.mst.model.gentwo.WordToken;
 
 // The purpose for metadata, in general, is to ease downstream processing when creating the structured output (JSON that represents Ontology/Snomed mapping).
 // The idea is to choose different processing paths based on features of the sentence, such as (really bad example)...

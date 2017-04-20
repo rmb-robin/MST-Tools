@@ -1,4 +1,4 @@
-package com.mst.testHelpers;
+package com.mst.metadataProviders;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -7,8 +7,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mst.model.Sentence;
 import com.mst.model.SentenceToken;
+import com.mst.model.gentwo.Sentence;
 import com.mst.sentenceprocessing.SentenceCleaner;
 import com.mst.sentenceprocessing.Tokenizer;
 

@@ -7,13 +7,13 @@ import java.util.Map;
 
 import com.mst.interfaces.PrepPhraseRelationshipProcessor;
 import com.mst.interfaces.RelationshipProcessor;
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.PartOfSpeachTypes;
 import com.mst.model.gentwo.PrepPhraseRelationshipMapping;
 import com.mst.model.gentwo.PropertyValueTypes;
 import com.mst.model.gentwo.RelationshipInput;
 import com.mst.model.gentwo.RelationshipMapping;
 import com.mst.model.gentwo.TokenRelationship;
+import com.mst.model.gentwo.WordToken;
 
 
 public class PrepPhraseRelationshipProcessorImpl extends RelationshipProcessorBase implements PrepPhraseRelationshipProcessor { 

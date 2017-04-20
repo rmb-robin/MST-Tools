@@ -2,8 +2,8 @@ package com.mst.interfaces;
 
 import java.util.List;
 
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.VerbProcessingInput;
+import com.mst.model.gentwo.WordToken;
 
 public interface VerbProcessor {
 

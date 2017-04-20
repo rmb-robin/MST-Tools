@@ -3,10 +3,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import com.mst.interfaces.PrepositionPhraseProcessor;
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.PartOfSpeachTypes;
 import com.mst.model.gentwo.PrepositionPhraseProcessingInput;
 import com.mst.model.gentwo.PropertyValueTypes;
+import com.mst.model.gentwo.WordToken;
 
 
 public class PrepositionPhraseProcessorImpl implements PrepositionPhraseProcessor {

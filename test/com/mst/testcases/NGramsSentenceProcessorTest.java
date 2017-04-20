@@ -10,15 +10,15 @@ import java.util.List;
  
 import org.junit.Test;
 
-import com.mst.model.Sentence;
+import com.mst.metadataProviders.NGramsHardCodedProvider;
+import com.mst.metadataProviders.TestDataProvider;
 import com.mst.model.SentenceToken;
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.NGramsModifierEntity;
+import com.mst.model.gentwo.Sentence;
+import com.mst.model.gentwo.WordToken;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.SentenceCleaner;
 import com.mst.sentenceprocessing.Tokenizer;
-import com.mst.testHelpers.NGramsHardCodedProvider;
-import com.mst.testHelpers.TestDataProvider;
 
 import static org.junit.Assert.*;
 

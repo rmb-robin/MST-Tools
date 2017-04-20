@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.mst.interfaces.NgramsSentenceProcessor;
-import com.mst.model.Sentence;
 import com.mst.model.gentwo.NGramsModifierEntity;
+import com.mst.model.gentwo.Sentence;
 
 public class NGramsSentenceProcessorImpl implements NgramsSentenceProcessor  {
 	

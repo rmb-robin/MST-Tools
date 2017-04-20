@@ -2,9 +2,9 @@ package com.mst.interfaces;
 
 import java.util.List;
 
-import com.mst.model.WordToken;
 import com.mst.model.gentwo.RelationshipInput;
 import com.mst.model.gentwo.TokenRelationship;
+import com.mst.model.gentwo.WordToken;
 
 public interface RelationshipProcessor {
 

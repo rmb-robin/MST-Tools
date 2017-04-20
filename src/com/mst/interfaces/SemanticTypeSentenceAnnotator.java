@@ -3,7 +3,7 @@ package com.mst.interfaces;
 import java.util.List;
 import java.util.Map;
 
-import com.mst.model.WordToken; 
+import com.mst.model.gentwo.WordToken; 
  
 public interface SemanticTypeSentenceAnnotator {
 	

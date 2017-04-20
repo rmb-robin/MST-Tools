@@ -7,22 +7,23 @@ import java.util.List;
 import org.junit.Test;
 import org.mongodb.morphia.utils.Assert.AssertionFailedException;
 
-import com.mst.model.Sentence;
-import com.mst.model.WordToken;
+import com.mst.metadataProviders.NGramsHardCodedProvider;
+import com.mst.metadataProviders.PartOfSpeechHardcodedAnnotatorEntityProvider;
+import com.mst.metadataProviders.SemanticTypeHardCodedProvider;
+import com.mst.metadataProviders.TestDataProvider;
+import com.mst.metadataProviders.VerbProcessingInputProvider;
 import com.mst.model.gentwo.PartOfSpeechAnnotatorEntity;
+import com.mst.model.gentwo.Sentence;
 import com.mst.model.gentwo.Verb;
 import com.mst.model.gentwo.VerbProcessingInput;
 import com.mst.model.gentwo.VerbTense;
 import com.mst.model.gentwo.VerbType;
+import com.mst.model.gentwo.WordToken;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.sentenceprocessing.VerbProcessorImpl;
-import com.mst.testHelpers.NGramsHardCodedProvider;
-import com.mst.testHelpers.PartOfSpeechHardcodedAnnotatorEntityProvider;
-import com.mst.testHelpers.SemanticTypeHardCodedProvider;
-import com.mst.testHelpers.TestDataProvider;
-import com.mst.testHelpers.VerbProcessingInputProvider;
+
 import static org.junit.Assert.*;
 
 public class VerbProcessorTest {
