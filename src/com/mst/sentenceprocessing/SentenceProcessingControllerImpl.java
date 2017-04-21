@@ -9,6 +9,7 @@ import com.mst.interfaces.PrepPhraseRelationshipProcessor;
 import com.mst.interfaces.PrepositionPhraseProcessor;
 import com.mst.interfaces.RelationshipProcessor;
 import com.mst.interfaces.SemanticTypeSentenceAnnotator;
+import com.mst.interfaces.SentenceProcessingController;
 import com.mst.interfaces.VerbPhraseProcessor;
 import com.mst.interfaces.VerbProcessor;
 import com.mst.model.SentenceToken;
@@ -17,7 +18,7 @@ import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
  
-public class SentenceProcessingControllerImpl {
+public class SentenceProcessingControllerImpl implements  SentenceProcessingController{
 
 	private NgramsSentenceProcessor ngramProcessor;  
 	private PrepositionPhraseProcessor prepPhraseProcessor;
@@ -52,9 +53,18 @@ public class SentenceProcessingControllerImpl {
 		this.sentenceProcessingMetaDataInput = sentenceProcessingMetaDataInput;
 	}
 		
-	public Sentence ProcessSentence(String sentenceText) throws Exception{
-
-		Sentence sentence = getSentence(sentenceText);
+	public List<Sentence> processSentences(List<String> sentenceTexts) throws Exception{
+		
+		List<Sentence> sentences = new ArrayList<>();	
+		for(String sentenceText: sentenceTexts){
+			Sentence sentence = getSentence(sentenceText);
+			sentence = processSentence(sentence);
+			sentences.add(sentence);
+		}
+		return sentences;
+	}
+	
+	private Sentence processSentence(Sentence sentence) throws Exception{
 		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
 		List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(),this.sentenceProcessingMetaDataInput.getSemanticTypes());
 		List<TokenRelationship> tokenRelationships = new ArrayList<>();
@@ -70,10 +80,9 @@ public class SentenceProcessingControllerImpl {
 		return sentence;
 	}
 	
-	private Sentence getSentence(String text){
 	
-		List<Sentence> sentences = new ArrayList<Sentence>();		
-		SentenceToken sentenceToken = tokenizer.splitSentencesNew(text).get(0);
+	private Sentence getSentence(String sentenceText){
+		SentenceToken sentenceToken = tokenizer.splitSentencesNew(sentenceText).get(0);
 		int position = 0;
 		
 		String cs = cleaner.cleanSentence(sentenceToken.getToken());
@@ -85,8 +94,6 @@ public class SentenceProcessingControllerImpl {
 		sentence.setSource(null);
 		sentence.setFullSentence(cs);
 		sentence.setOrigSentence(sentenceToken.getToken());
-		sentences.add(sentence);	
-	
 		return sentence;
 	}
 	
