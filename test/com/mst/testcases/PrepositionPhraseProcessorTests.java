@@ -31,7 +31,7 @@ import com.mst.sentenceprocessing.PrepositionPhraseProcessorImpl;
 import com.mst.sentenceprocessing.SemanticTypeSentenceAnnotatorImpl;
 import com.mst.sentenceprocessing.VerbProcessorImpl;
 
-public class PrepositionPhraseProcessorTest {
+public class PrepositionPhraseProcessorTests {
 
 	NGramsSentenceProcessorImpl ngramProcessor = new NGramsSentenceProcessorImpl();
 	PrepositionPhraseProcessorImpl prepPhraseProcessor = new PrepositionPhraseProcessorImpl();

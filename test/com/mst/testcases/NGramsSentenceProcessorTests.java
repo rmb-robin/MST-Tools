@@ -22,7 +22,7 @@ import com.mst.sentenceprocessing.Tokenizer;
 
 import static org.junit.Assert.*;
 
-public class NGramsSentenceProcessorTest {
+public class NGramsSentenceProcessorTests {
 
 
 
@@ -55,7 +55,7 @@ public class NGramsSentenceProcessorTest {
 		int index = 0;
 		for(Sentence sentence: originalSentences){
 			Sentence ngramsProcessedSentence = processor.process(sentence,ngramsProvider.getNGrams());
-		    assertEquals(expectedSentences.get(index).getOrigSentence(), ngramsProcessedSentence.getFullSentence());
+		    assertEquals(expectedSentences.get(index).getOrigSentence(), ngramsProcessedSentence.getNormalizedSentence());
 			output.add(getSentenceOutput(sentence));
 		    index+=1;
 		}
@@ -66,7 +66,7 @@ public class NGramsSentenceProcessorTest {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Original Sentence: " + sentence.getOrigSentence());
 		sb.append(System.getProperty("line.separator"));
-		sb.append("Modified Sentence: " + sentence.getFullSentence());
+		sb.append("Modified Sentence: " + sentence.getNormalizedSentence());
 		sb.append(System.getProperty("line.separator"));
 		
 		sb.append(System.getProperty("line.separator"));

@@ -58,7 +58,12 @@ public class VerbProcessorImpl implements VerbProcessor {
 		
 		LinkingModalVerbItem item = verbProcessingInput.getLinkingModalVerbMap().get(key);
 		wordToken.setPos(item.getVerbType().toString());
-		Verb verb = createVerb(item.getVerbTense(),item.getVerbType(),item.getVerbState(),null);
+		
+		boolean isExistance = false;
+		if(item.getVerbType().equals(VerbType.LV))
+			isExistance = true;
+		
+		Verb verb = createVerb(item.getVerbTense(),item.getVerbType(),item.getVerbState(),null,isExistance,false);
 		wordToken.setVerb(verb);
 		return true;
 	}
@@ -72,7 +77,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		
 		ActionVerbItem item = actionVerbTable.getVerbsByWord().get(key);
 		wordToken.setPos(VerbType.AV.toString());	
-		Verb verb = createVerb(item.getVerbTense(), VerbType.AV,null,item.getVerbNetClass());
+		Verb verb = createVerb(item.getVerbTense(), VerbType.AV,null,item.getVerbNetClass(), item.getIsExistance(),item.getIsMaintainVerbNetClass());
 		wordToken.setVerb(verb);
 		
 		if(item.getId()== item.getInfinitivePresentId()) return true;
@@ -84,12 +89,14 @@ public class VerbProcessorImpl implements VerbProcessor {
 		return true;
 	}
 	
-	private Verb createVerb(VerbTense verbTense, VerbType verbType, String state, String verbNetClass){
+	private Verb createVerb(VerbTense verbTense, VerbType verbType, String state, String verbNetClass, boolean isExistance,boolean isMaintainVerbNetClass){
 		Verb verb = new Verb();
 		verb.setVerbTense(verbTense);
 		verb.setVerbType(verbType);
 		verb.setVerbState(state);
 		verb.setVerbNetClass(verbNetClass);
+		verb.setExistance(isExistance);
+		verb.setMaintainVerbNetClass(isMaintainVerbNetClass);
 		return verb;
 	}
 

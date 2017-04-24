@@ -7,17 +7,17 @@ import org.junit.Test;
 import com.mst.metadataProviders.NGramsHardCodedProvider;
 import com.mst.metadataProviders.PartOfSpeechExpectedResultsProvider;
 import com.mst.metadataProviders.PartOfSpeechHardcodedAnnotatorEntityProvider;
+import com.mst.metadataProviders.PartOfSpeechSentenceExpectedResult;
 import com.mst.metadataProviders.TestDataProvider;
 import com.mst.model.sentenceProcessing.PartOfSpeechAnnotatorEntity;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.WordToken;
-import com.mst.models.test.PartOfSpeechSentenceExpectedResult;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
 import com.mst.sentenceprocessing.PartOfSpeechAnnotatorImpl;
 
 import static org.junit.Assert.*;
 
-public class PartOfSpeechAnnotatorTest {
+public class PartOfSpeechAnnotatorTests {
 
 	private String getTestDataPath(){
 		return System.getProperty("user.dir") + "\\testData\\pos_sentenceinput.txt";

@@ -92,7 +92,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		
 		sentence.setPractice("pratice");
 		sentence.setSource(null);
-		sentence.setFullSentence(cs);
+		sentence.setNormalizedSentence(cs);
 		sentence.setOrigSentence(sentenceToken.getToken());
 		return sentence;
 	}

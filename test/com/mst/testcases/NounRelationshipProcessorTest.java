@@ -64,7 +64,7 @@ public class NounRelationshipProcessorTest {
 			List<TokenRelationship> relationships =  processor.process(modifiedTokens, input);
 			List<TokenRelationship> expectedValues = expectedMap.get(index);
 			
-			System.out.println(sentence.getFullSentence());
+			System.out.println(sentence.getNormalizedSentence());
 			for(TokenRelationship tr :  relationships){
 				System.out.println("From " + tr.getFromToken().getToken());
 				System.out.println("To " + tr.getToToken().getToken());

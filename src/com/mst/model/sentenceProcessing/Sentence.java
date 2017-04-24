@@ -90,11 +90,11 @@ public class Sentence {
 		this.position = position;
 	}
 	
-	public String getFullSentence() {
+	public String getNormalizedSentence() {
 		return normalizedSentence;
 	}
 	
-	public void setFullSentence(String sentence) {
+	public void setNormalizedSentence(String sentence) {
 		this.normalizedSentence = sentence;
 	}
 	

@@ -11,6 +11,8 @@ public class ActionVerbItem {
 	private String verb;
 	private VerbTense verbTense;
 	private String verbNetClass;
+	private boolean isExistance; 
+	private boolean isMaintainVerbNetClass;
 	
 	public String getVerbNetClass() {
 		return verbNetClass;
@@ -41,6 +43,18 @@ public class ActionVerbItem {
 	}
 	public void setVerbTense(VerbTense verbTense) {
 		this.verbTense = verbTense;
+	}
+	public boolean getIsExistance() {
+		return isExistance;
+	}
+	public void setExistance(boolean isExistance) {
+		this.isExistance = isExistance;
+	}
+	public boolean getIsMaintainVerbNetClass() {
+		return isMaintainVerbNetClass;
+	}
+	public void setMaintainVerbNetClass(boolean isMaintainVerbNetClass) {
+		this.isMaintainVerbNetClass = isMaintainVerbNetClass;
 	}
 	
 }

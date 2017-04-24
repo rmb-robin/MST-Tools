@@ -8,7 +8,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
 
@@ -59,12 +59,7 @@
 			<version>1.2.1</version>
 		</dependency>
     
-        <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.7</version>
-    </dependency>
-    
+   
 	    <dependency>
 	    <groupId>redis.clients</groupId>
 	    <artifactId>jedis</artifactId>
@@ -113,9 +108,20 @@
         <directory>src</directory>
         <excludes>
           <exclude>**/*.java</exclude>
-        </excludes>
+        </excludes>       
       </resource>
-    </resources>
+      
+       <resource>
+        <directory>testData</directory>
+        <includes>
+          <include>**/*.txt</include>
+          </includes>
+      </resource>
+      
+      
+      
+</resources>
+     
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

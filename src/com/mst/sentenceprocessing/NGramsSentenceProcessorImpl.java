@@ -21,7 +21,7 @@ public class NGramsSentenceProcessorImpl implements NgramsSentenceProcessor  {
 		}
 		modifiedSentence = cleaner.cleanSentence(modifiedSentence);
 		sentence.setModifiedWordList(tokenizer.splitWords(modifiedSentence));
-		sentence.setFullSentence(modifiedSentence);
+		sentence.setNormalizedSentence(modifiedSentence);
 		return sentence;
 	}
 	

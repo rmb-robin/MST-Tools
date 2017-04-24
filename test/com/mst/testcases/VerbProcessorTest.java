@@ -92,11 +92,11 @@ public class VerbProcessorTest {
 	
 	@Test 
 	public void test_linkModalVerbs() throws Exception{
-		testLinkingModalVerb("I am going to the doctor",VerbTense.Present,VerbType.LV,"am", "existence");
-		testLinkingModalVerb("there is a cyst",VerbTense.Present,VerbType.LV,"is", null);
-		testLinkingModalVerb("i was at the doctor",VerbTense.Past,VerbType.LV,"was", null);
-		testLinkingModalVerb("i can have a cyst",VerbTense.Present,VerbType.MV,"can-have", "possibility");
-		testLinkingModalVerb("i can have had a cyst",VerbTense.Past,VerbType.LV,"can-have-had", "possibility");
+		testLinkingModalVerb("I am going to the doctor",VerbTense.Present,VerbType.LV,"am", "existence",true);
+		testLinkingModalVerb("there is a cyst",VerbTense.Present,VerbType.LV,"is", null,true);
+		testLinkingModalVerb("i was at the doctor",VerbTense.Past,VerbType.LV,"was", null,true);
+		testLinkingModalVerb("i can have a cyst",VerbTense.Present,VerbType.MV,"can-have", "possibility",false);
+		testLinkingModalVerb("i can have had a cyst",VerbTense.Past,VerbType.LV,"can-have-had", "possibility",true);
 	}
 	
 	
@@ -145,7 +145,7 @@ public class VerbProcessorTest {
 	}
 	
 	
-	private void testLinkingModalVerb(String sentenceText, VerbTense tense,VerbType verbType, String verbWord, String state) throws Exception{
+	private void testLinkingModalVerb(String sentenceText, VerbTense tense,VerbType verbType, String verbWord, String state, boolean isExistance) throws Exception{
 		Sentence sentence = TestDataProvider.getSentences(sentenceText).get(0);
 		processor.process(sentence, new NGramsHardCodedProvider().getNGrams());
 		
@@ -165,6 +165,7 @@ public class VerbProcessorTest {
 			assertEquals(tense, verb.getVerbTense());
 			assertEquals(verbType, verb.getVerbType());
 			assertEquals(state, verb.getVerbState());
+			assertEquals(isExistance, verb.isExistance());
 	
 	}
 	
@@ -183,7 +184,9 @@ public class VerbProcessorTest {
 			assertEquals(1, count);
 			assertEquals("AV",token.getPos());
 			assertEquals("measure", token.getToken());
-			assertEquals("measure", token.getVerb().getVerbNetClass());
+			assertEquals("calculate", token.getVerb().getVerbNetClass());
+			assertFalse(token.getVerb().isExistance());
+			assertTrue(token.getVerb().getIsMaintainVerbNetClass());
 			Verb verb = token.getVerb();
 			assertEquals("AV",token.getPos());
 			assertEquals("AV",token.getPos());

@@ -1,4 +1,4 @@
-package com.mst.models.test;
+package com.mst.metadataProviders;
 
 import java.util.List;
 import java.util.Map;

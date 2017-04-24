@@ -68,19 +68,34 @@ public class VerbProcessingInputProvider {
 		String[] contents = line.split(",");
 		
 		String verbNetClass = null;
-		if(contents.length==5)
+		boolean isExistance = false;
+		if(contents.length>=5)
 			verbNetClass = contents[4];
 
-		ActionVerbItem infinitivePresentItem = createActionVerbItem(VerbTense.InfinitivePresent, null,contents[0], verbNetClass);
+		if(contents.length>=6){
+			isExistance = getBooleanFromYesNo(contents[5]);
+		}
+		
+		boolean isMaintainVerbNetClass = false;
+		if(contents.length>=7)
+			isMaintainVerbNetClass = getBooleanFromYesNo(contents[6]);
+		
+		
+		ActionVerbItem infinitivePresentItem = createActionVerbItem(VerbTense.InfinitivePresent, null,contents[0], verbNetClass,isExistance,isMaintainVerbNetClass);
 		UUID infinitivePresentItemId = infinitivePresentItem.getId();
 		acttionVerbTable.addValue(infinitivePresentItem);
 	
-		acttionVerbTable.addValue(createActionVerbItem(VerbTense.PluralInfinitivePresent,infinitivePresentItemId, contents[1],verbNetClass));
-		acttionVerbTable.addValue(createActionVerbItem(VerbTense.Past,infinitivePresentItemId, contents[2],verbNetClass));
-		acttionVerbTable.addValue(createActionVerbItem(VerbTense.Present,infinitivePresentItemId, contents[3],verbNetClass));
+		acttionVerbTable.addValue(createActionVerbItem(VerbTense.PluralInfinitivePresent,infinitivePresentItemId, contents[1],verbNetClass,isExistance,isMaintainVerbNetClass));
+		acttionVerbTable.addValue(createActionVerbItem(VerbTense.Past,infinitivePresentItemId, contents[2],verbNetClass,isExistance,isMaintainVerbNetClass));
+		acttionVerbTable.addValue(createActionVerbItem(VerbTense.Present,infinitivePresentItemId, contents[3],verbNetClass,isExistance,isMaintainVerbNetClass));
 	}
 	
-	private ActionVerbItem createActionVerbItem(VerbTense tense, UUID infinitivePresentId, String verb, String verbNetClass){
+	private boolean getBooleanFromYesNo(String val){
+		if(val.equals("yes")) return true;
+		return false;
+	}
+	
+	private ActionVerbItem createActionVerbItem(VerbTense tense, UUID infinitivePresentId, String verb, String verbNetClass, boolean isExistance,boolean isMaintainVerbNetClass){
 		ActionVerbItem item = new ActionVerbItem();
 		if(infinitivePresentId ==null){
 			UUID id = UUID.randomUUID();
@@ -95,6 +110,8 @@ public class VerbProcessingInputProvider {
 		item.setVerbNetClass(verbNetClass);
 		item.setVerb(verb);
 		item.setVerbTense(tense);
+		item.setExistance(isExistance);
+		item.setMaintainVerbNetClass(isMaintainVerbNetClass);
 		return item;
 	}
 }

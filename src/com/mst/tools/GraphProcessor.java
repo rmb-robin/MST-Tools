@@ -173,7 +173,7 @@ public class GraphProcessor {
 			Vertex vID = new Vertex(GraphClass.ID, md5(s.getPractice()+s.getStudy()+s.getId()), s.getId(), 0);
 			String date = orientSDF.format(s.getProcessDate());
 			Vertex vProcedureDate = new Vertex(GraphClass.Date, md5(s.getPractice()+s.getStudy()+date.toString()), date.toString(), 0);
-			Vertex vSentence = new Vertex(GraphClass.Sentence, sentenceUUID, s.getFullSentence(), (int) s.getPosition());
+			Vertex vSentence = new Vertex(GraphClass.Sentence, sentenceUUID, s.getNormalizedSentence(), (int) s.getPosition());
 			Vertex vDiscrete = new Vertex(GraphClass.Discrete, md5(sentenceUUID + s.getId()), "", (int) 0);
 			// add a vertex to act as a placeholder for verbs that are missing a subj or subjc 
 			Vertex vPlaceholder = new Vertex(GraphClass.Token, md5(sentenceUUID + s.getModifiedWordList().size()), PLACEHOLDER, 0);
@@ -281,8 +281,8 @@ public class GraphProcessor {
 			graphSentence.setEdges(edges);
 			
 		} catch(Exception e) {
-			System.out.println(s.getFullSentence());
-			logger.debug(s.getFullSentence());
+			System.out.println(s.getNormalizedSentence());
+			logger.debug(s.getNormalizedSentence());
 			e.printStackTrace();
 		}
 		

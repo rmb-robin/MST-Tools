@@ -3,9 +3,16 @@ package com.mst.model.sentenceProcessing;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+
+@Entity("sentenceprocessingmetadatainput")
 public class SentenceProcessingMetaDataInput {
 
 	
+	@Id
+	private ObjectId id;
 	private List<NGramsModifierEntity> ngramsInput;
 	private PartOfSpeechAnnotatorEntity partOfSpeechAnnotatorEntity;
 	private Map<String, String> semanticTypes;
@@ -63,5 +70,11 @@ public class SentenceProcessingMetaDataInput {
 	}
 	public void setPhraseRelationshipMappings(List<PrepPhraseRelationshipMapping> phraseRelationshipMappings) {
 		this.phraseRelationshipMappings = phraseRelationshipMappings;
+	}
+	public ObjectId getId() {
+		return id;
+	}
+	public void setId(ObjectId id) {
+		this.id = id;
 	}
 }

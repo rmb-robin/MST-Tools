@@ -50,7 +50,7 @@ public class TestDataProvider {
 			
 			sentence.setPractice("pratice");
 			sentence.setSource(null);
-			sentence.setFullSentence(cs);
+			sentence.setNormalizedSentence(cs);
 			sentence.setOrigSentence(sentenceToken.getToken());
 			sentences.add(sentence);	
 		}

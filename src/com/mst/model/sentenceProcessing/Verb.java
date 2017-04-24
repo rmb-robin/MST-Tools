@@ -9,6 +9,8 @@ public class Verb {
 	private VerbTense verbTense;
 	private String verbState;
 	private String verbNetClass;
+	private boolean isExistance;
+	private boolean isMaintainVerbNetClass;
 	
 	public String getVerbNetClass() {
 		return verbNetClass;
@@ -33,5 +35,18 @@ public class Verb {
 	}
 	public void setVerbState(String verbState) {
 		this.verbState = verbState;
+	}
+	public boolean isExistance() {
+		return isExistance;
+	}
+	public void setExistance(boolean isExistance) {
+		this.isExistance = isExistance;
+	}
+	
+	public boolean getIsMaintainVerbNetClass() {
+		return isMaintainVerbNetClass;
+	}
+	public void setMaintainVerbNetClass(boolean isMaintainVerbNetClass) {
+		this.isMaintainVerbNetClass = isMaintainVerbNetClass;
 	}
 }
