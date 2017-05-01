@@ -3,7 +3,7 @@ package com.mst.sentenceprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mst.interfaces.VerbPhraseProcessor;
+import com.mst.interfaces.sentenceprocessing.VerbPhraseProcessor;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.metadataTypes.VerbType;

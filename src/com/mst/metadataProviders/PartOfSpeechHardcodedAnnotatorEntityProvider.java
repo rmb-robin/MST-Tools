@@ -3,7 +3,7 @@ package com.mst.metadataProviders;
 import java.util.List;
 import java.util.HashSet;
 
-import com.mst.interfaces.PartOfSpeechAnnotatorEntityProvider;
+import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotatorEntityProvider;
 import com.mst.model.sentenceProcessing.PartOfSpeechAnnotatorEntity;
 
 

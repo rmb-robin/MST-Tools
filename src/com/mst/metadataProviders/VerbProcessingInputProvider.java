@@ -3,7 +3,7 @@ package com.mst.metadataProviders;
 import java.util.List;
 import java.util.UUID;
 
-import com.mst.interfaces.LinkingModalVerbItemFactory;
+import com.mst.interfaces.sentenceprocessing.LinkingModalVerbItemFactory;
 import com.mst.model.metadataTypes.VerbTense;
 import com.mst.model.sentenceProcessing.ActionVerbItem;
 import com.mst.model.sentenceProcessing.ActionVerbTable;

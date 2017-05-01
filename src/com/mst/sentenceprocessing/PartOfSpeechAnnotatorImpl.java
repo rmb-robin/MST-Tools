@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import com.mst.interfaces.PartOfSpeechAnnotator;
+import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
 import com.mst.model.sentenceProcessing.PartOfSpeechAnnotatorEntity;
 import com.mst.model.sentenceProcessing.WordToken;
 

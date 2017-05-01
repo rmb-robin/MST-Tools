@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import com.mst.interfaces.RelationshipProcessor;
+import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.metadataProviders.NGramsHardCodedProvider;
 import com.mst.metadataProviders.PartOfSpeechHardcodedAnnotatorEntityProvider;
 import com.mst.metadataProviders.RelationshipInputProviderFileImpl;
@@ -83,7 +83,16 @@ public class VerbPhraseProcessorTest {
 		expectedSubjectComplements.add("cm");
 	//	runAssert("The left ovary measures 2.7x2.1x1.6 cm.",expectedSubjects,expectedSubjectComplements);
 
+		expectedSubjects.clear();
+		expectedSubjects.add("bone-marrow-biopsy");
+		expectedSubjects.add("ultrasound");
+		expectedSubjectComplements.clear();
+		expectedSubjectComplements.add("3.5");
+		runAssert("Bone marrow biopsy and ultrasound demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
+	
 
+		
+		
 	}
 	
 	
@@ -153,7 +162,7 @@ public class VerbPhraseProcessorTest {
 		expectedSubjects.add("kidney");
 		expectedSubjectComplements.clear();
 		expectedSubjectComplements.add("enlarged");
-		runAssert("Left kidney appears enlarged.",expectedSubjects,expectedSubjectComplements);
+		//runAssert("Left kidney appears enlarged.",expectedSubjects,expectedSubjectComplements);
 
 		expectedSubjects.clear();
 		expectedSubjects.add("ct-scan");
@@ -168,6 +177,13 @@ public class VerbPhraseProcessorTest {
 		expectedSubjectComplements.add("cyst");
 		runAssert("CT scan and ultrasound demonstrates a benign cyst.",expectedSubjects,expectedSubjectComplements);
 
+
+		expectedSubjects.clear();
+		expectedSubjects.add("bone-marrow-biopsy");
+		expectedSubjectComplements.clear();
+		expectedSubjectComplements.add("3.5");
+	//	runAssert("Bone marrow biopsy demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
+	
 		expectedSubjects.clear();
 		expectedSubjects.add("ct-scan");
 		expectedSubjects.add("bone-marrow-biopsy");
@@ -175,20 +191,8 @@ public class VerbPhraseProcessorTest {
 		
 		expectedSubjectComplements.clear();
 		expectedSubjectComplements.add("lesion");
-	//	runAssert("CT scan, bone marrow biopsy and ultrasound demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
+		runAssert("CT scan, bone marrow biopsy and ultrasound demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
 	
-		expectedSubjects.clear();
-		expectedSubjects.add("bone-marrow-biopsy");
-		expectedSubjectComplements.clear();
-		expectedSubjectComplements.add("3.5");
-		runAssert("Bone marrow biopsy demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
-	
-		expectedSubjects.clear();
-		expectedSubjects.add("bone-marrow-biopsy");
-		expectedSubjects.add("ultrasound");
-		expectedSubjectComplements.clear();
-		expectedSubjectComplements.add("3.5");
-		runAssert("Bone marrow biopsy and ultrasound demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
 	}
 	
 	private void runAssert(String sentenceText, List<String> subjects, List<String> subjectComplements) throws Exception{

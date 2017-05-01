@@ -2,7 +2,7 @@ package com.mst.sentenceprocessing;
 
 import org.joda.time.DateTime;
 
-import com.mst.interfaces.TokenRelationshipFactory;
+import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;

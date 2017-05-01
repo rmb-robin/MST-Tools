@@ -3,18 +3,19 @@ package com.mst.sentenceprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mst.interfaces.NgramsSentenceProcessor;
-import com.mst.interfaces.PartOfSpeechAnnotator;
-import com.mst.interfaces.PrepPhraseRelationshipProcessor;
-import com.mst.interfaces.PrepositionPhraseProcessor;
-import com.mst.interfaces.RelationshipProcessor;
-import com.mst.interfaces.SemanticTypeSentenceAnnotator;
-import com.mst.interfaces.SentenceProcessingController;
-import com.mst.interfaces.VerbPhraseProcessor;
-import com.mst.interfaces.VerbProcessor;
+import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
+import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
+import com.mst.interfaces.sentenceprocessing.PrepPhraseRelationshipProcessor;
+import com.mst.interfaces.sentenceprocessing.PrepositionPhraseProcessor;
+import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
+import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
+import com.mst.interfaces.sentenceprocessing.SentenceProcessingController;
+import com.mst.interfaces.sentenceprocessing.VerbPhraseProcessor;
+import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.model.SentenceToken;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
+import com.mst.model.sentenceProcessing.TextInput;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
  
@@ -33,9 +34,6 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	
 	private SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput;
 
-
-	
-	
 	public SentenceProcessingControllerImpl(){
 		ngramProcessor = new NGramsSentenceProcessorImpl();
 		prepPhraseProcessor = new PrepositionPhraseProcessorImpl();
@@ -64,6 +62,14 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		return sentences;
 	}
 	
+	public List<Sentence> processText(TextInput input) throws Exception {
+		List<Sentence> sentences = getSentences(input);
+		for(Sentence sentence: sentences){
+			processSentence(sentence);
+		}
+		return sentences;
+	}
+	
 	private Sentence processSentence(Sentence sentence) throws Exception{
 		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
 		List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(),this.sentenceProcessingMetaDataInput.getSemanticTypes());
@@ -83,18 +89,36 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	
 	private Sentence getSentence(String sentenceText){
 		SentenceToken sentenceToken = tokenizer.splitSentencesNew(sentenceText).get(0);
-		int position = 0;
+		return createSentence(sentenceToken,null,"practice",null,0);
+	}
+	
+	private List<Sentence> getSentences(TextInput textInput){
+		List<SentenceToken> sentenceTokens = tokenizer.splitSentencesNew(textInput.getText());
+		List<Sentence> result = new ArrayList<Sentence>();
 		
+		int position = 1;
+		for(SentenceToken sentenceToken: sentenceTokens){
+			Sentence sentence = createSentence(sentenceToken, textInput.getStudy(),textInput.getPractice(), textInput.getSource(), position);
+			result.add(sentence);
+			position +=1;
+		}
+		return result;
+	}
+
+	private Sentence createSentence(SentenceToken sentenceToken, String study, String practice, String source,int position){
 		String cs = cleaner.cleanSentence(sentenceToken.getToken());
-		Sentence sentence = new Sentence(null, position++);
+		Sentence sentence = new Sentence(null, position);
 		List<String> words =  tokenizer.splitWordsInStrings(cs);
 		sentence.setOriginalWords(words);
 		
-		sentence.setPractice("pratice");
-		sentence.setSource(null);
+		sentence.setPractice(practice);
+		sentence.setSource(source);
+		sentence.setStudy(study);
 		sentence.setNormalizedSentence(cs);
 		sentence.setOrigSentence(sentenceToken.getToken());
 		return sentence;
+		
 	}
+	
 	
 }

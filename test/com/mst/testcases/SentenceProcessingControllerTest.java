@@ -14,6 +14,7 @@ import com.mst.metadataProviders.TestDataProvider;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
+import com.mst.model.sentenceProcessing.TextInput;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.sentenceprocessing.PrepositionPhraseProcessingInputFactory;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
@@ -33,6 +34,19 @@ public class SentenceProcessingControllerTest {
 		expectedSubjectComplements.clear();
 		expectedSubjectComplements.add("cyst");
 		runAssert("CT scan demonstrates a benign cyst.",expectedSubjects,expectedSubjectComplements);
+	}
+	
+	
+	@Test
+	public void processTest() throws Exception {
+		TextInput input = new TextInput();
+		input.setText("she had a cyst in the ovary. She went to get a ct scan done. The test revealed a 3.5 cm cyst.");;
+		
+		SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
+		controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
+		
+		List<Sentence> sentences = controller.processText(input);
+		assertTrue(sentences.size()==3);
 	}
 	
 	private void runAssert(String sentenceText, List<String> subjects, List<String> subjectComplements) throws Exception{

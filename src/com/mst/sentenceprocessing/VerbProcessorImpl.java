@@ -1,7 +1,8 @@
 package com.mst.sentenceprocessing;
 
 import java.util.List;
-import com.mst.interfaces.VerbProcessor;
+
+import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.model.metadataTypes.VerbTense;
 import com.mst.model.metadataTypes.VerbType;
 import com.mst.model.sentenceProcessing.ActionVerbItem;

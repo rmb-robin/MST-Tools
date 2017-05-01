@@ -1,4 +1,4 @@
-package com.mst.interfaces;
+package com.mst.interfaces.sentenceprocessing;
 
 import com.mst.model.sentenceProcessing.RelationshipInput;
 

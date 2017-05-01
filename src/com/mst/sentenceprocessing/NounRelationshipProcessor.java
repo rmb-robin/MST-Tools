@@ -5,9 +5,10 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.mst.interfaces.RelationshipProcessor;
-import com.mst.interfaces.TokenRelationshipFactory;
+import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
+import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.metadataTypes.PropertyValueTypes;
+import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.RelationshipInput;
 import com.mst.model.sentenceProcessing.RelationshipMapping;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -108,9 +109,10 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 	
 	private List<TokenRelationship> iterateMap(Map<String,List<RelationshipMapping>> map, String key, WordToken wordToken){
 		List<TokenRelationship> result = new ArrayList<TokenRelationship>(); 
-		if(!map.containsKey(key)) return result;
+
+		if(!map.containsKey(key)) return result; 
+		
 		int startIndex = wordTokens.indexOf(wordToken);
-				
 		for(RelationshipMapping relationship: map.get(key)){
 			List<TokenRelationship> collection = processSingleNounRelationship(relationship,startIndex);
 			result.addAll(collection);
@@ -128,9 +130,9 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 		}
 		
 		int endIndex =  getEndIndex(startIndex,relationshipMapping.getMaxDistance());
-		for(int i = startIndex+1; i<endIndex;i++){
+		for(int i = startIndex+1; i<=endIndex;i++){
 			WordToken toToken = wordTokens.get(i);
-			if(isWordTokenMatchToRelationship(relationshipMapping.getIsFromSemanticType(), false,relationshipMapping.getFromToken(), toToken))
+			if(isWordTokenMatchToRelationship(relationshipMapping.getIsToSemanticType(), false,relationshipMapping.getToToken(), toToken))
 				result.add(createRelationshipAndAnnotateWordTokens(relationshipMapping.getEdgeName(), wordTokens.get(startIndex),wordTokens.get(i)));
 		}		
 		return result;

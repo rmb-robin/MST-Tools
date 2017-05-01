@@ -106,20 +106,12 @@
     <resources>
       <resource>
         <directory>src</directory>
+     <!--
         <excludes>
           <exclude>**/*.java</exclude>
-        </excludes>       
+        </excludes>
+        -->       
       </resource>
-      
-       <resource>
-        <directory>testData</directory>
-        <includes>
-          <include>**/*.txt</include>
-          </includes>
-      </resource>
-      
-      
-      
 </resources>
      
     <plugins>

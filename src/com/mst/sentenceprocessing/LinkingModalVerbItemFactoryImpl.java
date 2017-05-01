@@ -1,6 +1,6 @@
 package com.mst.sentenceprocessing;
 
-import com.mst.interfaces.LinkingModalVerbItemFactory;
+import com.mst.interfaces.sentenceprocessing.LinkingModalVerbItemFactory;
 import com.mst.model.metadataTypes.VerbTense;
 import com.mst.model.metadataTypes.VerbType;
 import com.mst.model.sentenceProcessing.LinkingModalVerbItem;

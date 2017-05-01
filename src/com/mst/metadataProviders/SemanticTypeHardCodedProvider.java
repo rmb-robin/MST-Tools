@@ -3,7 +3,7 @@ package com.mst.metadataProviders;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mst.interfaces.SemanticTypeProvider;
+import com.mst.interfaces.sentenceprocessing.SemanticTypeProvider;
 
 public class SemanticTypeHardCodedProvider implements SemanticTypeProvider {
 

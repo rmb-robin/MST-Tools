@@ -2,6 +2,8 @@ package com.mst.model.sentenceProcessing;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mst.jsonSerializers.UuidSerializer;
 import com.mst.model.metadataTypes.VerbTense;
 
 public class ActionVerbItem {

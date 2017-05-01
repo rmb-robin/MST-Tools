@@ -1,7 +1,8 @@
 package com.mst.sentenceprocessing;
 
 import java.util.List;
-import com.mst.interfaces.TokenRelationshipFactory;
+
+import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.sentenceProcessing.WordToken;
 
 public abstract class RelationshipProcessorBase {
@@ -18,13 +19,13 @@ public abstract class RelationshipProcessorBase {
 		return Math.min(index+distance,wordTokens.size()-1);
 	}
 
-	protected boolean isWordTokenMatchToRelationship(boolean isSemanticType,boolean isPosType,String relationshipToToken, WordToken wordToken){
-		String tokenCompareVlaue = wordToken.getToken();
+	protected boolean isWordTokenMatchToRelationship(boolean isSemanticType,boolean isPosType,String relationshipToToken, WordToken toToken){
+		String tokenCompareVlaue = toToken.getToken();
 		if(isSemanticType)
-			tokenCompareVlaue = wordToken.getSemanticType();
+			tokenCompareVlaue = toToken.getSemanticType();
 	
 		else if(isPosType)
-			tokenCompareVlaue = wordToken.getPos();
+			tokenCompareVlaue = toToken.getPos();
 		
 		if(tokenCompareVlaue==null) return false;
 		return tokenCompareVlaue.equals(relationshipToToken);

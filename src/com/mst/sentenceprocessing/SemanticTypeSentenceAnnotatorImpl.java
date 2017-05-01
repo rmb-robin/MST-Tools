@@ -3,7 +3,7 @@ package com.mst.sentenceprocessing;
 import java.util.List;
 import java.util.Map;
 
-import com.mst.interfaces.SemanticTypeSentenceAnnotator;
+import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
 import com.mst.model.SemanticType;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.WordToken;

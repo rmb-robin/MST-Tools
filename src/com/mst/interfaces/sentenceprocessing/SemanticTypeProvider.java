@@ -1,4 +1,4 @@
-package com.mst.interfaces;
+package com.mst.interfaces.sentenceprocessing;
 
 import java.util.Map;
 

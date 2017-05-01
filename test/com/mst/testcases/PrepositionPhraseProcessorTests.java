@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import com.mst.interfaces.RelationshipProcessor;
+import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.metadataProviders.NGramsHardCodedProvider;
 import com.mst.metadataProviders.PartOfSpeechHardcodedAnnotatorEntityProvider;
 import com.mst.metadataProviders.RelationshipInputProviderFileImpl;

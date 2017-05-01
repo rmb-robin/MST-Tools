@@ -3,7 +3,7 @@ package com.mst.metadataProviders;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mst.interfaces.NounRelationshipInputProvider;
+import com.mst.interfaces.sentenceprocessing.NounRelationshipInputProvider;
 import com.mst.model.sentenceProcessing.PrepPhraseRelationshipMapping;
 import com.mst.model.sentenceProcessing.RelationshipInput;
 import com.mst.model.sentenceProcessing.RelationshipMapping;
@@ -69,6 +69,7 @@ public class RelationshipInputProviderFileImpl implements NounRelationshipInputP
 		
 		nounRelationship.setMaxDistance(getDistance(values[4]));
 		nounRelationship.setEdgeName(values[5]);
+		nounRelationship.setMaxDistance(this.maxDistance);
 		return nounRelationship;
 		
 	}

@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mst.interfaces.NgramsSentenceProcessor;
+import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.model.sentenceProcessing.NGramsModifierEntity;
 import com.mst.model.sentenceProcessing.Sentence;
 

@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mst.interfaces.PrepPhraseRelationshipProcessor;
-import com.mst.interfaces.RelationshipProcessor;
+import com.mst.interfaces.sentenceprocessing.PrepPhraseRelationshipProcessor;
+import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.sentenceProcessing.PrepPhraseRelationshipMapping;

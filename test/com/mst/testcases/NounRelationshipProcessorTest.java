@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.mst.interfaces.RelationshipProcessor;
+import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.metadataProviders.NGramsHardCodedProvider;
 import com.mst.metadataProviders.NounrRelationshipExpectedProvider;
 import com.mst.metadataProviders.RelationshipInputProviderFileImpl;
@@ -26,6 +26,17 @@ import static org.junit.Assert.*;
 
 public class NounRelationshipProcessorTest {
 
+	RelationshipInput input = new RelationshipInputProviderFileImpl().getNounRelationships(7);
+	Map<Integer, List<TokenRelationship>> expectedMap = new NounrRelationshipExpectedProvider().get();
+	
+	NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
+	NGramsSentenceProcessorImpl ngramsProcessor = new NGramsSentenceProcessorImpl();
+	 
+	RelationshipProcessor processor = new NounRelationshipProcessor();
+
+	
+	SemanticTypeSentenceAnnotatorImpl annotator = new SemanticTypeSentenceAnnotatorImpl();
+	SemanticTypeHardCodedProvider provider = new SemanticTypeHardCodedProvider();
 	
 	private String getTestDataPath(){
 		return System.getProperty("user.dir") + "\\testData\\nounrelatationshipsentences.txt";
@@ -36,46 +47,47 @@ public class NounRelationshipProcessorTest {
 		return TestDataProvider.getSentences(fileText);
 	}
 	
+	@Test
+	public void processNoun(){
+		String text = "The simple cyst measures 3.5 cm.";
+		Sentence sentence = TestDataProvider.getSentences(text).get(0);
+		List<TokenRelationship> relationships = getTokenRelationships(sentence, 0);
+		
+		assertTrue(relationships.size()==1);
+		assertTrue(relationships.get(0).getEdgeName().equals("unit of measure"));
+		
+	}
+	
+	
 	//@Test
 	public void process(){
 		List<Sentence> sentences = getSentences();
-		
-		RelationshipInput input = new RelationshipInputProviderFileImpl().getNounRelationships(7);
-		Map<Integer, List<TokenRelationship>> expectedMap = new NounrRelationshipExpectedProvider().get();
-		
-		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
-		NGramsSentenceProcessorImpl ngramsProcessor = new NGramsSentenceProcessorImpl();
-		 
-		RelationshipProcessor processor = new NounRelationshipProcessor();
-
-		
-		SemanticTypeSentenceAnnotatorImpl annotator = new SemanticTypeSentenceAnnotatorImpl();
-		SemanticTypeHardCodedProvider provider = new SemanticTypeHardCodedProvider();
-		
 		int index = 0;
-		List<Integer> excludeList = new ArrayList<>();
 		for(Sentence sentence: sentences){
-
-			Sentence ngramsProcessedSentence = ngramsProcessor.process(sentence,ngramsProvider.getNGrams());
-			List<WordToken> modifiedTokens = annotator.annotate(ngramsProcessedSentence.getModifiedWordList(), provider.getSemanticTypes());
-			if(index==0){
-				System.out.println("STOP");
-			}
-			List<TokenRelationship> relationships =  processor.process(modifiedTokens, input);
+			List<TokenRelationship> relationships = getTokenRelationships(sentence, index);
 			List<TokenRelationship> expectedValues = expectedMap.get(index);
-			
-			System.out.println(sentence.getNormalizedSentence());
-			for(TokenRelationship tr :  relationships){
-				System.out.println("From " + tr.getFromToken().getToken());
-				System.out.println("To " + tr.getToToken().getToken());
-				
-				System.out.println(tr.getEdgeName());
-				System.out.println("**********************************************");
-			}
-			assertRelations(index, relationships,expectedMap.get(index));
+			assertRelations(index, relationships, expectedValues);
 			index+=1;
-			 
 		}
+	}
+	
+	private List<TokenRelationship> getTokenRelationships(Sentence sentence,int index){
+		Sentence ngramsProcessedSentence = ngramsProcessor.process(sentence,ngramsProvider.getNGrams());
+		List<WordToken> modifiedTokens = annotator.annotate(ngramsProcessedSentence.getModifiedWordList(), provider.getSemanticTypes());
+		if(index==0){
+			System.out.println("STOP");
+		}
+		List<TokenRelationship> relationships =  processor.process(modifiedTokens, input);
+		
+		System.out.println(sentence.getNormalizedSentence());
+		for(TokenRelationship tr :  relationships){
+			System.out.println("From " + tr.getFromToken().getToken());
+			System.out.println("To " + tr.getToToken().getToken());
+			
+			System.out.println(tr.getEdgeName());
+			System.out.println("**********************************************");
+		}
+		return relationships;
 	}
 	
 	private void assertRelations(int index,List<TokenRelationship> actual, List<TokenRelationship> expected){

@@ -15,6 +15,7 @@ import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.sentenceprocessing.SentenceConverter;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
+import com.mst.util.MongoDatastoreProviderDefault;
 
 public class LoadSentencesToMongo {
 
@@ -36,6 +37,10 @@ public class LoadSentencesToMongo {
 		processSentence("CT does not demonstrate a cyst."); 
 	}
 
+//	@Test 
+	public void writeOneSentence() throws Exception{
+		processSentence("She is going to the doctor for a ct");
+	}
 	
 	private void processSentence(String text) throws Exception{
 		Sentence sentence = getSentence(text);
@@ -44,13 +49,12 @@ public class LoadSentencesToMongo {
 	
 	private void write(Sentence sentence){
 		SentenceDb dbObj = SentenceConverter.convertToDocument(sentence);
-		getDatastore().save(dbObj);
+		new MongoDatastoreProviderDefault().getDataStore().save(dbObj);
 	}
-	
-	@Test
+	//@Test
 	public void loadMetaData(){
 		SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
-		Datastore ds = getDatastore();
+		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();
 		ds.delete(ds.createQuery(SentenceProcessingMetaDataInput.class));
 		ds.save(input);
 	}
@@ -64,24 +68,5 @@ public class LoadSentencesToMongo {
 		Sentence result = sentences.get(0);
 		return result;
 	}
-	
-	
-	protected Datastore getDatastore() {
-		Morphia morphia = new Morphia();
-    	
-//    	morphia.mapPackage("com.mst.model.morphia");
 
-    	Datastore datastore;
-		try {
-			datastore = morphia.createDatastore(new MongoClient("10.210.192.4"), "test");
-	    	datastore.ensureIndexes();
-	    	return datastore;
-	    	
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-
-    }
 }
