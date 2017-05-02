@@ -16,6 +16,7 @@ public class SentenceConverter {
 		dbObj.setSource(sentence.getSource());
 		dbObj.setStudy(sentence.getStudy());
 		dbObj.setNormalizedSentence(sentence.getNormalizedSentence());
+		dbObj.setDiscreteData(sentence.getDiscreteData());
 		return dbObj;
 	}
 }

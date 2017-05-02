@@ -16,12 +16,10 @@ public class SentenceQueryDaoTests {
 	public void runQuery(){
 		SentenceQueryDaoImpl dao = new SentenceQueryDaoImpl();
 		SentenceQueryInput input = new SentenceQueryInput();
-		input.getTokens().add("right");
-		input.setEdgeName("laterality");
+		input.getTokens().add("cyst");
+		input.setEdgeName("disease location");
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		List<SentenceQueryResult> sentences = dao.getSentences(input);	
-		List<SentenceQueryResult> tenmp = sentences;
-	}
-	
+	}	
 }
 

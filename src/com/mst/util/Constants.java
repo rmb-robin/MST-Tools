@@ -173,43 +173,43 @@ public class Constants {
 	private static final String REDIS_DB_HOST = Props.getProperty("redis_host");
 
 	
-	public enum MongoDB {
-	    INSTANCE;
+//	public enum MongoDB {
+//	    INSTANCE;
+//	    
+//	    private MongoClient mongo;
+//	    private DB db;
+//
+//	    MongoDB() {
+//	    	System.out.println("Established MongoDB connection");
+//	    	System.out.println(MONGO_DB_HOST + " / " + MONGO_DB + " / " + Props.getProperty("mongo_user") + " / " + Props.getProperty("mongo_pw"));
+//
+//	        try {
+//	            mongo = new MongoClient(MONGO_DB_HOST);
+//	        } catch (UnknownHostException e) {
+//	            e.printStackTrace();
+//	        }
+//
+//	        db = mongo.getDB(MONGO_DB);
+//	        
+//	        //if(MONGO_DB_HOST.equalsIgnoreCase("mongo01.medicalsearchtechnologies.com")) {
+//	        //	System.out.println("Authenticating to Digital Ocean server...");
+//			//	boolean auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
+//			//	System.out.println("MongoDB auth: " + auth);
+//	        //}
+//	    }
 	    
-	    private MongoClient mongo;
-	    private DB db;
-
-	    MongoDB() {
-	    	System.out.println("Established MongoDB connection");
-	    	System.out.println(MONGO_DB_HOST + " / " + MONGO_DB + " / " + Props.getProperty("mongo_user") + " / " + Props.getProperty("mongo_pw"));
-
-	        try {
-	            mongo = new MongoClient(MONGO_DB_HOST);
-	        } catch (UnknownHostException e) {
-	            e.printStackTrace();
-	        }
-
-	        db = mongo.getDB(MONGO_DB);
-	        
-	        //if(MONGO_DB_HOST.equalsIgnoreCase("mongo01.medicalsearchtechnologies.com")) {
-	        //	System.out.println("Authenticating to Digital Ocean server...");
-			//	boolean auth = db.authenticate(Props.getProperty("mongo_user"), Props.getProperty("mongo_pw").toCharArray());
-			//	System.out.println("MongoDB auth: " + auth);
-	        //}
-	    }
-	    
-	    public DB getDB() {
-	    	return db;
-	    }
-	    
-	    public DBCollection getCollection(String collection) {
-	    	return db.getCollection(collection);
-	    }
-
-	    public void close(){
-	        mongo.close();
-	    }
-	}
+//	    public DB getDB() {
+//	    	return db;
+//	    }
+//	    
+//	    public DBCollection getCollection(String collection) {
+//	    	return db.getCollection(collection);
+//	    }
+//
+//	    public void close(){
+//	        mongo.close();
+//	    }
+//	}
 	
 	public enum RedisDBx {
 	    INSTANCE;

@@ -25,6 +25,8 @@ public class Sentence {
 	private List<WordToken> modifiedWordList = new ArrayList<>();
 	private List<TokenRelationship> tokenRelationships = new ArrayList<>();
 	private String id, source, practice, study;
+
+	private DiscreteData discreteData;
 	
 	public Sentence() {	
 		this.processDate = new Date();
@@ -136,5 +138,13 @@ public class Sentence {
 
 	public void setTokenRelationships(List<TokenRelationship> tokenRelationships) {
 		this.tokenRelationships = tokenRelationships;
+	}
+
+	public DiscreteData getDiscreteData() {
+		return discreteData;
+	}
+
+	public void setDiscreteData(DiscreteData discreteData) {
+		this.discreteData = discreteData;
 	}
 }

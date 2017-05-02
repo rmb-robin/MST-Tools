@@ -100,9 +100,9 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 	
 	private boolean shouldAddTokenFromRelationship(TokenRelationship relation, String token, String edgeName){
-		if(edgeName != null)
-			if(!relation.getEdgeName().equals(edgeName)) return false;
-		
+//		if(edgeName != null)
+//			if(!relation.getEdgeName().equals(edgeName)) return false;
+//		
 		
 			if(relation.getFromToken().getToken().equals(token)) return true;
 		if(relation.getToToken().getToken().equals(token)) return true;

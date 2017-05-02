@@ -12,9 +12,10 @@ import org.junit.Test;
 import com.mst.metadataProviders.NGramsHardCodedProvider;
 import com.mst.metadataProviders.TestDataProvider;
 import com.mst.model.metadataTypes.PropertyValueTypes;
+import com.mst.model.requests.SentenceRequest;
+import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
-import com.mst.model.sentenceProcessing.TextInput;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.sentenceprocessing.PrepositionPhraseProcessingInputFactory;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
@@ -39,7 +40,7 @@ public class SentenceProcessingControllerTest {
 	
 	@Test
 	public void processTest() throws Exception {
-		TextInput input = new TextInput();
+		SentenceTextRequest input = new SentenceTextRequest();
 		input.setText("she had a cyst in the ovary. She went to get a ct scan done. The test revealed a 3.5 cm cyst.");;
 		
 		SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
@@ -53,9 +54,11 @@ public class SentenceProcessingControllerTest {
 		
 		SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
 		controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
+		SentenceRequest request = new SentenceRequest();
 		List<String> input = new ArrayList<>();
 		input.add(sentenceText);
-		List<Sentence> sentences = controller.processSentences(input);
+		request.setSenteceTexts(input);
+		List<Sentence> sentences = controller.processSentences(request);
 		Sentence result = sentences.get(0);
 		List<WordToken> tokens = result.getModifiedWordList();
 		

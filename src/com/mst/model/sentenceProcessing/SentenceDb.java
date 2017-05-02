@@ -9,6 +9,7 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Index;
 import org.mongodb.morphia.annotations.Indexes;
+import org.mongodb.morphia.annotations.Reference;
 
 @Entity("sentences")
 //@Indexes({
@@ -32,6 +33,8 @@ public class SentenceDb {
 	private List<TokenRelationship> tokenRelationships = new ArrayList<>();
 	private String source, practice, study;
 
+	@Reference
+	private DiscreteData discreteData;
 
 	public int getPosition() {
 		return position;
@@ -82,7 +85,6 @@ public class SentenceDb {
 		this.tokenRelationships = tokenRelationships;
 	}
 
-	
 	public String getSource() {
 		return source;
 	}
@@ -106,6 +108,12 @@ public class SentenceDb {
 	}
 	public ObjectId getId() {
 		return id;
+	}
+	public DiscreteData getDiscreteData() {
+		return discreteData;
+	}
+	public void setDiscreteData(DiscreteData discreteData) {
+		this.discreteData = discreteData;
 	}
 	
 	

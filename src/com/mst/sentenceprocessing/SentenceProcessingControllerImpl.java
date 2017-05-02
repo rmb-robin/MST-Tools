@@ -3,6 +3,8 @@ package com.mst.sentenceprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
 import com.mst.interfaces.sentenceprocessing.PrepPhraseRelationshipProcessor;
@@ -13,9 +15,12 @@ import com.mst.interfaces.sentenceprocessing.SentenceProcessingController;
 import com.mst.interfaces.sentenceprocessing.VerbPhraseProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.model.SentenceToken;
+import com.mst.model.requests.SentenceRequest;
+import com.mst.model.requests.SentenceRequestBase;
+import com.mst.model.requests.SentenceTextRequest;
+import com.mst.model.sentenceProcessing.DiscreteData;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
-import com.mst.model.sentenceProcessing.TextInput;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
  
@@ -51,19 +56,23 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		this.sentenceProcessingMetaDataInput = sentenceProcessingMetaDataInput;
 	}
 		
-	public List<Sentence> processSentences(List<String> sentenceTexts) throws Exception{
-		
+	public List<Sentence> processSentences(SentenceRequest request) throws Exception{
+		if(request.getDiscreteData()!=null)
+			request.getDiscreteData().setId(new ObjectId());
 		List<Sentence> sentences = new ArrayList<>();	
-		for(String sentenceText: sentenceTexts){
-			Sentence sentence = getSentence(sentenceText);
+		for(String sentenceText: request.getSenteceTexts()){
+			Sentence sentence = getSentence(sentenceText,request);
 			sentence = processSentence(sentence);
 			sentences.add(sentence);
 		}
 		return sentences;
 	}
-	
-	public List<Sentence> processText(TextInput input) throws Exception {
-		List<Sentence> sentences = getSentences(input);
+		
+	public List<Sentence> processText(SentenceTextRequest request) throws Exception {
+		if(request.getDiscreteData()!=null)
+			request.getDiscreteData().setId(new ObjectId());
+		
+		List<Sentence> sentences = getSentences(request);
 		for(Sentence sentence: sentences){
 			processSentence(sentence);
 		}
@@ -87,25 +96,25 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	}
 	
 	
-	private Sentence getSentence(String sentenceText){
+	private Sentence getSentence(String sentenceText,SentenceRequest request){
 		SentenceToken sentenceToken = tokenizer.splitSentencesNew(sentenceText).get(0);
-		return createSentence(sentenceToken,null,"practice",null,0);
+		return createSentence(sentenceToken,request.getStudy(),request.getPractice(),request.getSource(),0,request.getDiscreteData());
 	}
 	
-	private List<Sentence> getSentences(TextInput textInput){
-		List<SentenceToken> sentenceTokens = tokenizer.splitSentencesNew(textInput.getText());
+	private List<Sentence> getSentences(SentenceTextRequest request){
+		List<SentenceToken> sentenceTokens = tokenizer.splitSentencesNew(request.getText());
 		List<Sentence> result = new ArrayList<Sentence>();
-		
+		 
 		int position = 1;
 		for(SentenceToken sentenceToken: sentenceTokens){
-			Sentence sentence = createSentence(sentenceToken, textInput.getStudy(),textInput.getPractice(), textInput.getSource(), position);
+			Sentence sentence = createSentence(sentenceToken, request.getStudy(),request.getPractice(), request.getSource(), position, request.getDiscreteData());
 			result.add(sentence);
 			position +=1;
 		}
 		return result;
 	}
 
-	private Sentence createSentence(SentenceToken sentenceToken, String study, String practice, String source,int position){
+	private Sentence createSentence(SentenceToken sentenceToken, String study, String practice, String source,int position, DiscreteData discreteData){
 		String cs = cleaner.cleanSentence(sentenceToken.getToken());
 		Sentence sentence = new Sentence(null, position);
 		List<String> words =  tokenizer.splitWordsInStrings(cs);
@@ -116,6 +125,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		sentence.setStudy(study);
 		sentence.setNormalizedSentence(cs);
 		sentence.setOrigSentence(sentenceToken.getToken());
+		sentence.setDiscreteData(discreteData);
 		return sentence;
 		
 	}

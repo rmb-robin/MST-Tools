@@ -9,6 +9,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
+import com.mst.model.requests.SentenceRequest;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
@@ -20,7 +21,7 @@ import com.mst.util.MongoDatastoreProviderDefault;
 public class LoadSentencesToMongo {
 
 	
-	@Test
+//	@Test
 	public void process() throws Exception{
 		processSentence("The simple cyst measures 3.5 mm");
 		processSentence("She has a 3.5 mm simple cyst");
@@ -64,7 +65,11 @@ public class LoadSentencesToMongo {
 		controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
 		List<String> input = new ArrayList<>();
 		input.add(text);
-		List<Sentence> sentences = controller.processSentences(input);
+		
+		SentenceRequest request = new SentenceRequest();
+		request.setSenteceTexts(input);
+		
+		List<Sentence> sentences = controller.processSentences(request);
 		Sentence result = sentences.get(0);
 		return result;
 	}

@@ -1,7 +1,5 @@
 package com.mst.util;
 
-import java.net.UnknownHostException;
-
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
@@ -20,7 +18,7 @@ public class MongoConnectionProvider {
 	    	datastore.ensureIndexes();
 	    	return datastore;
 	    	
-		} catch (UnknownHostException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
