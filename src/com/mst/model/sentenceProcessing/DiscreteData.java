@@ -7,7 +7,7 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Index;
 import org.mongodb.morphia.annotations.Indexes;
 
-@Entity("sentences")
+@Entity("discreteData")
 //@Indexes({
 //    @Index(fields = @Field("id"))
 //})

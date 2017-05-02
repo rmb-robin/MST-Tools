@@ -57,8 +57,6 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	}
 		
 	public List<Sentence> processSentences(SentenceRequest request) throws Exception{
-		if(request.getDiscreteData()!=null)
-			request.getDiscreteData().setId(new ObjectId());
 		List<Sentence> sentences = new ArrayList<>();	
 		for(String sentenceText: request.getSenteceTexts()){
 			Sentence sentence = getSentence(sentenceText,request);
@@ -68,10 +66,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		return sentences;
 	}
 		
-	public List<Sentence> processText(SentenceTextRequest request) throws Exception {
-		if(request.getDiscreteData()!=null)
-			request.getDiscreteData().setId(new ObjectId());
-		
+	public List<Sentence> processText(SentenceTextRequest request) throws Exception {		
 		List<Sentence> sentences = getSentences(request);
 		for(Sentence sentence: sentences){
 			processSentence(sentence);
@@ -95,10 +90,9 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		return sentence;
 	}
 	
-	
 	private Sentence getSentence(String sentenceText,SentenceRequest request){
 		SentenceToken sentenceToken = tokenizer.splitSentencesNew(sentenceText).get(0);
-		return createSentence(sentenceToken,request.getStudy(),request.getPractice(),request.getSource(),0,request.getDiscreteData());
+		return createSentence(sentenceToken,request.getStudy(),request.getPractice(),request.getSource(),0);
 	}
 	
 	private List<Sentence> getSentences(SentenceTextRequest request){
@@ -107,14 +101,14 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		 
 		int position = 1;
 		for(SentenceToken sentenceToken: sentenceTokens){
-			Sentence sentence = createSentence(sentenceToken, request.getStudy(),request.getPractice(), request.getSource(), position, request.getDiscreteData());
+			Sentence sentence = createSentence(sentenceToken, request.getStudy(),request.getPractice(), request.getSource(), position);
 			result.add(sentence);
 			position +=1;
 		}
 		return result;
 	}
 
-	private Sentence createSentence(SentenceToken sentenceToken, String study, String practice, String source,int position, DiscreteData discreteData){
+	private Sentence createSentence(SentenceToken sentenceToken, String study, String practice, String source,int position){
 		String cs = cleaner.cleanSentence(sentenceToken.getToken());
 		Sentence sentence = new Sentence(null, position);
 		List<String> words =  tokenizer.splitWordsInStrings(cs);
@@ -125,7 +119,6 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		sentence.setStudy(study);
 		sentence.setNormalizedSentence(cs);
 		sentence.setOrigSentence(sentenceToken.getToken());
-		sentence.setDiscreteData(discreteData);
 		return sentence;
 		
 	}

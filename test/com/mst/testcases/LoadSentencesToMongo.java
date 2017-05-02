@@ -9,7 +9,9 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import com.mongodb.MongoClient;
+import com.mst.dao.SentenceDaoImpl;
 import com.mst.model.requests.SentenceRequest;
+import com.mst.model.sentenceProcessing.DiscreteData;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
@@ -38,7 +40,7 @@ public class LoadSentencesToMongo {
 		processSentence("CT does not demonstrate a cyst."); 
 	}
 
-//	@Test 
+	@Test 
 	public void writeOneSentence() throws Exception{
 		processSentence("She is going to the doctor for a ct");
 	}
@@ -50,7 +52,16 @@ public class LoadSentencesToMongo {
 	
 	private void write(Sentence sentence){
 		SentenceDb dbObj = SentenceConverter.convertToDocument(sentence);
-		new MongoDatastoreProviderDefault().getDataStore().save(dbObj);
+		List<SentenceDb> sentences = new ArrayList<>();
+		sentences.add(dbObj);
+		
+		DiscreteData dd = new DiscreteData();
+		dd.setAccessionNumber("111");
+		dd.setExamDescription("desc");
+		dd.setModality("m");	
+		SentenceDaoImpl dao =  new SentenceDaoImpl();
+		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+		dao.saveSentences(sentences, dd);
 	}
 	//@Test
 	public void loadMetaData(){
