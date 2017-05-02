@@ -3,9 +3,9 @@ package com.mst.interfaces.dao;
 import java.util.List;
 
 import com.mst.model.SentenceQuery.SentenceQueryInput;
-import com.mst.model.sentenceProcessing.SentenceDb;
+import com.mst.model.SentenceQuery.SentenceQueryResult;
 
 public interface SentenceQueryDao extends IDao {
 
-	List<SentenceDb> getSentences(SentenceQueryInput input);
+	List<SentenceQueryResult> getSentences(SentenceQueryInput input);
 }

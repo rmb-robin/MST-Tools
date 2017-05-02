@@ -83,16 +83,22 @@ public class VerbPhraseProcessorTest {
 		expectedSubjectComplements.add("cm");
 	//	runAssert("The left ovary measures 2.7x2.1x1.6 cm.",expectedSubjects,expectedSubjectComplements);
 
-		expectedSubjects.clear();
-		expectedSubjects.add("bone-marrow-biopsy");
-		expectedSubjects.add("ultrasound");
-		expectedSubjectComplements.clear();
-		expectedSubjectComplements.add("3.5");
-		runAssert("Bone marrow biopsy and ultrasound demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
-	
 
+	}
+
+	
+	@Test
+	public void failingThatusedtoPass() throws Exception{
+		List<String> expectedSubjects = new ArrayList<>();
+		List<String> expectedSubjectComplements = new ArrayList<>();
 		
-		
+		expectedSubjects.clear();
+		expectedSubjects.add("kidney");
+		expectedSubjectComplements.clear();
+		expectedSubjectComplements.add("enlarged");
+	//	runAssert("Left kidney appears enlarged.",expectedSubjects,expectedSubjectComplements);
+
+
 	}
 	
 	
@@ -143,7 +149,7 @@ public class VerbPhraseProcessorTest {
 		expectedSubjects.add("there");	
 		expectedSubjectComplements.clear();
 		expectedSubjectComplements.add("cyst");
-	//	runAssert("There is a simple 3.5 mm cyst.",expectedSubjects,expectedSubjectComplements);
+		runAssert("There is a simple 3.5 mm cyst.",expectedSubjects,expectedSubjectComplements);
 		
 		expectedSubjects.clear();
 		expectedSubjects.add("there");
@@ -158,11 +164,6 @@ public class VerbPhraseProcessorTest {
 		runAssert("The lesion in the upper lobe of the right kidney is a cyst.",expectedSubjects,expectedSubjectComplements);
 		
 		
-		expectedSubjects.clear();
-		expectedSubjects.add("kidney");
-		expectedSubjectComplements.clear();
-		expectedSubjectComplements.add("enlarged");
-		//runAssert("Left kidney appears enlarged.",expectedSubjects,expectedSubjectComplements);
 
 		expectedSubjects.clear();
 		expectedSubjects.add("ct-scan");
@@ -181,8 +182,8 @@ public class VerbPhraseProcessorTest {
 		expectedSubjects.clear();
 		expectedSubjects.add("bone-marrow-biopsy");
 		expectedSubjectComplements.clear();
-		expectedSubjectComplements.add("3.5");
-	//	runAssert("Bone marrow biopsy demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
+		expectedSubjectComplements.add("lesion");
+		runAssert("Bone marrow biopsy demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
 	
 		expectedSubjects.clear();
 		expectedSubjects.add("ct-scan");
@@ -192,6 +193,15 @@ public class VerbPhraseProcessorTest {
 		expectedSubjectComplements.clear();
 		expectedSubjectComplements.add("lesion");
 		runAssert("CT scan, bone marrow biopsy and ultrasound demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
+	
+	
+		expectedSubjects.clear();
+		expectedSubjects.add("bone-marrow-biopsy");
+		expectedSubjects.add("ultrasound");
+		expectedSubjectComplements.clear();
+		expectedSubjectComplements.add("lesion");
+		runAssert("Bone marrow biopsy and ultrasound demonstrates a 3.5 mm benign lesion.",expectedSubjects,expectedSubjectComplements);
+
 	
 	}
 	
