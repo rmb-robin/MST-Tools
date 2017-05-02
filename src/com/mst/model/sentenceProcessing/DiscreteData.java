@@ -1,11 +1,13 @@
 package com.mst.model.sentenceProcessing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
-import org.mongodb.morphia.annotations.Index;
-import org.mongodb.morphia.annotations.Indexes;
+
 
 @Entity("discreteData")
 //@Indexes({
@@ -29,7 +31,12 @@ public class DiscreteData {
 	private String reportFinalizedBy; 
 	private DateTime reportFinalizedDate; 
 	private int patientAge;
+	private List<DiscreteDataCustomField> customFields; 
 	
+	public DiscreteData(){
+		customFields = new ArrayList<>();
+	}
+
 	public String getReadingLocation() {
 		return readingLocation;
 	}
@@ -119,6 +126,14 @@ public class DiscreteData {
 	}
 	public void setId(ObjectId id) {
 		this.id = id;
+	}
+
+
+	public List<DiscreteDataCustomField> getCustomFields() {
+		return customFields;
+	}
+	public void setCustomFields(List<DiscreteDataCustomField> customFields) {
+		this.customFields = customFields;
 	} 
 	
 }
