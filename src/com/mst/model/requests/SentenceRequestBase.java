@@ -6,8 +6,8 @@ public abstract class SentenceRequestBase {
 
 	private String source, practice, study;
 	private DiscreteData discreteData;
+	private boolean convertMeasurements, convertLargest;
 	
-
 	public String getSource() {
 		return source;
 	}
@@ -31,6 +31,18 @@ public abstract class SentenceRequestBase {
 	}
 	public void setDiscreteData(DiscreteData discreteData) {
 		this.discreteData = discreteData;
+	}
+	public boolean isConvertMeasurements() {
+		return convertMeasurements;
+	}
+	public void setConvertMeasurements(boolean convertMeasurements) {
+		this.convertMeasurements = convertMeasurements;
+	}
+	public boolean isConvertLargest() {
+		return convertLargest;
+	}
+	public void setConvertLargest(boolean convertLargest) {
+		this.convertLargest = convertLargest;
 	}
 
 	

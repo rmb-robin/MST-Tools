@@ -11,6 +11,7 @@ import com.mst.interfaces.sentenceprocessing.PrepPhraseRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.PrepositionPhraseProcessor;
 import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
+import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
 import com.mst.interfaces.sentenceprocessing.SentenceProcessingController;
 import com.mst.interfaces.sentenceprocessing.VerbPhraseProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
@@ -36,6 +37,8 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	private VerbProcessor verbProcessor;
 	private Tokenizer tokenizer;
 	private SentenceCleaner cleaner;
+	private SentenceMeasureNormalizer sentenceMeasureNormalizer;
+	
 	
 	private SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput;
 
@@ -50,6 +53,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		verbProcessor = new VerbProcessorImpl();
 		tokenizer = new Tokenizer();
 		cleaner  = new SentenceCleaner();
+		sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
 	}
 
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
@@ -60,7 +64,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		List<Sentence> sentences = new ArrayList<>();	
 		for(String sentenceText: request.getSenteceTexts()){
 			Sentence sentence = getSentence(sentenceText,request);
-			sentence = processSentence(sentence);
+			sentence = processSentence(sentence,request);
 			sentences.add(sentence);
 		}
 		return sentences;
@@ -69,12 +73,12 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	public List<Sentence> processText(SentenceTextRequest request) throws Exception {		
 		List<Sentence> sentences = getSentences(request);
 		for(Sentence sentence: sentences){
-			processSentence(sentence);
+			processSentence(sentence,request);
 		}
 		return sentences;
 	}
 	
-	private Sentence processSentence(Sentence sentence) throws Exception{
+	private Sentence processSentence(Sentence sentence, SentenceRequestBase request) throws Exception{
 		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
 		List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(),this.sentenceProcessingMetaDataInput.getSemanticTypes());
 		List<TokenRelationship> tokenRelationships = new ArrayList<>();
@@ -85,6 +89,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		tokens = prepPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseProcessingInput());
 		tokenRelationships.addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
 		tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
+		tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements(), request.isConvertLargest());
 		sentence.setModifiedWordList(tokens);
 		sentence.setTokenRelationships(tokenRelationships);
 		return sentence;
