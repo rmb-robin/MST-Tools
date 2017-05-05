@@ -1,4 +1,4 @@
-package com.mst.sentenceprocessing;
+package com.mst.model.metadataTypes;
 
 public class EdgeTypes {
 

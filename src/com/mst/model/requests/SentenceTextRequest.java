@@ -1,8 +1,7 @@
 package com.mst.model.requests;
 
-
 public class SentenceTextRequest extends SentenceRequestBase {
-
+	
 	private String text;
 	
 	public String getText() {

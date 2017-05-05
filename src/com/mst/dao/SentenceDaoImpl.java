@@ -10,9 +10,11 @@ import com.mst.interfaces.dao.SentenceDao;
 import com.mst.model.sentenceProcessing.DiscreteData;
 import com.mst.model.sentenceProcessing.SentenceDb;
 
-public class SentenceDaoImpl implements SentenceDao {
+public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements SentenceDao {
 
-	private MongoDatastoreProvider datastoreProvider;
+	public SentenceDaoImpl() {
+		super(SentenceDb.class);
+	}
 
 	public void saveSentences(List<SentenceDb> sentences, DiscreteData discreteData) {
 		Datastore ds = datastoreProvider.getDataStore();
@@ -28,7 +30,6 @@ public class SentenceDaoImpl implements SentenceDao {
 	}
 
 	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
-		this.datastoreProvider = provider;
-		
+		super.setMongoDatastoreProvider(provider);
 	}
 }

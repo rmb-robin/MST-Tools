@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
+import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.RelationshipInput;
