@@ -1,5 +1,6 @@
 package com.mst.metadataProviders;
 
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public class VerbProcessingInputProvider {
 	private ActionVerbTable acttionVerbTable;
 	private LinkingModalVerbItemFactory linkingModalVerbItemFactory; 
 	private String getFullFilePath(String file){
-		return System.getProperty("user.dir") + "\\testData\\" + file;
+		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + file;
 	}
 	
 	public VerbProcessingInput getInput(){

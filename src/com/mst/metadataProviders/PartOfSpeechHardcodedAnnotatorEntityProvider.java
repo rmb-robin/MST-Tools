@@ -1,6 +1,7 @@
 package com.mst.metadataProviders;
 
 import java.util.List;
+import java.io.File;
 import java.util.HashSet;
 
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotatorEntityProvider;
@@ -24,7 +25,7 @@ public class PartOfSpeechHardcodedAnnotatorEntityProvider implements PartOfSpeec
 	}
 
 	private String getFullFilePath(String fileName){
-		return System.getProperty("user.dir") + "\\testData\\" + fileName;
+		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + fileName;
 	}
 
 	
