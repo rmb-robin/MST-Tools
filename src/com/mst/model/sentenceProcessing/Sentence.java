@@ -1,17 +1,12 @@
 package com.mst.model.sentenceProcessing;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.bson.types.ObjectId;
+import com.mst.model.discrete.DiscreteData;
 
-import com.google.common.base.Joiner;
-import com.mst.model.SentenceMetadata;
+import java.time.LocalDate;
+
 
 public class Sentence {
 
@@ -19,7 +14,7 @@ public class Sentence {
 	private long lineId;
 	private String origSentence;
 	private String normalizedSentence;
-	private Date processDate;
+	private LocalDate processDate;
 	
 	private List<String> originalWords;
 	private List<WordToken> modifiedWordList = new ArrayList<>();
@@ -28,22 +23,26 @@ public class Sentence {
 
 	private DiscreteData discreteData;
 	
-	public Sentence() {	
-		this.processDate = new Date();
-	}
 	
 	public Sentence(String id, int position) {	
 		this.id = id;
 		this.position = position;
-		this.processDate = new Date();
 	}
 
 	public Sentence(String fullSentence) {	
 		this.origSentence = fullSentence;
 		this.normalizedSentence = fullSentence;
-		this.processDate = new Date();
 	}
 	
+	
+	public void setProcessDate(){
+		this.processDate = LocalDate.now();
+	}
+	
+	public LocalDate getProcessDate(){
+		return processDate;
+	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
@@ -106,14 +105,6 @@ public class Sentence {
 	
 	public void setOrigSentence(String sentence) {
 		this.origSentence = sentence;
-	}
-
-	public void setProcessDate(Date processDate) {
-		this.processDate = processDate;
-	}
-	
-	public Date getProcessDate() {
-		return this.processDate;
 	}
 
 	public List<WordToken> getModifiedWordList() {

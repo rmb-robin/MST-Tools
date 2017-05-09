@@ -1,6 +1,6 @@
 package com.mst.model.requests;
 
-import com.mst.model.sentenceProcessing.DiscreteData;
+import com.mst.model.discrete.DiscreteData;
 
 public abstract class SentenceRequestBase {
 

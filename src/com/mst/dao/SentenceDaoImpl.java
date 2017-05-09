@@ -7,7 +7,7 @@ import org.mongodb.morphia.Datastore;
 
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceDao;
-import com.mst.model.sentenceProcessing.DiscreteData;
+import com.mst.model.discrete.DiscreteData;
 import com.mst.model.sentenceProcessing.SentenceDb;
 
 public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements SentenceDao {
@@ -20,6 +20,7 @@ public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements 
 		Datastore ds = datastoreProvider.getDataStore();
 		if(discreteData!=null){
 			discreteData.setId(new ObjectId());
+			//discreteData.setTimeStamps();
 			ds.save(discreteData);
 			
 			for(SentenceDb sentence: sentences){

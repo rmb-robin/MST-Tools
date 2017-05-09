@@ -1,5 +1,7 @@
-package com.mst.model.sentenceProcessing;
+package com.mst.model.discrete;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +26,19 @@ public class DiscreteData {
 	private String patientAccount; 
 	private int patientEncounter; 
 	private String vrReportId;
-	private String AccessionNumber; 
+	private String accessionNumber; 
 	private String examDescription; 
 	private String modality; 
 	private String resultStatus; 
 	private String reportFinalizedBy; 
 	private DateTime reportFinalizedDate; 
 	private int patientAge;
+	
+	private LocalTime processTime; 
+	private LocalDate processDate; 
+	
+	private String organizationName; 
+	
 	private List<DiscreteDataCustomField> customFields; 
 	
 	public DiscreteData(){
@@ -80,10 +88,10 @@ public class DiscreteData {
 		this.vrReportId = vrReportId;
 	}
 	public String getAccessionNumber() {
-		return AccessionNumber;
+		return accessionNumber;
 	}
 	public void setAccessionNumber(String accessionNumber) {
-		AccessionNumber = accessionNumber;
+		accessionNumber = accessionNumber;
 	}
 	public String getExamDescription() {
 		return examDescription;
@@ -134,6 +142,31 @@ public class DiscreteData {
 	}
 	public void setCustomFields(List<DiscreteDataCustomField> customFields) {
 		this.customFields = customFields;
+	}
+
+	public LocalTime getProcessTime() {
+		return processTime;
+	}
+
+	public void setTimeStamps() {
+		this.processTime  = LocalTime.now();
+		this.processDate = LocalDate.now();
+	}
+
+	public String getOrganizationName() {
+		return organizationName;
+	}
+
+	public void setOrganizationName(String organizationName) {
+		this.organizationName = organizationName;
+	}
+
+	public void setProcessTime(LocalTime processTime) {
+		this.processTime = processTime;
+	}
+
+	public LocalDate getProcessDate() {
+		return processDate;
 	} 
 	
 }

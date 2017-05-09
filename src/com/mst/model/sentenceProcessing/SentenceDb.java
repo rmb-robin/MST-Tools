@@ -1,7 +1,7 @@
 package com.mst.model.sentenceProcessing;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.*;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -10,6 +10,8 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Index;
 import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.annotations.Reference;
+
+import com.mst.model.discrete.DiscreteData;
 
 @Entity("sentences")
 //@Indexes({
@@ -26,7 +28,7 @@ public class SentenceDb {
 	private long lineId;
 	private String origSentence;
 	private String normalizedSentence;
-	//private Date processDate;
+	private LocalDate processDate;
 	
 	private List<String> originalWords;
 	private List<WordToken> modifiedWordList = new ArrayList<>();
@@ -60,12 +62,7 @@ public class SentenceDb {
 	public void setNormalizedSentence(String normalizedSentence) {
 		this.normalizedSentence = normalizedSentence;
 	}
-//	public Date getProcessDate() {
-//		return processDate;
-//	}
-//	public void setProcessDate(Date processDate) {
-//		this.processDate = processDate;
-//	}
+	
 	public List<String> getOriginalWords() {
 		return originalWords;
 	}
@@ -114,6 +111,12 @@ public class SentenceDb {
 	}
 	public void setDiscreteData(DiscreteData discreteData) {
 		this.discreteData = discreteData;
+	}
+	public LocalDate getProcessDate() {
+		return processDate;
+	}
+	public void setProcessDate(LocalDate processDate) {
+		this.processDate = processDate;
 	}
 	
 	
