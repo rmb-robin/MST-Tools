@@ -1,5 +1,6 @@
 package com.mst.metadataProviders;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,7 @@ import com.mst.model.sentenceProcessing.RelationshipMapping;
 public class RelationshipInputProviderFileImpl implements NounRelationshipInputProvider {
 
 	private String getFullFilePath(String filePath){
-		return System.getProperty("user.dir") + "\\testData\\" + filePath;
+		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + filePath;
 	}
 	
 	private int maxDistance;
