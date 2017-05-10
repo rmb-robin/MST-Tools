@@ -1,8 +1,8 @@
 package com.mst.testcases;
 
 import org.junit.Test;
-import com.mst.model.sentenceProcessing.DiscreteData;
-import com.mst.model.sentenceProcessing.DiscreteDataCustomField;
+import com.mst.model.discrete.DiscreteData;
+import com.mst.model.discrete.DiscreteDataCustomField;
 import com.mst.sentenceprocessing.DiscreteDataNormalizerImpl;
 
 import static org.junit.Assert.*;
