@@ -35,6 +35,17 @@ public class Sentence {
 	}
 	
 	
+	public List<TokenRelationship> getTokenRelationshipsByEdgeName(String edgeName){
+		List<TokenRelationship> result = new ArrayList<>();
+		if(this.tokenRelationships==null) return result;
+		
+		for(TokenRelationship tokenRelationship: this.tokenRelationships){
+			if(tokenRelationship.getEdgeName().equals(edgeName))
+				result.add(tokenRelationship);
+		}
+		return result;
+	}
+	
 	public void setProcessDate(){
 		this.processDate = LocalDate.now();
 	}

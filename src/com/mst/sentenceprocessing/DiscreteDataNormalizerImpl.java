@@ -4,9 +4,10 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 import com.mst.interfaces.sentenceprocessing.DiscreteDataNormalizer;
+import com.mst.metadataProviders.DiscreteDataCustomFieldNames;
 import com.mst.model.metadataTypes.CustomFieldDataType;
-import com.mst.model.sentenceProcessing.DiscreteData;
-import com.mst.model.sentenceProcessing.DiscreteDataCustomField;
+import com.mst.model.discrete.DiscreteData;
+import com.mst.model.discrete.DiscreteDataCustomField;
 
 public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 
@@ -21,13 +22,11 @@ public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 			DateTime dob = discreteData.getPatientDob();
 			DateTime finalized = discreteData.getReportFinalizedDate();
 			
-			// https://medicalsearchtechnologies.atlassian.net/browse/UI-141
 			if(dob != null && finalized != null) {
 				Period period = new Period(dob, finalized);
 				discreteData.setPatientAge(period.getYears());
 			}
-			
-			// https://medicalsearchtechnologies.atlassian.net/browse/UI-143
+
 			if(isFemalePatient(discreteData)) {
 				String status = MENOPAUSE_DEFAULT;
 				
@@ -37,7 +36,7 @@ public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 					status = MENOPAUSE_POST;
 				}
 				
-				DiscreteDataCustomField field = new DiscreteDataCustomField("MenopausalStatus", status, CustomFieldDataType.string);
+				DiscreteDataCustomField field = new DiscreteDataCustomField(DiscreteDataCustomFieldNames.menopausalStatus, status, CustomFieldDataType.string);
 				discreteData.getCustomFields().add(field);
 			}
 		}

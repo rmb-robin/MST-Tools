@@ -91,7 +91,7 @@ public class DiscreteData {
 		return accessionNumber;
 	}
 	public void setAccessionNumber(String accessionNumber) {
-		accessionNumber = accessionNumber;
+		this.accessionNumber = accessionNumber;
 	}
 	public String getExamDescription() {
 		return examDescription;
