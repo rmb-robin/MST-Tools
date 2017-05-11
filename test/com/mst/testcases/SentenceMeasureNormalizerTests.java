@@ -31,6 +31,34 @@ public class SentenceMeasureNormalizerTests {
 	}
 
 	@Test
+	public void testMMtoCM2() {
+		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+
+		List<WordToken> words = getWordTokens("The left kidney measures 9.1 x 3.2 cm.");
+		
+		System.out.println(words);
+		normalizer.Normalize(words, true, false);
+		System.out.println(words);
+		
+		assertEquals(words.get(4).getToken(), "9.1x3.2");
+		assertEquals(words.get(5).getToken(), "cm");
+	}
+	
+	@Test
+	public void testMMtoCM3() {
+		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+
+		List<WordToken> words = getWordTokens("The laceration is 21 mm.");
+		
+		System.out.println(words);
+		normalizer.Normalize(words, true, false);
+		System.out.println(words);
+		
+		assertEquals(words.get(3).getToken(), "2.1");
+		assertEquals(words.get(4).getToken(), "cm");
+	}
+	
+	@Test
 	public void testGetLargestValue() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
 
