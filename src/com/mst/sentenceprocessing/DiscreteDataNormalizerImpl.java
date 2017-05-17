@@ -17,7 +17,16 @@ public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 	private final String MENOPAUSE_PRE = "Pre-Menopausal";
 	private final String MENOPAUSE_POST = "Post-Menopausal";
 	
-	public DiscreteData process(DiscreteData discreteData){
+	public DiscreteData process(DiscreteData discreteData) {
+		
+		calculateAge(discreteData);
+		
+		determineMenopausalStatus(discreteData);
+		
+		return discreteData;
+	}
+	
+	private void calculateAge(DiscreteData discreteData) {
 		if(discreteData.getPatientAge() == 0) {
 			DateTime dob = discreteData.getPatientDob();
 			DateTime finalized = discreteData.getReportFinalizedDate();
@@ -26,22 +35,22 @@ public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 				Period period = new Period(dob, finalized);
 				discreteData.setPatientAge(period.getYears());
 			}
-
-			if(isFemalePatient(discreteData)) {
-				String status = MENOPAUSE_DEFAULT;
-				
-				if(discreteData.getPatientAge() <= MENOPAUSE_LOW_CUTOFF) {
-					status = MENOPAUSE_PRE;
-				} else if(discreteData.getPatientAge() >= MENOPAUSE_HIGH_CUTOFF) {
-					status = MENOPAUSE_POST;
-				}
-				
-				DiscreteDataCustomField field = new DiscreteDataCustomField(DiscreteDataCustomFieldNames.menopausalStatus, status, CustomFieldDataType.string);
-				discreteData.getCustomFields().add(field);
-			}
 		}
-		
-		return discreteData;
+	}
+	
+	private void determineMenopausalStatus(DiscreteData discreteData) {
+		if(discreteData.getPatientAge() == 0 && isFemalePatient(discreteData)) {
+			String status = MENOPAUSE_DEFAULT;
+				
+			if(discreteData.getPatientAge() <= MENOPAUSE_LOW_CUTOFF) {
+				status = MENOPAUSE_PRE;
+			} else if(discreteData.getPatientAge() >= MENOPAUSE_HIGH_CUTOFF) {
+				status = MENOPAUSE_POST;
+			}
+			
+			DiscreteDataCustomField field = new DiscreteDataCustomField(DiscreteDataCustomFieldNames.menopausalStatus, status, CustomFieldDataType.string);
+			discreteData.getCustomFields().add(field);
+		}
 	}
 	
 	private boolean isFemalePatient(DiscreteData discreteData) {
