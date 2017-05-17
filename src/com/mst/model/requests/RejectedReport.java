@@ -9,12 +9,13 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Converters;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.converters.DateConverter;
 
 import com.mst.util.LocalDateTimeConverter;
 
  
 @Entity("rejectedReport")
-@Converters(LocalDateTimeConverter.class)
+@Converters(DateConverter.class)
 //@Indexes({
 //  @Index(fields = @Field("id"))
 //}) 

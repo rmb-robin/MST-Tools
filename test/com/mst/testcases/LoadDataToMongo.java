@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
+import org.mongodb.morphia.converters.DateConverter;
 
 import com.mongodb.MongoClient;
 import com.mst.dao.DisceteDataComplianceDisplayFieldsDaoImpl;
@@ -48,7 +49,7 @@ public class LoadDataToMongo {
 		processSentence("CT does not demonstrate a cyst."); 
 	}
 
-	//@Test
+	@Test
 	public void loadRejectedReport(){
 		RejectedReportDaoImpl dao = new RejectedReportDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
@@ -90,7 +91,7 @@ public class LoadDataToMongo {
 		ds.save(input);
 	}
 	
-	@Test
+	//@Test
 	public void loadDiscreteDataComplianceFields(){
 		DiscreteDataComplianceFieldProvider provider = new DiscreteDataComplianceFieldProvider();
 		DisceteDataComplianceDisplayFields fields =  provider.get("rad","rad");

@@ -15,8 +15,8 @@ left,f,bpoc,t,null,laterality
 bilateral,f,bpoc,t,null,laterality
 right,f,bpoc,t,null,laterality
 diag,t,diagnosis,f,null,diagnosis
-cardinal number,t,cm,f,0,unit of measure
-cardinal number,t,mm,f,0,unit of measure
+cardinal number,t,cm,f,null,unit of measure
+cardinal number,t,mm,f,null,unit of measure
 bpoc,t,proc,t,null,procedure location
 stable,f,dysn,t,null,disease stability
 total,f,proc,t,null,degree of procedure

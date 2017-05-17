@@ -38,6 +38,7 @@ public class DiscreteData {
 	private LocalDate processDate; 
 	
 	private String organizationName; 
+	private String bucketName; 
 	
 	private List<DiscreteDataCustomField> customFields; 
 	
@@ -167,6 +168,14 @@ public class DiscreteData {
 
 	public LocalDate getProcessDate() {
 		return processDate;
+	}
+
+	public String getBucketName() {
+		return bucketName;
+	}
+
+	public void setBucketName(String bucketName) {
+		this.bucketName = bucketName;
 	} 
 	
 }

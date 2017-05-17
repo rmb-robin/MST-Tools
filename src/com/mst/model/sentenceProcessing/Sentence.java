@@ -40,10 +40,25 @@ public class Sentence {
 		if(this.tokenRelationships==null) return result;
 		
 		for(TokenRelationship tokenRelationship: this.tokenRelationships){
+			if(tokenRelationship.getEdgeName()==null)continue;
 			if(tokenRelationship.getEdgeName().equals(edgeName))
 				result.add(tokenRelationship);
 		}
 		return result;
+	}
+	
+	public boolean doesSentenceContainVerb(){
+		for(WordToken token: modifiedWordList){
+			if(token.isVerb()) return true;
+		}
+		return false;
+	}
+	
+	public void addHasVerb(){
+		WordToken hasToken = new WordToken();
+		hasToken.setToken("has");
+		hasToken.setVerb(new Verb());
+		modifiedWordList.add(0, hasToken);
 	}
 	
 	public void setProcessDate(){

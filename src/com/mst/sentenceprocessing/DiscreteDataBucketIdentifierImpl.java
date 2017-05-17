@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.mst.interfaces.sentenceprocessing.DiscreteDataBucketIdentifier;
 import com.mst.metadataProviders.DiscreteDataCustomFieldNames;
 import com.mst.model.discrete.ComplianceDisplayFieldsBucketItem;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
@@ -14,15 +15,14 @@ import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 
-public class DiscreteDataBucketIdentifier {
+public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdentifier {
 
-	public String getBucket(DiscreteData discreteData, List<Sentence> sentences,  DisceteDataComplianceDisplayFields f){
- 
-		for (Map.Entry<String, List<ComplianceDisplayFieldsBucketItem>> entry : f.getBuckets().entrySet()) {
+	public String getBucket(DiscreteData discreteData, List<Sentence> sentences,  DisceteDataComplianceDisplayFields fields){
+		for (Map.Entry<String, List<ComplianceDisplayFieldsBucketItem>> entry : fields.getBuckets().entrySet()) {
 			List<ComplianceDisplayFieldsBucketItem> filteredBuckets = findBucketsOnDiscrete(entry.getValue(), discreteData);
 			if(filteredBuckets.isEmpty()) continue;
 			for(Sentence sentence: sentences){
-				if(sentence.getOrigSentence().contains(entry.getKey())){
+				if(sentence.getOrigSentence().toLowerCase().contains(entry.getKey().toLowerCase())){
 				 String bucketName = findBucketForSentence(sentence, filteredBuckets);
 				 if(bucketName!=null) return bucketName;
 				}
@@ -46,7 +46,6 @@ public class DiscreteDataBucketIdentifier {
 	}
 	
 	private String findBucket(TokenRelationship tokenRelationship, List<ComplianceDisplayFieldsBucketItem> bucketItems){
-		List<ComplianceDisplayFieldsBucketItem> result = new ArrayList<>();
 		double measurement = 0;
 		String unitOfMeasure  = null;
 		Double value = WordTokenTypeConverter.tryConvertToDouble(tokenRelationship.getFromToken());
@@ -89,7 +88,7 @@ public class DiscreteDataBucketIdentifier {
 	private boolean filterByMenopausalStatus(DiscreteData discreteData, ComplianceDisplayFieldsBucketItem bucketItem){
 		if(bucketItem.getMenopausalStatus()==null) return true; 
 		if(bucketItem.getMenopausalStatus().equals(""))return true;
-		
+		 
 		 Map<String, DiscreteDataCustomField> customFieldsByName = discreteData.getCustomFields().stream().collect(
 	                Collectors.toMap(x -> x.getFieldName(), x -> x));
 		
