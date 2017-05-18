@@ -11,6 +11,7 @@ public class Verb {
 	private String verbNetClass;
 	private boolean isExistance;
 	private boolean isMaintainVerbNetClass;
+	private boolean isNegation; 
 	
 	public String getVerbNetClass() {
 		return verbNetClass;
@@ -48,5 +49,11 @@ public class Verb {
 	}
 	public void setMaintainVerbNetClass(boolean isMaintainVerbNetClass) {
 		this.isMaintainVerbNetClass = isMaintainVerbNetClass;
+	}
+	public boolean getIsNegation() {
+		return isNegation;
+	}
+	public void setNegation(boolean isNegation) {
+		this.isNegation = isNegation;
 	}
 }

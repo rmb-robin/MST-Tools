@@ -64,7 +64,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		if(item.getVerbType().equals(VerbType.LV))
 			isExistance = true;
 		
-		Verb verb = createVerb(item.getVerbTense(),item.getVerbType(),item.getVerbState(),null,isExistance,false);
+		Verb verb = createVerb(item.getVerbTense(),item.getVerbType(),item.getVerbState(),null,isExistance,false,false);
 		wordToken.setVerb(verb);
 		return true;
 	}
@@ -78,7 +78,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		
 		ActionVerbItem item = actionVerbTable.getVerbsByWord().get(key);
 		wordToken.setPos(VerbType.AV.toString());	
-		Verb verb = createVerb(item.getVerbTense(), VerbType.AV,null,item.getVerbNetClass(), item.getIsExistance(),item.getIsMaintainVerbNetClass());
+		Verb verb = createVerb(item.getVerbTense(), VerbType.AV,null,item.getVerbNetClass(), item.getIsExistance(),item.getIsMaintainVerbNetClass(),item.getIsNegation());
 		wordToken.setVerb(verb);
 		
 		if(item.getId()== item.getInfinitivePresentId()) return true;
@@ -90,7 +90,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		return true;
 	}
 	
-	private Verb createVerb(VerbTense verbTense, VerbType verbType, String state, String verbNetClass, boolean isExistance,boolean isMaintainVerbNetClass){
+	private Verb createVerb(VerbTense verbTense, VerbType verbType, String state, String verbNetClass, boolean isExistance,boolean isMaintainVerbNetClass,boolean isNegation){
 		Verb verb = new Verb();
 		verb.setVerbTense(verbTense);
 		verb.setVerbType(verbType);
@@ -98,6 +98,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		verb.setVerbNetClass(verbNetClass);
 		verb.setExistance(isExistance);
 		verb.setMaintainVerbNetClass(isMaintainVerbNetClass);
+		verb.setNegation(isNegation);
 		return verb;
 	}
 

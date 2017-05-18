@@ -90,8 +90,13 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		tokenRelationships.addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
 		tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
 		tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements(), request.isConvertLargest());
+		
+		//should go here...
+		
 		sentence.setModifiedWordList(tokens);
 		sentence.setTokenRelationships(tokenRelationships);
+		
+		
 		return sentence;
 	}
 	

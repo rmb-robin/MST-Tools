@@ -49,7 +49,7 @@ public class LoadDataToMongo {
 		processSentence("CT does not demonstrate a cyst."); 
 	}
 
-	@Test
+	//@Test
 	public void loadRejectedReport(){
 		RejectedReportDaoImpl dao = new RejectedReportDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
@@ -60,9 +60,9 @@ public class LoadDataToMongo {
 	}
 	
 	
-//	@Test 
+	@Test 
 	public void writeOneSentence() throws Exception{
-		processSentence("testing a  new sentence that has a timestamp.");
+		processSentence("she was denied a ct scan.");
 	}
 	
 	private void processSentence(String text) throws Exception{

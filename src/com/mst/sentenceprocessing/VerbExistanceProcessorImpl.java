@@ -12,41 +12,47 @@ import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.Verb;
 import com.mst.model.sentenceProcessing.WordToken;
-import com.mst.tools.GraphProcessor.EdgeDirection;
+
 
 public class VerbExistanceProcessorImpl {
 
-	private class MatchedTokenResult{
-		public TokenRelationship tokenRelationship;
-		public WordToken oppositeToken; 
-	}
-	
 	private WordToken verb = null;
 	private WordToken subject =null;
 	private WordToken subjectComplement = null;
-	private List<TokenRelationship> tokenRelationships;
     private TokenRelationshipFactory tokenRelationshipFactory; 
  
-    
-    
     public VerbExistanceProcessorImpl(){
     	tokenRelationshipFactory = new TokenRelationshipFactoryImpl();
     }
     
 	public List<TokenRelationship> process(Sentence sentence){
-		//tokenRelationships = new ArrayList<>();
+		 
 		setVerbPhraseTokens(sentence.getModifiedWordList());
-		String edgeName = getEdgeName(sentence);
-		if(edgeName==null) return new ArrayList<TokenRelationship>();
-		return createExistanceEdges(edgeName);
+		if(isVerbValid()){
+			String edgeName = getEdgeNameforNotHas(sentence);
+			if(edgeName !=null) 
+				return createNonHasEdges(edgeName);
+		}
+		
+		TokenRelationship relationship = createHasEdge(sentence);
+		List<TokenRelationship> relationships = new ArrayList<>();
+		if(relationship!=null) relationships.add(relationship);
+		return relationships;
 	}
 	
-	private String getEdgeName(Sentence sentence){
+	
+
+	private boolean isVerbValid(){
+		if(verb==null) return false;
+		if(verb.getVerb()==null) return false;
+		return true;
+	}
+	
+	private String getEdgeNameforNotHas(Sentence sentence){
 		List<TokenRelationship> existingRelationships = sentence.getTokenRelationships();
 		if(existingRelationships==null)return null;
 		if(existingRelationships.isEmpty()) return null;
 		if(subject==null || subjectComplement==null) return null;
-		if(verb==null) return null;
 		List<TokenRelationship> matchedRelationships = getTokenRelationsForTokens(existingRelationships);
 		if(matchedRelationships.isEmpty())return null;
 	
@@ -55,28 +61,10 @@ public class VerbExistanceProcessorImpl {
 		if(isExistancePossibilityEdge(matchedRelationships)) return EdgeNames.existancePossibility;
 		if(isExistenceMaybeNoEdge(matchedRelationships)) return EdgeNames.existanceMaybeNo;
 		
-		//might need to move this..
+		return null;
+	}
+	
 
-		if(!sentence.doesSentenceContainVerb())	
-			sentence.addHasVerb();
-		
-		return EdgeNames.existance;
-	}
-	
-	private boolean isExistenceMaybeNoEdge(List<TokenRelationship> tokenRelationships){
-		Verb verbObj = verb.getVerb();
-		if(verbObj!=null){
-			if(verbObj.getVerbState().equals(EdgeNames.possibility) ||verbObj.getVerbState().equals(EdgeNames.negation)) 
-				return true;
-		}
-		
-		for(TokenRelationship tokenRelationship: tokenRelationships){
-			if(tokenRelationship.getEdgeName().equals(EdgeNames.possibility))return true;
-			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation))return true;
-		}
-		return false;
-	}
-	
 	private boolean isExistancePossibilityEdge(List<TokenRelationship> tokenRelationships){
 		
 		for(TokenRelationship tokenRelationship: tokenRelationships){
@@ -85,6 +73,20 @@ public class VerbExistanceProcessorImpl {
 		return false;
 	}
 	
+	private boolean isExistenceMaybeNoEdge(List<TokenRelationship> tokenRelationships){
+		Verb verbObj = verb.getVerb();
+		if(verbObj.getVerbState().equals(EdgeNames.possibility) ||verbObj.getVerbState().equals(EdgeNames.negation)) 
+			return true;
+		
+		for(TokenRelationship tokenRelationship: tokenRelationships){
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.possibility))return true;
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation))return true;
+		}
+		return false;
+	}
+	
+
+	
 	private boolean isExistanceEdge(List<TokenRelationship> tokenRelationships){
 		for(TokenRelationship tokenRelationship: tokenRelationships){
 			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation))return false;
@@ -92,19 +94,13 @@ public class VerbExistanceProcessorImpl {
 		}
 		
 		Verb verbObj = verb.getVerb();
-		if(verbObj==null) return false;
-		
-		if(verb.getVerb().getVerbState()=="possibility") return false;
 		if(verbObj.getVerbState().equals(EdgeNames.possibility)) return false;
 		if(verbObj.getVerbState().equals(EdgeNames.negation)) return false;
-		
 		return true;
 	}
 	
 	private boolean isExistanceNoEdge(List<TokenRelationship> tokenRelationships){
 		Verb verbObj = verb.getVerb();
-		if(verbObj==null) return false;
-		
 		for(TokenRelationship tokenRelationship: tokenRelationships){
 			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation) && verbObj.getVerbState().equals(EdgeNames.negation)) 
 				return true;
@@ -125,15 +121,21 @@ public class VerbExistanceProcessorImpl {
 		}
 		return result;
 	}
+		
+	private List<TokenRelationship> getTokenRelationshipForSingleToken(List<TokenRelationship> existingRelationships, WordToken token){
+		List<TokenRelationship> result = new ArrayList<>();
+		for(TokenRelationship tokenRelationship: existingRelationships){
+			if(tokenRelationship.getToToken().equals(token)){
+				result.add(tokenRelationship);
+				continue;
+			}
+			if(tokenRelationship.getFromToken().equals(token))
+				result.add(tokenRelationship);
+		}
+		return result;
+	}	
 	
 	
-//	If any fromtoken or totoken has edgename “negation” or “possibility”, then create edge “existence-maybe-no” between “has” and NounPhraseEnd (in a sentence without a verb, the final token is always going to be NounPhraseEnd). Ex. Has no probable cyst.
-//	If any fromtoken or totoken has edgename “negation”, then create edge “existence-no” between “has” and NounPhraseEnd. Ex. Has no cyst.
-//	If any fromtoken or totoken has edgename “possibility”, then create edge “existence-possibility” between “has” and NounPhraseEnd. Ex. Has possible simple cyst.
-//	Else, create edge “existence” between “has” and NounPhraseEnd. Ex. Has simple cyst.
-//	Note to Self: After adding verb “has” was thinking about processing using same code as for verbs but that will not work because the sentence will not contain a subject.
-//	
-
 	
 	private void setVerbPhraseTokens(List<WordToken> tokens){
 		
@@ -158,7 +160,7 @@ public class VerbExistanceProcessorImpl {
 		}
 	}	
 		
-	private List<TokenRelationship> createExistanceEdges(String edgeName){
+	private List<TokenRelationship> createNonHasEdges(String edgeName){
 		List<TokenRelationship> relationships = new ArrayList<>();
 		if(shouldCreateSubjectSubjectComplementEdge()) 
 		{ 
@@ -172,26 +174,21 @@ public class VerbExistanceProcessorImpl {
 		}
 		return relationships;
 	}
-	
+		
 	private boolean shouldCreateVerbNetEdge(){
-		if(verb==null) return false;
 		if(subject==null) return false;
 		if(subjectComplement==null) return false;
 		Verb verbObject = verb.getVerb();
-		if(verbObject==null) return false;
 
 		if(verbObject.getVerbType()!=VerbType.AV) return false;
 		return (verbObject.isExistance() && verbObject.getIsMaintainVerbNetClass());
 	}
 	
 	private boolean shouldCreateSubjectSubjectComplementEdge(){
-		if(verb==null) return false;
 		if(subject==null) return false;
 		if(subjectComplement==null) return false;
-
-		Verb verbObject = verb.getVerb();
-		if(verbObject==null) return false;
 		
+		Verb verbObject = verb.getVerb();		
 		if(verbObject.getVerbType()==VerbType.LV) return true;
 		
 		if(verbObject.getVerbType()==VerbType.AV){
@@ -201,4 +198,70 @@ public class VerbExistanceProcessorImpl {
 	
 		return false;
 	}	
+	
+	
+	//E
+	private TokenRelationship createHasEdge(Sentence sentence){
+		WordToken nounPhraseEnd = getNounPhraseEnd(sentence.getModifiedWordList());
+		if(nounPhraseEnd==null) return null;
+		
+		if(!sentence.doesSentenceContainVerb())	{
+			sentence.addHasVerb();
+			return processEdgesForHasVerb(sentence,null);
+		}
+		return null;
+		
+		
+	}
+	
+	private TokenRelationship processEdgesForHasVerb(Sentence sentence, WordToken nounPhrase){
+		List<TokenRelationship> matchedTokenRelationship = getTokenRelationshipForSingleToken(sentence.getTokenRelationships(),nounPhrase);
+		String edgeName = getEdgeNameforNHas(matchedTokenRelationship);
+		if(edgeName==null) return null;
+		WordToken hasVerb = sentence.getModifiedWordList().get(0);
+		return tokenRelationshipFactory.create(edgeName, EdgeTypes.related, hasVerb, nounPhrase);
+	}
+	
+	private String getEdgeNameforNHas(List<TokenRelationship> matchedTokenRelationship){
+		if(isExistanceEdgeForHas(matchedTokenRelationship)) return EdgeNames.existance;
+		if(isExistanceNoEdgeForHas(matchedTokenRelationship)) return EdgeNames.existanceNo;
+		if(isExistancePossibilityEdge(matchedTokenRelationship)) return EdgeNames.existancePossibility;
+		if(tryCreatExistanceMaybeNo(matchedTokenRelationship)) return EdgeNames.existanceMaybeNo;		
+		return null;
+	}
+	
+	private boolean tryCreatExistanceMaybeNo(List<TokenRelationship> matchedTokenRelationship){
+		for(TokenRelationship tokenRelationship: matchedTokenRelationship){
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.possibility) || tokenRelationship.getEdgeName().equals(EdgeNames.negation) ) 
+				return true;
+		}
+		return false;
+	}
+
+	
+	private boolean isExistanceNoEdgeForHas(List<TokenRelationship> matchedTokenRelationship){
+		for(TokenRelationship tokenRelationship: matchedTokenRelationship){
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation)) 
+				return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean isExistanceEdgeForHas(List<TokenRelationship> matchedTokenRelationship){
+		for(TokenRelationship tokenRelationship: matchedTokenRelationship){
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation)) return false;
+		}
+		return true;
+		
+	}
+	
+	private WordToken getNounPhraseEnd(List<WordToken> tokens){
+		for(WordToken token: tokens){
+			if(token.getPropertyValueType().equals(PropertyValueTypes.NounPhraseEnd)) return token;
+		}
+		return null;
+	}
+	
+	
 }
