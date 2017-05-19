@@ -1,0 +1,78 @@
+brca,gene
+small,qlco
+very,qlco
+malignancy,neop-stage
+excisional biopsy,proc
+hysterectomy,bpoc
+indeterminate,qlco
+findings,dysn
+stomach,bpoc
+abdominal aortic aneurysm,dysn
+kidney,bpoc
+endometrioma,dysn
+uterus,bpoc
+adjuvant,qlco
+prior,temporal
+hepatic,bpoc
+lupron,drugpr
+tamoxifen,drugpr
+likely,qlco
+invasive,qlco
+non-melanotic,dysn
+liver,bpoc
+ductal,bpoc
+colonoscopies,proc
+lobe,bpoc
+salpingo-oophorectomy,proc
+left,laterality
+hemorrhagic,qlco
+triple negative,qlco
+abdominal,bpoc
+xtandi,drugpr
+appearing,appearance
+lesion,dysn
+ct scan,proc
+zytiga,drugpr
+triple positive,qlco
+treatment,proc
+probably,qlco
+ovarian,bpoc
+mass,dysn
+skin,bpoc
+cervical,bpoc
+bone-marrow-biopsy,proc
+minimal,qlco
+total,qlco
+lcis,dysn
+Myriad Genetic Laboratories, co name
+cancer panel,proc
+bilateral,laterality
+benign,neop-stage
+mammogram,proc
+mildly,qlco
+panel,proc
+Genedx,co name
+pap smear,proc
+previous,temporal
+therapy,proc
+one,number
+ultrasound-guided-biopsy,proc
+spine,bpoc
+cm,unit of measure
+t cell,bpoc-cell
+ultrasound,proc
+ovary,bpoc
+curatively,qlco
+ct-scan,proc
+Magnetic resonance imaging,proc
+stage,neop-stage
+radiation,proc
+carcinoma,dysn
+stable,qlco
+complicated,qlco
+biopsy,proc
+cyst,dysn
+cancer,dysn
+polyp,dysn
+risk,risk
+breast,bpoc

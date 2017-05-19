@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
+import com.mst.interfaces.sentenceprocessing.VerbExistanceProcessor;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
@@ -14,7 +15,7 @@ import com.mst.model.sentenceProcessing.Verb;
 import com.mst.model.sentenceProcessing.WordToken;
 
 
-public class VerbExistanceProcessorImpl {
+public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 
 	private WordToken verb = null;
 	private WordToken subject =null;

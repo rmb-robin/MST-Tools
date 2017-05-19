@@ -1,5 +1,11 @@
 package com.mst.testcases;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +15,7 @@ import org.junit.Test;
 import com.mst.metadataProviders.NGramsHardCodedProvider;
 import com.mst.metadataProviders.SemanticTypeHardCodedProvider;
 import com.mst.metadataProviders.TestDataProvider;
+import com.mst.model.sentenceProcessing.NGramsModifierEntity;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.sentenceprocessing.NGramsSentenceProcessorImpl;
@@ -25,7 +32,7 @@ public class SemanticTypeAnnotatorTest {
 	}
 	
 	
-	@Test
+	//@Test
 	public void annotate(){
 		SemanticTypeSentenceAnnotatorImpl annotator = new SemanticTypeSentenceAnnotatorImpl();
 		SemanticTypeHardCodedProvider provider = new SemanticTypeHardCodedProvider();
@@ -59,6 +66,23 @@ public class SemanticTypeAnnotatorTest {
 		
 	}
 	
+	@Test
+	public void createFile() throws Exception{
+		String file =  System.getProperty("user.dir") + File.separator + "testData" + File.separator + "semanticTypes.txt";
+		Path path = Paths.get(file);
+		Map<String,String> stTypes =  new SemanticTypeHardCodedProvider().getSemanticTypes();
+		
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<String, String> entry : stTypes.entrySet()) {
+
+			sb.append(entry.getKey() + "," + entry.getValue() + System.lineSeparator());
+		}
+		//Use try-with-resource to get auto-closeable writer instance
+		try (BufferedWriter writer = Files.newBufferedWriter(path)) 
+		{
+		    writer.write(sb.toString());
+		}
+	}
 	
 	private Map<String,String> getExpectedResults(){
 		Map<String,String> result = new HashMap<String,String>();

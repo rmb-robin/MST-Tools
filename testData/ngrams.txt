@@ -1,0 +1,86 @@
+follow up,follow-up
+up to date,current
+caught up,caught-up
+status post,after
+time senstive,urgent
+add up,compute
+prior to,before
+as a result of,because of
+due to,because of
+ultrasound guided biopsy,ultrasound-guided-biopsy
+bone marrow biopsy,bone-marrow-biopsy
+can have,can-have
+did be,did-be
+did have,did-have
+am having,am-having
+are having,are-having
+be having,be-having
+been having,been-having
+has had,has-had
+have had,have-had
+having had,having-had
+is having,is-having
+was having,was-having
+were being,were-being
+were having,were-having
+can be having,can-be-having
+can have been,can-have-been
+can have had,can-have-had
+could be having,could-be-having
+could have had,could-have-had
+had been being,had-been-being
+had been having,had-been-having
+has been being,has-been-being
+has been having,has-been-having
+have been being,have-been-being
+have been having,have-been-having
+may be having,may-be-having
+may have had,may-have-had
+might be having,might-be-having
+might have had,might-have-had
+must be having,must-be-having
+must have had,must-have-had
+shall be having,shall-be-having
+shall have been,shall-have-been
+shall have had,shall-have-had
+should be having,should-be-having
+should have had,should-have-had
+will be having,will-be-having
+would be having,would-be-having
+am being,am-being
+are being,are-being
+can be,can-be
+could be,could-be
+could have,could-have
+had been,had-been
+had had,had-had
+has been,has-been
+have been,have-been
+having been,having-been
+is being,is-being
+may be,may-be
+may have,may-have
+might be,might-be
+might have,might-have
+must be,must-be
+must have,must-have
+shall be,shall-be
+shall have,shall-have
+should be,should-be
+should have,should-have
+was being,was-being
+will be,will-be
+will have,will-have
+would be,would-be
+would have,would-have
+could have been,could-have-been
+may have been,may-have-been
+might have been,might-have-been
+must have been,must-have-been
+should have been,should-have-been
+will have been,will-have-been
+would have been,would-have-been
+would have had,would-have-had
+will have had,will-have-had
+pap smear,pap-smear
+ct scan,ct-scan
