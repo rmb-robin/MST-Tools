@@ -37,6 +37,7 @@ triple positive,qlco
 treatment,proc
 probably,qlco
 ovarian,bpoc
+pain,sympto
 mass,dysn
 skin,bpoc
 cervical,bpoc
