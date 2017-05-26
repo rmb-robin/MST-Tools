@@ -25,7 +25,6 @@ mr.,f,*,f,0,pii
 mrs.,f,*,f,0,pii
 ms.,f,*,f,0,pii
 bpoc,t,dysn,t,null,disease location
-cardinal number,t,dysn,t,null,disease quantity
 invasive,f,dysn,t,null,disease severity
 noninvasive,f,dysn,t,null,disease severity
 previous,f,dysn,t,null,general time
