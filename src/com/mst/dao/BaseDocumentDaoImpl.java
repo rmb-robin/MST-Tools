@@ -47,7 +47,7 @@ public abstract class BaseDocumentDaoImpl<T> {
 		return query.asList();
 	}
 	
-	protected void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
+	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
 		this.datastoreProvider = provider;
 		
 	}

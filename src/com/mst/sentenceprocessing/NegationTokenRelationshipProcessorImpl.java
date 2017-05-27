@@ -35,7 +35,8 @@ public class NegationTokenRelationshipProcessorImpl implements NegationTokenRela
 
 	private boolean shouldContinueLooping(WordToken token){
 		if(!token.isVerb()){
-			if(token.getPos()==null && token.getPos()!= PartOfSpeachTypes.NEG)return true;
+			if(token.getPos()==null) return true;
+			if(token.getPos()!= PartOfSpeachTypes.NEG)return true;
 			return false;
 		}
 		

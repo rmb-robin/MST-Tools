@@ -32,6 +32,7 @@ public class Verb {
 		this.verbTense = verbTense;
 	}
 	public String getVerbState() {
+		if(verbState==null) return "";
 		return verbState;
 	}
 	public void setVerbState(String verbState) {

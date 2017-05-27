@@ -6,18 +6,22 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Field;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexed;
 import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.utils.IndexType;
 
 import com.mst.model.discrete.DiscreteData;
 
 @Entity("sentences")
-//@Indexes({
-//    @Index(fields = @Field("id"))
-//    })
 
+@Indexes({
+    @Index(fields = {@Field(value = "origSentence", type = IndexType.TEXT)})
+})
+   
 public class SentenceDb {
 	
 	@Id
@@ -26,6 +30,7 @@ public class SentenceDb {
 	
 	private int position;
 	private long lineId;
+	
 	private String origSentence;
 	private String normalizedSentence;
 	private LocalDate processDate;

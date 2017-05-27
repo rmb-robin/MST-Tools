@@ -56,6 +56,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public PropertyValueTypes getPropertyValueType() {
+		if(propertyValueType==null) return PropertyValueTypes.NA;
 		return propertyValueType;
 	}
 

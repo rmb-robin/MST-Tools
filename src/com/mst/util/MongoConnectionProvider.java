@@ -9,20 +9,23 @@ import com.mst.model.util.MongoConnectionEntity;
 
 public class MongoConnectionProvider {
 
-	public static Datastore getDatastore(MongoConnectionEntity entity) {
-		Morphia morphia = new Morphia();
-		morphia.getMapper().getConverters().addConverter(new DateConverter());
-    	Datastore datastore;
-		try {
-			datastore = morphia.createDatastore(new MongoClient(entity.getIpAddress()), entity.getDatabaseName());
-			// remove connection properties...
-	    	datastore.ensureIndexes();
-	    	return datastore;
-	    	
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public enum MorphiaHelper {
+		INSTANCE;
+		private Datastore datastore;
+		private void createInstance(MongoConnectionEntity entity) {
+			try {
+		    	Morphia morphia = new Morphia();
+		    	datastore = morphia.createDatastore(new MongoClient(entity.getIpAddress()), entity.getDatabaseName());
+		    	datastore.ensureIndexes();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
-		return null;
+		
+		public Datastore getDatastore(MongoConnectionEntity entity) {
+			if(this.datastore==null) 
+				createInstance(entity);
+			return this.datastore;
+		}
     }
 }

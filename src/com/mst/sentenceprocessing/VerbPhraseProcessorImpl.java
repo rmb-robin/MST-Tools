@@ -189,7 +189,7 @@ public class VerbPhraseProcessorImpl implements VerbPhraseProcessor {
 			if(nextToken.getPos().equals(PartOfSpeachTypes.IN) || nextToken.getPos().equals(PartOfSpeachTypes.PUNCTUATION)) 
 				return false;
 		}
-		if(subjectComplementIndex>= wordTokens.size())return false;
+		if(subjectComplementIndex + 1>= wordTokens.size())return false;
 		nextToken = wordTokens.get(subjectComplementIndex+1);
 		if(nextToken.getPos()!=null){
 			if(nextToken.getPos().equals(PartOfSpeachTypes.CC) || nextToken.getToken().equals(","))

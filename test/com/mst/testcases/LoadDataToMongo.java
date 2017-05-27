@@ -79,6 +79,7 @@ public class LoadDataToMongo {
 		dd.setAccessionNumber("111");
 		dd.setExamDescription("desc");
 		dd.setModality("m");	
+		dd.setTimeStamps();
 		SentenceDaoImpl dao =  new SentenceDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		dao.saveSentences(sentences, dd);

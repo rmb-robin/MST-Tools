@@ -3,6 +3,7 @@ package com.mst.sentenceprocessing;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.escape.Escaper;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.interfaces.sentenceprocessing.VerbExistanceProcessor;
 import com.mst.model.metadataTypes.EdgeNames;
@@ -20,7 +21,8 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private WordToken verb = null;
 	private WordToken subject =null;
 	private WordToken subjectComplement = null;
-    private TokenRelationshipFactory tokenRelationshipFactory; 
+    private WordToken modalVerb = null;
+	private TokenRelationshipFactory tokenRelationshipFactory; 
  
     public VerbExistanceProcessorImpl(){
     	tokenRelationshipFactory = new TokenRelationshipFactoryImpl();
@@ -52,15 +54,14 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private String getEdgeNameforNotHas(Sentence sentence){
 		List<TokenRelationship> existingRelationships = sentence.getTokenRelationships();
 		if(existingRelationships==null)return null;
-		if(existingRelationships.isEmpty()) return null;
-		if(subject==null || subjectComplement==null) return null;
+		if(subject==null && subjectComplement==null) return null;
 		List<TokenRelationship> matchedRelationships = getTokenRelationsForTokens(existingRelationships);
-		if(matchedRelationships.isEmpty())return null;
+
 	
-		if(isExistanceEdge(matchedRelationships)) return EdgeNames.existance;
-		if(isExistanceNoEdge(matchedRelationships)) return EdgeNames.existanceNo;
-		if(isExistancePossibilityEdge(matchedRelationships)) return EdgeNames.existancePossibility;
-		if(isExistenceMaybeNoEdge(matchedRelationships)) return EdgeNames.existanceMaybeNo;
+		if(isExistanceEdge(matchedRelationships)) return EdgeNames.existence;
+		if(isExistanceNoEdge(matchedRelationships)) return EdgeNames.existenceNo;
+		if(isExistancePossibilityEdge(matchedRelationships)) return EdgeNames.existencePossibility;
+		if(isExistenceMaybeNoEdge(matchedRelationships)) return EdgeNames.existenceMaybe;
 		
 		return null;
 	}
@@ -75,10 +76,11 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	}
 	
 	private boolean isExistenceMaybeNoEdge(List<TokenRelationship> tokenRelationships){
-		Verb verbObj = verb.getVerb();
-		if(verbObj.getVerbState().equals(EdgeNames.possibility) ||verbObj.getVerbState().equals(EdgeNames.negation)) 
-			return true;
-		
+		if(verb.getVerb().getVerbState().equals(EdgeNames.negation)) return true;
+		if(modalVerb!=null){
+			if(modalVerb.getVerb().getVerbState().equals(EdgeNames.possibility))return true;
+		}
+
 		for(TokenRelationship tokenRelationship: tokenRelationships){
 			if(tokenRelationship.getEdgeName().equals(EdgeNames.possibility))return true;
 			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation))return true;
@@ -93,9 +95,10 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation))return false;
 			if(tokenRelationship.getEdgeName().equals(EdgeNames.possibility)) return false;
 		}
-		
+		if(modalVerb!=null){
+			if(modalVerb.getVerb().getVerbState().equals(EdgeNames.possibility)) return false; 
+		}
 		Verb verbObj = verb.getVerb();
-		if(verbObj.getVerbState().equals(EdgeNames.possibility)) return false;
 		if(verbObj.getVerbState().equals(EdgeNames.negation)) return false;
 		return true;
 	}
@@ -103,7 +106,10 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private boolean isExistanceNoEdge(List<TokenRelationship> tokenRelationships){
 		Verb verbObj = verb.getVerb();
 		for(TokenRelationship tokenRelationship: tokenRelationships){
-			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation) && verbObj.getVerbState().equals(EdgeNames.negation)) 
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation)){
+				if(verbObj.getVerbState().equals(EdgeNames.negation)) return true; 
+				if(verbObj.getVerbType()==VerbType.AV && verbObj.isExistance()) return true;
+			}
 				return true;
 		}
 		return false;					
@@ -143,19 +149,23 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 		verb = null;
 		subject = null;
 		subjectComplement = null;
+		modalVerb = null;
 		
 		for(WordToken wordToken: tokens){
 			if(wordToken.isVerb()){
-				verb = wordToken; 
+				if(wordToken.getVerb().getVerbType()==VerbType.MV)
+					modalVerb = wordToken;
+				else 
+					verb = wordToken; 
 				continue;
 			}
-			if(wordToken.getPropertyValueType().equals(PropertyValueTypes.Subject) && subject==null)
+			if(wordToken.getPropertyValueType()!=null && wordToken.getPropertyValueType().equals(PropertyValueTypes.Subject) && subject==null)
 			{
 				subject = wordToken;
 				continue;
 			}
 			
-			if(wordToken.getPropertyValueType().equals(PropertyValueTypes.SubjectComplement) && subjectComplement == null){
+			if(wordToken.getPropertyValueType()!=null && wordToken.getPropertyValueType().equals(PropertyValueTypes.SubjectComplement) && subjectComplement == null){
 				subjectComplement = wordToken;
 			}
 		}
@@ -208,11 +218,9 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 		
 		if(!sentence.doesSentenceContainVerb())	{
 			sentence.addHasVerb();
-			return processEdgesForHasVerb(sentence,null);
+			return processEdgesForHasVerb(sentence,nounPhraseEnd);
 		}
 		return null;
-		
-		
 	}
 	
 	private TokenRelationship processEdgesForHasVerb(Sentence sentence, WordToken nounPhrase){
@@ -224,10 +232,10 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	}
 	
 	private String getEdgeNameforNHas(List<TokenRelationship> matchedTokenRelationship){
-		if(isExistanceEdgeForHas(matchedTokenRelationship)) return EdgeNames.existance;
-		if(isExistanceNoEdgeForHas(matchedTokenRelationship)) return EdgeNames.existanceNo;
-		if(isExistancePossibilityEdge(matchedTokenRelationship)) return EdgeNames.existancePossibility;
-		if(tryCreatExistanceMaybeNo(matchedTokenRelationship)) return EdgeNames.existanceMaybeNo;		
+		if(isExistanceEdgeForHas(matchedTokenRelationship)) return EdgeNames.existence;
+		if(isExistanceNoEdgeForHas(matchedTokenRelationship)) return EdgeNames.existenceNo;
+		if(isExistancePossibilityEdge(matchedTokenRelationship)) return EdgeNames.existencePossibility;
+		if(tryCreatExistanceMaybeNo(matchedTokenRelationship)) return EdgeNames.existenceMaybe;		
 		return null;
 	}
 	

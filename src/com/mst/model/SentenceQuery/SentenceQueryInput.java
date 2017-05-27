@@ -6,7 +6,7 @@ import java.util.List;
 public class SentenceQueryInput {
 
 	private List<String> tokens; 
-	private String edgeName;
+	private List<String> edgeNames;
 	
 	public SentenceQueryInput(){
 		tokens = new ArrayList<>();
@@ -20,16 +20,11 @@ public class SentenceQueryInput {
 		this.tokens = tokens;
 	}
 
-	public String getEdgeName() {
-		return edgeName;
+	public List<String> getEdgeNames() {
+		return edgeNames;
 	}
 
-	public void setEdgeName(String edgeName) {
-		this.edgeName = edgeName;
+	public void setEdgeNames(List<String> edgeNames) {
+		this.edgeNames = edgeNames;
 	}
-	
-	
-	
-	
-	
 }

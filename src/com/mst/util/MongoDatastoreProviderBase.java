@@ -3,12 +3,13 @@ package com.mst.util;
 import org.mongodb.morphia.Datastore;
 
 import com.mst.model.util.MongoConnectionEntity;
+import com.mst.util.MongoConnectionProvider.MorphiaHelper;
 
 public abstract class MongoDatastoreProviderBase {
 
 	protected MongoConnectionEntity connectionEntity; 
 
 	public Datastore getDataStore() {
-		return MongoConnectionProvider.getDatastore(connectionEntity);
+		return MorphiaHelper.INSTANCE.getDatastore(connectionEntity);
 	}
 }

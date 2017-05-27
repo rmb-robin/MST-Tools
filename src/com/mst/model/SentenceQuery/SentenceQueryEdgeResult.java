@@ -5,6 +5,7 @@ public class SentenceQueryEdgeResult {
 	private String edgeName; 
 	private String fromToken;
 	private String toToken;
+	private String EdgeResultType; 
 	
 	public String getEdgeName() {
 		return edgeName;
@@ -23,6 +24,12 @@ public class SentenceQueryEdgeResult {
 	}
 	public void setToToken(String toToken) {
 		this.toToken = toToken;
+	}
+	public String getEdgeResultType() {
+		return EdgeResultType;
+	}
+	public void setEdgeResultType(String edgeResultType) {
+		EdgeResultType = edgeResultType;
 	} 
 	
 	

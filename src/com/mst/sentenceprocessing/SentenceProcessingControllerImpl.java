@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 
+import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
 import com.mst.interfaces.sentenceprocessing.PrepPhraseRelationshipProcessor;
@@ -13,6 +14,7 @@ import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
 import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
 import com.mst.interfaces.sentenceprocessing.SentenceProcessingController;
+import com.mst.interfaces.sentenceprocessing.VerbExistanceProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbPhraseProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.model.SentenceToken;
@@ -38,7 +40,8 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	private Tokenizer tokenizer;
 	private SentenceCleaner cleaner;
 	private SentenceMeasureNormalizer sentenceMeasureNormalizer;
-	
+	private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor;
+	private VerbExistanceProcessor verbExistanceProcessor;
 	
 	private SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput;
 
@@ -54,6 +57,8 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		tokenizer = new Tokenizer();
 		cleaner  = new SentenceCleaner();
 		sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
+		negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
+		verbExistanceProcessor = new VerbExistanceProcessorImpl();
 	}
 
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
@@ -91,7 +96,8 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
 		tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements(), request.isConvertLargest());
 		
-		//should go here...
+		tokenRelationships.addAll(negationTokenRelationshipProcessor.process(tokens));
+		tokenRelationships.addAll(verbExistanceProcessor.process(sentence));
 		
 		sentence.setModifiedWordList(tokens);
 		sentence.setTokenRelationships(tokenRelationships);

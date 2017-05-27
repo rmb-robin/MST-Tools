@@ -14,6 +14,7 @@ import com.mst.interfaces.dao.SentenceQueryDao;
 import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
+import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 
@@ -22,6 +23,12 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	private MongoDatastoreProvider datastoreProvider;
 	private HashSet<String> processedSentences; 
+	
+	@Override
+	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
+		this.datastoreProvider = provider;	
+	}
+	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
 		processedSentences = new HashSet<>();
 		List<SentenceQueryResult> queryResults = new ArrayList<>();
@@ -29,9 +36,11 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		for(String token: input.getTokens()){
 			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
 			 query
-			 .field("origSentence").contains(token)
-			 .field("tokenRelationships.edgeName").equal(input.getEdgeName());
-			 queryResults.addAll(getSentenceQueryResults(query.asList(), token, input.getEdgeName()));
+			 .search(token)
+			 .field("tokenRelationships.edgeName").hasAnyOf(input.getEdgeNames())
+			 .retrievedFields(true, "id", "tokenRelationships", "normalizedSentence");
+			 
+			 queryResults.addAll(getSentenceQueryResults(query.asList(), token));
 		}
 		return queryResults;
 	}	
@@ -40,17 +49,18 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		
 		for(TokenRelationship relationship:relationships){
 			if(relationship.equals(originalRelationship)) continue;
-			if(shouldAddTokenFromRelationship(relationship,token, null)){
+			if(shouldAddTokenFromRelationship(relationship,token)){
 				return relationship;
 			}
 		}
 		return null;
 	}
 
-	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, String edgeName){
+	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token){
 		
 		List<SentenceQueryResult> result = new ArrayList<>();
 		for(SentenceDb sentenceDb : sentences){
+			try{
 			String id = sentenceDb.getId().toString();
 			if(processedSentences.contains(id))continue;
 			processedSentences.add(id);
@@ -58,10 +68,10 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			TokenRelationship foundRelationship=null;
 			SentenceQueryResult queryResult = null;
 			for(TokenRelationship relationship: sentenceDb.getTokenRelationships()){
-				if(shouldAddTokenFromRelationship(relationship,token, edgeName))
+				if(shouldAddTokenFromRelationship(relationship,token))
 				{	
 					queryResult = createSentenceQueryResult(sentenceDb);
-					queryResult.getSentenceQueryEdgeResults().add(createSentenceQueryEdgeResult(relationship));
+					queryResult.getSentenceQueryEdgeResults().add(createSentenceQueryEdgeResult(relationship,EdgeResultTypes.primaryEdge));
 					oppositeToken = getOppositeTokenFromRelationship(relationship,token);
 					foundRelationship = relationship;
 					break;
@@ -71,10 +81,13 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			if(foundRelationship!=null){
 				TokenRelationship friendOfFriend = findFriendOfFriendEdges(sentenceDb.getTokenRelationships(),oppositeToken,foundRelationship);
 				if(friendOfFriend!=null)
-					queryResult.getSentenceQueryEdgeResults().add(createSentenceQueryEdgeResult(friendOfFriend));
-				
+					queryResult.getSentenceQueryEdgeResults().add(createSentenceQueryEdgeResult(friendOfFriend,EdgeResultTypes.friendOfFriend));
 				result.add(queryResult);
 			}
+		}
+	     catch(Exception ex){
+	    	 //to do.. add logging .for now this wil do..
+	     }
 		}
 		return result;
 	}
@@ -86,11 +99,12 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return result;
 	}
 	
-	private SentenceQueryEdgeResult createSentenceQueryEdgeResult(TokenRelationship relationship){
+	private SentenceQueryEdgeResult createSentenceQueryEdgeResult(TokenRelationship relationship, String edgeType){
 		SentenceQueryEdgeResult queryEdgeResult = new SentenceQueryEdgeResult();
 		queryEdgeResult.setEdgeName(relationship.getEdgeName());
 		queryEdgeResult.setFromToken(relationship.getFromToken().getToken());
 		queryEdgeResult.setToToken(relationship.getToToken().getToken());
+		queryEdgeResult.setEdgeResultType(edgeType);
 		return queryEdgeResult;
 	}
 	
@@ -99,19 +113,35 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return relationship.getToToken().getToken();
 	}
 	
-	private boolean shouldAddTokenFromRelationship(TokenRelationship relation, String token, String edgeName){
-//		if(edgeName != null)
-//			if(!relation.getEdgeName().equals(edgeName)) return false;
-//		
-		
-			if(relation.getFromToken().getToken().equals(token)) return true;
+	private boolean shouldAddTokenFromRelationship(TokenRelationship relation, String token){
+		if(relation.getFromToken()==null) return false;
+		if(relation.getToToken()==null) return false;
+		if(relation.getFromToken().getToken().equals(token)) return true;
 		if(relation.getToToken().getToken().equals(token)) return true;
 		return false;
 	}
 
-	@Override
-	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
-		this.datastoreProvider = provider;
-		
+	public List<String> getEdgeNamesByTokens(List<String> tokens) {
+		Datastore datastore =  datastoreProvider.getDataStore();
+		HashSet<String> edgeNames = new HashSet<>();
+		for(String token: tokens){
+			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
+			 query
+			 .search(token)
+			 .retrievedFields(true, "tokenRelationships");
+			 
+			 List<SentenceDb> sentences = query.asList();
+			 edgeNames.addAll(getEdgeNamesForSentences(sentences));
+	}
+		return new ArrayList<>(edgeNames);
+	}
+
+	private HashSet<String> getEdgeNamesForSentences(List<SentenceDb> sentences){
+		HashSet<String> result = new HashSet<>();
+		for(SentenceDb sentence : sentences){
+			if(sentence.getTokenRelationships()==null)continue;
+			  sentence.getTokenRelationships().forEach(a-> result.add(a.getEdgeName()));
+		}
+		return result;
 	}
 }
