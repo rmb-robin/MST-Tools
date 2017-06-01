@@ -14,7 +14,7 @@ public class Sentence {
 	private long lineId;
 	private String origSentence;
 	private String normalizedSentence;
-	private LocalDate processDate;
+	private LocalDate processingDate;
 	
 	private List<String> originalWords;
 	private List<WordToken> modifiedWordList = new ArrayList<>();
@@ -62,11 +62,11 @@ public class Sentence {
 	}
 	
 	public void setProcessDate(){
-		this.processDate = LocalDate.now();
+		this.processingDate = LocalDate.now();
 	}
 	
 	public LocalDate getProcessDate(){
-		return processDate;
+		return processingDate;
 	}
 
 	public void setId(String id) {

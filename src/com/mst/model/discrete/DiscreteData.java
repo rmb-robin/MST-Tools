@@ -7,14 +7,18 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
+import org.mongodb.morphia.annotations.Converters;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+
+import com.mst.util.LocalDateConverter;
 
 
 @Entity("discreteData")
 //@Indexes({
 //    @Index(fields = @Field("id"))
 //})
+@Converters(LocalDateConverter.class)
 public class DiscreteData {
 
 	@Id
@@ -33,9 +37,8 @@ public class DiscreteData {
 	private String reportFinalizedBy; 
 	private DateTime reportFinalizedDate; 
 	private int patientAge;
-	
-	private LocalTime processTime; 
-	private LocalDate processDate; 
+
+	private LocalDate processingDate; 
 	
 	private String organizationName; 
 	private String bucketName; 
@@ -145,13 +148,8 @@ public class DiscreteData {
 		this.customFields = customFields;
 	}
 
-	public LocalTime getProcessTime() {
-		return processTime;
-	}
-
 	public void setTimeStamps() {
-		this.processTime  = LocalTime.now();
-		this.processDate = LocalDate.now();
+		this.processingDate = LocalDate.now();
 	}
 
 	public String getOrganizationName() {
@@ -162,12 +160,8 @@ public class DiscreteData {
 		this.organizationName = organizationName;
 	}
 
-	public void setProcessTime(LocalTime processTime) {
-		this.processTime = processTime;
-	}
-
 	public LocalDate getProcessDate() {
-		return processDate;
+		return processingDate;
 	}
 
 	public String getBucketName() {

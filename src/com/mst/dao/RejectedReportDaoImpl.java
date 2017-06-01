@@ -25,20 +25,13 @@ public class RejectedReportDaoImpl extends BaseDocumentDaoImpl<RejectedReport> i
 		super.setMongoDatastoreProvider(provider);
 	}
 
-	public List<RejectedReport> getByNameAndDate(String orgName, LocalDateTime localDate) {
-		
-		
-		ZonedDateTime zoned = (localDate).atZone(ZoneOffset.systemDefault());
-		Date t =  Date.from(zoned.toInstant());
-		
+	public List<RejectedReport> getByNameAndDate(String orgName, LocalDate localDate) {
+		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 		Query<RejectedReport> query = datastoreProvider.getDataStore().createQuery(RejectedReport.class);
 		 query
 		 	.field("organizationName").equal(orgName);
-		 
-		 
 		 	query
-		 	.filter("processingTime >=", new Date(System.currentTimeMillis() - 2 * 24 * 3600 * 1000 ))
-		 	.filter("processingTime <",t );
+		 	.filter("processingDate =", date);
 		 return query.asList();
 	}
 }

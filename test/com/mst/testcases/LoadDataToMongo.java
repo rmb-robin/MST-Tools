@@ -57,23 +57,11 @@ public class LoadDataToMongo {
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		RejectedReport rr = new RejectedReport();
 		rr.setTimeStamps();
-		rr.setOrganizationName("updatedOrg");
+		rr.setOrganizationName("orgName-Test");
 		dao.save(rr);
 	}
-	
-	
-	@Test
-	public void getRejectedReport(){
 		
-		LocalDateTime tomorrow = LocalDateTime.of(2017, 6, 1, 0, 0);
-		RejectedReportDaoImpl dao = new RejectedReportDaoImpl();
-		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		List<RejectedReport> rejectedReports =  dao.getByNameAndDate("updatedOrg", tomorrow);
-		List<RejectedReport> rejectedReportsNew = rejectedReports;
-		//assertTrue()
-	}
-	
-	//@Test 
+	@Test 
 	public void writeOneSentence() throws Exception{
 		processSentence("she was denied a ct scan.");
 	}
@@ -92,6 +80,7 @@ public class LoadDataToMongo {
 		dd.setAccessionNumber("111");
 		dd.setExamDescription("desc");
 		dd.setModality("m");	
+		dd.setOrganizationName("orgName-Test");
 		dd.setTimeStamps();
 		SentenceDaoImpl dao =  new SentenceDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());

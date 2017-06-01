@@ -12,11 +12,12 @@ import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.converters.DateConverter;
 
+import com.mst.util.LocalDateConverter;
 import com.mst.util.LocalDateTimeConverter;
 
  
 @Entity("rejectedReport")
-@Converters(LocalDateTimeConverter.class)
+@Converters(LocalDateConverter.class)
 //@Indexes({
 //  @Index(fields = @Field("id"))
 //}) 
@@ -27,8 +28,8 @@ public class RejectedReport {
 	private String organizationName;
 	private String accessionNumber;
 	private List<String> missingFields; 
-	//private LocalDate processingDate; 
-	private LocalDateTime processingTime; 
+	private LocalDate processingDate; 
+	//private LocalDateTime processingTime; 
 	
 	public RejectedReport(){
 		missingFields = new ArrayList<>();
@@ -73,17 +74,16 @@ public class RejectedReport {
 	}
 
 
-//
-//	public LocalDate getProcessingDate() {
-//		return processingDate;
-//	}
-
-	public LocalDateTime getProcessingTime() {
-		return processingTime;
+	public LocalDate getProcessingDate() {
+		return processingDate;
 	}
+
+//	public LocalDateTime getProcessingTime() {
+//		return processingTime;
+//	}
 	
 	public void setTimeStamps(){
-		//this.processingDate = LocalDate.now();
-		this.processingTime = LocalDateTime.now();
+		this.processingDate = LocalDate.now();
+	//	this.processingTime = LocalDateTime.now();
 	}
 }

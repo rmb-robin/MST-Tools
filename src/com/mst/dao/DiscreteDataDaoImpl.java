@@ -1,6 +1,8 @@
 package com.mst.dao;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 import org.mongodb.morphia.query.Query;
@@ -8,7 +10,6 @@ import org.mongodb.morphia.query.Query;
 import com.mst.interfaces.DiscreteDataDao;
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.model.discrete.DiscreteData;
-
 
 public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> implements DiscreteDataDao {
 
@@ -22,24 +23,22 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 	}
 
 	@Override
-	public List<DiscreteData> getByNameAndDate(String orgName, LocalDate date) {
-		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
-		 query
-		 .field("organizationName").equal(orgName);
-		// .field("processingDate").equal(date);
-		 return query.asList();
+	public List<DiscreteData> getByNameAndDate(String orgName, LocalDate localDate) {
+		return getQueryByOrgNameAndDate(orgName,localDate).asList();
+	}
+
+	public long getCountByNameAndDate(String orgName, LocalDate localDate) {
+		 return getQueryByOrgNameAndDate(orgName,localDate).countAll();
 	}
 	
-	
-	public long getCountByNameAndDate(String orgName, LocalDate date) {
+	private Query<DiscreteData> getQueryByOrgNameAndDate(String orgName, LocalDate localDate){
+		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
 		 query
-		 .field("organizationName").equal(orgName);
-		// .field("processingDate").equal(date);
-		 return query.countAll();
+		 .field("organizationName").equal(orgName)
+		 .filter("processingDate =", date);
+		 return query;
 	}
-	
-	
-	
 	
 }
+

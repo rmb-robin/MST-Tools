@@ -5,6 +5,7 @@ import java.time.*;
 import java.util.List;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Converters;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Field;
 import org.mongodb.morphia.annotations.Id;
@@ -15,13 +16,14 @@ import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.utils.IndexType;
 
 import com.mst.model.discrete.DiscreteData;
+import com.mst.util.LocalDateConverter;
 
 @Entity("sentences")
 
 @Indexes({
     @Index(fields = {@Field(value = "origSentence", type = IndexType.TEXT)})
 })
-   
+@Converters(LocalDateConverter.class)
 public class SentenceDb {
 	
 	@Id
@@ -33,7 +35,7 @@ public class SentenceDb {
 	
 	private String origSentence;
 	private String normalizedSentence;
-	private LocalDate processDate;
+	private LocalDate processingDate;
 	
 	private List<String> originalWords;
 	private List<WordToken> modifiedWordList = new ArrayList<>();
@@ -118,10 +120,10 @@ public class SentenceDb {
 		this.discreteData = discreteData;
 	}
 	public LocalDate getProcessDate() {
-		return processDate;
+		return processingDate;
 	}
 	public void setProcessDate(LocalDate processDate) {
-		this.processDate = processDate;
+		this.processingDate = processDate;
 	}
 	
 	

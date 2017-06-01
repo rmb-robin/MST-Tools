@@ -81,8 +81,7 @@ public class SentenceQueryDaoIntergrationTest {
 		
 		
 	}
-	
-	
+
 	@Test
 	public void runQuery(){
 		SentenceQueryDaoImpl dao = new SentenceQueryDaoImpl();

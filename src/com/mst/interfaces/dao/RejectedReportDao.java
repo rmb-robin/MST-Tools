@@ -9,5 +9,5 @@ import com.mst.model.requests.RejectedReport;
 public interface RejectedReportDao extends IDao {
 
 	String save(RejectedReport rejectedReport);
-	List<RejectedReport> getByNameAndDate(String orgName, LocalDateTime date);
+	List<RejectedReport> getByNameAndDate(String orgName, LocalDate localDate);
 }
