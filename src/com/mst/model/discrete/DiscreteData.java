@@ -24,7 +24,7 @@ public class DiscreteData {
 	private DateTime patientDob;
 	private String sex; 
 	private String patientAccount; 
-	private int patientEncounter; 
+	private String patientEncounter; 
 	private String vrReportId;
 	private String accessionNumber; 
 	private String examDescription; 
@@ -76,10 +76,10 @@ public class DiscreteData {
 	public void setPatientAccount(String patientAccount) {
 		this.patientAccount = patientAccount;
 	}
-	public int getPatientEncounter() {
+	public String getPatientEncounter() {
 		return patientEncounter;
 	}
-	public void setPatientEncounter(int patientEncounter) {
+	public void setPatientEncounter(String patientEncounter) {
 		this.patientEncounter = patientEncounter;
 	}
 	public String getVrReportId() {

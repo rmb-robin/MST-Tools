@@ -2,7 +2,10 @@ package com.mst.dao;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,16 +25,20 @@ public class RejectedReportDaoImpl extends BaseDocumentDaoImpl<RejectedReport> i
 		super.setMongoDatastoreProvider(provider);
 	}
 
-	public List<RejectedReport> getByNameAndDate(String orgName, LocalDate localDate) {
+	public List<RejectedReport> getByNameAndDate(String orgName, LocalDateTime localDate) {
 		
-	
-//		Instant instant = localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-//		Date date = Date.from(instant);
-//		
+		
+		ZonedDateTime zoned = (localDate).atZone(ZoneOffset.systemDefault());
+		Date t =  Date.from(zoned.toInstant());
+		
 		Query<RejectedReport> query = datastoreProvider.getDataStore().createQuery(RejectedReport.class);
 		 query
 		 	.field("organizationName").equal(orgName);
-		 	//.field("processingDate").equal(localDate);
+		 
+		 
+		 	query
+		 	.filter("processingTime >=", new Date(System.currentTimeMillis() - 2 * 24 * 3600 * 1000 ))
+		 	.filter("processingTime <",t );
 		 return query.asList();
 	}
 }

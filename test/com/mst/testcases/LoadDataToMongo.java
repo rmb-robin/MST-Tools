@@ -1,6 +1,8 @@
 package com.mst.testcases;
 
 import java.net.UnknownHostException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +29,7 @@ import com.mst.sentenceprocessing.SentenceConverter;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
 import com.mst.util.MongoDatastoreProviderDefault;
-import com.sun.scenario.effect.impl.prism.PrImage;
+
 
 public class LoadDataToMongo {
 
@@ -55,12 +57,23 @@ public class LoadDataToMongo {
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		RejectedReport rr = new RejectedReport();
 		rr.setTimeStamps();
-		rr.setOrganizationName("SomeOrg");
+		rr.setOrganizationName("updatedOrg");
 		dao.save(rr);
 	}
 	
 	
-	@Test 
+	@Test
+	public void getRejectedReport(){
+		
+		LocalDateTime tomorrow = LocalDateTime.of(2017, 6, 1, 0, 0);
+		RejectedReportDaoImpl dao = new RejectedReportDaoImpl();
+		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+		List<RejectedReport> rejectedReports =  dao.getByNameAndDate("updatedOrg", tomorrow);
+		List<RejectedReport> rejectedReportsNew = rejectedReports;
+		//assertTrue()
+	}
+	
+	//@Test 
 	public void writeOneSentence() throws Exception{
 		processSentence("she was denied a ct scan.");
 	}

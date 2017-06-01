@@ -15,6 +15,7 @@ public class MongoConnectionProvider {
 		private void createInstance(MongoConnectionEntity entity) {
 			try {
 		    	Morphia morphia = new Morphia();
+		    	morphia.getMapper().getConverters().addConverter(new LocalDateTimeConverter());
 		    	datastore = morphia.createDatastore(new MongoClient(entity.getIpAddress()), entity.getDatabaseName());
 		    	datastore.ensureIndexes();
 			} catch(Exception e) {

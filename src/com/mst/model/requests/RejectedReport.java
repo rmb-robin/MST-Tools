@@ -1,6 +1,7 @@
 package com.mst.model.requests;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ import com.mst.util.LocalDateTimeConverter;
 
  
 @Entity("rejectedReport")
-@Converters(DateConverter.class)
+@Converters(LocalDateTimeConverter.class)
 //@Indexes({
 //  @Index(fields = @Field("id"))
 //}) 
@@ -26,8 +27,8 @@ public class RejectedReport {
 	private String organizationName;
 	private String accessionNumber;
 	private List<String> missingFields; 
-	private LocalDate processingDate; 
-	private LocalTime processingTime; 
+	//private LocalDate processingDate; 
+	private LocalDateTime processingTime; 
 	
 	public RejectedReport(){
 		missingFields = new ArrayList<>();
@@ -72,17 +73,17 @@ public class RejectedReport {
 	}
 
 
+//
+//	public LocalDate getProcessingDate() {
+//		return processingDate;
+//	}
 
-	public LocalDate getProcessingDate() {
-		return processingDate;
-	}
-
-	public LocalTime getProcessingTime() {
+	public LocalDateTime getProcessingTime() {
 		return processingTime;
 	}
 	
 	public void setTimeStamps(){
-		this.processingDate = LocalDate.now();
-		this.processingTime = LocalTime.now();
+		//this.processingDate = LocalDate.now();
+		this.processingTime = LocalDateTime.now();
 	}
 }
