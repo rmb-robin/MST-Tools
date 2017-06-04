@@ -28,3 +28,19 @@ previous,f,dysn,t,null,general time
 prior,f,dysn,t,null,general time
 cardinal number,t,cm,f,null,measurement
 cardinal number,t,mm,f,null,measurement
+qlco,t,dysn,t,null,disease modifier
+qlco-cert,t,dysn,t,null,disease modifier
+qlco-degree,t,dysn,t,null,disease modifier
+qlco-depth,t,dysn,t,null,disease modifier
+qlco-fixed,t,dysn,t,null,disease modifier
+qlco-sev,t,dysn,t,null,disease modifier
+qlco-simple,t,cyst,f,null,simple cyst modifiers
+qlco-sizeref,t,dysn,t,null,disease modifier
+qlco-sym,t,dysn,t,null,disease modifier
+qlco-tempor,t,proc,t,null,procedure timing
+tempor,t,proc,t,null,procedure timing
+bpoc,t,proc,t,null,procedure location
+bpoc,t,title-med,t,null,physician speciality
+bpoc,t,ptconsul,t,null,consultation speciality
+proc,t,ptconsul,t,null,procedure evaluation
+qlco-neop,t,disease,f,null,neoplasm severity
