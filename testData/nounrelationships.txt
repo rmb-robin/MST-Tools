@@ -6,7 +6,6 @@ stable,f,appearing,f,null,appearance
 testing,f,criteria,f,null,diagnostic parameters
 benign,f,dysn,t,null,disease severity
 malignant,f,dysn,t,null,disease severity
-breast,f,dysn,t,null,location
 mm,f,dysn,t,null,measure
 cm,f,dysn,t,null,measure
 invasive,f,neop,t,null,disease severity
