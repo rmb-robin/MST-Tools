@@ -37,10 +37,10 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
 			 query
 			 .search(token)
-			 .field("tokenRelationships.edgeName").hasAnyOf(edgeQueriesByName.keySet())
+			 .field("tokenRelationships.edgeName").hasAllOf(edgeQueriesByName.keySet())
 			 .retrievedFields(true, "id", "tokenRelationships", "normalizedSentence");
 			 
-			 queryResults.addAll(getSentenceQueryResults(query.asList(), token));
+			 queryResults.addAll(getSentenceQueryResults(query.asList(), token,input.getEdges()));
 		}
 		return queryResults;
 	}	
@@ -56,6 +56,17 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return result;
 	}
 	
+	private Map<String,List<TokenRelationship>> convertSentenceRelationshipsToMap(List<TokenRelationship> relationships){
+		Map<String,List<TokenRelationship>> result = new HashMap<>();
+		for(TokenRelationship tokenRelationship: relationships){
+		 if(!result.containsKey(tokenRelationship.getEdgeName()))
+				 result.put(tokenRelationship.getEdgeName(), new ArrayList<TokenRelationship>());
+		 
+		 result.get(tokenRelationship.getEdgeName()).add(tokenRelationship); 
+		}
+		return result;
+	}
+	
 	
 	private TokenRelationship findFriendOfFriendEdges(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship){
 		
@@ -67,13 +78,33 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		}
 		return null;
 	}
+	
+	private boolean shouldAddSentenceToResult(Map<String,List<TokenRelationship>> relationshipsByEdgeName,List<EdgeQuery> edgeQuerys){
+		
+		
+		for(EdgeQuery edgeQuery: edgeQuerys){
+			if(edgeQuery.getValue()==null || edgeQuery.getValue().equals("")) continue;
+			if(!relationshipsByEdgeName.containsKey(edgeQuery.getName()))continue;
+			
+			List<TokenRelationship> tokenRelationships = relationshipsByEdgeName.get(edgeQuery.getName());
+			
+			String edgeValue = edgeQuery.getValue().toLowerCase();
+			for(TokenRelationship relationship: tokenRelationships){
+				if(!relationship.getFromToken().getToken().equals(edgeValue) && 
+				   !relationship.getToToken().getToken().equals(edgeValue)) return false;
+			}
+		}
+		return true;
+	}
 
-	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token){
+	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery){
 		
 		List<SentenceQueryResult> result = new ArrayList<>();
 		for(SentenceDb sentenceDb : sentences){
 			try{
 			String id = sentenceDb.getId().toString();
+			Map<String,List<TokenRelationship>> relationshipsByEdgeName = convertSentenceRelationshipsToMap(sentenceDb.getTokenRelationships());
+			if(!shouldAddSentenceToResult(relationshipsByEdgeName,edgeQuery)) continue;
 			
 			if(processedSentences.contains(id))continue;
 			processedSentences.add(id);
