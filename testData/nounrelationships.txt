@@ -26,3 +26,5 @@ ms.,f,*,f,0,pii
 bpoc,t,dysn,t,null,disease location
 previous,f,dysn,t,null,general time
 prior,f,dysn,t,null,general time
+cardinal number,t,cm,f,null,measurement
+cardinal number,t,mm,f,null,measurement
