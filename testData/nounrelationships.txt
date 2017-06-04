@@ -2,7 +2,7 @@ cancer,f,panel,f,null,assay type
 cancer ,f,stage,f,null,disease severity
 current,f,criteria,f,null,parameters
 genedx,f,panel,f,null,assay brand
-stable,f,appearing,f,null,stability
+appearing,f,dysn,t,null,disease appearance
 testing,f,criteria,f,null,diagnostic parameters
 benign,f,dysn,t,null,disease severity
 malignant,f,dysn,t,null,disease severity
