@@ -23,3 +23,82 @@ appear,appears,appeared,appearing,appear,yes
 see,sees,saw,seeing,view,yes
 develop,develops,developed,developing,develop,yes
 deny,denies,denied,denying,deny,no,no,yes
+accompany,accompanies,accompanied,accompanying,action,yes
+activate,activates,activated,activating,action,yes
+attach,attaches,attached,attaching,action,yes
+bind,binds,bound,binding,action,yes
+close,closes,closed,closing,action,yes,yes
+collect,collects,collected,collecting,action,yes
+connect,connects,connected,connecting,action,yes
+document,documents,documented,documenting,action,yes
+establish,establishes,established,establishing,action,yes
+evaluate,evaluates,evaluated,evaluating,action,yes,yes
+examine,examines,examined,examining,action,yes,yes
+expect,expects,expected,expecting,action,yes
+include,includes,included,including,action,yes
+investigate,investigates,investigated,investigating,action,yes
+involve,involves,involved,involving,action,yes
+observe,observes,observed,observing,action,yes
+obtain,obtains,obtained,obtaining,action,yes
+perform,performs,performed,performing,action,yes,yes
+play,plays,played,playing,action,yes
+provide,provides,provided,providing,action,yes
+read,reads,read,reading,action,yes
+repair,repairs,repaired,repairing,action,yes
+replace,replaces,replaced,replacing,action,yes
+review,reviews,reviewed,reviewing,action,yes
+scan,scans,scanned,scanning,action,yes,yes
+separate,separates,separated,separating,action,yes
+study,studies,studied,studying,action,yes,yes
+use,uses,used,using,action,yes
+associate,associates,associated,associating,associate,yes
+clear,clears,cleared,clearing,clear,yes
+empty,empties,emptied,emptying,clear,yes
+analyze,analyzes,analyzed,analyzing,define,yes,yes
+define,defines,defined,defining,define,yes,yes
+delineate,delineates,delineated,delineating,define,yes,yes
+describe,describes,described,describing,define,yes,yes
+detail,details,detailed,detailing,define,yes,yes
+size,sizes,sized,sizing,define,yes,yes
+form,forms,formed,forming,develop,yes,yes
+make,makes,made,making,develop,yes,yes
+produce,produces,produced,producing,develop,yes,yes
+find,finds,found,finding,identify,yes,yes
+rupture,ruptures,ruptured,rupturing,action,yes,yes
+attenuate,attenuates,attenuated,attenuating,change value,yes,yes
+change,changes,changed,changing,change value,yes,yes
+contrast,contrasts,contrasted,contrasting,change value,yes,yes
+decompress,decompresses,decompressed,decompressing,change value,yes,yes
+decrease,decreases,decreased,decreasing,change value,yes,yes
+deflate,deflates,deflated,deflating,change value,yes,yes
+degenerate,degenerates,degenerated,degenerating,change value,yes,yes
+down regulate,down regulates,down regulated,down regulating,change value,yes,yes
+enhance,enhances,enhanced,enhancing,change value,yes,yes
+enlarge,enlarges,enlarged,enlarging,change value,yes,yes
+extend,extends,extended,extending,change value,yes,yes
+increase,increases,increased,increasing,change value,yes,yes
+induce,induces,induced,inducing,change value,yes,yes
+limit,limits,limited,limiting,change value,yes,yes
+modulate,modulates,modulated,modulating,change value,yes,yes
+overexpress,overexpresses,overexpressed,overexpressing,change value,yes,yes
+promote,promotes,promoted,promoting,change value,yes,yes
+raise,raises,raised,raising,change value,yes,yes
+range,ranges,ranged,ranging,change value,yes,yes
+reduce,reduces,reduced,reducing,change value,yes,yes
+remove,removes,removed,removing,change value,yes,yes
+swell,swells,swelled,swelling,change value,yes,yes
+up regulate,up regulates,up regulated,up regulating,change value,yes,yes
+worsen,worsens,worsened,worsening,change value,yes,yes
+administer,administers,administered,administering,action,yes,yes
+give,gives,gave,giving,action,yes,yes
+utilize,utilizes,utilized,utilizing,action,yes
+consider,considers,considered,considering,advise,yes,yes
+suggest,suggests,suggested,suggesting,advise,yes,yes
+advise,advises,advised,advising,advise,yes,yes
+recommend,recommends,recommended,recommending,advise,yes,yes
+refer,refers,referred,referring,advise,yes,yes
+acknowledge,acknowledges,acknowledged,acknowledging,consent,yes,yes
+sign,signs,signed,signing,consent,yes,yes
+place,places,placed,placing,position,yes
+position,positions,positioned,positioning,position,yes
+situate,situates,situated,situating,position,yes
