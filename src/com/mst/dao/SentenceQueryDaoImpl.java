@@ -5,13 +5,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
+import org.mongodb.morphia.query.QueryResults;
+
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceQueryDao;
 import com.mst.model.SentenceQuery.EdgeQuery;
 import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
+import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
@@ -20,8 +25,17 @@ import com.mst.model.sentenceProcessing.TokenRelationship;
 
 public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
+	private class SentenceQueryInstanceResult{
+		public List<SentenceQueryResult> sentenceQueryResult;
+		public List<SentenceDb> sentences;
+	}
+	
 	private MongoDatastoreProvider datastoreProvider;
 	private HashSet<String> processedSentences; 
+	
+	private Map<String,SentenceQueryResult> queryResults;
+	private Map<String,SentenceDb> cumalativeSentenceResults;
+	
 	
 	@Override
 	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
@@ -30,22 +44,117 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
 		processedSentences = new HashSet<>(); 
-		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(input);
-		List<SentenceQueryResult> queryResults = new ArrayList<>();
 		Datastore datastore =  datastoreProvider.getDataStore();
-		for(String token: input.getTokens()){
+		queryResults = new HashMap<>();
+		cumalativeSentenceResults = new HashMap<>();
+		
+		//
+		
+		for(int i =0;i< input.getSentenceQueryInstances().size();i++){
+			SentenceQueryInstance sentenceQueryInstance = input.getSentenceQueryInstances().get(i);
+			if(i==0){
+				addResults(processQueryInstance(sentenceQueryInstance, datastore));
+				continue;
+			}
+			
+			if(sentenceQueryInstance.getAppender()==null) continue;
+			String appender = sentenceQueryInstance.getAppender().toLowerCase();
+			if(appender.equals("or")){
+				addResults(processQueryInstance(sentenceQueryInstance, datastore));
+				continue;
+			}
+			
+			if(appender.equals("and")){
+				filterForAnd(sentenceQueryInstance);
+			}
+		}
+		return new ArrayList<SentenceQueryResult>(queryResults.values());
+	}	
+
+	
+	private void addResults(SentenceQueryInstanceResult result){
+		
+		Map<String, SentenceDb> sentencesById = new HashMap<String,SentenceDb>();
+		for(SentenceDb s: result.sentences){
+			if(sentencesById.containsKey(s.getId().toString()))continue;
+			sentencesById.put(s.getId().toString(),s);
+		}
+		
+		for(SentenceQueryResult queryResult: result.sentenceQueryResult){
+			if(this.queryResults.containsKey(queryResult.getSentenceId())) continue;
+			this.queryResults.put(queryResult.getSentenceId(), queryResult);
+			SentenceDb matchedSentence = sentencesById.get(queryResult.getSentenceId());
+			if(matchedSentence!=null && !this.cumalativeSentenceResults.containsKey(queryResult.getSentenceId())){
+				this.cumalativeSentenceResults.put(queryResult.getSentenceId(), matchedSentence);
+			}
+		}
+	}
+	
+	
+	private void filterForAnd(SentenceQueryInstance sentenceQueryInstance){
+		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
+		HashSet<String> matchedIds = new HashSet<>();
+		for (Map.Entry<String, SentenceDb> entry : cumalativeSentenceResults.entrySet()) {
+			 boolean tokenMatch = false;
+			 for(String token: sentenceQueryInstance.getTokens()){
+				if(entry.getValue().getOrigSentence().contains(token)){
+					tokenMatch = true;
+					break;
+				}
+			}
+			 
+			if(!tokenMatch) continue;
+
+			HashSet<String> sentenceUniqueEdgeNames = new HashSet<>();
+			entry.getValue().getTokenRelationships().stream().forEach(a-> sentenceUniqueEdgeNames.add(a.getEdgeName()));
+			for(String edgeName: edgeQueriesByName.keySet()){
+				if(!sentenceUniqueEdgeNames.contains(edgeName)){
+					tokenMatch = false;
+					break;
+				}
+			}
+				
+			if(!tokenMatch) continue;
+			if(!shouldAddSentenceToResult(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges())) continue;
+			matchedIds.add(entry.getKey());
+		 }
+		updateExistingResults(matchedIds);
+	}
+	
+	private void updateExistingResults(HashSet<String> matchedIds){
+		List<String> idsToRemove = new ArrayList<>();
+		for(String id: this.queryResults.keySet()){
+			if(matchedIds.contains(id))continue;
+			idsToRemove.add(id);
+		}
+	
+		for(String id: idsToRemove){
+			queryResults.remove(id);
+			if(this.cumalativeSentenceResults.containsKey(id))
+				this.cumalativeSentenceResults.remove(id);
+		}
+	}
+	
+	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore){
+		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
+		SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();
+		result.sentenceQueryResult  = new ArrayList<>();
+		result.sentences = new ArrayList<>();
+		
+		for(String token: sentenceQueryInstance.getTokens()){
 			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
 			 query
 			 .search(token)
 			 .field("tokenRelationships.edgeName").hasAllOf(edgeQueriesByName.keySet())
-			 .retrievedFields(true, "id", "tokenRelationships", "normalizedSentence");
-			 
-			 queryResults.addAll(getSentenceQueryResults(query.asList(), token,input.getEdges()));
+			 .retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence");
+			 List<SentenceDb> sentences = query.asList();
+			 result.sentences.addAll(sentences);
+			 result.sentenceQueryResult.addAll(getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges()));
 		}
-		return queryResults;
-	}	
-
-	private Map<String, EdgeQuery> convertEdgeQueryToDictionary(SentenceQueryInput input){
+		return result;
+	}
+	
+	private Map<String, EdgeQuery> convertEdgeQueryToDictionary(SentenceQueryInstance input){
 		Map<String,EdgeQuery> result = new HashMap<String, EdgeQuery>();
 		
 		for(EdgeQuery q : input.getEdges()){
@@ -79,9 +188,9 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return null;
 	}
 	
-	private boolean shouldAddSentenceToResult(Map<String,List<TokenRelationship>> relationshipsByEdgeName,List<EdgeQuery> edgeQuerys){
+	private boolean shouldAddSentenceToResult(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQuerys){
 		
-		
+		Map<String,List<TokenRelationship>> relationshipsByEdgeName = convertSentenceRelationshipsToMap(existingtokenRelationships);
 		for(EdgeQuery edgeQuery: edgeQuerys){
 			if(edgeQuery.getValue()==null || edgeQuery.getValue().equals("")) continue;
 			if(!relationshipsByEdgeName.containsKey(edgeQuery.getName()))continue;
@@ -103,8 +212,8 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		for(SentenceDb sentenceDb : sentences){
 			try{
 			String id = sentenceDb.getId().toString();
-			Map<String,List<TokenRelationship>> relationshipsByEdgeName = convertSentenceRelationshipsToMap(sentenceDb.getTokenRelationships());
-			if(!shouldAddSentenceToResult(relationshipsByEdgeName,edgeQuery)) continue;
+
+			if(!shouldAddSentenceToResult(sentenceDb.getTokenRelationships(),edgeQuery)) continue;
 			
 			if(processedSentences.contains(id))continue;
 			processedSentences.add(id);

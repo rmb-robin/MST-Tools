@@ -1,6 +1,7 @@
 package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import com.google.common.escape.Escaper;
@@ -19,8 +20,8 @@ import com.mst.model.sentenceProcessing.WordToken;
 public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 
 	private WordToken verb = null;
-	private WordToken subject =null;
-	private WordToken subjectComplement = null;
+	private HashSet<WordToken> subjects =null;
+	private HashSet<WordToken> subjectComplements = null;
     private WordToken modalVerb = null;
 	private TokenRelationshipFactory tokenRelationshipFactory; 
  
@@ -54,10 +55,9 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private String getEdgeNameforNotHas(Sentence sentence){
 		List<TokenRelationship> existingRelationships = sentence.getTokenRelationships();
 		if(existingRelationships==null)return null;
-		if(subject==null && subjectComplement==null) return null;
+		if(subjects.isEmpty() && subjectComplements.isEmpty()) return null;
 		List<TokenRelationship> matchedRelationships = getTokenRelationsForTokens(existingRelationships);
 
-	
 		if(isExistanceEdge(matchedRelationships)) return EdgeNames.existence;
 		if(isExistanceNoEdge(matchedRelationships)) return EdgeNames.existenceNo;
 		if(isExistancePossibilityEdge(matchedRelationships)) return EdgeNames.existencePossibility;
@@ -119,11 +119,11 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private List<TokenRelationship> getTokenRelationsForTokens(List<TokenRelationship> existingRelationships){
 		List<TokenRelationship> result = new ArrayList<>();
 		for(TokenRelationship tokenRelationship: existingRelationships){
-			if(tokenRelationship.getToToken().equals(subject) || tokenRelationship.getToToken().equals(subjectComplement)){
+			if(subjects.contains(tokenRelationship.getToToken()) || subjectComplements.contains(tokenRelationship.getToToken())){
 				result.add(tokenRelationship);
 				continue;
 			}
-			if(tokenRelationship.getFromToken().equals(subject) || tokenRelationship.getFromToken().equals(subjectComplement))
+			if(subjects.contains(tokenRelationship.getFromToken())|| subjectComplements.contains(tokenRelationship.getFromToken()))
 				result.add(tokenRelationship);
 		}
 		return result;
@@ -147,8 +147,8 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private void setVerbPhraseTokens(List<WordToken> tokens){
 		
 		verb = null;
-		subject = null;
-		subjectComplement = null;
+		subjects = new HashSet<>();
+		subjectComplements = new HashSet<>();
 		modalVerb = null;
 		
 		for(WordToken wordToken: tokens){
@@ -159,36 +159,48 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 					verb = wordToken; 
 				continue;
 			}
-			if(wordToken.getPropertyValueType()!=null && wordToken.getPropertyValueType().equals(PropertyValueTypes.Subject) && subject==null)
+			if(wordToken.getPropertyValueType()!=null && wordToken.getPropertyValueType().equals(PropertyValueTypes.Subject))
 			{
-				subject = wordToken;
+				subjects.add(wordToken);
 				continue;
 			}
 			
-			if(wordToken.getPropertyValueType()!=null && wordToken.getPropertyValueType().equals(PropertyValueTypes.SubjectComplement) && subjectComplement == null){
-				subjectComplement = wordToken;
+			if(wordToken.getPropertyValueType()!=null && wordToken.getPropertyValueType().equals(PropertyValueTypes.SubjectComplement)){
+				subjectComplements.add(wordToken);
 			}
 		}
 	}	
 		
+	private List<TokenRelationship> createRelationshipsForAll(String edgeName){
+		List<TokenRelationship> result = new ArrayList<>();
+		
+		for(WordToken subject: subjects){
+			for(WordToken  subjectComplement: subjectComplements){
+				result.add(tokenRelationshipFactory.create(edgeName, EdgeTypes.related, subject, subjectComplement));
+			}
+		}
+		return result;
+	}
+
 	private List<TokenRelationship> createNonHasEdges(String edgeName){
-		List<TokenRelationship> relationships = new ArrayList<>();
+		
 		if(shouldCreateSubjectSubjectComplementEdge()) 
 		{ 
-			relationships.add(tokenRelationshipFactory.create(edgeName, EdgeTypes.related, subject, subjectComplement));
-			return relationships;
+			return createRelationshipsForAll(edgeName);
 		}
+		List<TokenRelationship> relationships = new ArrayList<>();
 		if(shouldCreateVerbNetEdge()){
-			relationships.add(tokenRelationshipFactory.create(edgeName, EdgeTypes.related, subject, subjectComplement));
-			relationships.add(tokenRelationshipFactory.create(verb.getVerb().getVerbNetClass(), EdgeTypes.related, subject, subjectComplement));
+			
+			relationships.addAll(createRelationshipsForAll(edgeName));
+			relationships.addAll(createRelationshipsForAll(verb.getVerb().getVerbNetClass()));
 			return relationships;
 		}
 		return relationships;
 	}
 		
 	private boolean shouldCreateVerbNetEdge(){
-		if(subject==null) return false;
-		if(subjectComplement==null) return false;
+		if(subjects.isEmpty()) return false;
+		if(subjectComplements.isEmpty()) return false;
 		Verb verbObject = verb.getVerb();
 
 		if(verbObject.getVerbType()!=VerbType.AV) return false;
@@ -196,8 +208,8 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	}
 	
 	private boolean shouldCreateSubjectSubjectComplementEdge(){
-		if(subject==null) return false;
-		if(subjectComplement==null) return false;
+		if(subjects.isEmpty()) return false;
+		if(subjectComplements.isEmpty()) return false;
 		
 		Verb verbObject = verb.getVerb();		
 		if(verbObject.getVerbType()==VerbType.LV) return true;

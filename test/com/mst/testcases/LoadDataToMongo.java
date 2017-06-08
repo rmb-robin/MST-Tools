@@ -30,9 +30,17 @@ import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
 import com.mst.util.MongoDatastoreProviderDefault;
 
+import org.apache.log4j.Logger;
 
 public class LoadDataToMongo {
 
+	
+	@Test
+	public void testLog(){
+		 Logger logger = Logger.getLogger(LoadDataToMongo.class);
+	        logger.error("Don't panic");
+	}
+	
 	
 //	@Test
 	public void process() throws Exception{
@@ -61,7 +69,7 @@ public class LoadDataToMongo {
 		dao.save(rr);
 	}
 		
-	@Test 
+	//@Test 
 	public void writeOneSentence() throws Exception{
 		processSentence("she was denied a ct scan.");
 	}
@@ -86,7 +94,7 @@ public class LoadDataToMongo {
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		dao.saveSentences(sentences, dd);
 	}
-	//@Test
+//	@Test
 	public void loadMetaData(){
 		SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
 		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();

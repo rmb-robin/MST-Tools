@@ -86,23 +86,19 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	private Sentence processSentence(Sentence sentence, SentenceRequestBase request) throws Exception{
 		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
 		List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(),this.sentenceProcessingMetaDataInput.getSemanticTypes());
-		List<TokenRelationship> tokenRelationships = new ArrayList<>();
 		
+		sentence.setTokenRelationships(new ArrayList<TokenRelationship>());
 		tokens = partOfSpeechAnnotator.annotate(tokens, this.sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
 		tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
-		tokenRelationships.addAll(nounrelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
+		sentence.getTokenRelationships().addAll(nounrelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
 		tokens = prepPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseProcessingInput());
-		tokenRelationships.addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
+		sentence.getTokenRelationships().addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
 		tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
 		tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements(), request.isConvertLargest());
 		
-		tokenRelationships.addAll(negationTokenRelationshipProcessor.process(tokens));
-		tokenRelationships.addAll(verbExistanceProcessor.process(sentence));
-		
+		sentence.getTokenRelationships().addAll(negationTokenRelationshipProcessor.process(tokens));
+		sentence.getTokenRelationships().addAll(verbExistanceProcessor.process(sentence));
 		sentence.setModifiedWordList(tokens);
-		sentence.setTokenRelationships(tokenRelationships);
-		
-		
 		return sentence;
 	}
 	

@@ -9,6 +9,7 @@ import com.mst.dao.SentenceDaoImpl;
 import com.mst.dao.SentenceQueryDaoImpl;
 import com.mst.model.SentenceQuery.EdgeQuery;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
+import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
 import com.mst.util.MongoDatastoreProviderDefault;
 
@@ -37,9 +38,11 @@ public class SentenceQueryDaoIntergrationTest {
 	public void getSentencesTest(){
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		SentenceQueryInput input = new SentenceQueryInput();
+		SentenceQueryInstance queryInstance = new SentenceQueryInstance();
+		
 		List<String> tokens = new ArrayList<>();
 		tokens.add("cyst");
-		input.setTokens(tokens);
+		queryInstance.setTokens(tokens);
 		List<EdgeQuery> edgeNames = new ArrayList<>();
 		
 		
@@ -48,7 +51,8 @@ public class SentenceQueryDaoIntergrationTest {
 		edgeNames.add(createEdgeQuery("disease location",null));
 		
 		
-		input.setEdges(edgeNames);
+		queryInstance.setEdges(edgeNames);
+		input.getSentenceQueryInstances().add(queryInstance);
 		List<SentenceQueryResult> result = dao.getSentences(input);
 		List<SentenceQueryResult> resultN = result; 
 		List<SentenceQueryResult> resultF = resultN; 
@@ -64,9 +68,8 @@ public class SentenceQueryDaoIntergrationTest {
 		tokens.add("cyst");
 		tokens.add("mass");
 		tokens.add("tumor");
-		
-		input.setTokens(tokens);
-	
+		SentenceQueryInstance queryInstance = new SentenceQueryInstance();
+		queryInstance.setTokens(tokens);
 
 		
 		List<String> edges = dao.getEdgeNamesByTokens(tokens);
@@ -76,21 +79,33 @@ public class SentenceQueryDaoIntergrationTest {
 			edgeNames.add(createEdgeQuery(e,null));
 		}
 	
-		input.setEdges(edgeNames);
+		queryInstance.setEdges(edgeNames);
+		input.getSentenceQueryInstances().add(queryInstance);
+
 		dao.getSentences(input);
-		
-		
+
 	}
 
 	@Test
 	public void runQuery(){
 		SentenceQueryDaoImpl dao = new SentenceQueryDaoImpl();
 		SentenceQueryInput input = new SentenceQueryInput();
-		input.getTokens().add("cyst");
+		SentenceQueryInstance queryInstance = new SentenceQueryInstance();
+		
+		queryInstance.getTokens().add("cyst");
 		List<EdgeQuery> edges = new ArrayList<>();
 		edges.add(createEdgeQuery("laterality",null));
-		input.setEdges(edges);
+		queryInstance.setEdges(edges);
+		input.getSentenceQueryInstances().add(queryInstance);
+		
+		queryInstance = new SentenceQueryInstance();
+		queryInstance.setAppender("and");
+		queryInstance.getTokens().add("cyst");
+	//	queryInstance.setEdges(edges);
+		
+		input.getSentenceQueryInstances().add(queryInstance);
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+		
 		List<SentenceQueryResult> sentences = dao.getSentences(input);	
 		int size = sentences.size();
 		int t = size;

@@ -5,26 +5,15 @@ import java.util.List;
 
 public class SentenceQueryInput {
 
-	private List<String> tokens; 
-	private List<EdgeQuery> edges;
-	
+	private List<SentenceQueryInstance> sentenceQueryInstances; 
 	public SentenceQueryInput(){
-		tokens = new ArrayList<>();
+		sentenceQueryInstances = new ArrayList<>();
 	}
-
-	public List<String> getTokens() {
-		return tokens;
+	
+	public List<SentenceQueryInstance> getSentenceQueryInstances() {
+		return sentenceQueryInstances;
 	}
-
-	public void setTokens(List<String> tokens) {
-		this.tokens = tokens;
-	}
-
-	public List<EdgeQuery> getEdges() {
-		return edges;
-	}
-
-	public void setEdges(List<EdgeQuery> edges) {
-		this.edges = edges;
+	public void setSentenceQueryInstances(List<SentenceQueryInstance> sentenceQueryInstances) {
+		this.sentenceQueryInstances = sentenceQueryInstances;
 	}
 }
