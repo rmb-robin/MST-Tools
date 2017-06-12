@@ -13,14 +13,17 @@ import org.mongodb.morphia.query.QueryResults;
 
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceQueryDao;
+import com.mst.model.SemanticType;
 import com.mst.model.SentenceQuery.EdgeQuery;
 import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
 import com.mst.model.metadataTypes.EdgeResultTypes;
+import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.model.sentenceProcessing.WordToken;
 
 
 public class SentenceQueryDaoImpl implements SentenceQueryDao  {
@@ -192,20 +195,69 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		
 		Map<String,List<TokenRelationship>> relationshipsByEdgeName = convertSentenceRelationshipsToMap(existingtokenRelationships);
 		for(EdgeQuery edgeQuery: edgeQuerys){
-			if(edgeQuery.getValue()==null || edgeQuery.getValue().equals("")) continue;
 			if(!relationshipsByEdgeName.containsKey(edgeQuery.getName()))continue;
+			HashSet<String> edgeValues = edgeQuery.getValuesLower();
+			if(edgeValues==null || edgeValues.isEmpty()) continue;
+			
+			List<String> edgeValuesList = new ArrayList<>(edgeValues);
 			
 			List<TokenRelationship> tokenRelationships = relationshipsByEdgeName.get(edgeQuery.getName());
 			
-			String edgeValue = edgeQuery.getValue().toLowerCase();
+			if(edgeQuery.getIsNumeric()==null)
+				edgeQuery.setIsNumeric(isEdgeQueryNumeric(edgeValuesList));
+			
+			boolean isEdgeNumeric = edgeQuery.getIsNumeric();
+			boolean isEdgeInRange =false;
 			for(TokenRelationship relationship: tokenRelationships){
-				if(!relationship.getFromToken().getToken().equals(edgeValue) && 
-				   !relationship.getToToken().getToken().equals(edgeValue)) return false;
+				
+				if(isEdgeNumeric && !isEdgeInRange){
+					if(isTokenCardinal(relationship.getFromToken()))
+						isEdgeInRange = isNumericInRange(edgeValuesList,relationship.getFromToken().getToken());
+					else if(isTokenCardinal(relationship.getToToken())) 
+						isEdgeInRange = isNumericInRange(edgeValuesList,relationship.getToToken().getToken());
+				}
+				
+				if(!isEdgeNumeric){
+				if(!edgeValues.contains(relationship.getFromToken().getToken()) && 
+				   !edgeValues.contains(relationship.getToToken().getToken())) return false;
+				}
 			}
+			if(isEdgeNumeric && !isEdgeInRange) return false;
 		}
 		return true;
 	}
 
+	private boolean isTokenCardinal(WordToken wordToken){
+		if(wordToken.getSemanticType()==null);
+		return wordToken.getSemanticType().equals(SemanticTypes.cardinalNumber);
+	}
+
+	
+	private boolean isNumericInRange(List<String> edgeValues, String relationShipValue){
+		
+		if(!isNumericValue(relationShipValue)) return false;
+		double value = Double.parseDouble(relationShipValue);
+		
+		double valueOne = Double.parseDouble(edgeValues.get(0));
+		double valueTwo = Double.parseDouble(edgeValues.get(1));
+		double min = Math.min(valueOne, valueTwo);
+		double max = Math.max(valueOne, valueTwo);
+		if(value>=min && value <=max) return true;
+		return false;
+	}
+	
+	
+	private boolean isEdgeQueryNumeric(List<String> edgeValues){
+		if(edgeValues.size()>2) return false;
+		if(!isNumericValue(edgeValues.get(0))) return false;
+		if(!isNumericValue(edgeValues.get(1))) return false;
+		return true;
+	}
+	
+	private boolean isNumericValue(String value){
+		return value.matches("[-+]?\\d*\\.?\\d+");
+	}
+	
 	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery){
 		
 		List<SentenceQueryResult> result = new ArrayList<>();

@@ -30,7 +30,15 @@ public class SentenceQueryDaoIntergrationTest {
 	private EdgeQuery createEdgeQuery(String name, String value){
 		EdgeQuery q = new EdgeQuery();
 		q.setName(name);
-		q.setValue(value);
+		q.getValues().add(value);
+		return q;
+	}
+	
+	private EdgeQuery createNumericEdgeQuery(String name, String value, String valueTwo){
+		EdgeQuery q = new EdgeQuery();
+		q.setName(name);
+		q.getValues().add(value);
+		q.getValues().add(valueTwo);
 		return q;
 	}
 	
@@ -86,6 +94,26 @@ public class SentenceQueryDaoIntergrationTest {
 
 	}
 
+	@Test 
+	public void runQueryForNumericMatch(){
+		SentenceQueryDaoImpl dao = new SentenceQueryDaoImpl();
+		SentenceQueryInput input = new SentenceQueryInput();
+		SentenceQueryInstance queryInstance = new SentenceQueryInstance();
+		
+		queryInstance.getTokens().add("cyst");
+		List<EdgeQuery> edges = new ArrayList<>();
+		edges.add(createNumericEdgeQuery("disease quantity","1","5"));
+		queryInstance.setEdges(edges);
+		input.getSentenceQueryInstances().add(queryInstance);
+		
+		input.getSentenceQueryInstances().add(queryInstance);
+		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+		
+		List<SentenceQueryResult> sentences = dao.getSentences(input);	
+		int size = sentences.size();
+		int t = size;
+	}
+	
 	@Test
 	public void runQuery(){
 		SentenceQueryDaoImpl dao = new SentenceQueryDaoImpl();

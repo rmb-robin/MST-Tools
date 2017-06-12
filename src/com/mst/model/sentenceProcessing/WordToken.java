@@ -34,6 +34,7 @@ public class WordToken extends GenericToken {
 	}
 
 	public String getSemanticType() {
+		//if(s)
 		return semanticType;
 	}
 
