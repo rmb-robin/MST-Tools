@@ -160,8 +160,12 @@ public class DiscreteData {
 		this.organizationName = organizationName;
 	}
 
-	public LocalDate getProcessDate() {
+	public LocalDate getProcessingDate() {
 		return processingDate;
+	}
+	
+	public void setProcessingDate(LocalDate processingDate){
+		this.processingDate = processingDate;
 	}
 
 	public String getBucketName() {

@@ -32,9 +32,7 @@ public class DiscreteDataComplianceFieldProvider {
 	}
 	
 	private void processLine(String[] values, String dieseName){
-		
 
-		
 		ComplianceDisplayFieldsBucketItem bucketItem = new ComplianceDisplayFieldsBucketItem();
 		bucketItem.setBucketName(values[1]);
 		if(tryParseInt(values[2]))
