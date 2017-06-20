@@ -41,6 +41,7 @@ public class SentenceDb {
 	private List<WordToken> modifiedWordList = new ArrayList<>();
 	private List<TokenRelationship> tokenRelationships = new ArrayList<>();
 	private String source, practice, study;
+	private String organizationId;
 
 	@Reference
 	private DiscreteData discreteData;
@@ -119,11 +120,17 @@ public class SentenceDb {
 	public void setDiscreteData(DiscreteData discreteData) {
 		this.discreteData = discreteData;
 	}
-	public LocalDate getProcessDate() {
+	public LocalDate getProcessingDate() {
 		return processingDate;
 	}
-	public void setProcessDate(LocalDate processDate) {
+	public void setProcessingDate(LocalDate processDate) {
 		this.processingDate = processDate;
+	}
+	public String getOrganizationId() {
+		return organizationId;
+	}
+	public void setOrganizationId(String organizationId) {
+		this.organizationId = organizationId;
 	}
 	
 	

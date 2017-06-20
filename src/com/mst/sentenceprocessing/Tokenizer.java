@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import com.mst.model.SentenceToken;
 import com.mst.model.sentenceProcessing.WordToken;
-import com.mst.util.Constants;
 
 public class Tokenizer {
 
@@ -22,7 +21,7 @@ public class Tokenizer {
 	//https://www.regex101.com/r/dB1gO3/5
 	
 	private final String allowedCharsBetweenSentences = "[\\s\u2022\u2002\u201c\u00a0]";
-	private final String titles = "((?<!" + Constants.SALUTATION_REGEX.toString() + "|MG\\.|mg\\.|Jan\\.|Feb\\.|Mar\\.|Apr\\.|May\\.|Jun\\.|Jul\\.|Aug\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)";
+	private final String titles = "((?<!" + Pattern.compile("Dr\\.|Mr\\.|Ms\\.|Mrs\\.").toString() + "|MG\\.|mg\\.|Jan\\.|Feb\\.|Mar\\.|Apr\\.|May\\.|Jun\\.|Jul\\.|Aug\\.|Sep\\.|Oct\\.|Nov\\.|Dec\\.)";
 	// # main sentence split (with spaces)
 	private final String regex1 = titles + "(?<=\\.|\\?|!)\\s*;*([*\"\\])]|\u201D)?\\s+(?:" + allowedCharsBetweenSentences + ")*\\s*(?=[A-Z0-9(\"\\[]))"; // https://www.regex101.com/r/qP7hH5/4
 	// # some articles don't have spaces between periods and next sentence

@@ -25,7 +25,7 @@ public class RejectedReport {
 
 	@Id
 	private ObjectId id;
-	private String organizationName;
+	private String organizationId;
 	private String accessionNumber;
 	private List<String> missingFields; 
 	private LocalDate processingDate; 
@@ -63,14 +63,14 @@ public class RejectedReport {
 
 
 
-	public String getOrganizationName() {
-		return organizationName;
+	public String getOrganizationId() {
+		return organizationId;
 	}
 
 
 
-	public void setOrganizationName(String organizationName) {
-		this.organizationName = organizationName;
+	public void setOrganizationId(String organizationId) {
+		this.organizationId = organizationId;
 	}
 
 

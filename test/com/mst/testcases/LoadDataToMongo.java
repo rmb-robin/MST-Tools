@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 public class LoadDataToMongo {
 
 	
-	@Test
+	//@Test
 	public void testLog(){
 		 Logger logger = Logger.getLogger(LoadDataToMongo.class);
 	        logger.error("Don't panic");
@@ -65,17 +65,27 @@ public class LoadDataToMongo {
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		RejectedReport rr = new RejectedReport();
 		rr.setTimeStamps();
-		rr.setOrganizationName("orgName-Test");
+		rr.setOrganizationId("orgName-Test");
 		dao.save(rr);
 	}
+	
+	//@Test
+	public void getSentenceByOrgId(){
 		
-	//@Test 
+		SentenceDaoImpl dao =  new SentenceDaoImpl();
+		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+		List<SentenceDb> results = dao.getSentenceByDate("58c6f3ceaf3c420b90160803");
+		int t = results.size();
+	}
+	
+	@Test 
 	public void writeOneSentence() throws Exception{
 		processSentence("she was denied a ct scan.");
 	}
 	
 	private void processSentence(String text) throws Exception{
 		Sentence sentence = getSentence(text);
+		sentence.setOrganizationId("58c6f3ceaf3c420b90160803");
 		write(sentence);	
 	}
 	
@@ -88,13 +98,13 @@ public class LoadDataToMongo {
 		dd.setAccessionNumber("111");
 		dd.setExamDescription("desc");
 		dd.setModality("m");	
-		dd.setOrganizationName("orgName-Test");
+		dd.setOrganizationId("orgName-Test");
 		dd.setTimeStamps();
 		SentenceDaoImpl dao =  new SentenceDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		dao.saveSentences(sentences, dd);
+		dao.saveSentences(sentences, null);
 	}
-//	@Test
+	//@Test
 	public void loadMetaData(){
 		SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
 		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();

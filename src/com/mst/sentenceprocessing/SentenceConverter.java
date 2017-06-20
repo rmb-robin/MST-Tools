@@ -12,11 +12,12 @@ public class SentenceConverter {
 		dbObj.setOrigSentence(sentence.getOrigSentence());
 		dbObj.setTokenRelationships(sentence.getTokenRelationships());
 		dbObj.setPractice(sentence.getPractice());
-		dbObj.setProcessDate(sentence.getProcessDate());
+		dbObj.setProcessingDate(sentence.getProcessDate());
 		dbObj.setSource(sentence.getSource());
 		dbObj.setStudy(sentence.getStudy());
 		dbObj.setNormalizedSentence(sentence.getNormalizedSentence());
 		dbObj.setDiscreteData(sentence.getDiscreteData());
+		dbObj.setOrganizationId(sentence.getOrganizationId());
 		return dbObj;
 	}
 }

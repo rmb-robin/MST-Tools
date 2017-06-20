@@ -15,8 +15,8 @@ public class DisceteDataComplianceDisplayFieldsDaoImpl extends BaseDocumentDaoIm
 		super.setMongoDatastoreProvider(provider);
 	}
 
-	public DisceteDataComplianceDisplayFields getbyOrgname(String orgName) {
-		return super.getQueryByFieldName(orgName, "orgName").get();
+	public DisceteDataComplianceDisplayFields getbyOrgname(String orgId) {
+		return super.getQueryByFieldName(orgId, "orgId").get();
 	}
 
 }

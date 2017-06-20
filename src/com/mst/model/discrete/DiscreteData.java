@@ -40,7 +40,7 @@ public class DiscreteData {
 
 	private LocalDate processingDate; 
 	
-	private String organizationName; 
+	private String organizationId; 
 	private String bucketName; 
 	
 	private List<DiscreteDataCustomField> customFields; 
@@ -152,12 +152,12 @@ public class DiscreteData {
 		this.processingDate = LocalDate.now();
 	}
 
-	public String getOrganizationName() {
-		return organizationName;
+	public String getOrganizationId() {
+		return organizationId;
 	}
 
-	public void setOrganizationName(String organizationName) {
-		this.organizationName = organizationName;
+	public void setOrganizationId(String organizationId) {
+		this.organizationId = organizationId;
 	}
 
 	public LocalDate getProcessingDate() {

@@ -168,9 +168,9 @@ public class Constants {
 	// https://www.regex101.com/r/zA0iG2/1
 	public static final Pattern TIME_REGEX = Pattern.compile("\\b[0-2]?\\d(:[0-5]\\d){1,2}(\\s*[A|P]M)?\\b", Pattern.CASE_INSENSITIVE);
 	
-	private static final String MONGO_DB_HOST = Props.getProperty("mongo_host");
-	private static final String MONGO_DB = Props.getProperty("mongo_db");
-	private static final String REDIS_DB_HOST = Props.getProperty("redis_host");
+//	private static final String MONGO_DB_HOST = Props.getProperty("mongo_host");
+//	private static final String MONGO_DB = Props.getProperty("mongo_db");
+//	private static final String REDIS_DB_HOST = Props.getProperty("redis_host");
 
 	
 //	public enum MongoDB {
@@ -211,52 +211,52 @@ public class Constants {
 //	    }
 //	}
 	
-	public enum RedisDBx {
-	    INSTANCE;
-	    
-	    private Jedis jedis;
+//	public enum RedisDBx {
+//	    INSTANCE;
+//	    
+//	    private Jedis jedis;
+//
+//	    RedisDBx() {
+//	        try {
+//	            jedis = new Jedis(REDIS_DB_HOST);
+//		    	System.out.println("Established Redis connection");
+//	        } catch(Exception e) {
+//	            e.printStackTrace();
+//	        }
+//	    }
+//	    
+//	    public Jedis getInstance() {
+//	    	return jedis;
+//	    }
+//
+//	    public void close(){
+//	        jedis.close();
+//	    }
+//	}
 
-	    RedisDBx() {
-	        try {
-	            jedis = new Jedis(REDIS_DB_HOST);
-		    	System.out.println("Established Redis connection");
-	        } catch(Exception e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    
-	    public Jedis getInstance() {
-	    	return jedis;
-	    }
-
-	    public void close(){
-	        jedis.close();
-	    }
-	}
-
-	public enum MyJedisPool {
-	    INSTANCE;
-	    
-	    private JedisPool pool;
-	    
-	    MyJedisPool() {
-	        try {
-	        	JedisPoolConfig config = new JedisPoolConfig();
-	        	pool = new JedisPool(config, REDIS_DB_HOST);
-		    	System.out.println("Established Jedis Pool.");
-	        } catch(Exception e) {
-	            e.printStackTrace();
-	        }
-	    }
-	    
-	    public Jedis getResource() {
-	    	return pool.getResource();
-	    }
-
-	    public void close(){
-	       pool.close();
-	    }
-	}
+//	public enum MyJedisPool {
+//	    INSTANCE;
+//	    
+//	    private JedisPool pool;
+//	    
+//	    MyJedisPool() {
+//	        try {
+//	        	JedisPoolConfig config = new JedisPoolConfig();
+//	        	pool = new JedisPool(config, REDIS_DB_HOST);
+//		    	System.out.println("Established Jedis Pool.");
+//	        } catch(Exception e) {
+//	            e.printStackTrace();
+//	        }
+//	    }
+//	    
+//	    public Jedis getResource() {
+//	    	return pool.getResource();
+//	    }
+//
+//	    public void close(){
+//	       pool.close();
+//	    }
+//	}
 	
 	public static long getTime() {
 		Calendar cal = Calendar.getInstance();

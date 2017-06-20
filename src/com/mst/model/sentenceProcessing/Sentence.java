@@ -20,6 +20,7 @@ public class Sentence {
 	private List<WordToken> modifiedWordList = new ArrayList<>();
 	private List<TokenRelationship> tokenRelationships = new ArrayList<>();
 	private String id, source, practice, study;
+	private String organizationId;
 
 	private DiscreteData discreteData;
 	
@@ -163,5 +164,13 @@ public class Sentence {
 
 	public void setDiscreteData(DiscreteData discreteData) {
 		this.discreteData = discreteData;
+	}
+
+	public String getOrganizationId() {
+		return organizationId;
+	}
+
+	public void setOrganizationId(String organizationId) {
+		this.organizationId = organizationId;
 	}
 }

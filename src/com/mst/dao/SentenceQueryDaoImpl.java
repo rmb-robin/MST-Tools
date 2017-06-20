@@ -50,20 +50,18 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		Datastore datastore =  datastoreProvider.getDataStore();
 		queryResults = new HashMap<>();
 		cumalativeSentenceResults = new HashMap<>();
-		
-		//
-		
+
 		for(int i =0;i< input.getSentenceQueryInstances().size();i++){
 			SentenceQueryInstance sentenceQueryInstance = input.getSentenceQueryInstances().get(i);
 			if(i==0){
-				addResults(processQueryInstance(sentenceQueryInstance, datastore));
+				addResults(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId()));
 				continue;
 			}
 			
 			if(sentenceQueryInstance.getAppender()==null) continue;
 			String appender = sentenceQueryInstance.getAppender().toLowerCase();
 			if(appender.equals("or")){
-				addResults(processQueryInstance(sentenceQueryInstance, datastore));
+				addResults(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId()));
 				continue;
 			}
 			
@@ -138,7 +136,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		}
 	}
 	
-	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore){
+	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId){
 		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
 		SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();
 		result.sentenceQueryResult  = new ArrayList<>();
@@ -149,6 +147,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			 query
 			 .search(token)
 			 .field("tokenRelationships.edgeName").hasAllOf(edgeQueriesByName.keySet())
+			 .field("organizationId").equal(organizationId)
 			 .retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence");
 			 List<SentenceDb> sentences = query.asList();
 			 result.sentences.addAll(sentences);

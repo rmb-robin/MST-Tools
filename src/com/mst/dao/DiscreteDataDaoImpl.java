@@ -23,22 +23,21 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 	}
 
 	@Override
-	public List<DiscreteData> getByNameAndDate(String orgName, LocalDate localDate) {
-		return getQueryByOrgNameAndDate(orgName,localDate).asList();
+	public List<DiscreteData> getByNameAndDate(String orgId, LocalDate localDate) {
+		return getQueryByOrgNameAndDate(orgId,localDate).asList();
 	}
 
-	public long getCountByNameAndDate(String orgName, LocalDate localDate) {
-		 return getQueryByOrgNameAndDate(orgName,localDate).countAll();
+	public long getCountByNameAndDate(String orgId, LocalDate localDate) {
+		 return getQueryByOrgNameAndDate(orgId,localDate).countAll();
 	}
 	
-	private Query<DiscreteData> getQueryByOrgNameAndDate(String orgName, LocalDate localDate){
+	private Query<DiscreteData> getQueryByOrgNameAndDate(String orgId, LocalDate localDate){
 		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
 		 query
-		 .field("organizationName").equal(orgName)
+		 .field("organizationId").equal(orgId)
 		 .filter("processingDate =", date);
 		 return query;
 	}
-	
 }
 
