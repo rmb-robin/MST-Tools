@@ -7,6 +7,7 @@ public class SentenceQueryInput {
 
 	private List<SentenceQueryInstance> sentenceQueryInstances; 
 	private String organizationId; 
+	private DiscreteDataFilter discreteDataFilter;
 	
 	public SentenceQueryInput(){
 		sentenceQueryInstances = new ArrayList<>();
@@ -26,4 +27,14 @@ public class SentenceQueryInput {
 	public void setOrganizationId(String organizationId) {
 		this.organizationId = organizationId;
 	}
+
+	public DiscreteDataFilter getDiscreteDataFilter() {
+		return discreteDataFilter;
+	}
+
+	public void setDiscreteDataFilter(DiscreteDataFilter discreteDataFilter) {
+		this.discreteDataFilter = discreteDataFilter;
+	}
+	
+	
 }

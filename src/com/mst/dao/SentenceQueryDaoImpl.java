@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.QueryResults;
 
+import com.mst.interfaces.DiscreteDataDao;
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceQueryDao;
 import com.mst.model.SemanticType;
@@ -19,6 +21,7 @@ import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
+import com.mst.model.discrete.DiscreteData;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
@@ -36,6 +39,9 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	private MongoDatastoreProvider datastoreProvider;
 	private HashSet<String> processedSentences; 
 	
+	private DiscreteDataDao discreteDataDao; 
+	
+	
 	private Map<String,SentenceQueryResult> queryResults;
 	private Map<String,SentenceDb> cumalativeSentenceResults;
 	
@@ -45,23 +51,37 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		this.datastoreProvider = provider;	
 	}
 	
+	private void initDaos(){
+		discreteDataDao = new DiscreteDataDaoImpl();
+		discreteDataDao.setMongoDatastoreProvider(this.datastoreProvider);
+	}
+	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
 		processedSentences = new HashSet<>(); 
 		Datastore datastore =  datastoreProvider.getDataStore();
 		queryResults = new HashMap<>();
 		cumalativeSentenceResults = new HashMap<>();
 
+		boolean filterOnDiscreteData = false;
+		List<DiscreteData> discreteDataIds = null;
+		if(input.getDiscreteDataFilter()!=null){
+			filterOnDiscreteData = true;
+			initDaos();
+			discreteDataIds = discreteDataDao.getDiscreteDataIds(input.getDiscreteDataFilter(), input.getOrganizationId());
+		}
+		
+		
 		for(int i =0;i< input.getSentenceQueryInstances().size();i++){
 			SentenceQueryInstance sentenceQueryInstance = input.getSentenceQueryInstances().get(i);
 			if(i==0){
-				addResults(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId()));
+				addResults(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId(),discreteDataIds,filterOnDiscreteData));
 				continue;
 			}
 			
 			if(sentenceQueryInstance.getAppender()==null) continue;
 			String appender = sentenceQueryInstance.getAppender().toLowerCase();
 			if(appender.equals("or")){
-				addResults(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId()));
+				addResults(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId(),discreteDataIds,filterOnDiscreteData));
 				continue;
 			}
 			
@@ -136,7 +156,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		}
 	}
 	
-	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId){
+	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete){
 		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
 		SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();
 		result.sentenceQueryResult  = new ArrayList<>();
@@ -147,8 +167,13 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			 query
 			 .search(token)
 			 .field("tokenRelationships.edgeName").hasAllOf(edgeQueriesByName.keySet())
-			 .field("organizationId").equal(organizationId)
-			 .retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence");
+			 .field("organizationId").equal(organizationId);
+			 
+			 if(filterForDiscrete)
+				 query.field("discreteData").hasAnyOf(discreteDataIds);
+			 
+			 
+			 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence");
 			 List<SentenceDb> sentences = query.asList();
 			 result.sentences.addAll(sentences);
 			 result.sentenceQueryResult.addAll(getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges()));
