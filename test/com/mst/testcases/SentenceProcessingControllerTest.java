@@ -50,6 +50,17 @@ public class SentenceProcessingControllerTest {
 		assertTrue(sentences.size()==3);
 	}
 	
+	@Test
+	public void runSample() throws Exception {
+		SentenceTextRequest input = new SentenceTextRequest();
+		input.setText("recent ct shows a 3.5 mm simple cyst.");
+		SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
+		controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
+		List<Sentence> sentences = controller.processText(input);
+		
+		Sentence s = sentences.get(0);
+	}
+	
 	private void runAssert(String sentenceText, List<String> subjects, List<String> subjectComplements) throws Exception{
 		
 		SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();

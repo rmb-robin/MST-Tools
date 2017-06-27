@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.metadataTypes.EdgeTypes;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.RelationshipInput;
@@ -21,7 +23,15 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 
 	protected Map<String, List<RelationshipMapping>> relationshipMap;
 	protected Map<String, List<RelationshipMapping>> semanticTypeRelationshipMap; 
+	private HashSet<String> posTypes;
 	
+	public NounRelationshipProcessor(){
+		posTypes = new HashSet<>();
+		posTypes.add(PartOfSpeachTypes.CC);
+		posTypes.add(PartOfSpeachTypes.NEG);
+		posTypes.add(PartOfSpeachTypes.IN);
+		posTypes.add(PartOfSpeachTypes.DET);
+	}
 	
 	public List<TokenRelationship> process(List<WordToken> tokens, RelationshipInput input) {
 		List<TokenRelationship> result = new ArrayList<TokenRelationship>();
@@ -34,7 +44,50 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 			if(!singleTokenResult.isEmpty())
 				result.addAll(singleTokenResult);
 		}
+		assignNounPhraseAnnotations(result);
 		return result;
+	}
+	
+	
+	private void assignNounPhraseAnnotations(List<TokenRelationship> relationships){
+		
+
+		List<Integer> highestIndexes = new ArrayList<Integer>();
+		highestIndexes.add(0);
+		int lowestIndex = wordTokens.size();
+		for(TokenRelationship tokenRelationship: relationships){
+			WordToken token = tokenRelationship.getToToken();
+			int index = wordTokens.indexOf(token);
+			if(index>highestIndexes.get(0)) 
+				highestIndexes.set(0, index);
+		
+			token = tokenRelationship.getFromToken();
+			index = wordTokens.indexOf(token);
+			if(index<lowestIndex)
+				lowestIndex = index;
+		}
+
+		int highestIndex = highestIndexes.get(0);
+		for(int i = lowestIndex+1;i< highestIndex;i++){
+			WordToken token = wordTokens.get(i);
+			if(token.isVerb()) 
+			{
+				highestIndexes.add(i-1);continue;
+			}
+			
+			if(token.getPos()!=null &&  this.posTypes.contains(token.getPos()))
+			{
+				highestIndexes.add(i-1);continue;	
+			}
+		}
+	
+		WordToken token = wordTokens.get(lowestIndex);
+		token.setPropertyValueType(PropertyValueTypes.NounPhraseBegin);
+		
+		for(int index: highestIndexes){
+			token = wordTokens.get(index);
+			token.setPropertyValueType(PropertyValueTypes.NounPhraseEnd);
+		}
 	}
 	
 	private void setrelationshipMaps(List<RelationshipMapping> relationshipMappings){
@@ -140,8 +193,8 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 	}
 
 	private TokenRelationship createRelationshipAndAnnotateWordTokens(String edgeName,WordToken fromToken,WordToken toToken){
-		fromToken.setPropertyValueType(PropertyValueTypes.NounPhraseBegin);
-		toToken.setPropertyValueType(PropertyValueTypes.NounPhraseEnd);
+		//fromToken.setPropertyValueType(PropertyValueTypes.NounPhraseBegin);
+		//toToken.setPropertyValueType(PropertyValueTypes.NounPhraseEnd);
 		return tokenRelationshipFactory.create(edgeName, EdgeTypes.related, fromToken,toToken);
 	}
 	

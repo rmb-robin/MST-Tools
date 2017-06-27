@@ -34,7 +34,8 @@ public class PrepPhraseRelationshipProcessorImpl extends RelationshipProcessorBa
 		
 		for(int i =0;i<wordTokens.size();i++){
 			WordToken wordToken = wordTokens.get(i);
-			if(wordToken.getPos()!=PartOfSpeachTypes.IN) continue;
+			if(wordToken.getPos()==null) continue;
+			if(!wordToken.getPos().equals(PartOfSpeachTypes.IN)) continue;
 			List<TokenRelationship> tokenRelationships = getTokenRelationship(i,wordToken);
 			result.addAll(tokenRelationships);	
 		}

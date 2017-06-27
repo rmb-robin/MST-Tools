@@ -59,6 +59,13 @@ public class NounRelationshipProcessorTest {
 	}
 	
 	
+	@Test
+	public void run(){
+		String text = "recent ct shows a 3.5 mm simple cyst";
+		Sentence sentence = TestDataProvider.getSentences(text).get(0);
+		List<TokenRelationship> relationships = getTokenRelationships(sentence, 0);
+	}
+	
 	//@Test
 	public void process(){
 		List<Sentence> sentences = getSentences();

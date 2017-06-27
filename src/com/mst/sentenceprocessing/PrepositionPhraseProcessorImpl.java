@@ -48,7 +48,8 @@ public class PrepositionPhraseProcessorImpl implements PrepositionPhraseProcesso
 	
 	private void processPropositionPhrases(){
 		for(WordToken wordToken: tokens){
-			if(wordToken.getPos()!=PartOfSpeachTypes.IN) continue;
+			if(wordToken.getPos()==null)continue;
+			if(!wordToken.getPos().equals(PartOfSpeachTypes.IN)) continue;
 			processInToken(wordToken);
 		}
 	}
@@ -124,7 +125,7 @@ public class PrepositionPhraseProcessorImpl implements PrepositionPhraseProcesso
 	 }
 	
 	private boolean shouldAnnotateWithPrepPhraseEnd(WordToken wordToken, List<WordToken> nounPhraseEndTokens, List<StAnnotion> stTokens, int index){
-		if(wordToken.getPropertyValueType() == PropertyValueTypes.NounPhraseEnd) 
+		if(wordToken.getPropertyValueType().equals(PropertyValueTypes.NounPhraseEnd)) 
 		{
 			nounPhraseEndTokens.add(wordToken);
 			return true;
