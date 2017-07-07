@@ -92,6 +92,7 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	
 	private boolean isExistanceEdge(List<TokenRelationship> tokenRelationships){
 		for(TokenRelationship tokenRelationship: tokenRelationships){
+			if(tokenRelationship.getEdgeName()==null) continue;
 			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation))return false;
 			if(tokenRelationship.getEdgeName().equals(EdgeNames.possibility)) return false;
 		}

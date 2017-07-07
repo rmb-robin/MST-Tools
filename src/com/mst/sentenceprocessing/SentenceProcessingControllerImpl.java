@@ -22,8 +22,11 @@ import com.mst.model.discrete.DiscreteData;
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.requests.SentenceRequestBase;
 import com.mst.model.requests.SentenceTextRequest;
+import com.mst.model.sentenceProcessing.FailedSentence;
 import com.mst.model.sentenceProcessing.Sentence;
+import com.mst.model.sentenceProcessing.SentenceProcessingFailures;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
+import com.mst.model.sentenceProcessing.SentenceProcessingResult;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
  
@@ -75,12 +78,26 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		return sentences;
 	}
 		
-	public List<Sentence> processText(SentenceTextRequest request) throws Exception {		
+	public SentenceProcessingResult processText(SentenceTextRequest request) throws Exception {		
+		SentenceProcessingResult result = new SentenceProcessingResult();
 		List<Sentence> sentences = getSentences(request);
 		for(Sentence sentence: sentences){
-			processSentence(sentence,request);
+			try{
+				processSentence(sentence,request);
+			}
+			catch(Exception ex){
+				if(result.getFailures()==null)
+					result.setFailures(new SentenceProcessingFailures());
+				FailedSentence failedSentence = new FailedSentence();
+				failedSentence.setError(ex.getLocalizedMessage());
+				failedSentence.setSentence(sentence.getOrigSentence());
+				result.getFailures().getFailedSentences().add(failedSentence);
+				sentence.setDidFail(true);
+			}
 		}
-		return sentences;
+		 
+		result.setSentences(sentences);
+		return result;
 	}
 	
 	private Sentence processSentence(Sentence sentence, SentenceRequestBase request) throws Exception{

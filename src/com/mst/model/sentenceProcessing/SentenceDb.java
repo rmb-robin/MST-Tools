@@ -42,7 +42,8 @@ public class SentenceDb {
 	private List<TokenRelationship> tokenRelationships = new ArrayList<>();
 	private String source, practice, study;
 	private String organizationId;
-
+	private boolean didFail;
+	
 	@Reference
 	private DiscreteData discreteData;
 
@@ -131,6 +132,12 @@ public class SentenceDb {
 	}
 	public void setOrganizationId(String organizationId) {
 		this.organizationId = organizationId;
+	}
+	public boolean isDidFail() {
+		return didFail;
+	}
+	public void setDidFail(boolean didFail) {
+		this.didFail = didFail;
 	}
 	
 	

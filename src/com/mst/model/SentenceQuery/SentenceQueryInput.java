@@ -7,10 +7,11 @@ public class SentenceQueryInput {
 
 	private List<SentenceQueryInstance> sentenceQueryInstances; 
 	private String organizationId; 
-	private DiscreteDataFilter discreteDataFilter;
+	private List<DiscreteDataFilter> discreteDataFilters;
 	
 	public SentenceQueryInput(){
 		sentenceQueryInstances = new ArrayList<>();
+		discreteDataFilters = new ArrayList<>();
 	}
 	
 	public List<SentenceQueryInstance> getSentenceQueryInstances() {
@@ -28,12 +29,12 @@ public class SentenceQueryInput {
 		this.organizationId = organizationId;
 	}
 
-	public DiscreteDataFilter getDiscreteDataFilter() {
-		return discreteDataFilter;
+	public List<DiscreteDataFilter> getDiscreteDataFilters() {
+		return discreteDataFilters;
 	}
 
-	public void setDiscreteDataFilter(DiscreteDataFilter discreteDataFilter) {
-		this.discreteDataFilter = discreteDataFilter;
+	public void setDiscreteDataFilters(List<DiscreteDataFilter> discreteDataFilters) {
+		this.discreteDataFilters = discreteDataFilters;
 	}
 	
 	

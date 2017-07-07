@@ -3,6 +3,7 @@ package com.mst.testcases;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -26,7 +27,9 @@ public class DiscreteDataDaoIntegrationTest {
 	@Test
 	public void getDiscreteDataIdsTest(){
 		DiscreteDataFilter dataFilter = new DiscreteDataFilter();
-		dataFilter.setPatientSex("F");
+		List<String> gender = new ArrayList<>();
+		gender.add("F");
+		dataFilter.setPatientSex(gender);
 		
 		DiscreteDataDaoImpl dao = new DiscreteDataDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());

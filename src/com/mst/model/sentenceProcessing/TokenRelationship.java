@@ -16,6 +16,7 @@ public class TokenRelationship {
 	
 	
 	public String getEdgeName() {
+		if(edgeName==null) return "";
 		return edgeName;
 	}
 	public void setEdgeName(String edgeName) {

@@ -201,7 +201,6 @@ dominant follicle,qlco-simple
 dominant,qlco-simple
 dorsal,qlco
 dot,qlco-shape
-dr.,title-med
 ducts,bpoc
 duct,bpoc
 ductal,bpoc

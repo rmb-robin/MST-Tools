@@ -102,7 +102,7 @@ public class LoadDataToMongo {
 		dd.setTimeStamps();
 		SentenceDaoImpl dao =  new SentenceDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		dao.saveSentences(sentences, null);
+		dao.saveSentences(sentences, null,null);
 	}
 	//@Test
 	public void loadMetaData(){

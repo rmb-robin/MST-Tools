@@ -39,23 +39,25 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		
 		query.field("organizationId").equal(orgId);
 		
-		if(dataFilter.getExamDescription()!=null)
-			query.field("examDescription").equal(dataFilter.getExamDescription());
+		if(!dataFilter.getExamDescription().isEmpty())
+			query.field("examDescription").hasAnyOf(dataFilter.getExamDescription());
 		
 		
-		if(dataFilter.getModality()!=null)
-			query.field("modality").equal(dataFilter.getModality());
+		if(!dataFilter.getModality().isEmpty())
+			query.field("modality").hasAnyOf(dataFilter.getModality());
 		
 		if(dataFilter.getPatientAge()!=0)
 			query.field("patientAge").equal(dataFilter.getPatientAge());
 		
-		if(dataFilter.getPatientSex()!=null)
-			query.field("sex").equal(dataFilter.getPatientSex());
 		
-		if(dataFilter.getReadingLocation()!=null)
-			query.field("readingLocation").equal(dataFilter.getReadingLocation());
+		if(!dataFilter.getPatientSex().isEmpty())
+			query.field("sex").hasAnyOf(dataFilter.getPatientSex());
 		
-		if(dataFilter.getResultStatus()!=null)
+		
+		if(!dataFilter.getReadingLocation().isEmpty())
+			query.field("readingLocation").hasAnyOf(dataFilter.getReadingLocation());
+		
+		if(!dataFilter.getResultStatus().isEmpty())
 			query.field("resultStatus").equal(dataFilter.getResultStatus());
 		
 //		if(dataFilter.getReportFinalizedDate()!=null){

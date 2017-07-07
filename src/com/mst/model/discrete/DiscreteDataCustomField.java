@@ -8,6 +8,8 @@ public class DiscreteDataCustomField {
 	private String value; 
 	private CustomFieldDataType fieldType;
 	
+	public DiscreteDataCustomField(){}
+	
 	public DiscreteDataCustomField(String fieldName, String value, CustomFieldDataType fieldType) {
 		this.fieldName = fieldName;
 		this.value = value;

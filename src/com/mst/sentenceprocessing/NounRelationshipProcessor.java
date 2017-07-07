@@ -51,7 +51,7 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 	
 	private void assignNounPhraseAnnotations(List<TokenRelationship> relationships){
 		
-
+		if(relationships.size()==0)return;
 		List<Integer> highestIndexes = new ArrayList<Integer>();
 		highestIndexes.add(0);
 		int lowestIndex = wordTokens.size();
@@ -86,6 +86,8 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 		
 		for(int index: highestIndexes){
 			token = wordTokens.get(index);
+			if(token.isVerb()) continue;
+			if(token.getPos()!=null &&  this.posTypes.contains(token.getPos())) continue;
 			token.setPropertyValueType(PropertyValueTypes.NounPhraseEnd);
 		}
 	}

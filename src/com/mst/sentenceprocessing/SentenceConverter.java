@@ -18,6 +18,7 @@ public class SentenceConverter {
 		dbObj.setNormalizedSentence(sentence.getNormalizedSentence());
 		dbObj.setDiscreteData(sentence.getDiscreteData());
 		dbObj.setOrganizationId(sentence.getOrganizationId());
+		dbObj.setDidFail(sentence.isDidFail());
 		return dbObj;
 	}
 }

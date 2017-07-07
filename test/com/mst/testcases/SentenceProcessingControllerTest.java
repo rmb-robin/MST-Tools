@@ -16,6 +16,7 @@ import com.mst.model.requests.SentenceRequest;
 import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
+import com.mst.model.sentenceProcessing.SentenceProcessingResult;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.sentenceprocessing.PrepositionPhraseProcessingInputFactory;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
@@ -46,19 +47,17 @@ public class SentenceProcessingControllerTest {
 		SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
 		controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
 		
-		List<Sentence> sentences = controller.processText(input);
-		assertTrue(sentences.size()==3);
+		SentenceProcessingResult result = controller.processText(input);
+		assertTrue(result.getSentences().size()==3);
 	}
 	
 	@Test
 	public void runSample() throws Exception {
 		SentenceTextRequest input = new SentenceTextRequest();
-		input.setText("recent ct shows a 3.5 mm simple cyst.");
+		input.setText("Since the last CT, the cyst now measures 3.5 mm.");
 		SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
 		controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
-		List<Sentence> sentences = controller.processText(input);
-		
-		Sentence s = sentences.get(0);
+		SentenceProcessingResult result  = controller.processText(input);
 	}
 	
 	private void runAssert(String sentenceText, List<String> subjects, List<String> subjectComplements) throws Exception{

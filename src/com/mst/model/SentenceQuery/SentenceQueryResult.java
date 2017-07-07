@@ -3,10 +3,14 @@ package com.mst.model.SentenceQuery;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mst.model.discrete.DiscreteData;
+
 public class SentenceQueryResult {
 
 	private String sentence; 
 	private String sentenceId;
+	private DiscreteData discreteData; 
+	
 	
 	private List<SentenceQueryEdgeResult> sentenceQueryEdgeResults;
 	
@@ -36,6 +40,14 @@ public class SentenceQueryResult {
 
 	public void setSentenceId(String sentenceId) {
 		this.sentenceId = sentenceId;
+	}
+
+	public DiscreteData getDiscreteData() {
+		return discreteData;
+	}
+
+	public void setDiscreteData(DiscreteData discreteData) {
+		this.discreteData = discreteData;
 	}
 	
 }

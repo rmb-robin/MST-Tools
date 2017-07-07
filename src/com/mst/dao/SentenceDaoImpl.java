@@ -13,6 +13,7 @@ import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceDao;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.sentenceProcessing.SentenceDb;
+import com.mst.model.sentenceProcessing.SentenceProcessingFailures;
 
 public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements SentenceDao {
 
@@ -20,19 +21,29 @@ public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements 
 		super(SentenceDb.class);
 	}
 
-	public void saveSentences(List<SentenceDb> sentences, DiscreteData discreteData) {
+	public void saveSentences(List<SentenceDb> sentences, DiscreteData discreteData,SentenceProcessingFailures failures) {
 		Datastore ds = datastoreProvider.getDataStore();
 		if(discreteData!=null){
 			discreteData.setId(new ObjectId());
 			discreteData.setTimeStamps();
 			ds.save(discreteData);
 			
-			for(SentenceDb sentence: sentences){
-				sentence.setDiscreteData(discreteData);
-				sentence.setOrganizationId(discreteData.getOrganizationId());
+			if(discreteData!=null){
+				for(SentenceDb sentence: sentences){
+					sentence.setDiscreteData(discreteData);
+					sentence.setOrganizationId(discreteData.getOrganizationId());
+				}
 			}
 		}
 		ds.save(sentences);
+		
+		if(failures!=null){
+			failures.setDate(LocalDate.now());
+			if(discreteData!=null)
+				failures.setDiscreteDataId(discreteData.getId().toString());
+				failures.setOrgId(discreteData.getOrganizationId());
+			ds.save(failures);
+		}
 	}
 	
 	public List<SentenceDb> getSentenceByDate(String orgId){

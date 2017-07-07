@@ -22,6 +22,7 @@ public class Sentence {
 	private String id, source, practice, study;
 	private String organizationId;
 
+	private boolean didFail;
 	private DiscreteData discreteData;
 	
 	
@@ -41,7 +42,7 @@ public class Sentence {
 		if(this.tokenRelationships==null) return result;
 		
 		for(TokenRelationship tokenRelationship: this.tokenRelationships){
-			if(tokenRelationship.getEdgeName()==null)continue;
+			if(tokenRelationship.getEdgeName().equals(""))continue;
 			if(tokenRelationship.getEdgeName().equals(edgeName))
 				result.add(tokenRelationship);
 		}
@@ -172,5 +173,13 @@ public class Sentence {
 
 	public void setOrganizationId(String organizationId) {
 		this.organizationId = organizationId;
+	}
+
+	public boolean isDidFail() {
+		return didFail;
+	}
+
+	public void setDidFail(boolean didFail) {
+		this.didFail = didFail;
 	}
 }
