@@ -25,7 +25,7 @@ public class DiscreteData {
 	private ObjectId id;
 	private String readingLocation;
 	private String patientMRN;
-	private DateTime patientDob;
+	private LocalDate patientDob;
 	private String sex; 
 	private String patientAccount; 
 	private String patientEncounter; 
@@ -35,7 +35,7 @@ public class DiscreteData {
 	private String modality; 
 	private String resultStatus; 
 	private String reportFinalizedBy; 
-	private DateTime reportFinalizedDate; 
+	private LocalDate reportFinalizedDate; 
 	private int patientAge;
 
 	private LocalDate processingDate; 
@@ -61,10 +61,10 @@ public class DiscreteData {
 	public void setPatientMRN(String patientMRN) {
 		this.patientMRN = patientMRN;
 	}
-	public DateTime getPatientDob() {
+	public LocalDate getPatientDob() {
 		return patientDob;
 	}
-	public void setPatientDob(DateTime patientDob) {
+	public void setPatientDob(LocalDate patientDob) {
 		this.patientDob = patientDob;
 	}
 	public String getSex() {
@@ -121,10 +121,10 @@ public class DiscreteData {
 	public void setReportFinalizedBy(String reportFinalizedBy) {
 		this.reportFinalizedBy = reportFinalizedBy;
 	}
-	public DateTime getReportFinalizedDate() {
+	public LocalDate getReportFinalizedDate() {
 		return reportFinalizedDate;
 	}
-	public void setReportFinalizedDate(DateTime reportFinalizedDate) {
+	public void setReportFinalizedDate(LocalDate reportFinalizedDate) {
 		this.reportFinalizedDate = reportFinalizedDate;
 	}
 	public int getPatientAge() {

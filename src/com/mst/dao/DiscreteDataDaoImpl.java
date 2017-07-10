@@ -46,9 +46,10 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		if(!dataFilter.getModality().isEmpty())
 			query.field("modality").hasAnyOf(dataFilter.getModality());
 		
-		if(dataFilter.getPatientAge()!=0)
-			query.field("patientAge").equal(dataFilter.getPatientAge());
-		
+		if(dataFilter.getPatientAge().size()==2){
+			query.field("patientAge").greaterThanOrEq(dataFilter.getPatientAge().get(0));
+			query.field("patientAge").lessThanOrEq(dataFilter.getPatientAge().get(1));
+		}
 		
 		if(!dataFilter.getPatientSex().isEmpty())
 			query.field("sex").hasAnyOf(dataFilter.getPatientSex());
