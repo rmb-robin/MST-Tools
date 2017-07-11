@@ -7,7 +7,8 @@ import com.mst.sentenceprocessing.DiscreteDataNormalizerImpl;
 
 import static org.junit.Assert.*;
 
-import org.joda.time.DateTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class DiscreteDataNormalizerTests {
 	
@@ -52,7 +53,8 @@ public class DiscreteDataNormalizerTests {
 	
 	@Test
 	public void testCalcAge() {
-		DiscreteData discrete = getDiscreteObject(new DateTime(1980, 2, 20, 0, 0, 0, 0), new DateTime(2017, 3, 1, 0, 0, 0, 0));
+		DateTimeFormatter format = DateTimeFormatter.ofPattern("M/d/yyyy");
+		DiscreteData discrete = getDiscreteObject(LocalDate.parse("2/20/1980", format), LocalDate.parse("3/1/2017", format));
 		
 		assertEquals(discrete.getPatientAge(), 37);
 	}
@@ -68,11 +70,11 @@ public class DiscreteDataNormalizerTests {
 		return discrete;
 	}
 	
-	private DiscreteData getDiscreteObject(DateTime dob, DateTime finalized) {
+	private DiscreteData getDiscreteObject(LocalDate dob, LocalDate finalized) {
 		DiscreteData discrete = new DiscreteData();
 		
 		discrete.setPatientDob(dob);
-		//discrete.setReportFinalizedDate(finalized);
+		discrete.setReportFinalizedDate(finalized);
 		
 		DiscreteDataNormalizerImpl normalizer = new DiscreteDataNormalizerImpl();
 		normalizer.process(discrete);
