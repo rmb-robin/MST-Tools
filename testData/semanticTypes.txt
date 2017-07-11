@@ -630,7 +630,7 @@ shoulders,bpoc
 significance,qlco
 significant,qlco
 silhouette,qlco
-simple,qlco-sev
+simple,qlco-simple
 sinus,bpoc
 skin,bpoc
 skulls,bpoc
