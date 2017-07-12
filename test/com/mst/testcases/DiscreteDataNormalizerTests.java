@@ -24,6 +24,8 @@ public class DiscreteDataNormalizerTests {
 				break;
 			}
 		}
+		
+		assertEquals(discrete.getCustomFields().size(), 1);
 	}
 	
 	@Test
@@ -36,6 +38,8 @@ public class DiscreteDataNormalizerTests {
 				break;
 			}
 		}
+		
+		assertEquals(discrete.getCustomFields().size(), 1);
 	}
 	
 	@Test
@@ -49,6 +53,8 @@ public class DiscreteDataNormalizerTests {
 				break;
 			}
 		}
+		
+		assertEquals(discrete.getCustomFields().size(), 1);
 	}
 	
 	@Test
@@ -63,6 +69,7 @@ public class DiscreteDataNormalizerTests {
 		DiscreteData discrete = new DiscreteData();
 		
 		discrete.setPatientAge(age);
+		discrete.setSex("F");
 		
 		DiscreteDataNormalizerImpl normalizer = new DiscreteDataNormalizerImpl();
 		normalizer.process(discrete);
