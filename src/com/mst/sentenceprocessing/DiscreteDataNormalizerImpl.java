@@ -3,14 +3,13 @@ package com.mst.sentenceprocessing;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-import org.joda.time.DateTime;
-import org.joda.time.Period;
-
 import com.mst.interfaces.sentenceprocessing.DiscreteDataNormalizer;
 import com.mst.metadataProviders.DiscreteDataCustomFieldNames;
 import com.mst.model.metadataTypes.CustomFieldDataType;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.discrete.DiscreteDataCustomField;
+
+import static java.lang.Math.toIntExact;
 
 public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 
@@ -35,8 +34,12 @@ public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 			LocalDate finalized = discreteData.getReportFinalizedDate();
 			
 			if(dob != null && finalized != null) {
-				int months = (int) dob.until( finalized, ChronoUnit.MONTHS);
-				discreteData.setPatientAge(months);
+				long age = dob.until(finalized, ChronoUnit.YEARS);
+				try {
+					discreteData.setPatientAge(toIntExact(age));
+				} catch(ArithmeticException e) {
+					discreteData.setPatientAge(-1);
+				}
 			}
 		}
 	}
