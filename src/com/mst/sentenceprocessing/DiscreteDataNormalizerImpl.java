@@ -1,5 +1,8 @@
 package com.mst.sentenceprocessing;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
@@ -28,12 +31,12 @@ public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 	
 	private void calculateAge(DiscreteData discreteData) {
 		if(discreteData.getPatientAge() == 0) {
-			DateTime dob = discreteData.getPatientDob();
-			DateTime finalized = discreteData.getReportFinalizedDate();
+			LocalDate dob = discreteData.getPatientDob();
+			LocalDate finalized = discreteData.getReportFinalizedDate();
 			
 			if(dob != null && finalized != null) {
-				Period period = new Period(dob, finalized);
-				discreteData.setPatientAge(period.getYears());
+				int months = (int) dob.until( finalized, ChronoUnit.MONTHS);
+				discreteData.setPatientAge(months);
 			}
 		}
 	}
