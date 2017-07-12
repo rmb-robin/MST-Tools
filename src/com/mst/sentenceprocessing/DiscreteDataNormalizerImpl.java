@@ -38,14 +38,14 @@ public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 				try {
 					discreteData.setPatientAge(toIntExact(age));
 				} catch(ArithmeticException e) {
-					discreteData.setPatientAge(-1);
+					discreteData.setPatientAge(0);
 				}
 			}
 		}
 	}
 	
 	private void determineMenopausalStatus(DiscreteData discreteData) {
-		if(discreteData.getPatientAge() == 0 && isFemalePatient(discreteData)) {
+		if(discreteData.getPatientAge() > 0 && isFemalePatient(discreteData)) {
 			String status = MENOPAUSE_DEFAULT;
 				
 			if(discreteData.getPatientAge() <= MENOPAUSE_LOW_CUTOFF) {
