@@ -71,7 +71,7 @@ public class DiscreteDataNormalizerTests {
 	private DiscreteData getDiscreteObject(DateTime dob, DateTime finalized) {
 		DiscreteData discrete = new DiscreteData();
 		
-		discrete.setPatientDob(dob);
+	//	discrete.setPatientDob(dob);
 		//discrete.setReportFinalizedDate(finalized);
 		
 		DiscreteDataNormalizerImpl normalizer = new DiscreteDataNormalizerImpl();
