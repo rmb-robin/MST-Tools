@@ -58,12 +58,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 	
 	private List<DiscreteData> getDiscreteDatas(SentenceQueryInput input){
-		HashSet<DiscreteData> discreteDatas = new HashSet<DiscreteData>();
-		for(DiscreteDataFilter discreteDataFilter : input.getDiscreteDataFilters()){
-			List<DiscreteData> datas = discreteDataDao.getDiscreteDataIds(discreteDataFilter, input.getOrganizationId());
-			discreteDatas.addAll(datas);
-		}
-		return new ArrayList<DiscreteData>(discreteDatas);
+		return discreteDataDao.getDiscreteDataIds(input.getDiscreteDataFilter(), input.getOrganizationId());
 	}
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
@@ -74,7 +69,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 
 		boolean filterOnDiscreteData = false;
 		List<DiscreteData> discreteDataIds = null;
-		if(!input.getDiscreteDataFilters().isEmpty()){
+		if(input.getDiscreteDataFilter()!=null){
 			filterOnDiscreteData = true;
 			initDaos();
 			discreteDataIds = getDiscreteDatas(input);

@@ -78,7 +78,7 @@ public class LoadDataToMongo {
 		int t = results.size();
 	}
 	
-	@Test 
+	//@Test 
 	public void writeOneSentence() throws Exception{
 		processSentence("she was denied a ct scan.");
 	}
@@ -112,7 +112,7 @@ public class LoadDataToMongo {
 		ds.save(input);
 	}
 	
-	//@Test
+	@Test
 	public void loadDiscreteDataComplianceFields(){
 		DiscreteDataComplianceFieldProvider provider = new DiscreteDataComplianceFieldProvider();
 		DisceteDataComplianceDisplayFields fields =  provider.get("rad","rad");

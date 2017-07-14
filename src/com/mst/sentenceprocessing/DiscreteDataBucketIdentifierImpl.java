@@ -10,28 +10,52 @@ import com.mst.metadataProviders.DiscreteDataCustomFieldNames;
 import com.mst.model.discrete.ComplianceDisplayFieldsBucketItem;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
+import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.discrete.DiscreteDataCustomField;
+import com.mst.model.discrete.Followup;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 
 public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdentifier {
 
-	public String getBucket(DiscreteData discreteData, List<Sentence> sentences,  DisceteDataComplianceDisplayFields fields){
+	public DiscreteDataBucketIdentifierResult getBucket(DiscreteData discreteData, List<Sentence> sentences,  DisceteDataComplianceDisplayFields fields){
 		for (Map.Entry<String, List<ComplianceDisplayFieldsBucketItem>> entry : fields.getBuckets().entrySet()) {
 			List<ComplianceDisplayFieldsBucketItem> filteredBuckets = findBucketsOnDiscrete(entry.getValue(), discreteData);
 			if(filteredBuckets.isEmpty()) continue;
 			for(Sentence sentence: sentences){
 				if(sentence.getOrigSentence().toLowerCase().contains(entry.getKey().toLowerCase())){
-				 String bucketName = findBucketForSentence(sentence, filteredBuckets);
-				 if(bucketName!=null) return bucketName;
-				}
+				ComplianceDisplayFieldsBucketItem bucket = findBucketForSentence(sentence, filteredBuckets);
+				 if(bucket!=null) {
+					 DiscreteDataBucketIdentifierResult result = new DiscreteDataBucketIdentifierResult();
+					 result.setBucketName(bucket.getBucketName());
+					 result.setIsCompliant(issentenceCompliant(sentence,bucket));
+					 return result;
+				 }
+			   }
 			}
 		}
 		return null;
 	}
 	
-	private String findBucketForSentence(Sentence sentence, List<ComplianceDisplayFieldsBucketItem> bucketItems){
+	private boolean issentenceCompliant(Sentence sentence, ComplianceDisplayFieldsBucketItem bucket){
+		Followup followup = bucket.getFollowUp();
+		if(sentence.getTokenRelationships()==null || sentence.getTokenRelationships()==null) return false;
+		if(!followup.getIsNumeric())
+		{
+			String edgeName = followup.getFollowupDescription();
+			List<TokenRelationship> matched = sentence.getTokenRelationshipsByEdgeName(edgeName);
+			if(matched.size()==0)return false;
+			return true;
+		}
+		
+		
+		return true;///
+		
+		
+	}
+	
+	private ComplianceDisplayFieldsBucketItem findBucketForSentence(Sentence sentence, List<ComplianceDisplayFieldsBucketItem> bucketItems){
 		if(sentence.getTokenRelationships()==null)return null; 
 		if(sentence.getTokenRelationships().isEmpty())return null; 
 			
@@ -39,13 +63,13 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 		if(unitOfMeasureEdges==null) return null;
 		
 		for(TokenRelationship tokenRelationship: unitOfMeasureEdges){
-			String bucketName = findBucket(tokenRelationship, bucketItems);
-			if(bucketName!=null) return bucketName;
+			ComplianceDisplayFieldsBucketItem bucket = findBucket(tokenRelationship, bucketItems);
+			if(bucket!=null) return bucket;
 		}
 		return null;
 	}
 	
-	private String findBucket(TokenRelationship tokenRelationship, List<ComplianceDisplayFieldsBucketItem> bucketItems){
+	private ComplianceDisplayFieldsBucketItem findBucket(TokenRelationship tokenRelationship, List<ComplianceDisplayFieldsBucketItem> bucketItems){
 		double measurement = 0;
 		String unitOfMeasure  = null;
 		Double value = WordTokenTypeConverter.tryConvertToDouble(tokenRelationship.getFromToken());
@@ -65,7 +89,7 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 		for(ComplianceDisplayFieldsBucketItem bucketItem : bucketItems){
 			if(measurement>=bucketItem.getSizeMin() && measurement <= bucketItem.getSizeMax() 
 					&& bucketItem.getUnitOfMeasure().toLowerCase().equals(unitOfMeasure))
-				return bucketItem.getBucketName();
+				return bucketItem;
 		}
 		return null;
 	}

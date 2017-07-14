@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.mst.model.discrete.ComplianceDisplayFieldsBucketItem;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
+import com.mst.model.discrete.Followup;
 
 public class DiscreteDataComplianceFieldProvider {
 
@@ -51,9 +52,39 @@ public class DiscreteDataComplianceFieldProvider {
 			bucketItem.setSizeMax(Double.parseDouble(values[6]));
 		
 		bucketItem.setUnitOfMeasure(values[7]);
-		bucketItem.setFollowUpTime(values[7]);
 		
+		bucketItem.setFollowUp(createFollowup(values));
+		bucketItem.setFollowUpProcedures(getFollowupProcedures(values));
 		result.getBuckets().get(dieseName).add(bucketItem);
+	}
+	
+	private List<String> getFollowupProcedures(String[] values){
+		if(values.length<12) return null;
+		List<String> result = new ArrayList<>();
+		
+		if(values[11]==null) return null;
+		if(values[11].equals("")) return null;
+		
+		String[] edges = values[11].split("\\|");
+		for(String edge:edges){
+			edge = edge.replace(";", ",");
+			result.add(edge);
+		}
+		return result;
+	}
+	
+	private Followup createFollowup(String[] values){
+		Followup followup = new Followup();
+		if(values[8].equals("t")){
+			followup.setIsNumeric(true);
+			if(tryParseDouble(values[9]))
+				followup.setDuration(Integer.parseInt(values[9]));
+		
+			followup.setDurationMeasure(values[10]);
+			return followup;
+		}
+		followup.setFollowupDescription(values[10]);
+		return followup;
 	}
 	
 	boolean tryParseInt(String value) {  

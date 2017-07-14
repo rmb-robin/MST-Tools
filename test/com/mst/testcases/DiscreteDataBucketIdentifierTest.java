@@ -7,6 +7,7 @@ import org.junit.Test;
 import com.mst.metadataProviders.DiscreteDataComplianceFieldProvider;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
+import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.discrete.DiscreteDataCustomField;
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.sentenceProcessing.Sentence;
@@ -47,11 +48,8 @@ public class DiscreteDataBucketIdentifierTest {
 		SentenceRequest request = new SentenceRequest();
 		request.getSenteceTexts().add(sentence);
 		List<Sentence> sentences = controller.processSentences(request);
-		String bucketName = identifier.getBucket(discreteData, sentences, fields);
-		assertEquals(expectedBucketName,bucketName);
-		
-		
-		
+		DiscreteDataBucketIdentifierResult result = identifier.getBucket(discreteData, sentences, fields);
+		assertEquals(expectedBucketName,result.getBucketName());
 	}
 	
 	

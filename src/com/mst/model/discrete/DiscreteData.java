@@ -42,7 +42,7 @@ public class DiscreteData {
 	
 	private String organizationId; 
 	private String bucketName; 
-	
+	private boolean isCompliant;
 	private List<DiscreteDataCustomField> customFields; 
 	
 	public DiscreteData(){
@@ -174,6 +174,14 @@ public class DiscreteData {
 
 	public void setBucketName(String bucketName) {
 		this.bucketName = bucketName;
+	}
+
+	public boolean getIsCompliant() {
+		return isCompliant;
+	}
+
+	public void setIsCompliant(boolean isCompliant) {
+		this.isCompliant = isCompliant;
 	} 
 	
 }

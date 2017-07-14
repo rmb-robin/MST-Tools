@@ -1,22 +1,22 @@
 t,Abdominal Aortic Aneurysm,Age Begin,Age End,Menopausal Status,Size min,Size max,Size Unit of Measure,Follow up time,Follow up procedure
-f,Bucket1,,,,2.6,2.9,cm,every 5 years,
-f,Bucket2,,,,3,3.4,cm,every 3 years,
-f,Bucket3,,,,3.5,3.9,cm,every 12 months,
-f,Bucket4,,,,4,4.4,cm,every 12 months,
-f,Bucket5,,,,4,4.4,cm,vascular consultation,
-f,Bucket6,,,,4.5,5.4,cm,every 6 months,
-f,Bucket7,,,,4.5,5.4,cm,vascular consultation,
-f,Bucket8,,,,5.5,100,cm,vascular surgeon,
+f,Bucket1,,,,2.6,2.9,cm,t,5,years,
+f,Bucket2,,,,3,3.4,cm,t,3,years,
+f,Bucket3,,,,3.5,3.9,cm,t,12, months,
+f,Bucket4,,,,4,4.4,cm,t,12,months,
+f,Bucket5,,,,4,4.4,cm,f,0,vascular consultation,
+f,Bucket6,,,,4.5,5.4,cm,t,6, months,
+f,Bucket7,,,,4.5,5.4,cm,f,0,vascular consultation,advise; value - surgeon|surgeon type; value vascular
+f,Bucket8,,,,5.5,100,cm,f,0,vascular surgeon,advise; value - consultation|consultation type; value vascular
 t,Incidental Thyroid Nodule,,,,,,,,
-f,Bucket1,0,18,,(all),(all),,ultrasound,
-f,Bucket2,19,34,,1,100,cm,ultrasound,
-f,Bucket3,35,100,,1.5,100,cm,ultrasound,
+f,Bucket1,0,18,,(all),(all),,f,0,ultrasound,advise; value - ultrasound
+f,Bucket2,19,34,,1,100,cm,f,0,ultrasound,advise; value - ultrasound
+f,Bucket3,35,100,,1.5,100,cm,f,0,ultrasound,advise; value - ultrasound
 t,Ovarian Simple Cyst,,,,,,,,
-f,Bucket1,,,premenopausal,0,3,cm,no follow-up imaging recommended,
-f,Bucket2,,,premenopausal,3.1,5,cm,no follow-up imaging recommended,
-f,Bucket3,,,premenopausal,5.1,7,cm,ultrasound annually,
-f,Bucket4,,,premenopausal,7.1,100,cm,MR with IV contrast or surgical evaluation,
-f,Bucket5,,,postmenopausal,0,1,cm,no follow-up imaging recommended,
-f,Bucket6,,,postmenopausal,1.1,3,cm,no follow-up imaging recommended,
-f,Bucket7,,,postmenopausal,3.1,7,cm,ultrasound annually,
-f,Bucket8,,,postmenopausal,7.1,100,cm,MR with IV contrast or surgical evaluation,
+f,Bucket1,,,premenopausal,0,3,cm,f,0,no follow-up imaging recommended,
+f,Bucket2,,,premenopausal,3.1,5,cm,f,0,no follow-up imaging recommended,
+f,Bucket3,,,premenopausal,5.1,7,cm,f,0,ultrasound annually,advise; value - ultrasound
+f,Bucket4,,,premenopausal,7.1,100,cm,f,0,MR with IV contrast or surgical evaluation,
+f,Bucket5,,,postmenopausal,0,1,cm,f,0,no follow-up imaging recommended,
+f,Bucket6,,,postmenopausal,1.1,3,cm,f,0,no follow-up imaging recommended,
+f,Bucket7,,,postmenopausal,3.1,7,cm,f,0,ultrasound annually,advise; value - ultrasound
+f,Bucket8,,,postmenopausal,7.1,100,cm,f,0,MR with IV contrast or surgical evaluation,

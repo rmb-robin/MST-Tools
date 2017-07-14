@@ -1,14 +1,21 @@
 package com.mst.model.discrete;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ComplianceDisplayFieldsBucketItem {
 
 	private int AgeBegin, AgeEnd;
 	private String MenopausalStatus;
 	private double sizeMin, sizeMax;
 	private String unitOfMeasure;
-	private String followUpTime;
-	private String followUpProcedure;
+	private Followup followUp;
+	private List<String> followUpProcedures;
 	private String bucketName; 
+	
+	public ComplianceDisplayFieldsBucketItem(){
+		followUpProcedures = new ArrayList<>();
+	}
 	
 	public int getAgeBegin() {
 		return AgeBegin;
@@ -46,22 +53,25 @@ public class ComplianceDisplayFieldsBucketItem {
 	public void setUnitOfMeasure(String unitOfMeasure) {
 		this.unitOfMeasure = unitOfMeasure;
 	}
-	public String getFollowUpTime() {
-		return followUpTime;
-	}
-	public void setFollowUpTime(String followUpTime) {
-		this.followUpTime = followUpTime;
-	}
-	public String getFollowUpProcedure() {
-		return followUpProcedure;
-	}
-	public void setFollowUpProcedure(String followUpProcedure) {
-		this.followUpProcedure = followUpProcedure;
-	}
+
 	public String getBucketName() {
 		return bucketName;
 	}
 	public void setBucketName(String bucketName) {
 		this.bucketName = bucketName;
+	}
+	public Followup getFollowUp() {
+		return followUp;
+	}
+	public void setFollowUp(Followup followUp) {
+		this.followUp = followUp;
+	}
+
+	public List<String> getFollowUpProcedures() {
+		return followUpProcedures;
+	}
+
+	public void setFollowUpProcedures(List<String> followUpProcedures) {
+		this.followUpProcedures = followUpProcedures;
 	}
 }
