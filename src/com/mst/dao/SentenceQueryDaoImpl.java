@@ -319,6 +319,8 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			}
 		}
 	     catch(Exception ex){
+	    	Exception e = ex;
+	    	ex.printStackTrace();
 	    	 //to do.. add logging .for now this wil do..
 	     }
 		}
@@ -350,6 +352,10 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	private boolean shouldAddTokenFromRelationship(TokenRelationship relation, String token){
 		if(relation.getFromToken()==null) return false;
 		if(relation.getToToken()==null) return false;
+		
+		if(token.split(" ").length>1){
+			token = token.replace(" ","-");
+		}
 		
 		if(relation.getFromToken().getToken().equals(token)) return true;
 		if(relation.getToToken().getToken().equals(token)) return true;

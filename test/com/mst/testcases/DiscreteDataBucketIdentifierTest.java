@@ -42,6 +42,11 @@ public class DiscreteDataBucketIdentifierTest {
 		//runTest(sentence, discreteData, "Bucket2");  
 	}
 	
+	@Test
+	public void getComplianceTest(){
+		
+	}
+	
 	private void runTest(String sentence, DiscreteData discreteData, String expectedBucketName) throws Exception{
 		DiscreteDataBucketIdentifierImpl identifier = new DiscreteDataBucketIdentifierImpl();
 		

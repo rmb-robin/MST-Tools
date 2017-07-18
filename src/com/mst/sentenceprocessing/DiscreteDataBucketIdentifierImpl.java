@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.mst.interfaces.sentenceprocessing.DiscreteDataBucketIdentifier;
 import com.mst.metadataProviders.DiscreteDataCustomFieldNames;
+import com.mst.model.SemanticType;
 import com.mst.model.discrete.ComplianceDisplayFieldsBucketItem;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
@@ -14,8 +15,11 @@ import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.discrete.DiscreteDataCustomField;
 import com.mst.model.discrete.Followup;
 import com.mst.model.metadataTypes.EdgeNames;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
+import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.model.sentenceProcessing.WordToken;
 
 public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdentifier {
 
@@ -38,7 +42,7 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 		return null;
 	}
 	
-	private boolean issentenceCompliant(Sentence sentence, ComplianceDisplayFieldsBucketItem bucket){
+	public boolean issentenceCompliant(Sentence sentence, ComplianceDisplayFieldsBucketItem bucket){
 		Followup followup = bucket.getFollowUp();
 		if(sentence.getTokenRelationships()==null || sentence.getTokenRelationships()==null) return false;
 		if(!followup.getIsNumeric())
@@ -49,10 +53,32 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 			return true;
 		}
 		
+		List<TokenRelationship> matched = sentence.getTokenRelationshipsByEdgeName(EdgeNames.followUp);
+		if(matched.size()==0) return false;
 		
-		return true;///
-		
-		
+		for(TokenRelationship relationship : matched){
+			if(isTokenCardinal(relationship.getFromToken())){
+				if(isCompliantOnNumeric(relationship.getFromToken(), relationship.getToToken(), relationship,bucket)) return true;
+			}
+			
+			if(isTokenCardinal(relationship.getToToken())){
+				if(isCompliantOnNumeric(relationship.getToToken(), relationship.getFromToken(), relationship,bucket)) return true;
+			}
+		}
+		return false;		
+	}
+	
+	private boolean isCompliantOnNumeric(WordToken cardinal, WordToken durationMeasure, TokenRelationship relationship,ComplianceDisplayFieldsBucketItem bucket){
+		Double measure = WordTokenTypeConverter.tryConvertToDouble(cardinal);
+		if(measure==null)return false; 
+		if(measure!= bucket.getFollowUp().getDuration()) return false; 
+		if(!durationMeasure.getToken().equals(bucket.getFollowUp().getDurationMeasure())) return false;
+		return true;
+	}
+	
+	private boolean isTokenCardinal(WordToken workToken){
+		if(workToken.getSemanticType()==null) return false;
+		return workToken.getSemanticType().equals(SemanticTypes.cardinalNumber);
 	}
 	
 	private ComplianceDisplayFieldsBucketItem findBucketForSentence(Sentence sentence, List<ComplianceDisplayFieldsBucketItem> bucketItems){

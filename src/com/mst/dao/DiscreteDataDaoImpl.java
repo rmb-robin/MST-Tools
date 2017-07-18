@@ -59,7 +59,7 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 			query.field("readingLocation").hasAnyOf(dataFilter.getReadingLocation());
 		
 		if(!dataFilter.getResultStatus().isEmpty())
-			query.field("resultStatus").equal(dataFilter.getResultStatus());
+			query.field("resultStatus").hasAnyOf(dataFilter.getResultStatus());
 		
 //		if(dataFilter.getReportFinalizedDate()!=null){
 //			Date date = Date.from(dataFilter.getReportFinalizedDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
