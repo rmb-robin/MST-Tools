@@ -20,7 +20,7 @@ public class SentenceMeasureNormalizerTests {
 	public void testMMtoCM() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
 
-		List<WordToken> words = getWordTokens("The right kidney measures 90 x 32 x 62 mm, volume 93 mL.");
+		List<WordToken> words = getWordTokens("The right kidney measuring 90 x 32 x 62 mm, volume 93 mL.");
 		
 		System.out.println(words);
 		normalizer.Normalize(words, true, false);
@@ -70,6 +70,20 @@ public class SentenceMeasureNormalizerTests {
 		
 		assertEquals(words.get(4).getToken(), "9.0");
 		assertEquals(words.get(5).getToken(), "cm");
+	}
+	
+	@Test
+	public void testGetLargestNoConversion() {
+		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+
+		List<WordToken> words = getWordTokens("The right kidney measuring 70 x 22 x 52 mm, volume 93 mL.");
+		
+		System.out.println(words);
+		normalizer.Normalize(words, false, true);
+		System.out.println(words);
+		
+		assertEquals(words.get(4).getToken(), "70.0");
+		assertEquals(words.get(5).getToken(), "mm");
 	}
 	
 	private List<WordToken> getWordTokens(String text) {
