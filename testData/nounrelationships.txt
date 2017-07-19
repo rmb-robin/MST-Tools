@@ -48,3 +48,4 @@ family,f,dysn,t,null,history
 drugpr,t,delivermeth,t,null,drug delivery
 followup,f,tempor,t,null,supp care
 cardinal number,t,tempor,t,null,time
+bpoc,t,ptconsul,t,null,consultation type
