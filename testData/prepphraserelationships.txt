@@ -13,4 +13,4 @@ positive,f,f,for,f,f,dysn,t,f,existence
 negative,f,f,for,f,f,dysn,t,f,existence-no
 without,f,f,dysn,t,f,sympto,t,f,existence-no
 here,f,f,for,f,f,dysn,t,f,existence
-in,f,f,followup,f,f,tempor,t,f,supp care
+in,f,f,follow-up,f,f,tempor,t,f,supp care
