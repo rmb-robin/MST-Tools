@@ -259,12 +259,7 @@ flat,qlco-shape
 focal,qlco
 focals,qlco
 follicular,qlco-simple
-follow up,followup
-follow ups,followup
-follow-up,followup
-follow-ups,followup
 followup,followup
-followups,followup
 foot,bpoc
 feet,bpoc
 forearms,bpoc
