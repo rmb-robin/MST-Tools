@@ -46,6 +46,6 @@ proc,t,ptconsul,t,null,procedure evaluation
 qlco-neop,t,disease,f,null,neoplasm severity
 family,f,dysn,t,null,history
 drugpr,t,delivermeth,t,null,drug delivery
-followup,f,tempor,t,null,supp care
+follow-up,f,tempor,t,null,supp care
 cardinal number,t,tempor,t,null,time
 bpoc,t,ptconsul,t,null,consultation type
