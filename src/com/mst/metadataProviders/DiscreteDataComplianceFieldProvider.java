@@ -6,6 +6,7 @@ import java.util.List;
 import com.mst.model.discrete.ComplianceDisplayFieldsBucketItem;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.Followup;
+import com.mst.model.discrete.FollowupProcedure;
 
 public class DiscreteDataComplianceFieldProvider {
 
@@ -54,21 +55,23 @@ public class DiscreteDataComplianceFieldProvider {
 		bucketItem.setUnitOfMeasure(values[7]);
 		
 		bucketItem.setFollowUp(createFollowup(values));
-		bucketItem.setFollowUpProcedures(getFollowupProcedures(values));
 		result.getBuckets().get(dieseName).add(bucketItem);
 	}
 	
-	private List<String> getFollowupProcedures(String[] values){
+	private List<FollowupProcedure> getFollowupProcedures(String[] values){
 		if(values.length<12) return null;
-		List<String> result = new ArrayList<>();
+		List<FollowupProcedure> result = new ArrayList<>();
 		
 		if(values[11]==null) return null;
 		if(values[11].equals("")) return null;
 		
 		String[] edges = values[11].split("\\|");
 		for(String edge:edges){
-			edge = edge.replace(";", ",");
-			result.add(edge);
+			String [] splits = edge.split(";");
+			FollowupProcedure followupProcedure = new FollowupProcedure();
+			followupProcedure.setEdgeName(splits[0]);
+			followupProcedure.setValue(splits[1]);
+			result.add(followupProcedure);
 		}
 		return result;
 	}
@@ -83,7 +86,7 @@ public class DiscreteDataComplianceFieldProvider {
 			followup.setDurationMeasure(values[10]);
 			return followup;
 		}
-		followup.setFollowupDescription(values[10]);
+		followup.setProcedures(getFollowupProcedures(values));
 		return followup;
 	}
 	

@@ -10,12 +10,8 @@ public class ComplianceDisplayFieldsBucketItem {
 	private double sizeMin, sizeMax;
 	private String unitOfMeasure;
 	private Followup followUp;
-	private List<String> followUpProcedures;
 	private String bucketName; 
 	
-	public ComplianceDisplayFieldsBucketItem(){
-		followUpProcedures = new ArrayList<>();
-	}
 	
 	public int getAgeBegin() {
 		return AgeBegin;
@@ -65,13 +61,5 @@ public class ComplianceDisplayFieldsBucketItem {
 	}
 	public void setFollowUp(Followup followUp) {
 		this.followUp = followUp;
-	}
-
-	public List<String> getFollowUpProcedures() {
-		return followUpProcedures;
-	}
-
-	public void setFollowUpProcedures(List<String> followUpProcedures) {
-		this.followUpProcedures = followUpProcedures;
 	}
 }

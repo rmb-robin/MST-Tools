@@ -1,7 +1,9 @@
 package com.mst.model.sentenceProcessing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.mst.model.discrete.DiscreteData;
 
@@ -48,6 +50,19 @@ public class Sentence {
 		}
 		return result;
 	}
+	
+	public Map<String,List<TokenRelationship>> getTokenRelationsByNameMap(){
+		HashMap<String,List<TokenRelationship>> result = new HashMap<>();
+		if(this.tokenRelationships==null) return result;
+		
+		for(TokenRelationship tokenRelationship: this.tokenRelationships){
+			if(!result.containsKey(tokenRelationship.getEdgeName()))
+				result.put(tokenRelationship.getEdgeName(), new ArrayList<TokenRelationship>());
+			result.get(tokenRelationship.getEdgeName()).add(tokenRelationship);
+		}
+		return result;
+	}
+	
 	
 	public boolean doesSentenceContainVerb(){
 		for(WordToken token: modifiedWordList){

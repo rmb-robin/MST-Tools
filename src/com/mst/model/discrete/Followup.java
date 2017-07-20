@@ -1,11 +1,19 @@
 package com.mst.model.discrete;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Followup {
 
 	private int duration;
 	private String durationMeasure;
 	private boolean isNumeric;
-	private String followupDescription; 
+	private List<FollowupProcedure> procedures;
+	
+	public Followup(){
+		procedures = new ArrayList<>();
+	}
+	
 	
 	public int getDuration() {
 		return duration;
@@ -25,14 +33,19 @@ public class Followup {
 	public void setIsNumeric(boolean isNumeric) {
 		this.isNumeric = isNumeric;
 	}
-	public String getFollowupDescription() {
-		return followupDescription;
+
+
+	public List<FollowupProcedure> getProcedures() {
+		return procedures;
 	}
-	public void setFollowupDescription(String followupDescription) {
-		this.followupDescription = followupDescription;
+
+
+	public void setProcedures(List<FollowupProcedure> procedures) {
+		this.procedures = procedures;
 	}
-	
-	
-	
-	
+
+
+	public void setNumeric(boolean isNumeric) {
+		this.isNumeric = isNumeric;
+	}
 }

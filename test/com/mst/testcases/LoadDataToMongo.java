@@ -104,7 +104,7 @@ public class LoadDataToMongo {
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		dao.saveSentences(sentences, null,null);
 	}
-	//@Test
+	@Test
 	public void loadMetaData(){
 		SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
 		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();
@@ -112,7 +112,7 @@ public class LoadDataToMongo {
 		ds.save(input);
 	}
 	
-	@Test
+	//@Test
 	public void loadDiscreteDataComplianceFields(){
 		DiscreteDataComplianceFieldProvider provider = new DiscreteDataComplianceFieldProvider();
 		DisceteDataComplianceDisplayFields fields =  provider.get("rad","rad");

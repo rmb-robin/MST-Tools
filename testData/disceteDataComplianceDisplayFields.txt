@@ -3,7 +3,7 @@ f,Bucket1,,,,2.6,2.9,cm,t,5,years,
 f,Bucket2,,,,3,3.4,cm,t,3,years,
 f,Bucket3,,,,3.5,3.9,cm,t,12, months,
 f,Bucket4,,,,4,4.4,cm,t,12,months,
-f,Bucket5,,,,4,4.4,cm,f,0,vascular consultation,advise; value - consultation|consultation type; value - vascular
+f,Bucket5,,,,4,4.4,cm,f,0,vascular consultation,advise;consultation|consultation type; value - vascular
 f,Bucket6,,,,4.5,5.4,cm,t,6, months,
 f,Bucket7,,,,4.5,5.4,cm,f,0,vascular consultation,advise; value - consultation|consultation type; value - vascular
 f,Bucket8,,,,5.5,100,cm,f,0,vascular surgeon,advise; value - consultation|consultation type; value vascular

@@ -14,6 +14,7 @@ import com.mst.model.discrete.DiscreteData;
 import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.discrete.DiscreteDataCustomField;
 import com.mst.model.discrete.Followup;
+import com.mst.model.discrete.FollowupProcedure;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
@@ -33,7 +34,7 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 				 if(bucket!=null) {
 					 DiscreteDataBucketIdentifierResult result = new DiscreteDataBucketIdentifierResult();
 					 result.setBucketName(bucket.getBucketName());
-					 result.setIsCompliant(issentenceCompliant(sentence,bucket));
+					 //result.setIsCompliant(issentenceCompliant(sentence,bucket));
 					 return result;
 				 }
 			   }
@@ -45,15 +46,18 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 	public boolean issentenceCompliant(Sentence sentence, ComplianceDisplayFieldsBucketItem bucket){
 		Followup followup = bucket.getFollowUp();
 		if(sentence.getTokenRelationships()==null || sentence.getTokenRelationships()==null) return false;
-		if(!followup.getIsNumeric())
-		{
-			String edgeName = followup.getFollowupDescription();
-			List<TokenRelationship> matched = sentence.getTokenRelationshipsByEdgeName(edgeName);
-			if(matched.size()==0)return false;
-			return true;
-		}
 		
-		List<TokenRelationship> matched = sentence.getTokenRelationshipsByEdgeName(EdgeNames.followUp);
+		if(!followup.getIsNumeric())
+			return isCompliantOnFollowupProcedure(followup,sentence);
+		
+		return isCompliantOnTime(bucket,sentence);
+
+	}
+	
+	private boolean isCompliantOnTime(ComplianceDisplayFieldsBucketItem bucket, Sentence sentence){
+		List<TokenRelationship> suppCareEdges = sentence.getTokenRelationshipsByEdgeName(EdgeNames.suppcare);
+		if(suppCareEdges.isEmpty()) return false;
+		List<TokenRelationship> matched = sentence.getTokenRelationshipsByEdgeName(EdgeNames.time);
 		if(matched.size()==0) return false;
 		
 		for(TokenRelationship relationship : matched){
@@ -65,7 +69,22 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 				if(isCompliantOnNumeric(relationship.getToToken(), relationship.getFromToken(), relationship,bucket)) return true;
 			}
 		}
-		return false;		
+		return false;
+	}
+	
+	private boolean isCompliantOnFollowupProcedure(Followup followup, Sentence sentence){
+		
+		Map<String,List<TokenRelationship>> relationshipMap = sentence.getTokenRelationsByNameMap();
+		for(FollowupProcedure procedure: followup.getProcedures()){
+			if(!relationshipMap.containsKey(procedure.getEdgeName())) continue;
+			
+			List<TokenRelationship> matchedRelationships = relationshipMap.get(procedure.getEdgeName());
+			for(TokenRelationship tokenRelationship: matchedRelationships){
+				if(tokenRelationship.getFromToken().equals(procedure.getValue())) return true; 
+				if(tokenRelationship.getToToken().equals(procedure.getValue())) return true;
+			}
+		}
+		return false;
 	}
 	
 	private boolean isCompliantOnNumeric(WordToken cardinal, WordToken durationMeasure, TokenRelationship relationship,ComplianceDisplayFieldsBucketItem bucket){
