@@ -3,20 +3,20 @@ f,Bucket1,,,,2.6,2.9,cm,t,5,years,
 f,Bucket2,,,,3,3.4,cm,t,3,years,
 f,Bucket3,,,,3.5,3.9,cm,t,12, months,
 f,Bucket4,,,,4,4.4,cm,t,12,months,
-f,Bucket5,,,,4,4.4,cm,f,0,vascular consultation,advise;consultation|consultation type; value - vascular
+f,Bucket5,,,,4,4.4,cm,f,0,advise; consultation|consultation type;vascular
 f,Bucket6,,,,4.5,5.4,cm,t,6, months,
-f,Bucket7,,,,4.5,5.4,cm,f,0,vascular consultation,advise; value - consultation|consultation type; value - vascular
-f,Bucket8,,,,5.5,100,cm,f,0,vascular surgeon,advise; value - consultation|consultation type; value vascular
+f,Bucket7,,,,4.5,5.4,cm,f,0,advise;consultation|consultation type;vascular 
+f,Bucket8,,,,5.5,100,cm,f,0,advise;surgeon|physician specialty;vascular
 t,Incidental Thyroid Nodule,,,,,,,,
-f,Bucket1,0,18,,(all),(all),,f,0,ultrasound,advise; value - ultrasound
-f,Bucket2,19,34,,1,100,cm,f,0,ultrasound,advise; value - ultrasound
-f,Bucket3,35,100,,1.5,100,cm,f,0,ultrasound,advise; value - ultrasound
+f,Bucket1,0,18,,(all),(all),,f,0,advise;ultrasound
+f,Bucket2,19,34,,1,100,cm,f,0,advise;ultrasound
+f,Bucket3,35,100,,1.5,100,cm,f,0,advise;ultrasound
 t,Ovarian Simple Cyst,,,,,,,,
-f,Bucket1,,,premenopausal,0,3,cm,f,0,no follow-up imaging recommended,
-f,Bucket2,,,premenopausal,3.1,5,cm,f,0,no follow-up imaging recommended,
-f,Bucket3,,,premenopausal,5.1,7,cm,f,0,ultrasound annually
-f,Bucket4,,,premenopausal,7.1,100,cm,f,0,MR with IV contrast or surgical evaluation,
-f,Bucket5,,,postmenopausal,0,1,cm,f,0,no follow-up imaging recommended,
-f,Bucket6,,,postmenopausal,1.1,3,cm,f,0,no follow-up imaging recommended,
-f,Bucket7,,,postmenopausal,3.1,7,cm,f,0,ultrasound annually,
-f,Bucket8,,,postmenopausal,7.1,100,cm,f,0,MR with IV contrast or surgical evaluation,
+f,Bucket1,,,premenopausal,0,3,cm,f,0,advise-no;imaging
+f,Bucket2,,,premenopausal,3.1,5,cm,f,0,advise-no;imaging
+f,Bucket3,,,premenopausal,5.1,7,cm,f,0,advise;ultrasound|procedure time;annual
+f,Bucket4,,,premenopausal,7.1,100,cm,f,0,advise;MR
+f,Bucket5,,,postmenopausal,0,1,cm,f,0,advise-no;imaging
+f,Bucket6,,,postmenopausal,1.1,3,cm,f,0,advise-no;imaging
+f,Bucket7,,,postmenopausal,3.1,7,cm,f,0,advise;ultrasound|procedure time;annual
+f,Bucket8,,,postmenopausal,7.1,100,cm,f,0,advise;MR

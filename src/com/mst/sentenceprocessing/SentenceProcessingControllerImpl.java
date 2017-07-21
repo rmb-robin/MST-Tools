@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 
+import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
 import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
@@ -22,6 +23,7 @@ import com.mst.model.discrete.DiscreteData;
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.requests.SentenceRequestBase;
 import com.mst.model.requests.SentenceTextRequest;
+import com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl;
 import com.mst.model.sentenceProcessing.FailedSentence;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingFailures;
@@ -45,7 +47,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	private SentenceMeasureNormalizer sentenceMeasureNormalizer;
 	private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor;
 	private VerbExistanceProcessor verbExistanceProcessor;
-	
+	private AdditionalExistenceEdgeProcesser additionalExistenceEdgeProcesser;
 	private SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput;
 
 	public SentenceProcessingControllerImpl(){
@@ -62,8 +64,9 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
 		negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
 		verbExistanceProcessor = new VerbExistanceProcessorImpl();
-	}
-
+		additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
+	
+	
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
 		this.sentenceProcessingMetaDataInput = sentenceProcessingMetaDataInput;
 	}
@@ -115,6 +118,11 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		
 		sentence.getTokenRelationships().addAll(negationTokenRelationshipProcessor.process(tokens));
 		sentence.getTokenRelationships().addAll(verbExistanceProcessor.process(sentence));
+		
+		TokenRelationship additionalExistence = additionalExistenceEdgeProcesser.process(sentence);
+		if(additionalExistence!=null)
+			sentence.getTokenRelationships().add(additionalExistence);
+	
 		sentence.setModifiedWordList(tokens);
 		return sentence;
 	}

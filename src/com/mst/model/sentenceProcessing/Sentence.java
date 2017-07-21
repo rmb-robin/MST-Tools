@@ -38,6 +38,18 @@ public class Sentence {
 		this.normalizedSentence = fullSentence;
 	}
 	
+	public WordToken getTokenBySemanticType(String semanticType){
+		if(this.modifiedWordList==null) return null;
+		
+		for(WordToken wordToken: this.modifiedWordList){
+			if(wordToken.getSemanticType()==null) continue;
+			if(wordToken.getSemanticType().equals(semanticType))
+				return wordToken;
+			
+		}
+		return null;
+	}
+	
 	
 	public List<TokenRelationship> getTokenRelationshipsByEdgeName(String edgeName){
 		List<TokenRelationship> result = new ArrayList<>();

@@ -11,6 +11,7 @@ import com.mst.model.discrete.DiscreteData;
 import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.discrete.DiscreteDataCustomField;
 import com.mst.model.discrete.Followup;
+import com.mst.model.discrete.FollowupProcedure;
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.Sentence;
@@ -82,6 +83,25 @@ public class DiscreteDataBucketIdentifierTest {
 		followup.setDuration(3);
 		isCompliant = bucketIdentifierImpl.issentenceCompliant(sentence, bucketItem);
 		assertTrue(isCompliant);	
+		
+		request.setText("I recommend vascular consultation");
+		result =  controller.processText(request);
+		
+		sentence = result.getSentences().get(0);
+		
+		bucketItem.getFollowUp().setIsNumeric(false);
+		bucketItem.getFollowUp().getProcedures().add(createProcedure("advise","consultation"));
+		bucketItem.getFollowUp().getProcedures().add(createProcedure("consultation type","vascular"));
+
+		isCompliant = bucketIdentifierImpl.issentenceCompliant(sentence, bucketItem);
+		assertTrue(isCompliant);	
+	}
+	
+	private FollowupProcedure createProcedure(String edge, String value){
+		FollowupProcedure followupProcedure = new FollowupProcedure();
+		followupProcedure.setEdgeName(edge);
+		followupProcedure.setValue(value);
+		return followupProcedure;
 	}
 	
 	private void runTest(String sentence, DiscreteData discreteData, String expectedBucketName) throws Exception{

@@ -59,13 +59,13 @@ public class DiscreteDataComplianceFieldProvider {
 	}
 	
 	private List<FollowupProcedure> getFollowupProcedures(String[] values){
-		if(values.length<12) return null;
+		if(values.length<11) return null;
 		List<FollowupProcedure> result = new ArrayList<>();
 		
-		if(values[11]==null) return null;
-		if(values[11].equals("")) return null;
+		if(values[10]==null) return null;
+		if(values[10].equals("")) return null;
 		
-		String[] edges = values[11].split("\\|");
+		String[] edges = values[10].split("\\|");
 		for(String edge:edges){
 			String [] splits = edge.split(";");
 			FollowupProcedure followupProcedure = new FollowupProcedure();

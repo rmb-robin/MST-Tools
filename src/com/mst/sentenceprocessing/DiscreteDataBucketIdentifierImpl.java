@@ -80,8 +80,8 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 			
 			List<TokenRelationship> matchedRelationships = relationshipMap.get(procedure.getEdgeName());
 			for(TokenRelationship tokenRelationship: matchedRelationships){
-				if(tokenRelationship.getFromToken().equals(procedure.getValue())) return true; 
-				if(tokenRelationship.getToToken().equals(procedure.getValue())) return true;
+				if(tokenRelationship.getFromToken().getToken().equals(procedure.getValue())) return true; 
+				if(tokenRelationship.getToToken().getToken().equals(procedure.getValue())) return true;
 			}
 		}
 		return false;
