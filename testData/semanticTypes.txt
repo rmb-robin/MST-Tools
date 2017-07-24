@@ -2,8 +2,6 @@ ab,bpoc
 abs,bpoc
 abdomen,bpoc
 abdomens,bpoc
-abdominal aortic aneurysm,dysn
-abdominal aortic aneurysms,dysn
 abdominal,bpoc
 abdominals,bpoc
 abnormalities,qlco
