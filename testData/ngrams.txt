@@ -90,7 +90,6 @@ pre menopause,pre-menopause
 post menopause,post-menopause
 dominant follicle,dominant-follicle
 at least,at-least
-abdominal aortic aneurysm,abdominal-aortic-aneurysm
 MR with IV contrast,MR-with-iv-contrast
 dominant follicular,dominant-follicular
 endovascular aneurysm repair,endovascular-aneurysm-repair
