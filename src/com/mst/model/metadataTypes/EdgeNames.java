@@ -10,7 +10,9 @@ public class EdgeNames {
 	public final static String existenceMaybe = "existence-maybe";
 	public final static String suppcare = "supp care";
 	public final static String time = "time";
+	public final static String simpleCystModifiers = "simple cyst modifiers";
 	public final static String simpleCystModifier = "simple cyst modifier";
+	
 	public final static String diseaseModifier = "disease modifier";
 	public final static String diseaseLocation = "disease location";
 }

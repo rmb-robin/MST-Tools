@@ -48,12 +48,18 @@ public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements 
 	
 	public List<SentenceDb> getSentenceByDate(String orgId){
 		//Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+		
+		
+		LocalDate localDate = LocalDate.of(2017,7, 20);
+		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+		
 		Query<SentenceDb> query = datastoreProvider.getDataStore().createQuery(SentenceDb.class);
 		query.field("organizationId").equal(orgId);
-		 return query.asList();
-		// .filter("processingDate =", date);
-		 //.retrievedFields(true, "id", "discreteData");
-		// return query.asList();
+		query
+		 .filter("processingDate >", date);
+
+		return query.asList();		 
+		 
 	}
 
 	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {

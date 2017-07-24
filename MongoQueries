@@ -1,0 +1,20 @@
+Update Sentences: 
+
+db.sentences.updateMany({ "$and" : [{"organizationId" : "58c6f3ceaf3c420b90160803"} ,
+    {"processingDate" : { "$lt" :  new ISODate("2017-07-20T05:00:00.000Z")}}
+    ]}, { $set: {"organizationId": "59667d670bc1e91d43554492" }})
+
+
+Custom Sentence Edge Query: 
+
+
+db.sentences.find({ "$and" : [ { "origSentence" : { "$regex" : "cyst"}} , 
+{ "organizationId" : "58c6f3ceaf3c420b90160803"} , 
+{ "tokenRelationships.edgeName" : { "$in" : ["simple cyst modifiers"]}} ,
+{ "tokenRelationships.edgeName" : { "$not" : { "$in" : ["existence"]}}}
+]})
+
+
+    
+    
+    

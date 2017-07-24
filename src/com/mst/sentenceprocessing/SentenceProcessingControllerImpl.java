@@ -65,6 +65,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
 		verbExistanceProcessor = new VerbExistanceProcessorImpl();
 		additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
+	}
 	
 	
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
