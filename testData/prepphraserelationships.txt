@@ -15,3 +15,4 @@ without,f,f,dysn,t,f,sympto,t,f,existence-no
 here,f,f,for,f,f,dysn,t,f,existence
 in,f,f,follow-up,f,f,tempor,t,f,supp care
 without,f,f,calcifications,f,f,dysn,t,f,existence-no
+with,f,f,correlation,f,f,history,f,f,history review
