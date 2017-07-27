@@ -13,4 +13,5 @@ public interface SentenceProcessingController {
 	void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput);
 	List<Sentence> processSentences(SentenceRequest sentenceRequesr) throws Exception;
 	SentenceProcessingResult processText(SentenceTextRequest request) throws Exception;
+	SentenceProcessingResult reprocessSentences(List<Sentence> sentences);
 }

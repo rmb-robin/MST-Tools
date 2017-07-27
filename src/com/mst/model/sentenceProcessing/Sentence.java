@@ -33,6 +33,8 @@ public class Sentence {
 		this.position = position;
 	}
 
+	public Sentence(){}
+	
 	public Sentence(String fullSentence) {	
 		this.origSentence = fullSentence;
 		this.normalizedSentence = fullSentence;
@@ -92,6 +94,10 @@ public class Sentence {
 	
 	public void setProcessDate(){
 		this.processingDate = LocalDate.now();
+	}
+	
+	public void setProcessingDate(LocalDate date){
+		this.processingDate = date;
 	}
 	
 	public LocalDate getProcessDate(){

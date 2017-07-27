@@ -22,6 +22,7 @@ import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
+import com.mst.model.SentenceQuery.SentenceReprocessingInput;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
@@ -384,5 +385,13 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			  sentence.getTokenRelationships().forEach(a-> result.add(a.getEdgeName()));
 		}
 		return result;
+	}
+
+	public List<SentenceDb> getSentencesByToken(SentenceReprocessingInput input) {
+		Query<SentenceDb> query =   datastoreProvider.getDataStore().createQuery(SentenceDb.class);
+		 query
+		 .search(input.getToken())
+		 .field("organizationId").equal(input.getOrganizationId());		 
+		 return query.asList();
 	}
 }

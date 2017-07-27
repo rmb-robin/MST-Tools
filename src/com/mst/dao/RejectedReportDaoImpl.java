@@ -20,7 +20,7 @@ public class RejectedReportDaoImpl extends BaseDocumentDaoImpl<RejectedReport> i
 	public RejectedReportDaoImpl() {
 		super(RejectedReport.class);
 	}
-
+	
 	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
 		super.setMongoDatastoreProvider(provider);
 	}
@@ -29,7 +29,7 @@ public class RejectedReportDaoImpl extends BaseDocumentDaoImpl<RejectedReport> i
 		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 		Query<RejectedReport> query = datastoreProvider.getDataStore().createQuery(RejectedReport.class);
 		 query
-		 	.field("organizationId").equal(orgId);
+		 	.field("organizationName").equal(orgId);
 		 	query
 		 	.filter("processingDate =", date);
 		 return query.asList();

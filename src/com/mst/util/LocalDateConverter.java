@@ -4,9 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Date;
-
 import org.mongodb.morphia.converters.SimpleValueConverter;
 import org.mongodb.morphia.converters.TypeConverter;
 import org.mongodb.morphia.mapping.MappedField;
@@ -58,6 +56,4 @@ public class LocalDateConverter extends TypeConverter implements SimpleValueConv
 
         throw new IllegalArgumentException(String.format("Cannot encode object of class: %s", value.getClass().getName()));
     }
-    
-
 }

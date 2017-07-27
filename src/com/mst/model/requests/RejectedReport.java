@@ -26,6 +26,7 @@ public class RejectedReport {
 	@Id
 	private ObjectId id;
 	private String organizationId;
+	private String organizationName;
 	private String accessionNumber;
 	private List<String> missingFields; 
 	private LocalDate processingDate; 
@@ -85,5 +86,17 @@ public class RejectedReport {
 	public void setTimeStamps(){
 		this.processingDate = LocalDate.now();
 	//	this.processingTime = LocalDateTime.now();
+	}
+
+
+
+	public String getOrganizationName() {
+		return organizationName;
+	}
+
+
+
+	public void setOrganizationName(String organizationName) {
+		this.organizationName = organizationName;
 	}
 }

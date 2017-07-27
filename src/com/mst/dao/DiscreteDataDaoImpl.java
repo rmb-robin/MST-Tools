@@ -36,6 +36,7 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 	
 	public List<DiscreteData> getDiscreteDataIds(DiscreteDataFilter dataFilter, String orgId){
 		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
+		query.disableValidation();
 		
 		query.field("organizationId").equal(orgId);
 		
@@ -61,17 +62,33 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		if(!dataFilter.getResultStatus().isEmpty())
 			query.field("resultStatus").hasAnyOf(dataFilter.getResultStatus());
 		
-//		if(dataFilter.getReportFinalizedDate()!=null){
-//			Date date = Date.from(dataFilter.getReportFinalizedDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-//			.filter("processingDate =", date);
-//		}
+		if(dataFilter.getReportFinalizedDate().size()==2){
+			addDateQuery(dataFilter.getReportFinalizedDate().get(0),query,true);
+			addDateQuery(dataFilter.getReportFinalizedDate().get(1),query,false);
+		}
 		
-		query.retrievedFields(true, "id");
+		query.retrievedFields(true, "id","reportFinalizedDate");
+		
 		return query.asList();
 	//	List<ObjectId> result = new ArrayList<>();
 		
 		//discreteDatas.forEach(a-> result.add(a.getId()));
 		//return result;
+	}
+	
+	private void addDateQuery(LocalDate localdate, Query<DiscreteData> query, boolean isFirst){
+		Date date = Date.from(localdate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+		
+		if(isFirst)
+			query.filter("reportFinalizedDate >= ", date);
+		else 
+		{
+			LocalDate nextLocaldate = localdate.plusDays(1);
+			Date nexDate = Date.from(nextLocaldate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+			
+			query.filter("reportFinalizedDate < ", nexDate);	
+		}
+		
 	}
 	
 	private Query<DiscreteData> getQueryByOrgNameAndDate(String orgId, LocalDate localDate){
@@ -83,4 +100,3 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		 return query;
 	}
 }
-

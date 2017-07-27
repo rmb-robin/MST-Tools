@@ -81,10 +81,14 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		}
 		return sentences;
 	}
-		
-	public SentenceProcessingResult processText(SentenceTextRequest request) throws Exception {		
+			
+	public SentenceProcessingResult reprocessSentences(List<Sentence> sentences){
+		return processSentences(sentences, null);
+	}
+
+	private SentenceProcessingResult processSentences(List<Sentence> sentences,SentenceRequestBase request){
 		SentenceProcessingResult result = new SentenceProcessingResult();
-		List<Sentence> sentences = getSentences(request);
+		
 		for(Sentence sentence: sentences){
 			try{
 				processSentence(sentence,request);
@@ -99,9 +103,15 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 				sentence.setDidFail(true);
 			}
 		}
-		 
 		result.setSentences(sentences);
 		return result;
+	}
+	
+	public SentenceProcessingResult processText(SentenceTextRequest request) throws Exception {		
+		
+		List<Sentence> sentences = getSentences(request);
+		return processSentences(sentences, request);
+	
 	}
 	
 	private Sentence processSentence(Sentence sentence, SentenceRequestBase request) throws Exception{
@@ -115,7 +125,8 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		tokens = prepPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseProcessingInput());
 		sentence.getTokenRelationships().addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
 		tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
-		tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements(), request.isConvertLargest());
+		if(request!=null)
+			tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements(), request.isConvertLargest());
 		
 		sentence.getTokenRelationships().addAll(negationTokenRelationshipProcessor.process(tokens));
 		sentence.getTokenRelationships().addAll(verbExistanceProcessor.process(sentence));

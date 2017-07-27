@@ -14,7 +14,7 @@ import static org.junit.Assert.*;
 
 public class RejectedReportDaoIntergrationTest {
 
-	//@Test
+	@Test
 	public void getRejectedReport(){
 		
 		LocalDate date = LocalDate.of(2017,6, 1);

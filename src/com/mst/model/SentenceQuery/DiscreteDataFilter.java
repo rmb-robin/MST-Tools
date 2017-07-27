@@ -11,7 +11,7 @@ public class DiscreteDataFilter {
 	private List<String> examDescription;
 	private List<String> modality;
 	private List<Integer> patientAge;
-	private LocalDate reportFinalizedDate;
+	private List<LocalDate> reportFinalizedDate;
 	
 
 	public DiscreteDataFilter(){
@@ -21,7 +21,9 @@ public class DiscreteDataFilter {
 		examDescription = new ArrayList<>();
 		modality = new ArrayList<>();
 		patientAge = new ArrayList<>();
+		reportFinalizedDate = new ArrayList<>();
 	}
+	
 
 	public List<Integer> getPatientAge() {
 		return patientAge;
@@ -29,10 +31,10 @@ public class DiscreteDataFilter {
 	public void setPatientAge(List<Integer> patientAge) {
 		this.patientAge = patientAge;
 	}
-	public LocalDate getReportFinalizedDate() {
+	public List<LocalDate> getReportFinalizedDate() {
 		return reportFinalizedDate;
 	}
-	public void setReportFinalizedDate(LocalDate reportFinalizedDate) {
+	public void setReportFinalizedDate(List<LocalDate> reportFinalizedDate) {
 		this.reportFinalizedDate = reportFinalizedDate;
 	}
 	public List<String> getResultStatus() {
