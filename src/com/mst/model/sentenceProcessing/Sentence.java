@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import com.mst.model.discrete.DiscreteData;
 
 import java.time.LocalDate;
@@ -24,6 +26,7 @@ public class Sentence {
 	private String id, source, practice, study;
 	private String organizationId;
 
+	
 	private boolean didFail;
 	private DiscreteData discreteData;
 	

@@ -21,17 +21,19 @@ public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements 
 		super(SentenceDb.class);
 	}
 
-	public void saveSentences(List<SentenceDb> sentences, DiscreteData discreteData,SentenceProcessingFailures failures) {
+	public void saveSentences(List<SentenceDb> sentences, DiscreteData discreteData,SentenceProcessingFailures failures, boolean isReprocess) {
 		Datastore ds = datastoreProvider.getDataStore();
 		if(discreteData!=null){
-			discreteData.setId(new ObjectId());
+			if(!isReprocess) discreteData.setId(new ObjectId());
 			discreteData.setTimeStamps();
 			ds.save(discreteData);
 			
 			if(discreteData!=null){
 				for(SentenceDb sentence: sentences){
-					sentence.setDiscreteData(discreteData);
-					sentence.setOrganizationId(discreteData.getOrganizationId());
+					if(!isReprocess){
+						sentence.setDiscreteData(discreteData);
+						sentence.setOrganizationId(discreteData.getOrganizationId());
+					}
 				}
 			}
 		}

@@ -25,26 +25,34 @@ public class SentenceConverter {
 		return dbObj;
 	}
 	
-	public static List<Sentence> convertToSentence(List<SentenceDb> sentencedbobjects){
+	public static List<Sentence> convertToSentence(List<SentenceDb> sentencedbobjects, boolean addRelationships,boolean addModifiedList,boolean addFailure){
 		List<Sentence> sentences = new ArrayList<>();
 		
-			for(SentenceDb sentencedb: sentencedbobjects){
-				Sentence sentence = new Sentence();
+		for(SentenceDb sentencedb: sentencedbobjects){
+			Sentence sentence = new Sentence();
+			sentence.setId(sentencedb.getId().toString());
+			if(addModifiedList){
 				sentence.setModifiedWordList(sentencedb.getModifiedWordList());
-				sentence.setOriginalWords(sentencedb.getOriginalWords());
-				sentence.setOrigSentence(sentencedb.getOrigSentence());
-				sentence.setTokenRelationships(sentencedb.getTokenRelationships());
-				sentence.setPractice(sentencedb.getPractice());
-			//	sentence.setProcessDate(sentencedb.getProcessingDate());
-				sentence.setSource(sentencedb.getSource());
-				sentence.setStudy(sentencedb.getStudy());
 				sentence.setNormalizedSentence(sentencedb.getNormalizedSentence());
-				sentence.setDiscreteData(sentencedb.getDiscreteData());
-				sentence.setOrganizationId(sentencedb.getOrganizationId());
-				sentence.setDidFail(sentencedb.isDidFail());
-				sentences.add(sentence);
 			}
-			return sentences;
+			
+			sentence.setOriginalWords(sentencedb.getOriginalWords());
+			sentence.setOrigSentence(sentencedb.getOrigSentence());
+			if(addRelationships) 
+				sentence.setTokenRelationships(sentencedb.getTokenRelationships());
+			
+			sentence.setPractice(sentencedb.getPractice());
+		//	sentence.setProcessDate(sentencedb.getProcessingDate());
+			sentence.setSource(sentencedb.getSource());
+			sentence.setStudy(sentencedb.getStudy());
+
+			sentence.setDiscreteData(sentencedb.getDiscreteData());
+			sentence.setOrganizationId(sentencedb.getOrganizationId());
+			if(addFailure)
+				sentence.setDidFail(sentencedb.isDidFail());
+			sentences.add(sentence);
+		}
+		return sentences;
 	}
 	
 }

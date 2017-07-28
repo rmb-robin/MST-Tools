@@ -76,22 +76,23 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		List<Sentence> sentences = new ArrayList<>();	
 		for(String sentenceText: request.getSenteceTexts()){
 			Sentence sentence = getSentence(sentenceText,request);
-			sentence = processSentence(sentence,request);
+			sentence = processSentence(sentence,request.isConvertMeasurements(),request.isConvertLargest());
 			sentences.add(sentence);
 		}
 		return sentences;
 	}
 			
 	public SentenceProcessingResult reprocessSentences(List<Sentence> sentences){
-		return processSentences(sentences, null);
+		return processSentences(sentences, true,true);
 	}
 
-	private SentenceProcessingResult processSentences(List<Sentence> sentences,SentenceRequestBase request){
+	private SentenceProcessingResult processSentences(List<Sentence> sentences,boolean isConvertMeasurements,boolean isConvertLargest){
 		SentenceProcessingResult result = new SentenceProcessingResult();
 		
 		for(Sentence sentence: sentences){
 			try{
-				processSentence(sentence,request);
+				processSentence(sentence,isConvertMeasurements,isConvertLargest);
+				sentence.setProcessDate();
 			}
 			catch(Exception ex){
 				if(result.getFailures()==null)
@@ -110,11 +111,11 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	public SentenceProcessingResult processText(SentenceTextRequest request) throws Exception {		
 		
 		List<Sentence> sentences = getSentences(request);
-		return processSentences(sentences, request);
+		return processSentences(sentences, request.isConvertMeasurements(),request.isConvertLargest());
 	
 	}
 	
-	private Sentence processSentence(Sentence sentence, SentenceRequestBase request) throws Exception{
+	private Sentence processSentence(Sentence sentence, boolean isConvertMeasurements,boolean isConvertLargest ) throws Exception{
 		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
 		List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(),this.sentenceProcessingMetaDataInput.getSemanticTypes());
 		
@@ -125,8 +126,8 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		tokens = prepPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseProcessingInput());
 		sentence.getTokenRelationships().addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
 		tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
-		if(request!=null)
-			tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements(), request.isConvertLargest());
+		
+		tokens = sentenceMeasureNormalizer.Normalize(tokens, isConvertMeasurements,isConvertLargest);
 		
 		sentence.getTokenRelationships().addAll(negationTokenRelationshipProcessor.process(tokens));
 		sentence.getTokenRelationships().addAll(verbExistanceProcessor.process(sentence));
@@ -168,10 +169,6 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		sentence.setStudy(study);
 		sentence.setNormalizedSentence(cs);
 		sentence.setOrigSentence(sentenceToken.getToken());
-		sentence.setProcessDate();
 		return sentence;
-		
 	}
-	
-	
 }

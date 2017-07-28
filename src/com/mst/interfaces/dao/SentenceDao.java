@@ -8,5 +8,5 @@ import com.mst.model.sentenceProcessing.SentenceProcessingFailures;
 
 public interface SentenceDao extends IDao {
 
-	void saveSentences(List<SentenceDb> sentences, DiscreteData discreteData, SentenceProcessingFailures failures);
+	void saveSentences(List<SentenceDb> sentences, DiscreteData discreteData, SentenceProcessingFailures failures,boolean isReprocess);
 }
