@@ -6,11 +6,16 @@ after,f,f,therapy,f,f,surgery,f,f,sequence of events
 of,f,f,history,f,f,bpoc,t,f,diagnosis
 with,f,f,consistent,f,f,dysn,t,f,diagnose
 on,f,f,LV,f,t,drugpr,t,f,take
-suspicious,f,f,for,f,f,dysn,t,f,existence-maybe
-concerning,f,f,for,f,f,dysn,t,f,existence
-consistent,f,f,with,f,f,dysn,t,f,existence
-positive,f,f,for,f,f,dysn,t,f,existence
-negative,f,f,for,f,f,dysn,t,f,existence-no
+for,f,f,suspicious,f,f,dysn,t,f,existence-maybe
+for,f,f,concerning,f,f,dysn,t,f,existence
+with,f,f,consistent,f,f,dysn,t,f,existence
+for,f,f,positive,f,f,dysn,t,f,existence
+for,f,f,negative,f,f,dysn,t,f,existence-no
+of,f,f,suggestive,f,f,dysn,t,f,existence-maybe
 without,f,f,dysn,t,f,sympto,t,f,existence-no
 here,f,f,for,f,f,dysn,t,f,existence
 in,f,f,follow-up,f,f,tempor,t,f,supp care
+without,f,f,calcifications,f,f,dysn,t,f,existence-no
+with,f,f,correlation,f,f,history,f,f,history review
+of,f,f,evidence,f,f,dysn,t,f,existence
+to,f,f,up,f,f,uom,t,f,range value

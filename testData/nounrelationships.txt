@@ -49,3 +49,6 @@ drugpr,t,delivermeth,t,null,drug delivery
 follow-up,f,tempor,t,null,supp care
 cardinal number,t,tempor,t,null,time
 bpoc,t,ptconsul,t,null,consultation type
+no,f,evidence,f,1,negation
+no,f,follow-up,f,1,negation
+ultrasound,f,follow-up,f,1,follow-up
