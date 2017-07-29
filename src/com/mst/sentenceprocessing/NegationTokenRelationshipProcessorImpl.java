@@ -47,6 +47,8 @@ public class NegationTokenRelationshipProcessorImpl implements NegationTokenRela
 	private List<TokenRelationship> getNegationEdges(List<WordToken> wordTokens){
 		List<TokenRelationship> result = new ArrayList<>();
 		WordToken verb= null;
+		List<WordToken> negationTokens = new ArrayList<>();
+		
 		for(int i = 0;i<wordTokens.size();i++){
 			WordToken wordToken = wordTokens.get(i);
 
@@ -61,7 +63,7 @@ public class NegationTokenRelationshipProcessorImpl implements NegationTokenRela
 			}
 			
 			if(shouldContinueLooping(wordToken)) continue;
-			
+			negationTokens.add(wordToken);
 			
 			if(i+1>= wordTokens.size()) return result;
 			
@@ -89,10 +91,20 @@ public class NegationTokenRelationshipProcessorImpl implements NegationTokenRela
 			
 			//D) If verb isNegation=T, then create negation edge between av and subject complement.
 		}
-		return result;
+		if(result.size()>0) return result;
+		return getAllNegationTokenEdges(negationTokens, wordTokens);
 	}
 	
-
+	private List<TokenRelationship> getAllNegationTokenEdges(List<WordToken> negationTokens, List<WordToken> wordTokens){
+		List<TokenRelationship> result = new ArrayList<>();
+		for(WordToken negationToken:negationTokens){
+			if(wordTokens.indexOf(negationToken) < wordTokens.size()-1)
+				result.add(createNegationEdge(negationToken, wordTokens.get(wordTokens.indexOf(negationToken)+1)));
+		}
+		return result;
+		
+	}
+	
 	//B2) If negation token precedes NounPhrase begin where NounPhraseFinal is not a subject or 
 	//subject complement, then create negation edge between the NounPhraseFinal token and the negation token.
 	private TokenRelationship createNegationEdge(WordToken from, WordToken to){
@@ -128,7 +140,7 @@ public class NegationTokenRelationshipProcessorImpl implements NegationTokenRela
 	}
 
 	
-	private SubjectSearchResult findSubjectForConjunctionVerbs(WordToken firstVerb,List<WordToken> wordTokens, int currentIndex){
+	private SubjectSearchResult findSubjectForConjunctionVerbs(WordToken  firstVerb,List<WordToken> wordTokens, int currentIndex){
 		if(currentIndex+2>= wordTokens.size()) return null;
 		
 		if(firstVerb.getVerb().getVerbType()!= VerbType.MV && firstVerb.getVerb().getVerbType()!= VerbType.LV)return null;
