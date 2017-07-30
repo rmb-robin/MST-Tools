@@ -52,3 +52,5 @@ bpoc,t,ptconsul,t,null,consultation type
 no,f,evidence,f,1,negation
 no,f,follow-up,f,1,negation
 ultrasound,f,follow-up,f,1,follow-up
+abdominal,f,aneurysm,f,1,disease location
+aortic,f,aneurysm,f,0,disease modifier
