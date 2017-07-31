@@ -70,7 +70,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 
 		boolean filterOnDiscreteData = false;
 		List<DiscreteData> discreteDataIds = null;
-		if(input.getDiscreteDataFilter()!=null){
+		if(input.getDiscreteDataFilter()!=null && !input.getDiscreteDataFilter().isEmpty()){
 			filterOnDiscreteData = true;
 			initDaos();
 			discreteDataIds = getDiscreteDatas(input);

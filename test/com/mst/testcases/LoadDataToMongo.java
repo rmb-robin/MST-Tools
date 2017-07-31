@@ -102,15 +102,9 @@ public class LoadDataToMongo {
 		dd.setTimeStamps();
 		SentenceDaoImpl dao =  new SentenceDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		dao.saveSentences(sentences, null,null);
+		dao.saveSentences(sentences, null,null,false);
 	}
-	//@Test
-	public void loadMetaData(){
-		SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
-		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();
-		ds.delete(ds.createQuery(SentenceProcessingMetaDataInput.class));
-		ds.save(input);
-	}
+	
 	
 	@Test
 	public void loadDiscreteDataComplianceFields(){

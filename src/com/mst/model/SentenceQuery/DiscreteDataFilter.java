@@ -67,4 +67,16 @@ public class DiscreteDataFilter {
 	public void setModality(List<String> modality) {
 		this.modality = modality;
 	}
+	
+	public boolean isEmpty(){
+		if(!resultStatus.isEmpty()) return false;
+		if(!readingLocation.isEmpty()) return false;
+		if(!patientSex.isEmpty()) return false;
+		if(!examDescription.isEmpty()) return false;
+		
+		if(!modality.isEmpty()) return false;
+		if(patientAge.size()==2) return false;
+		if(reportFinalizedDate.size()==2) return false;
+		return true;
+	}
 }
