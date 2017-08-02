@@ -823,3 +823,10 @@ aaa,dysn
 follicle,dysn
 tumor,dysn
 tumors,dysn
+fentanyl,drugpr
+percocet,drugpr
+codeine,drugpr
+vicodin,drugpr
+morphone,drugpr
+methadone,drugpr
+hyrdrocodone,drugpr
