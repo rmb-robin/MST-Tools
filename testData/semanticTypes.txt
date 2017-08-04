@@ -830,3 +830,6 @@ vicodin,drugpr
 morphone,drugpr
 methadone,drugpr
 hyrdrocodone,drugpr
+calcifications,dysn
+intracranial,bpoc
+calcified,dysn

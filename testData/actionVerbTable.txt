@@ -13,7 +13,7 @@ calculate,calculates,calculated,calculating,calculate,yes,yes
 demonstrate,demonstrates,demonstrated,demonstrating,indicate,yes
 confirm,confirms,confirmed,confirming,confirm,yes
 reveal,reveals,revealed,revealing,indicate,yes,yes
-show,shows,shown,showing,indicate,yes
+show,shows,showed,showing,indicate,yes
 determine,determines,determined,determining,define,yes
 identify,identifies,identified,identifying,define,yes
 report,reports,reported,reporting,define,yes,yes
