@@ -6,6 +6,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
+import com.mst.interfaces.sentenceprocessing.ExistenceToExistenceNoConverter;
 import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
@@ -49,7 +50,8 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	private VerbExistanceProcessor verbExistanceProcessor;
 	private AdditionalExistenceEdgeProcesser additionalExistenceEdgeProcesser;
 	private SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput;
-
+	private ExistenceToExistenceNoConverter existenceToExistenceNoConverter;
+	
 	public SentenceProcessingControllerImpl(){
 		ngramProcessor = new NGramsSentenceProcessorImpl();
 		prepPhraseProcessor = new PrepositionPhraseProcessorImpl();
@@ -65,6 +67,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
 		verbExistanceProcessor = new VerbExistanceProcessorImpl();
 		additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
+		existenceToExistenceNoConverter = new ExistenceToExistenceNoConverterImpl();
 	}
 	
 	
@@ -129,7 +132,9 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		
 		tokens = sentenceMeasureNormalizer.Normalize(tokens, isConvertMeasurements,isConvertLargest);
 		
-		sentence.getTokenRelationships().addAll(negationTokenRelationshipProcessor.process(tokens));
+		List<TokenRelationship> negationRelationships = negationTokenRelationshipProcessor.process(tokens); 
+		sentence.setTokenRelationships(existenceToExistenceNoConverter.convertExistenceNo(negationRelationships, sentence.getTokenRelationships()));
+		
 		sentence.getTokenRelationships().addAll(verbExistanceProcessor.process(sentence));
 		
 		TokenRelationship additionalExistence = additionalExistenceEdgeProcesser.process(sentence);

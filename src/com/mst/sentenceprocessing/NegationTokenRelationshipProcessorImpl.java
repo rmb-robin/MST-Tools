@@ -1,6 +1,7 @@
 package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
@@ -10,6 +11,7 @@ import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.metadataTypes.VerbType;
+import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
@@ -88,12 +90,12 @@ public class NegationTokenRelationshipProcessorImpl implements NegationTokenRela
 				i = searchResult.index;
 				continue;
 			}
-			
-			//D) If verb isNegation=T, then create negation edge between av and subject complement.
 		}
-		if(result.size()>0) return result;
-		return getAllNegationTokenEdges(negationTokens, wordTokens);
+		if(result.size()==0)
+			result = getAllNegationTokenEdges(negationTokens, wordTokens);
+		return result;
 	}
+	
 	
 	private List<TokenRelationship> getAllNegationTokenEdges(List<WordToken> negationTokens, List<WordToken> wordTokens){
 		List<TokenRelationship> result = new ArrayList<>();

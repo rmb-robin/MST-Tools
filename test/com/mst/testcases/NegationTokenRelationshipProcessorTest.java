@@ -1,5 +1,6 @@
 package com.mst.testcases;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,8 +67,16 @@ public class NegationTokenRelationshipProcessorTest {
 		runAssert("CT may not show the cyst.","show","cyst");
 		runAssert("She denies cyst.","deny","cyst");
 
+		runAssert("No cyst.","no","cyst");
+		runAssert("No back pain.","no","back");
+		
+		runAssert("No significant  enhancement is noted after contrast administration suggesting a  spectrum of simple cysts as well as proteinaceous/hemorrhagic cyst."
+				,"no","significant");
+		
+		runAssert("Skin biopsies showed no lesions.","no","lesions");
+
 	}
-	
+
 	private void runAssert(String sentenceText, String from, String to) throws Exception{
 		Sentence sentence = TestDataProvider.getSentences(sentenceText).get(0);
 		
@@ -83,5 +92,6 @@ public class NegationTokenRelationshipProcessorTest {
 		TokenRelationship relationship = tokenRelationships.get(0);
 		assertEquals(relationship.getFromToken().getToken(), from);
 		assertEquals(relationship.getToToken().getToken(), to);
+		assertEquals(1, tokenRelationships.size());
 	}
 }
