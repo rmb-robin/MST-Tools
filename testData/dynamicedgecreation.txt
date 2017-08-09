@@ -1,0 +1,4 @@
+r,Create Existence Edges From Sub Edges 
+c,t,dysn,t,f,,,,,,,,t
+c,f,,,,simple cyst modifiers;disease modifier; disease location,dysn,,,dysn,,,t
+c,f,,,,existence; existence-no; existence-maybe,dysn,,,dysn,,,t
