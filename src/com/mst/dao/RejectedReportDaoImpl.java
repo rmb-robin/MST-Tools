@@ -27,11 +27,16 @@ public class RejectedReportDaoImpl extends BaseDocumentDaoImpl<RejectedReport> i
 
 	public List<RejectedReport> getByNameAndDate(String orgId, LocalDate localDate) {
 		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+		Date nexDate = Date.from(localDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+		Date prevDate = Date.from(localDate.plusDays(-1).atTime(11, 59).atZone(ZoneId.systemDefault()).toInstant());
+		
 		Query<RejectedReport> query = datastoreProvider.getDataStore().createQuery(RejectedReport.class);
 		 query
-		 	.field("organizationName").equal(orgId);
-		 	query
-		 	.filter("processingDate =", date);
+		 	.field("organizationId").equal(orgId);
+		 	
+		 query
+		 	.filter("processingDate >=", date)
+		 	.filter("processingDate <", nexDate);
 		 return query.asList();
 	}
 }

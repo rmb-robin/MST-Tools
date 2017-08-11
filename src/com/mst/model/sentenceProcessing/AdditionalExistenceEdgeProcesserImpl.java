@@ -29,7 +29,7 @@ public class AdditionalExistenceEdgeProcesserImpl implements AdditionalExistence
 		for(TokenRelationship relationship: sentence.getTokenRelationships()){
 			String edgeName = relationship.getEdgeName();
 			if(doesEdgeEqualExistance(edgeName)){
-				if(isDsynTokenOnEdge(dysnToken.getToken(),relationship)) return null;
+				if(relationship.isToFromTokenMatch(dysnToken.getToken())) return null;
 			}
 			
 			if(oppositeEdge==null && doesEdgeEqualModifier(edgeName)){
@@ -61,10 +61,4 @@ public class AdditionalExistenceEdgeProcesserImpl implements AdditionalExistence
 		return null;
 	}
 	
-	private boolean isDsynTokenOnEdge(String dysnToken, TokenRelationship relationship){
-		if(relationship.getToToken().getToken().equals(dysnToken)) return true;
-		if(relationship.getFromToken().getToken().equals(dysnToken)) return true; 
-		return false;
-	}
-
 }
