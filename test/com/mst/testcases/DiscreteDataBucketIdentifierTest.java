@@ -37,16 +37,22 @@ public class DiscreteDataBucketIdentifierTest {
 	
 		String sentence = "Abdominal aortic aneurysm measuring 4 cm. Follow up yearly";
 		DiscreteData discreteData = new DiscreteData();
-		runTest(sentence,discreteData,"Bucket4");
+	//	runTest(sentence,discreteData,"Bucket4");
 		
-		sentence = "The abdominal aortic aneurysm measures 5.1 cm distal to the renal arteries. Vascular consultation is recommended.";
+	//	sentence = "The abdominal aortic aneurysm measures 5.1 cm distal to the renal arteries. Vascular consultation is recommended.";
 	//	runTest(sentence, discreteData, "Bucket6"); //need change here to 7 per visit time. 
 		
-		discreteData.setPatientAge(33);
-		sentence = "There is an enlarged thyroid nodule that appears to be heterogeneous and measures 3.1cm. Consider follow-up ultrasound.";
-		//runTest(sentence, discreteData, "Bucket2");  
+		discreteData.setPatientAge(32);
+		//sentence = "There is an enlarged thyroid nodule that appears to be heterogeneous and measures 3.1cm. Consider follow-up ultrasound.";
+		
+		sentence =  "3.1x2.5 cm simple cyst in the left ovary.";
+		DiscreteDataCustomField field = new DiscreteDataCustomField();
+		field.setFieldName("MenopausalStatus");
+		field.setValue("premenopausal");
+		discreteData.getCustomFields().add(field);
+		runTest(sentence, discreteData, "Bucket2"); 
 	}
-	
+
 	@Test
 	public void getComplianceTest() throws Exception{
 		
@@ -66,6 +72,8 @@ public class DiscreteDataBucketIdentifierTest {
 	
 		SentenceTextRequest request = new SentenceTextRequest();
 		request.setText("Recommend follow up in 5 years");
+		request.setConvertLargest(true);
+		request.setConvertMeasurements(true);
 		request.setDiscreteData(new DiscreteData());
 		SentenceProcessingResult result =  controller.processText(request);
 		
@@ -108,12 +116,12 @@ public class DiscreteDataBucketIdentifierTest {
 		DiscreteDataBucketIdentifierImpl identifier = new DiscreteDataBucketIdentifierImpl();
 		
 		SentenceRequest request = new SentenceRequest();
+		request.setConvertLargest(true);
+		request.setConvertMeasurements(true);
 		request.getSenteceTexts().add(sentence);
 		List<Sentence> sentences = controller.processSentences(request);
 		DiscreteDataBucketIdentifierResult result = identifier.getBucket(discreteData, sentences, fields);
 		assertEquals(expectedBucketName,result.getBucketName());
 	}
-	
-	
 }
  

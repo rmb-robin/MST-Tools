@@ -37,8 +37,8 @@ public class AdditionalExistenceEdgeProcesserTest {
 		assertEquals(1, relationships.size());
 		
 		TokenRelationship first = relationships.get(0);
-		assertEquals("cyst", first.getFromToken().getToken());
-		assertEquals("anechoic", first.getToToken().getToken());
+		assertEquals("anechoic", first.getFromToken().getToken());
+		assertEquals("cyst", first.getToToken().getToken());
 		
 		
 		result = sentenceController.processText(getRequest("simple right ovarian cyst."));

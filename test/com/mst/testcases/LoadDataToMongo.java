@@ -108,7 +108,7 @@ public class LoadDataToMongo {
 	}
 	
 	
-	//@Test
+//	@Test
 	public void loadDiscreteDataComplianceFields(){
 		DiscreteDataComplianceFieldProvider provider = new DiscreteDataComplianceFieldProvider();
 		DisceteDataComplianceDisplayFields fields =  provider.get("rad","rad");
@@ -131,7 +131,7 @@ public class LoadDataToMongo {
 		return result;
 	}
 	
-	@Test
+	//@Test
 	public void run_Test(){
 		List<DynamicEdgeCreationRule> input =new DynamicRuleProvider().getRules();
 		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();

@@ -53,8 +53,8 @@ public class NounRelationshipProcessorTest {
 		Sentence sentence = TestDataProvider.getSentences(text).get(0);
 		List<TokenRelationship> relationships = getTokenRelationships(sentence, 0);
 		
-		assertTrue(relationships.size()==1);
-		assertTrue(relationships.get(0).getEdgeName().equals("unit of measure"));
+		assertTrue(relationships.size()==3);
+		assertTrue(relationships.get(1).getEdgeName().equals("unit of measure"));
 		
 	}
 	

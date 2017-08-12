@@ -127,13 +127,14 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		
 		sentence.setTokenRelationships(new ArrayList<TokenRelationship>());
 		tokens = partOfSpeechAnnotator.annotate(tokens, this.sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
+		tokens = sentenceMeasureNormalizer.Normalize(tokens, isConvertMeasurements,isConvertLargest);
+		
 		tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
 		sentence.getTokenRelationships().addAll(nounrelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
 		tokens = prepPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseProcessingInput());
 		sentence.getTokenRelationships().addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
 		tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
 		
-		tokens = sentenceMeasureNormalizer.Normalize(tokens, isConvertMeasurements,isConvertLargest);
 		
 		List<TokenRelationship> negationRelationships =negationTokenRelationshipProcessor.process(tokens);
 		sentence.getTokenRelationships().addAll(negationRelationships); 

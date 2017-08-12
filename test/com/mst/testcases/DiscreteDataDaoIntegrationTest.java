@@ -20,7 +20,7 @@ import com.mst.util.MongoDatastoreProviderDefault;
 
 public class DiscreteDataDaoIntegrationTest {
 
-	@Test
+	//@Test
 	public void getQueryByOrgNameAndDate(){
 		DiscreteDataDaoImpl dao = new DiscreteDataDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());

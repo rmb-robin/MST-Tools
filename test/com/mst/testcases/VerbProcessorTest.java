@@ -93,8 +93,8 @@ public class VerbProcessorTest {
 	@Test 
 	public void test_linkModalVerbs() throws Exception{
 		testLinkingModalVerb("I am going to the doctor",VerbTense.Present,VerbType.LV,"am", "existence",true);
-		testLinkingModalVerb("there is a cyst",VerbTense.Present,VerbType.LV,"is", null,true);
-		testLinkingModalVerb("i was at the doctor",VerbTense.Past,VerbType.LV,"was", null,true);
+		testLinkingModalVerb("there is a cyst",VerbTense.Present,VerbType.LV,"is", "",true);
+		testLinkingModalVerb("i was at the doctor",VerbTense.Past,VerbType.LV,"was", "",true);
 		testLinkingModalVerb("i can have a cyst",VerbTense.Present,VerbType.MV,"can-have", "possibility",false);
 		testLinkingModalVerb("i can have had a cyst",VerbTense.Past,VerbType.LV,"can-have-had", "possibility",true);
 	}
