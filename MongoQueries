@@ -15,6 +15,10 @@ db.sentences.find({ "$and" : [ { "origSentence" : { "$regex" : "cyst"}} ,
 ]})
 
 
+Query Sentence by sentenceId
+
+db.sentences.find( { _id: ObjectID("598cb0b1bde4270bc52b9cb7") } ) 
+
     
     
     
