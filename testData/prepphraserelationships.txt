@@ -23,3 +23,14 @@ of,f,f,history,f,f,neop-can,t,f,existence-history
 of,f,f,evidence,f,f,dysn,t,f,existence
 of,f,f,evidence,f,f,neop-can,t,f,existence
 without,f,f,dysn,t,f,dysn,t,f,existence-no
+on,f,f,seen,f,f,bpoc,t,f,disease location
+at,f,f,dysn,t,f,bpoc,t,f,disease location
+with,f,f,associated,f,f,bpoc,t,f,disease location
+in,f,f,present,f,f,bpoc,t,f,disease location
+within,f,f,noted,f,f,bpoc,t,f,disease location
+in,f,f,observed,f,f,bpoc,t,f,disease location
+from,f,f,arising,f,f,bpoc,t,f,disease location
+off,f,f,dysn,t,f,bpoc,t,f,disease location
+on,f,f,dysn,t,f,bpoc,t,f,disease location
+within,f,f,seen,f,f,bpoc,t,f,disease location
+in,f,f,seen,f,f,bpoc,t,f,disease location

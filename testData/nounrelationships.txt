@@ -35,6 +35,7 @@ qlco-depth,t,dysn,t,null,disease modifier
 qlco-fixed,t,dysn,t,null,disease modifier
 qlco-sev,t,dysn,t,null,disease modifier
 qlco-simple,t,cyst,f,null,simple cyst modifiers
+qlco-simple,t,cysts,f,null,simple cyst modifiers
 qlco-sizeref,t,dysn,t,null,disease modifier
 qlco-sym,t,dysn,t,null,disease modifier
 qlco-tempor,t,proc,t,null,procedure timing
@@ -52,3 +53,7 @@ bpoc,t,ptconsul,t,null,consultation type
 ultrasound,f,follow-up,f,1,follow-up
 abdominal,f,aneurysm,f,1,disease location
 aortic,f,aneurysm,f,0,disease modifier
+recommend,f,proc,t,1,advise
+proc,t,recommended,f,2,advise
+clinically,f,abdominal,f,2,disease modifier
+evidence,f,seen,f,1,disease modifier
