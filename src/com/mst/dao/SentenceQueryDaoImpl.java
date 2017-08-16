@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
@@ -29,6 +30,7 @@ import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
+import com.mst.util.Constants;
 
 
 public class SentenceQueryDaoImpl implements SentenceQueryDao  {
@@ -387,11 +389,24 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return result;
 	}
 
-	public List<SentenceDb> getSentencesByToken(SentenceReprocessingInput input) {
+	public List<SentenceDb> getSentencesForReprocess(SentenceReprocessingInput input) {
 		Query<SentenceDb> query =   datastoreProvider.getDataStore().createQuery(SentenceDb.class);
 		 query
 		 .search(input.getToken())
-		 .field("organizationId").equal(input.getOrganizationId());		 
+		 .field("organizationId").equal(input.getOrganizationId())
+		 .field("reprocessId").notEqual(input.getReprocessId())
+		 .limit(input.getTakeSize());
 		 return query.asList();
 	}
-}
+	
+	
+	public List<SentenceDb> getSentencesByDiscreteDataIds(Set<String> ids){
+		initDaos();
+		List<DiscreteData> discreteData = discreteDataDao.getByIds(ids);
+		if(discreteData.isEmpty()) return new ArrayList<SentenceDb>();
+		Query<SentenceDb> query =   datastoreProvider.getDataStore().createQuery(SentenceDb.class);
+		 query
+		 .field("discreteData").hasAnyOf(discreteData);
+		 return query.asList();
+	}
+  } 

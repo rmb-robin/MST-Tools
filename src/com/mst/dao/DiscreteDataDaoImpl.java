@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.query.Query;
@@ -68,12 +69,7 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		}
 		
 		query.retrievedFields(true, "id","reportFinalizedDate");
-		
 		return query.asList();
-	//	List<ObjectId> result = new ArrayList<>();
-		
-		//discreteDatas.forEach(a-> result.add(a.getId()));
-		//return result;
 	}
 	
 	private void addDateQuery(LocalDate localdate, Query<DiscreteData> query, boolean isFirst){
@@ -98,5 +94,22 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		 .field("organizationId").equal(orgId)
 		 .filter("processingDate =", date);
 		 return query;
+	}
+
+	public List<DiscreteData> getByIds(Set<String> ids) {
+		List<ObjectId> objectids = new ArrayList<>();
+		ids.forEach(a-> objectids.add(new ObjectId(a)));
+		
+		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
+		 query
+		 .field("id").hasAnyOf(objectids);
+		 return query.asList();
+	}
+	
+	public String save(DiscreteData discreteData, boolean isReprocess){
+		if(!isReprocess) 
+			discreteData.setId(new ObjectId());
+		discreteData.setTimeStamps();
+		return super.save(discreteData);
 	}
 }

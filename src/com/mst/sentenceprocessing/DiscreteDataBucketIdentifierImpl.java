@@ -36,7 +36,7 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 				 if(bucket!=null) {
 					 DiscreteDataBucketIdentifierResult result = new DiscreteDataBucketIdentifierResult();
 					 result.setBucketName(bucket.getBucketName());
-					 result.setIsCompliant(issentenceCompliant(sentence,bucket));
+					 result.setIsCompliant(areAllSentenceCompliant(sentences,bucket));
 					 return result;
 				 }
 			   }
@@ -50,12 +50,23 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 		for(Map.Entry<String, HashSet<String>> entry : mandatoryEdges.entrySet()){
 			if(!tokensByEdgename.containsKey(entry.getKey())) return false;
 			List<TokenRelationship> tokenRelationships = tokensByEdgename.get(entry.getKey());
-			for(TokenRelationship tokenRelationship: tokenRelationships){
-				if(tokenRelationship.isToFromTokenSetMatch(entry.getValue())) continue;
-				return false;
-			}
+			if(!isSentenceMatchOnEdge(tokenRelationships,entry.getValue()))return false;
 		}
 		return true;
+	}
+	
+	private boolean isSentenceMatchOnEdge(List<TokenRelationship> sentenceTokenRelationships, HashSet<String> matchedTokFrom){
+		for(TokenRelationship tokenRelationship: sentenceTokenRelationships){
+			if(tokenRelationship.isToFromTokenSetMatch(matchedTokFrom)) return true;
+		}
+		return false;
+	}
+	
+	private boolean areAllSentenceCompliant(List<Sentence> sentences, ComplianceDisplayFieldsBucketItem bucket){
+		for(Sentence sentence: sentences){
+			if(issentenceCompliant(sentence, bucket)) return true;
+		}
+		return false;
 	}
 	
 	public boolean issentenceCompliant(Sentence sentence, ComplianceDisplayFieldsBucketItem bucket){
