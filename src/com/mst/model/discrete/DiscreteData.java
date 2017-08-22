@@ -34,7 +34,8 @@ public class DiscreteData {
 	private String examDescription; 
 	private String modality; 
 	private String resultStatus; 
-	private String reportFinalizedBy; 
+	private String reportFinalizedBy;
+	private String reportFinalizedById;
 	private LocalDate reportFinalizedDate; 
 	private int patientAge;
 
@@ -45,10 +46,28 @@ public class DiscreteData {
 	private boolean isCompliant;
 	private List<DiscreteDataCustomField> customFields; 
 	
+	private String orderControl;
+	
 	public DiscreteData(){
 		customFields = new ArrayList<>();
 	}
 
+	public String getReportFinalizedById() {
+		return reportFinalizedById;
+	}
+
+	public void setReportFinalizedById(String reportFinalizedById) {
+		this.reportFinalizedById = reportFinalizedById;
+	}
+
+	public String getOrderControl() {
+		return orderControl;
+	}
+
+	public void setOrderControl(String orderControl) {
+		this.orderControl = orderControl;
+	}
+	
 	public String getReadingLocation() {
 		return readingLocation;
 	}
