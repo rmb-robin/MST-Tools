@@ -13,7 +13,8 @@ import com.mst.model.discrete.DiscreteData;
 public interface DiscreteDataDao  extends IDao {
 	List<DiscreteData> getByNameAndDate(String orgName, LocalDate date);	
 	long getCountByNameAndDate(String orgName, LocalDate date);
-	List<DiscreteData> getDiscreteDataIds(DiscreteDataFilter dataFilter, String orgId);
+	List<DiscreteData> getDiscreteDatas(DiscreteDataFilter dataFilter, String orgId,boolean allvalues);
 	List<DiscreteData> getByIds(Set<String> ids);
 	String save(DiscreteData discreteData, boolean isReprocess);
+	void saveCollection(List<DiscreteData> discreteDatas);
 }

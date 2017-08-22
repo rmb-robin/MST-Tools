@@ -61,7 +61,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 	
 	private List<DiscreteData> getDiscreteDatas(SentenceQueryInput input){
-		return discreteDataDao.getDiscreteDataIds(input.getDiscreteDataFilter(), input.getOrganizationId());
+		return discreteDataDao.getDiscreteDatas(input.getDiscreteDataFilter(), input.getOrganizationId(),false);
 	}
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){

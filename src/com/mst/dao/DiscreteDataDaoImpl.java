@@ -35,7 +35,7 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		 return getQueryByOrgNameAndDate(orgId,localDate).countAll();
 	}
 	
-	public List<DiscreteData> getDiscreteDataIds(DiscreteDataFilter dataFilter, String orgId){
+	public List<DiscreteData> getDiscreteDatas(DiscreteDataFilter dataFilter, String orgId, boolean allValues){
 		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
 		query.disableValidation();
 		
@@ -68,7 +68,8 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 			addDateQuery(dataFilter.getReportFinalizedDate().get(1),query,false);
 		}
 		
-		query.retrievedFields(true, "id","reportFinalizedDate");
+		if(!allValues)
+			query.retrievedFields(true, "id","reportFinalizedDate");
 		return query.asList();
 	}
 	
@@ -111,5 +112,10 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 			discreteData.setId(new ObjectId());
 		discreteData.setTimeStamps();
 		return super.save(discreteData);
+	}
+
+	@Override
+	public void saveCollection(List<DiscreteData> discreteDatas) {
+		datastoreProvider.getDataStore().save(discreteDatas);
 	}
 }
