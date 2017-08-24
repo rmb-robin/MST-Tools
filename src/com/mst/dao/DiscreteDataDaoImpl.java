@@ -68,6 +68,45 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 			addDateQuery(dataFilter.getReportFinalizedDate().get(1),query,false);
 		}
 		
+		
+		if(!dataFilter.getProcessingDate().isEmpty()){
+			addDateQuery(dataFilter.getProcessingDate().get(0),query,true);
+			addDateQuery(dataFilter.getProcessingDate().get(0),query,false);
+		}
+		
+		if(!dataFilter.getPatientDob().isEmpty()){
+			addDateQuery(dataFilter.getPatientDob().get(0),query,true);
+			addDateQuery(dataFilter.getPatientDob().get(0),query,false);
+		}
+		
+		if(!dataFilter.getPatientMRN().isEmpty())
+			query.field("patientMRN").hasAnyOf(dataFilter.getPatientMRN());
+		
+		if(!dataFilter.getPatientAccount().isEmpty())
+			query.field("patientAccount").hasAnyOf(dataFilter.getPatientAccount());
+		
+		if(!dataFilter.getPatientEncounter().isEmpty())
+			query.field("patientEncounter").hasAnyOf(dataFilter.getPatientEncounter());
+		
+		if(!dataFilter.getVrReportId().isEmpty())
+			query.field("vrReportId").hasAnyOf(dataFilter.getVrReportId());
+		
+		if(!dataFilter.getAccessionNumber().isEmpty())
+			query.field("accessionNumber").hasAnyOf(dataFilter.getAccessionNumber());
+		
+		if(!dataFilter.getBucketName().isEmpty())
+			query.field("bucketName").hasAnyOf(dataFilter.getBucketName());
+		
+		if(dataFilter.getIsComplaint()!=null)
+			query.field("isComplaint").equal(dataFilter.getIsComplaint());
+	
+		if(!dataFilter.getReportFinalizedBy().isEmpty())
+			query.field("reportFinalizedBy").hasAnyOf(dataFilter.getReportFinalizedBy());
+	
+		//redo..
+    //	if(!dataFilter.getMenopausalStatus().isEmpty())
+	//		query.field("customFields.fieldName").hasAnyOf(dataFilter.getMenopausalStatus());
+	
 		if(!allValues)
 			query.retrievedFields(true, "id","reportFinalizedDate");
 		return query.asList();

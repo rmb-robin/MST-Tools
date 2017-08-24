@@ -13,6 +13,23 @@ public class DiscreteDataFilter {
 	private List<Integer> patientAge;
 	private List<LocalDate> reportFinalizedDate;
 	
+	private List<String> patientMRN; 
+	private List<String> patientAccount; 
+	private List<String> patientEncounter; 
+	private List<String> vrReportId;
+	private List<String> accessionNumber; 
+	private List<LocalDate> processingDate; 
+	private List<String> bucketName;
+	private Boolean isComplaint; 
+	private List<String> menopausalStatus;
+	private List<LocalDate>	patientDob;
+	private List<String> reportFinalizedBy; 
+	
+	
+	//questions. is processing date a rang should we epxcet to?
+	//report finailzied by or id?
+	// Report Finalized By,   
+	
 
 	public DiscreteDataFilter(){
 		resultStatus = new ArrayList<>();
@@ -22,6 +39,17 @@ public class DiscreteDataFilter {
 		modality = new ArrayList<>();
 		patientAge = new ArrayList<>();
 		reportFinalizedDate = new ArrayList<>();
+		
+		 patientMRN = new ArrayList<>(); 
+		 patientAccount = new ArrayList<>(); 
+		 patientEncounter = new ArrayList<>(); 
+		 vrReportId = new ArrayList<>();
+		 accessionNumber = new ArrayList<>(); 
+		 processingDate = new ArrayList<>(); 
+		 bucketName = new ArrayList<>();
+		 menopausalStatus = new ArrayList<>();
+		 patientDob  = new ArrayList<>();
+		 reportFinalizedBy = new ArrayList<>();
 	}
 	
 
@@ -78,5 +106,115 @@ public class DiscreteDataFilter {
 		if(patientAge.size()==2) return false;
 		if(reportFinalizedDate.size()==2) return false;
 		return true;
+	}
+
+
+	public List<String> getPatientMRN() {
+		return patientMRN;
+	}
+
+
+	public void setPatientMRN(List<String> patientMRN) {
+		this.patientMRN = patientMRN;
+	}
+
+
+	public List<String> getPatientAccount() {
+		return patientAccount;
+	}
+
+
+	public void setPatientAccount(List<String> patientAccount) {
+		this.patientAccount = patientAccount;
+	}
+
+
+	public List<String> getPatientEncounter() {
+		return patientEncounter;
+	}
+
+
+	public void setPatientEncounter(List<String> patientEncounter) {
+		this.patientEncounter = patientEncounter;
+	}
+
+
+	public List<String> getVrReportId() {
+		return vrReportId;
+	}
+
+
+	public void setVrReportId(List<String> vrReportId) {
+		this.vrReportId = vrReportId;
+	}
+
+
+	public List<String> getAccessionNumber() {
+		return accessionNumber;
+	}
+
+
+	public void setAccessionNumber(List<String> accessionNumber) {
+		this.accessionNumber = accessionNumber;
+	}
+
+
+	public List<LocalDate> getProcessingDate() {
+		return processingDate;
+	}
+
+
+	public void setProcessingDate(List<LocalDate> processingDate) {
+		this.processingDate = processingDate;
+	}
+
+
+	public List<String> getBucketName() {
+		return bucketName;
+	}
+
+
+	public void setBucketName(List<String> bucketName) {
+		this.bucketName = bucketName;
+	}
+
+
+	public Boolean getIsComplaint() {
+		return isComplaint;
+	}
+
+
+	public void setIsComplaint(Boolean isComplaint) {
+		this.isComplaint = isComplaint;
+	}
+
+
+	public List<String> getMenopausalStatus() {
+		return menopausalStatus;
+	}
+
+
+	public void setMenopausalStatus(List<String> menopausalStatus) {
+		this.menopausalStatus = menopausalStatus;
+	}
+
+
+	public List<LocalDate> getPatientDob() {
+		return patientDob;
+	}
+
+
+	public void setPatientDob(List<LocalDate> patientDob) {
+		this.patientDob = patientDob;
+	}
+
+
+	public List<String> getReportFinalizedBy() {
+		return reportFinalizedBy;
+	}
+
+
+	public void setReportFinalizedBy(List<String> reportFinalizedBy) {
+		this.reportFinalizedBy = reportFinalizedBy;
 	}
 }

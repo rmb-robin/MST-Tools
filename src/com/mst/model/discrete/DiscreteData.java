@@ -11,8 +11,9 @@ import org.mongodb.morphia.annotations.Converters;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mst.util.LocalDateConverter;
-
+import com.mst.jsonSerializers.ObjectIdJsonSerializer;;
 
 @Entity("discreteData")
 //@Indexes({
@@ -22,6 +23,7 @@ import com.mst.util.LocalDateConverter;
 public class DiscreteData {
 
 	@Id
+	@JsonSerialize(using=ObjectIdJsonSerializer.class)
 	private ObjectId id;
 	private String readingLocation;
 	private String patientMRN;
