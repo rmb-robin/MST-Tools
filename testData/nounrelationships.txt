@@ -57,10 +57,10 @@ recommend,f,proc,t,1,advise
 proc,t,recommended,f,2,advise
 clinically,f,abdominal,f,2,disease modifier
 evidence,f,seen,f,1,disease modifier
-incidental,f,dysn,t,new disease
-stable,f,dysn,t,disease stablity
-infrarenal,f,dysn,t,disease modifier
-fusiform,f,dysn,t,disease modifier
-previous,f,dysn,t,disease history
-dysn,t,resection,f,procedure location
-sonographic,f,evidence,f,procedure
+incidental,f,dysn,t,,new disease
+stable,f,dysn,t,,disease stablity
+infrarenal,f,dysn,t,,disease modifier
+fusiform,f,dysn,t,,disease modifier
+previous,f,dysn,t,,disease history
+dysn,t,resection,f,,procedure location
+sonographic,f,evidence,f,,procedure
