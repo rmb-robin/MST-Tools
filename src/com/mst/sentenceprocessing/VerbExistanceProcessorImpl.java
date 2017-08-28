@@ -133,18 +133,12 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private List<TokenRelationship> getTokenRelationshipForSingleToken(List<TokenRelationship> existingRelationships, WordToken token){
 		List<TokenRelationship> result = new ArrayList<>();
 		for(TokenRelationship tokenRelationship: existingRelationships){
-			if(tokenRelationship.getToToken().equals(token)){
-				result.add(tokenRelationship);
-				continue;
-			}
-			if(tokenRelationship.getFromToken().equals(token))
+			if(tokenRelationship.isToFromWordTokenMatch(token))
 				result.add(tokenRelationship);
 		}
 		return result;
 	}	
-	
-	
-	
+		
 	private void setVerbPhraseTokens(List<WordToken> tokens){
 		
 		verb = null;

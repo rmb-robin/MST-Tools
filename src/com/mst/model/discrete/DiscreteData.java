@@ -11,8 +11,9 @@ import org.mongodb.morphia.annotations.Converters;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mst.util.LocalDateConverter;
-
+import com.mst.jsonSerializers.ObjectIdJsonSerializer;;
 
 @Entity("discreteData")
 //@Indexes({
@@ -22,6 +23,7 @@ import com.mst.util.LocalDateConverter;
 public class DiscreteData {
 
 	@Id
+	@JsonSerialize(using=ObjectIdJsonSerializer.class)
 	private ObjectId id;
 	private String readingLocation;
 	private String patientMRN;
@@ -34,7 +36,8 @@ public class DiscreteData {
 	private String examDescription; 
 	private String modality; 
 	private String resultStatus; 
-	private String reportFinalizedBy; 
+	private String reportFinalizedBy;
+	private String reportFinalizedById;
 	private LocalDate reportFinalizedDate; 
 	private int patientAge;
 
@@ -45,10 +48,28 @@ public class DiscreteData {
 	private boolean isCompliant;
 	private List<DiscreteDataCustomField> customFields; 
 	
+	private String orderControl;
+	
 	public DiscreteData(){
 		customFields = new ArrayList<>();
 	}
 
+	public String getReportFinalizedById() {
+		return reportFinalizedById;
+	}
+
+	public void setReportFinalizedById(String reportFinalizedById) {
+		this.reportFinalizedById = reportFinalizedById;
+	}
+
+	public String getOrderControl() {
+		return orderControl;
+	}
+
+	public void setOrderControl(String orderControl) {
+		this.orderControl = orderControl;
+	}
+	
 	public String getReadingLocation() {
 		return readingLocation;
 	}

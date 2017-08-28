@@ -1,6 +1,7 @@
 package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import com.mst.model.SemanticType;
 import com.mst.model.discrete.ComplianceDisplayFieldsBucketItem;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
+import com.mst.model.discrete.DiscreteDataBucketGroup;
 import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.discrete.DiscreteDataCustomField;
 import com.mst.model.discrete.Followup;
@@ -25,22 +27,46 @@ import com.mst.model.sentenceProcessing.WordToken;
 public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdentifier {
 
 	public DiscreteDataBucketIdentifierResult getBucket(DiscreteData discreteData, List<Sentence> sentences,  DisceteDataComplianceDisplayFields fields){
-		for (Map.Entry<String, List<ComplianceDisplayFieldsBucketItem>> entry : fields.getBuckets().entrySet()) {
-			List<ComplianceDisplayFieldsBucketItem> filteredBuckets = findBucketsOnDiscrete(entry.getValue(), discreteData);
+		for (Map.Entry<String, DiscreteDataBucketGroup> entry : fields.getBucketGroups().entrySet()) {
+			List<ComplianceDisplayFieldsBucketItem> filteredBuckets = findBucketsOnDiscrete(entry.getValue().getBucketItems(), discreteData);
 			if(filteredBuckets.isEmpty()) continue;
 			for(Sentence sentence: sentences){
-				if(sentence.getOrigSentence().toLowerCase().contains(entry.getKey().toLowerCase())){
+				if(isSentenceMatchOnEdges(sentence, entry.getValue().getMatchedEdges())){
 				ComplianceDisplayFieldsBucketItem bucket = findBucketForSentence(sentence, filteredBuckets);
 				 if(bucket!=null) {
 					 DiscreteDataBucketIdentifierResult result = new DiscreteDataBucketIdentifierResult();
 					 result.setBucketName(bucket.getBucketName());
-					 //result.setIsCompliant(issentenceCompliant(sentence,bucket));
+					 result.setIsCompliant(areAllSentenceCompliant(sentences,bucket));
 					 return result;
 				 }
 			   }
 			}
 		}
 		return null;
+	}
+	
+	private boolean isSentenceMatchOnEdges(Sentence sentence, Map<String,HashSet<String>> mandatoryEdges){
+		Map<String,List<TokenRelationship>> tokensByEdgename = sentence.getTokenRelationsByNameMap();
+		for(Map.Entry<String, HashSet<String>> entry : mandatoryEdges.entrySet()){
+			if(!tokensByEdgename.containsKey(entry.getKey())) return false;
+			List<TokenRelationship> tokenRelationships = tokensByEdgename.get(entry.getKey());
+			if(!isSentenceMatchOnEdge(tokenRelationships,entry.getValue()))return false;
+		}
+		return true;
+	}
+	
+	private boolean isSentenceMatchOnEdge(List<TokenRelationship> sentenceTokenRelationships, HashSet<String> matchedTokFrom){
+		for(TokenRelationship tokenRelationship: sentenceTokenRelationships){
+			if(tokenRelationship.isToFromTokenSetMatch(matchedTokFrom)) return true;
+		}
+		return false;
+	}
+	
+	private boolean areAllSentenceCompliant(List<Sentence> sentences, ComplianceDisplayFieldsBucketItem bucket){
+		for(Sentence sentence: sentences){
+			if(issentenceCompliant(sentence, bucket)) return true;
+		}
+		return false;
 	}
 	
 	public boolean issentenceCompliant(Sentence sentence, ComplianceDisplayFieldsBucketItem bucket){
@@ -80,8 +106,7 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 			
 			List<TokenRelationship> matchedRelationships = relationshipMap.get(procedure.getEdgeName());
 			for(TokenRelationship tokenRelationship: matchedRelationships){
-				if(tokenRelationship.getFromToken().getToken().equals(procedure.getValue())) return true; 
-				if(tokenRelationship.getToToken().getToken().equals(procedure.getValue())) return true;
+				if(tokenRelationship.isToFromTokenMatch(procedure.getValue())) return true;
 			}
 		}
 		return false;

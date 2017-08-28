@@ -28,7 +28,7 @@ public class SentenceDb {
 	
 	@Id
 	private ObjectId id;
-	
+    private String reprocessId;	
 	
 	private int position;
 	private long lineId;
@@ -138,6 +138,12 @@ public class SentenceDb {
 	}
 	public void setDidFail(boolean didFail) {
 		this.didFail = didFail;
+	}
+	public String getReprocessId() {
+		return reprocessId;
+	}
+	public void setReprocessId(String reprocessId) {
+		this.reprocessId = reprocessId;
 	}
 	
 	

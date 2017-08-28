@@ -15,6 +15,13 @@ db.sentences.find({ "$and" : [ { "origSentence" : { "$regex" : "cyst"}} ,
 ]})
 
 
+Query Sentence by sentenceId
+
+db.sentences.find( { _id: ObjectID("598cb0b1bde4270bc52b9cb7") } ) 
+
+Query All Sentences by discreteData ObjectID
+
+db.sentences.find( { discreteData: DBRef("discreteData",ObjectID("598dba91bde4270bc5e89bdf") } ) 
     
     
     

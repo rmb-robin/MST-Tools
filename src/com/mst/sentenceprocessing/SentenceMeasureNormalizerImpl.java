@@ -3,6 +3,7 @@ package com.mst.sentenceprocessing;
 import java.util.List;
 
 import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.util.Constants;
@@ -81,6 +82,7 @@ public class SentenceMeasureNormalizerImpl implements SentenceMeasureNormalizer 
 					}
 					
 					word.setToken(String.valueOf(newValue));
+					word.setSemanticType(SemanticTypes.cardinalNumber);
 				}
 			}
 		}

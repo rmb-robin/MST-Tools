@@ -116,13 +116,7 @@ public class PrepPhraseRelationshipProcessorTest {
 		runAssert(true,"No follow up ultrasound recommended in this postmenopausal post ovarian cancer treated patient as new labs negative for ca125.", relationships);
 	}
 	
-	@Test
-	public void runTest() throws Exception{
-		int i = 1;
-		runAssert(true,"she has cancer of the right kidney.", relationships);
-	}
-	
-	
+
 	@Test
 	public void process()throws Exception{
 		

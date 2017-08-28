@@ -94,7 +94,7 @@ public class SentenceQueryDaoIntergrationTest {
 
 	}
 
-	@Test 
+	//@Test 
 	public void runQueryForNumericMatch(){
 		SentenceQueryDaoImpl dao = new SentenceQueryDaoImpl();
 		SentenceQueryInput input = new SentenceQueryInput();
@@ -114,7 +114,7 @@ public class SentenceQueryDaoIntergrationTest {
 		int t = size;
 	}
 	
-	@Test
+	//@Test
 	public void runQuery(){
 		SentenceQueryDaoImpl dao = new SentenceQueryDaoImpl();
 		SentenceQueryInput input = new SentenceQueryInput();

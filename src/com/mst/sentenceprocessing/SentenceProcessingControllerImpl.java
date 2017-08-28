@@ -6,6 +6,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
+import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
 import com.mst.interfaces.sentenceprocessing.ExistenceToExistenceNoConverter;
 import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
@@ -51,6 +52,8 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	private AdditionalExistenceEdgeProcesser additionalExistenceEdgeProcesser;
 	private SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput;
 	private ExistenceToExistenceNoConverter existenceToExistenceNoConverter;
+	private DistinctTokenRelationshipDeterminer distinctTokenRelationshipDeterminer;
+	
 	
 	public SentenceProcessingControllerImpl(){
 		ngramProcessor = new NGramsSentenceProcessorImpl();
@@ -68,6 +71,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		verbExistanceProcessor = new VerbExistanceProcessorImpl();
 		additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
 		existenceToExistenceNoConverter = new ExistenceToExistenceNoConverterImpl();
+		distinctTokenRelationshipDeterminer = new DistinctTokenRelationshipDeterminerImpl();
 	}
 	
 	
@@ -115,7 +119,6 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		
 		List<Sentence> sentences = getSentences(request);
 		return processSentences(sentences, request.isConvertMeasurements(),request.isConvertLargest());
-	
 	}
 	
 	private Sentence processSentence(Sentence sentence, boolean isConvertMeasurements,boolean isConvertLargest ) throws Exception{
@@ -124,24 +127,29 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		
 		sentence.setTokenRelationships(new ArrayList<TokenRelationship>());
 		tokens = partOfSpeechAnnotator.annotate(tokens, this.sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
+		tokens = sentenceMeasureNormalizer.Normalize(tokens, isConvertMeasurements,isConvertLargest);
+		
 		tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
 		sentence.getTokenRelationships().addAll(nounrelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
 		tokens = prepPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseProcessingInput());
 		sentence.getTokenRelationships().addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
 		tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
 		
-		tokens = sentenceMeasureNormalizer.Normalize(tokens, isConvertMeasurements,isConvertLargest);
 		
-		List<TokenRelationship> negationRelationships = negationTokenRelationshipProcessor.process(tokens); 
-		sentence.setTokenRelationships(existenceToExistenceNoConverter.convertExistenceNo(negationRelationships, sentence.getTokenRelationships()));
-		
+		List<TokenRelationship> negationRelationships =negationTokenRelationshipProcessor.process(tokens);
+		sentence.getTokenRelationships().addAll(negationRelationships); 
+
 		sentence.getTokenRelationships().addAll(verbExistanceProcessor.process(sentence));
 		
 		TokenRelationship additionalExistence = additionalExistenceEdgeProcesser.process(sentence);
 		if(additionalExistence!=null)
 			sentence.getTokenRelationships().add(additionalExistence);
 	
+		sentence.setTokenRelationships(existenceToExistenceNoConverter.convertExistenceNo(negationRelationships,sentence.getTokenRelationships()));
+		
 		sentence.setModifiedWordList(tokens);
+		List<TokenRelationship> distinctTokenRelations = distinctTokenRelationshipDeterminer.getDistinctTokenRelationships(sentence);
+		sentence.setTokenRelationships(distinctTokenRelations);
 		return sentence;
 	}
 	

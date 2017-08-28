@@ -14,9 +14,17 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 		TokenRelationship tokenRelationship = new TokenRelationship();
 		tokenRelationship.setEdgeName(edgeName);
 		tokenRelationship.setFrameName(frameName);
-		tokenRelationship.setFromToken(fromToken);
-		tokenRelationship.setToToken(toToken);
-		//tokenRelationship.setCreatedTime(DateTime.now());
+	
+		if(fromToken.getPosition()<toToken.getPosition())
+		{
+			tokenRelationship.setFromToken(fromToken);
+			tokenRelationship.setToToken(toToken);
+		}
+		else 
+		{
+			tokenRelationship.setFromToken(toToken);
+			tokenRelationship.setToToken(fromToken);
+		}
 		return tokenRelationship;
 	}
 }

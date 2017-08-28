@@ -17,10 +17,10 @@ public class DisceteDataComplianceDisplayFields {
 	private ObjectId id; 
 	private String orgId; 
 	private String orgName;
-	private Map<String,List<ComplianceDisplayFieldsBucketItem>> buckets;
+	private Map<String,DiscreteDataBucketGroup> bucketGroups;
 
 	public DisceteDataComplianceDisplayFields(){
-		buckets = new HashMap<>();
+		bucketGroups = new HashMap<>();
 	}
 	
 	public ObjectId getId() {
@@ -47,13 +47,14 @@ public class DisceteDataComplianceDisplayFields {
 		this.orgName = orgName;
 	}
 
-	public Map<String, List<ComplianceDisplayFieldsBucketItem>> getBuckets() {
-		return buckets;
+	public Map<String, DiscreteDataBucketGroup> getBucketGroups() {
+		return bucketGroups;
 	}
 
-	public void setBuckets(Map<String, List<ComplianceDisplayFieldsBucketItem>> buckets) {
-		this.buckets = buckets;
-	} 
+	public void setBucketGroups(Map<String, DiscreteDataBucketGroup> bucketGroups) {
+		this.bucketGroups = bucketGroups;
+	}
+
 
 
 	

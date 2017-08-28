@@ -23,7 +23,7 @@ public class QueryBuildHelperTest {
 
 	private MongoDatastoreProvider datastoreProvider;
 	
-	@Test 
+	//@Test 
 	public void buildQuery(){
 		datastoreProvider = new MongoDatastoreProviderDefault();
 		Query<SentenceDb> query = datastoreProvider.getDataStore().createQuery(SentenceDb.class); 
@@ -38,7 +38,7 @@ public class QueryBuildHelperTest {
 		List<SentenceDb>  r = query.asList();
 	}
 	
-	@Test
+	//@Test
 	public void updateSentences(){	
 		 SentenceDaoImpl dao = new SentenceDaoImpl();
 		 dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());

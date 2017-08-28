@@ -1,10 +1,14 @@
 package com.mst.metadataProviders;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.mst.model.discrete.ComplianceDisplayFieldsBucketItem;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
+import com.mst.model.discrete.DiscreteDataBucketGroup;
 import com.mst.model.discrete.Followup;
 import com.mst.model.discrete.FollowupProcedure;
 
@@ -23,7 +27,11 @@ public class DiscreteDataComplianceFieldProvider {
 			String[] values = line.split(",");
 			if(values[0].equals("t")){
 				dieseName = values[1];
-				result.getBuckets().put(dieseName,new ArrayList<>());
+				result.getBucketGroups().put(dieseName,new DiscreteDataBucketGroup());
+				continue;
+			}
+			if(values[0].equals("e")){
+				processBucketGroupEdges(values, dieseName);
 				continue;
 			}
 			processLine(values, dieseName);
@@ -55,7 +63,22 @@ public class DiscreteDataComplianceFieldProvider {
 		bucketItem.setUnitOfMeasure(values[7]);
 		
 		bucketItem.setFollowUp(createFollowup(values));
-		result.getBuckets().get(dieseName).add(bucketItem);
+		result.getBucketGroups().get(dieseName).getBucketItems().add(bucketItem);
+	}
+	
+	private void processBucketGroupEdges(String[] contents, String dieaseName)	{
+		//do processing of the line. 
+		
+		String edgesString = contents[1];
+		String[] edges =  edgesString.split("\\|");
+		
+		for(String edgeInput: edges){
+			String[] edgeSplit = edgeInput.split(";");
+			String edgeName = edgeSplit[0];
+			String tokens = edgeSplit[1];
+			HashSet<String> tokensHash = new HashSet<String>(Arrays.asList(tokens.split("-")));
+			result.getBucketGroups().get(dieaseName).getMatchedEdges().put(edgeName, tokensHash);
+		}
 	}
 	
 	private List<FollowupProcedure> getFollowupProcedures(String[] values){

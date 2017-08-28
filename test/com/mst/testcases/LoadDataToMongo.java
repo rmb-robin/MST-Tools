@@ -18,10 +18,12 @@ import com.mst.dao.SentenceDaoImpl;
 import com.mst.interfaces.dao.DisceteDataComplianceDisplayFieldsDao;
 import com.mst.interfaces.dao.RejectedReportDao;
 import com.mst.metadataProviders.DiscreteDataComplianceFieldProvider;
+import com.mst.metadataProviders.DynamicRuleProvider;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.requests.RejectedReport;
 import com.mst.model.requests.SentenceRequest;
+import com.mst.model.sentenceProcessing.DynamicEdgeCreationRule;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
@@ -106,7 +108,7 @@ public class LoadDataToMongo {
 	}
 	
 	
-	@Test
+//	@Test
 	public void loadDiscreteDataComplianceFields(){
 		DiscreteDataComplianceFieldProvider provider = new DiscreteDataComplianceFieldProvider();
 		DisceteDataComplianceDisplayFields fields =  provider.get("rad","rad");
@@ -128,5 +130,12 @@ public class LoadDataToMongo {
 		Sentence result = sentences.get(0);
 		return result;
 	}
-
+	
+	//@Test
+	public void run_Test(){
+		List<DynamicEdgeCreationRule> input =new DynamicRuleProvider().getRules();
+		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();
+		ds.delete(ds.createQuery(DynamicEdgeCreationRule.class));
+		ds.save(input);
+	}
 }

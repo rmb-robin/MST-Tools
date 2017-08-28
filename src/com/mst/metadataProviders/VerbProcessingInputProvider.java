@@ -12,7 +12,7 @@ import com.mst.model.sentenceProcessing.LinkingModalVerbItem;
 import com.mst.model.sentenceProcessing.VerbProcessingInput;
 import com.mst.sentenceprocessing.LinkingModalVerbItemFactoryImpl;
 
-public class VerbProcessingInputProvider {
+public class VerbProcessingInputProvider extends BaseProvider {
 
 	private VerbProcessingInput verbProcessingInput;
 	private ActionVerbTable acttionVerbTable;
@@ -57,12 +57,6 @@ public class VerbProcessingInputProvider {
 			state = getString(contents[3]);
 		LinkingModalVerbItem item = linkingModalVerbItemFactory.create(getString(contents[1]),getString(contents[2]), contents[0],state);
 		verbProcessingInput.getLinkingModalVerbMap().put(token, item);
-	}
-	
-	private String getString(String val){
-		if(val==null) return null; 
-		if(val.equals("")) return null;
-		return val;
 	}
 	
 	private void processActionVerbLine(String line){

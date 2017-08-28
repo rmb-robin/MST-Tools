@@ -6,6 +6,6 @@ import com.mst.model.sentenceProcessing.TokenRelationship;
 
 public interface ExistenceToExistenceNoConverter {
 
-	List<TokenRelationship> convertExistenceNo(List<TokenRelationship> negationRelations, List<TokenRelationship> existing);
+	List<TokenRelationship> convertExistenceNo(List<TokenRelationship> negationRelations, List<TokenRelationship> allTokenRelationships);
 	
 }

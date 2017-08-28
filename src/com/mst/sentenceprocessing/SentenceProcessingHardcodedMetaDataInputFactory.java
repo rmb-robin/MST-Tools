@@ -1,6 +1,7 @@
 package com.mst.sentenceprocessing;
 
 import com.mst.interfaces.SentenceProcessingMetaDataInputFactory;
+import com.mst.metadataProviders.DynamicRuleProvider;
 import com.mst.metadataProviders.NGramsHardCodedProvider;
 import com.mst.metadataProviders.PartOfSpeechHardcodedAnnotatorEntityProvider;
 import com.mst.metadataProviders.RelationshipInputProviderFileImpl;
@@ -21,6 +22,7 @@ public class SentenceProcessingHardcodedMetaDataInputFactory implements Sentence
 		metaDataInput.setVerbPhraseInput(new VerbPhraseInputFactoryImpl().create());
 		metaDataInput.setVerbProcessingInput(new VerbProcessingInputProvider().getInput());
 		metaDataInput.setPhraseRelationshipMappings(new RelationshipInputProviderFileImpl().getPrepPhraseRelationshipMapping());
+		metaDataInput.setDynamicEdgeCreationRules(new DynamicRuleProvider().getRules());
 		return metaDataInput;
 	}
 }

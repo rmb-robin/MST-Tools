@@ -21,7 +21,7 @@ public class SentenceProcessingMetaDataInput {
 	private PrepositionPhraseProcessingInput phraseProcessingInput;
 	private VerbPhraseInput verbPhraseInput;
 	private List<PrepPhraseRelationshipMapping> phraseRelationshipMappings;
-	
+	private List<DynamicEdgeCreationRule> dynamicEdgeCreationRules;
 	
 	public List<NGramsModifierEntity> getNgramsInput() {
 		return ngramsInput;
@@ -76,5 +76,11 @@ public class SentenceProcessingMetaDataInput {
 	}
 	public void setId(ObjectId id) {
 		this.id = id;
+	}
+	public List<DynamicEdgeCreationRule> getDynamicEdgeCreationRules() {
+		return dynamicEdgeCreationRules;
+	}
+	public void setDynamicEdgeCreationRules(List<DynamicEdgeCreationRule> dynamicEdgeCreationRules) {
+		this.dynamicEdgeCreationRules = dynamicEdgeCreationRules;
 	}
 }

@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.query.Query;
@@ -34,7 +35,7 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		 return getQueryByOrgNameAndDate(orgId,localDate).countAll();
 	}
 	
-	public List<DiscreteData> getDiscreteDataIds(DiscreteDataFilter dataFilter, String orgId){
+	public List<DiscreteData> getDiscreteDatas(DiscreteDataFilter dataFilter, String orgId, boolean allValues){
 		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
 		query.disableValidation();
 		
@@ -67,13 +68,48 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 			addDateQuery(dataFilter.getReportFinalizedDate().get(1),query,false);
 		}
 		
-		query.retrievedFields(true, "id","reportFinalizedDate");
 		
+		if(!dataFilter.getProcessingDate().isEmpty()){
+			addDateQuery(dataFilter.getProcessingDate().get(0),query,true);
+			addDateQuery(dataFilter.getProcessingDate().get(0),query,false);
+		}
+		
+		if(!dataFilter.getPatientDob().isEmpty()){
+			addDateQuery(dataFilter.getPatientDob().get(0),query,true);
+			addDateQuery(dataFilter.getPatientDob().get(0),query,false);
+		}
+		
+		if(!dataFilter.getPatientMRN().isEmpty())
+			query.field("patientMRN").hasAnyOf(dataFilter.getPatientMRN());
+		
+		if(!dataFilter.getPatientAccount().isEmpty())
+			query.field("patientAccount").hasAnyOf(dataFilter.getPatientAccount());
+		
+		if(!dataFilter.getPatientEncounter().isEmpty())
+			query.field("patientEncounter").hasAnyOf(dataFilter.getPatientEncounter());
+		
+		if(!dataFilter.getVrReportId().isEmpty())
+			query.field("vrReportId").hasAnyOf(dataFilter.getVrReportId());
+		
+		if(!dataFilter.getAccessionNumber().isEmpty())
+			query.field("accessionNumber").hasAnyOf(dataFilter.getAccessionNumber());
+		
+		if(!dataFilter.getBucketName().isEmpty())
+			query.field("bucketName").hasAnyOf(dataFilter.getBucketName());
+		
+		if(dataFilter.getIsComplaint()!=null)
+			query.field("isComplaint").equal(dataFilter.getIsComplaint());
+	
+		if(!dataFilter.getReportFinalizedBy().isEmpty())
+			query.field("reportFinalizedBy").hasAnyOf(dataFilter.getReportFinalizedBy());
+	
+		//redo..
+    //	if(!dataFilter.getMenopausalStatus().isEmpty())
+	//		query.field("customFields.fieldName").hasAnyOf(dataFilter.getMenopausalStatus());
+	
+		if(!allValues)
+			query.retrievedFields(true, "id","reportFinalizedDate");
 		return query.asList();
-	//	List<ObjectId> result = new ArrayList<>();
-		
-		//discreteDatas.forEach(a-> result.add(a.getId()));
-		//return result;
 	}
 	
 	private void addDateQuery(LocalDate localdate, Query<DiscreteData> query, boolean isFirst){
@@ -98,5 +134,27 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		 .field("organizationId").equal(orgId)
 		 .filter("processingDate =", date);
 		 return query;
+	}
+
+	public List<DiscreteData> getByIds(Set<String> ids) {
+		List<ObjectId> objectids = new ArrayList<>();
+		ids.forEach(a-> objectids.add(new ObjectId(a)));
+		
+		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
+		 query
+		 .field("id").hasAnyOf(objectids);
+		 return query.asList();
+	}
+	
+	public String save(DiscreteData discreteData, boolean isReprocess){
+		if(!isReprocess) 
+			discreteData.setId(new ObjectId());
+		discreteData.setTimeStamps();
+		return super.save(discreteData);
+	}
+
+	@Override
+	public void saveCollection(List<DiscreteData> discreteDatas) {
+		datastoreProvider.getDataStore().save(discreteDatas);
 	}
 }

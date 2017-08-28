@@ -14,8 +14,7 @@ public class NGramsHardCodedProvider implements NGramsProvider {
 	private String getFullFilePath(String filePath){
 		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + filePath;
 	}
-	
-	
+
 	public List<NGramsModifierEntity> getNGrams() {
 		List<NGramsModifierEntity> result = new ArrayList<>();
 		
