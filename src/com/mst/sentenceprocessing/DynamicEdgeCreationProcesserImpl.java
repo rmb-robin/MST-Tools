@@ -2,9 +2,11 @@ package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcesser;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
+import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.sentenceProcessing.DynamicEdgeCondition;
 import com.mst.model.sentenceProcessing.DynamicEdgeCreationRule;
 import com.mst.model.sentenceProcessing.Sentence;
@@ -19,8 +21,7 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
 		tokenRelationshipFactory = new TokenRelationshipFactoryImpl();
 	}
 	
-	//done..
-	@Override
+
 	public List<TokenRelationship> process(List<DynamicEdgeCreationRule> rules, Sentence sentence) {
 		// TODO Auto-generated method stub
 		List<TokenRelationship> results = new ArrayList<>();
@@ -45,7 +46,7 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
 		if(condition.isCondition1Token())
 			isValid = isTokenConditionValid(condition,sentence);
 		else
-			isValid = isTokenRelationshipValid(condition);
+			isValid = isTokenRelationshipValid(condition,sentence);
 		
 		if(condition.getIsEqualTo())
 			return isValid;
@@ -71,13 +72,46 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
 		return token.getToken().equals(value);
 		
 	}
-	private boolean isTokenRelationshipValid(DynamicEdgeCondition condition){
-		return true;
+
+	private boolean isTokenRelationshipValid(DynamicEdgeCondition condition,Sentence sentence){
+		 if(condition.getEdgeNames().isEmpty()) return true;
+		 Map<String,List<TokenRelationship>> map = sentence.getTokenRelationsByNameMap();
+		 for(String edgeName: condition.getEdgeNames()){
+			 if(map.containsKey(edgeName)){
+				 if(isTokenRelationshipmatch(map.get(edgeName),condition))return true;
+			 }
+		 }
+		 return false;
+		 
 	}
 	
+	
+	private boolean areTokensMatch (boolean isSementicType, boolean isPos, WordToken token,List<String> values){
+		for(String value: values){
+			if(isTokenAMatch(isSementicType, isPos, token, value)) return true;
+		}
+		return false;
+	}
+	
+	private boolean isTokenRelationshipmatch(List<TokenRelationship> tokenRelationships, DynamicEdgeCondition condition){
+		if(condition.getToTokens().isEmpty() && condition.getFromTokens().isEmpty()) return true;
+		
+		for(TokenRelationship tokenRelationship: tokenRelationships){
+			if(!condition.getFromTokens().isEmpty()){
+				if(!areTokensMatch(condition.getIsFromTokenSemanticType(), condition.getIsFromTokenPOSType(), tokenRelationship.getFromToken(),condition.getFromTokens()))
+					continue;
+			}
+			
+			if(!condition.getToken().isEmpty()){
+				if(areTokensMatch(condition.getIsToTokenSemanticType(), condition.getIsToTokenPOSType(), tokenRelationship.getToToken(),condition.getFromTokens()))
+					return true;
+			}
+		}
+		return false;
+	}
 
 	private TokenRelationship create(DynamicEdgeCreationRule rule){
-		return tokenRelationshipFactory.create("","", null,null);
+		return tokenRelationshipFactory.create("DynamicEdge",EdgeTypes.related, null,null);
 	}
 
 }

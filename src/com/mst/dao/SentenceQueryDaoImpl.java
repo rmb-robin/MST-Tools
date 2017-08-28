@@ -40,6 +40,11 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		public List<SentenceDb> sentences;
 	}
 	
+	private class IsEdgeMatchOnQueryResult{
+		public boolean isMatch; 
+		public boolean didTokenRelationsContainAnyMatches;
+	}
+	
 	private MongoDatastoreProvider datastoreProvider;
 	private HashSet<String> processedSentences; 
 	
@@ -143,10 +148,20 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			}
 				
 			if(!tokenMatch) continue;
-			if(!shouldAddSentenceToResult(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges())) continue;
+			if(shouldByPassResult(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges(), sentenceQueryInstance.getExclusiveEdges())) continue;
+		
 			matchedIds.add(entry.getKey());
 		 }
 		updateExistingResults(matchedIds);
+	}
+	
+	private boolean shouldByPassResult(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries,List<EdgeQuery> exclusionEdgeQueries){
+		IsEdgeMatchOnQueryResult edgeMatchOnQueryResult  = AreEdgesMatchOnQuery(existingtokenRelationships,edgeQueries);
+		if(!edgeMatchOnQueryResult.isMatch) return true;
+		
+		edgeMatchOnQueryResult  = AreEdgesMatchOnQuery(existingtokenRelationships,exclusionEdgeQueries);
+		if(edgeMatchOnQueryResult.isMatch && edgeMatchOnQueryResult.didTokenRelationsContainAnyMatches) return true;
+		return false;
 	}
 	
 	private void updateExistingResults(HashSet<String> matchedIds){
@@ -183,7 +198,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
 			 List<SentenceDb> sentences = query.asList();
 			 result.sentences.addAll(sentences);
-			 result.sentenceQueryResult.addAll(getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges()));
+			 result.sentenceQueryResult.addAll(getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges(), sentenceQueryInstance.getExclusiveEdges()));
 		}
 		return result;
 	}
@@ -222,14 +237,15 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return null;
 	}
 	
-	private boolean shouldAddSentenceToResult(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQuerys){
-		
+	private IsEdgeMatchOnQueryResult AreEdgesMatchOnQuery(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries){	
+		IsEdgeMatchOnQueryResult result = new IsEdgeMatchOnQueryResult();
 		Map<String,List<TokenRelationship>> relationshipsByEdgeName = convertSentenceRelationshipsToMap(existingtokenRelationships);
-		for(EdgeQuery edgeQuery: edgeQuerys){
+		for(EdgeQuery edgeQuery: edgeQueries){
 			if(!relationshipsByEdgeName.containsKey(edgeQuery.getName()))continue;
 			HashSet<String> edgeValues = edgeQuery.getValuesLower();
 			if(edgeValues==null || edgeValues.isEmpty()) continue;
 			
+			result.didTokenRelationsContainAnyMatches = true;
 			List<String> edgeValuesList = new ArrayList<>(edgeValues);
 			
 			List<TokenRelationship> tokenRelationships = relationshipsByEdgeName.get(edgeQuery.getName());
@@ -249,15 +265,23 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 				}
 				
 				if(!isEdgeNumeric){
-				if(!edgeValues.contains(relationship.getFromToken().getToken()) && 
-				   !edgeValues.contains(relationship.getToToken().getToken())) return false;
+					if(!edgeValues.contains(relationship.getFromToken().getToken()) && 
+					   !edgeValues.contains(relationship.getToToken().getToken())) {
+						result.isMatch = false; 
+						return result;
+					}
 				}
 			}
-			if(isEdgeNumeric && !isEdgeInRange) return false;
+			if(isEdgeNumeric && !isEdgeInRange){
+				result.isMatch = false; return result;
+			}
 		}
-		return true;
+		
+		result.isMatch = true;
+		return result;
+		
 	}
-
+	
 	private boolean isTokenCardinal(WordToken wordToken){
 		if(wordToken.getSemanticType()==null);
 		return wordToken.getSemanticType().equals(SemanticTypes.cardinalNumber);
@@ -289,16 +313,16 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return value.matches("[-+]?\\d*\\.?\\d+");
 	}
 	
-	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery){
-		
+	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, List<EdgeQuery> exclusiveEdges){
+		 
 		List<SentenceQueryResult> result = new ArrayList<>();
 		for(SentenceDb sentenceDb : sentences){
 			try{
 			String id = sentenceDb.getId().toString();
-
-			if(!shouldAddSentenceToResult(sentenceDb.getTokenRelationships(),edgeQuery)) continue;
-			
 			if(processedSentences.contains(id))continue;
+			if(shouldByPassResult(sentenceDb.getTokenRelationships(),edgeQuery,exclusiveEdges)) continue;
+		
+			
 			processedSentences.add(id);
 			String oppositeToken = null;
 			TokenRelationship foundRelationship=null;

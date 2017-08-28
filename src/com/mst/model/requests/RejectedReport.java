@@ -30,6 +30,8 @@ public class RejectedReport {
 	private String accessionNumber;
 	private List<String> missingFields; 
 	private LocalDate processingDate; 
+	private String readingLocation;
+	
 	//private LocalDateTime processingTime; 
 	
 	public RejectedReport(){
@@ -88,15 +90,19 @@ public class RejectedReport {
 	//	this.processingTime = LocalDateTime.now();
 	}
 
-
-
 	public String getOrganizationName() {
 		return organizationName;
 	}
 
-
-
 	public void setOrganizationName(String organizationName) {
 		this.organizationName = organizationName;
+	}
+
+	public String getReadingLocation() {
+		return readingLocation;
+	}
+
+	public void setReadingLocation(String readingLocation) {
+		this.readingLocation = readingLocation;
 	}
 }

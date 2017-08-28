@@ -80,7 +80,6 @@ public class Sentence {
 		return result;
 	}
 	
-	
 	public boolean doesSentenceContainVerb(){
 		for(WordToken token: modifiedWordList){
 			if(token.isVerb()) return true;
