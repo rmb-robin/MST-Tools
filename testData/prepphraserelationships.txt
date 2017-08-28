@@ -18,8 +18,6 @@ in,f,f,follow-up,f,f,tempor,t,f,supp care
 without,f,f,calcifications,f,f,dysn,t,f,existence-no
 with,f,f,correlation,f,f,history,f,f,history review
 to,f,f,up,f,f,uom,t,f,range value
-of,f,f,history,f,f,dysn,t,f,existence-history
-of,f,f,history,f,f,neop-can,t,f,existence-history
 of,f,f,evidence,f,f,dysn,t,f,existence
 of,f,f,evidence,f,f,neop-can,t,f,existence
 without,f,f,dysn,t,f,dysn,t,f,existence-no
@@ -34,3 +32,7 @@ off,f,f,dysn,t,f,bpoc,t,f,disease location
 on,f,f,dysn,t,f,bpoc,t,f,disease location
 within,f,f,seen,f,f,bpoc,t,f,disease location
 in,f,f,seen,f,f,bpoc,t,f,disease location
+for,f,f,screening,f,f,dysn,t,f,procedure
+of,f,f,history,f,f,dysn,t,f,disease-history
+of,f,f,history,f,f,neop-can,t,f,disease-history
+of,f,f,redemonstration,f,f,dysn,t,f,disease-history
