@@ -1,19 +1,16 @@
-r,Create Existence Edges From Sub Edges 
+r,Create Existence Edges From Sub Edges,existence,simple cyst modifiers; disease modifier; disease location,,f,dysn,t 
 c,t,dysn,t,f,,,,,,,,t
 c,f,,,,simple cyst modifiers;disease modifier; disease location,dysn,,,dysn,,,t
 c,f,,,,existence; existence-no; existence-maybe,dysn,,,dysn,,,t
-r,Create Measurement Edge
+r,Create Measurement Edge,measure,,cm,f,dysn,t
 c,f,,,,existence,dysn,t,f,dysn,t,f,t
 c,f,,,,unit of measure,,,,,,,t
 c,f,,,,measure,,,,,,,t
-r,Create Disease Location Edge
+r,Create Disease Location Edge,disease location,,bpoc,t,dysn,t
 c,f,,,,existence,dysn,t,f,dysn,t,f,t
 c,f,,,,laterality,,,,,,,t
 c,f,,,,disease location,,,,,,,t
-r,Ticket 146
+r,Ticket 146,simple cyst modifiers,ovary; ovarian; ovaries,,f,dysn,t
 c,t,cyst,f,f,,,,,,,,?
 c,f,,,,disease modifier,ovary; ovarian; ovaries,,,ovary; ovarian; ovaries,,,?
 c,f,,,,simple cyst modifiers,cyst,,,cyst,,,f
-r,Assign ICD 10 Code
-c,f,,,,existence,cancer,,,cancer,,,t
-c,f,,,,disease location,prostate,,,prostate,,,?
