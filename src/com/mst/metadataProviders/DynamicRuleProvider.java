@@ -2,6 +2,7 @@ package com.mst.metadataProviders;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.mst.model.sentenceProcessing.DynamicEdgeCondition;
@@ -36,6 +37,21 @@ public class DynamicRuleProvider extends BaseProvider {
 	private DynamicEdgeCreationRule getRule(String[] contents){
 		DynamicEdgeCreationRule rule = new DynamicEdgeCreationRule();
 		rule.setName(contents[1]);
+		rule.setEdgeName(contents[2]);
+		
+		if(!contents[3].equals("")){
+			String[] edgeArray = contents[3].split(";");
+			rule.setFromEdgeNames(new ArrayList<>(Arrays.asList(edgeArray)));
+			rule.setFromTokenSementicType(false);
+			rule.setFromToken(null);
+		}
+		else {
+			rule.setFromToken(contents[4]);
+			rule.setFromTokenSementicType(convertToBool(contents[5]));
+		}
+
+		rule.setToToken(contents[6]);
+		rule.setToTokenSementicType(convertToBool(contents[7]));
 		return rule;
 	}
 

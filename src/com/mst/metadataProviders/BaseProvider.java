@@ -13,6 +13,7 @@ public abstract class BaseProvider {
 	}
 	
 	protected Boolean convertToBool(String value){
+		value = value.trim();
 		if(value.toLowerCase().equals("t")) return true;
 		if(value.toLowerCase().equals("f")) return false;
 		return null;
