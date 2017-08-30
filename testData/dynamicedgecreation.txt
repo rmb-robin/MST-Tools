@@ -4,13 +4,13 @@ c,f,,,,simple cyst modifiers;disease modifier; disease location,dysn,,,dysn,,,t
 c,f,,,,existence; existence-no; existence-maybe,dysn,,,dysn,,,t
 r,Create Measurement Edge,measure,,cm,f,dysn,t
 c,f,,,,existence,dysn,t,f,dysn,t,f,t
-c,f,,,,unit of measure,,,,,,,t
-c,f,,,,measure,,,,,,,t
+c,f,,,,unit of measure,cm,f,f,cm,f,f,t
+c,f,,,,measure,cm,f,f,cm,f,f,t
 r,Create Disease Location Edge,disease location,,bpoc,t,dysn,t
 c,f,,,,existence,dysn,t,f,dysn,t,f,t
-c,f,,,,laterality,,,,,,,t
-c,f,,,,disease location,,,,,,,t
+c,f,,,,laterality,bpoc,t,f,bpoc,t,f,t
+c,f,,,,disease location,bpoc,t,f,bpoc,t,f,t
 r,Ticket 146,simple cyst modifiers,ovary; ovarian; ovaries,,f,dysn,t
-c,t,cyst,f,f,,,,,,,,?
-c,f,,,,disease modifier,ovary; ovarian; ovaries,,,ovary; ovarian; ovaries,,,?
-c,f,,,,simple cyst modifiers,cyst,,,cyst,,,f
+c,t,cyst,f,f,,,,,,,,t
+c,f,,,,disease modifier,ovary; ovarian; ovaries,f,f,ovary; ovarian; ovaries,f,f,t
+c,f,,,,simple cyst modifiers,cyst,f,f,cyst,f,f,f
