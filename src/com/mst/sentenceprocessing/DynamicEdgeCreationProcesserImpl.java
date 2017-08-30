@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.activemq.protobuf.compiler.parser.Token;
+
 import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcesser;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.metadataTypes.EdgeTypes;
@@ -27,7 +29,9 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
 		List<TokenRelationship> results = new ArrayList<>();
 		for(DynamicEdgeCreationRule rule: rules){
 			if(isRuleValid(rule,sentence)){
-				results.add(create(rule));
+				TokenRelationship relationship = create(rule,sentence); 
+				if(relationship!=null)
+					results.add(relationship);
 			}
 		}
 		return results;
@@ -102,16 +106,45 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
 					continue;
 			}
 			
-			if(!condition.getToken().isEmpty()){
-				if(areTokensMatch(condition.getIsToTokenSemanticType(), condition.getIsToTokenPOSType(), tokenRelationship.getToToken(),condition.getFromTokens()))
+			if(!condition.getToTokens().isEmpty()){
+				if(areTokensMatch(condition.getIsToTokenSemanticType(), condition.getIsToTokenPOSType(), tokenRelationship.getToToken(),condition.getToTokens()))
 					return true;
 			}
 		}
 		return false;
 	}
 
-	private TokenRelationship create(DynamicEdgeCreationRule rule){
-		return tokenRelationshipFactory.create("DynamicEdge",EdgeTypes.related, null,null);
+	private TokenRelationship create(DynamicEdgeCreationRule rule, Sentence sentence){
+		WordToken from=null; 
+		WordToken to=null;
+		if(!rule.getFromEdgeNames().isEmpty()){
+			from = getFromTokenFromEdgesNames(rule.getFromEdgeNames(),sentence);
+			if(from==null)return null;
+		}
+	
+		for(WordToken token: sentence.getModifiedWordList()){
+			if(from==null && isTokenAMatch(rule.isFromTokenSementicType(),false, token, rule.getFromToken())){
+				from = token;
+				continue;
+			}
+			if(to==null && isTokenAMatch(rule.isToTokenSementicType(), false, token,rule.getToToken()))
+				to = token;
+		}
+		
+		if(from==null) return null;
+		if(to==null)return null;
+		
+		return tokenRelationshipFactory.create(rule.getEdgeName(),EdgeTypes.related, from,to);
 	}
 
+	private WordToken getFromTokenFromEdgesNames(List<String> edgeNames, Sentence sentence){
+		Map<String,List<TokenRelationship>> map = sentence.getTokenRelationsByNameMap();
+		for(String edgeName:edgeNames){
+			if(map.containsKey(edgeName)){
+				return map.get(edgeName).get(0).getFromToken();
+			}
+		}
+		return null;
+	}
+	
 }

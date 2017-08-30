@@ -7,16 +7,16 @@ public class DynamicEdgeCondition {
 
 	private boolean isCondition1Token;
 	private String token;
-	private Boolean isTokenSemanticType;
-	private Boolean isTokenPOSType;
+	private boolean isTokenSemanticType;
+	private boolean isTokenPOSType;
 	private List<String> edgeNames;
 	private List<String> fromTokens;
-	private Boolean isFromTokenSemanticType;
-	private Boolean isFromTokenPOSType;
+	private boolean isFromTokenSemanticType;
+	private boolean isFromTokenPOSType;
 	private List<String> toTokens;
-	private Boolean isToTokenSemanticType;
-	private Boolean isToTokenPOSType;
-	private Boolean isEqualTo;
+	private boolean isToTokenSemanticType;
+	private boolean isToTokenPOSType;
+	private boolean isEqualTo;
 	
 	public DynamicEdgeCondition(){
 		edgeNames = new ArrayList<>();
@@ -65,36 +65,36 @@ public class DynamicEdgeCondition {
 	}
 
 
-	public Boolean getIsFromTokenSemanticType() {
+	public boolean getIsFromTokenSemanticType() {
 		return isFromTokenSemanticType;
 	}
 
-	public void setIsFromTokenSemanticType(Boolean isFromTokenSemanticType) {
+	public void setIsFromTokenSemanticType(boolean isFromTokenSemanticType) {
 		this.isFromTokenSemanticType = isFromTokenSemanticType;
 	}
 
-	public Boolean getIsFromTokenPOSType() {
+	public boolean getIsFromTokenPOSType() {
 		return isFromTokenPOSType;
 	}
 
-	public void setIsFromTokenPOSType(Boolean isFromTokenPOSType) {
+	public void setIsFromTokenPOSType(boolean isFromTokenPOSType) {
 		this.isFromTokenPOSType = isFromTokenPOSType;
 	}
 
 
-	public Boolean getIsToTokenSemanticType() {
+	public boolean getIsToTokenSemanticType() {
 		return isToTokenSemanticType;
 	}
 
-	public void setIsToTokenSemanticType(Boolean isToTokenSemanticType) {
+	public void setIsToTokenSemanticType(boolean isToTokenSemanticType) {
 		this.isToTokenSemanticType = isToTokenSemanticType;
 	}
 
-	public Boolean getIsToTokenPOSType() {
+	public boolean getIsToTokenPOSType() {
 		return isToTokenPOSType;
 	}
 
-	public void setIsToTokenPOSType(Boolean isToTokenPOSType) {
+	public void setIsToTokenPOSType(boolean isToTokenPOSType) {
 		this.isToTokenPOSType = isToTokenPOSType;
 	}
 

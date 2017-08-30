@@ -12,15 +12,15 @@ public abstract class BaseProvider {
 		return val;
 	}
 	
-	protected Boolean convertToBool(String value){
+	protected boolean convertToBool(String value){
 		value = value.trim();
 		if(value.toLowerCase().equals("t")) return true;
 		if(value.toLowerCase().equals("f")) return false;
-		return null;
+		return false;
 	}
 	
 	protected List<String> getValuesforSemiColenList(String values){
-		if(values==null || values == "") return new ArrayList<String>();
+		if(values==null || values.equals("")) return new ArrayList<String>();
 		String[] splits = values.split(";");
 		return Arrays.asList(splits);
 	}

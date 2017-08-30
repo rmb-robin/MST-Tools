@@ -49,7 +49,8 @@ public class DiscreteData {
 	private List<DiscreteDataCustomField> customFields; 
 	
 	private String orderControl;
-	
+	private Boolean isDuplicate;
+
 	public DiscreteData(){
 		customFields = new ArrayList<>();
 	}
@@ -203,6 +204,14 @@ public class DiscreteData {
 
 	public void setIsCompliant(boolean isCompliant) {
 		this.isCompliant = isCompliant;
+	}
+
+	public Boolean getIsDuplicate() {
+		return isDuplicate;
+	}
+
+	public void setIsDuplicate(Boolean isDuplicate) {
+		this.isDuplicate = isDuplicate;
 	} 
 	
 }

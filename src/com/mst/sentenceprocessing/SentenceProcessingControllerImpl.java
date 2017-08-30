@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 
 import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
 import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
+import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcesser;
 import com.mst.interfaces.sentenceprocessing.ExistenceToExistenceNoConverter;
 import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
@@ -53,7 +54,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	private SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput;
 	private ExistenceToExistenceNoConverter existenceToExistenceNoConverter;
 	private DistinctTokenRelationshipDeterminer distinctTokenRelationshipDeterminer;
-	
+	private DynamicEdgeCreationProcesser dynamicEdgeCreationProcesser;
 	
 	public SentenceProcessingControllerImpl(){
 		ngramProcessor = new NGramsSentenceProcessorImpl();
@@ -72,6 +73,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
 		existenceToExistenceNoConverter = new ExistenceToExistenceNoConverterImpl();
 		distinctTokenRelationshipDeterminer = new DistinctTokenRelationshipDeterminerImpl();
+		dynamicEdgeCreationProcesser = new DynamicEdgeCreationProcesserImpl();
 	}
 	
 	
@@ -146,6 +148,9 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 			sentence.getTokenRelationships().add(additionalExistence);
 	
 		sentence.setTokenRelationships(existenceToExistenceNoConverter.convertExistenceNo(negationRelationships,sentence.getTokenRelationships()));
+		
+		sentence.getTokenRelationships().addAll(dynamicEdgeCreationProcesser.
+					process(this.sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), sentence));
 		
 		sentence.setModifiedWordList(tokens);
 		List<TokenRelationship> distinctTokenRelations = distinctTokenRelationshipDeterminer.getDistinctTokenRelationships(sentence);
