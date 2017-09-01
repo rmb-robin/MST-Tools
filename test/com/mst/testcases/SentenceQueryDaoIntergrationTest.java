@@ -1,7 +1,9 @@
 package com.mst.testcases;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -11,11 +13,21 @@ import com.mst.model.SentenceQuery.EdgeQuery;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
+import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.util.MongoDatastoreProviderDefault;
 
 public class SentenceQueryDaoIntergrationTest {
 
 	SentenceQueryDaoImpl dao =  new SentenceQueryDaoImpl();
+	
+	@Test
+	public void getSentencesByDiscreteDataIds(){
+		Set<String> ids = new HashSet<>();
+		ids.add("598ccafdbde4270bc5381ea4");
+		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+		List<SentenceDb> result = dao.getSentencesByDiscreteDataIds(ids);
+		int c = result.size();
+	}
 	
 	
 	//@Test 

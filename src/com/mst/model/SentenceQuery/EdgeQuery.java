@@ -10,6 +10,7 @@ public class EdgeQuery {
 	private HashSet<String> values ;
 	private HashSet<String> lowerValues = null;
 	private Boolean isNumeric = null;
+	private boolean includeValues; 
 	
 	public EdgeQuery(){
 		values = new HashSet<>();
@@ -46,6 +47,14 @@ public class EdgeQuery {
 
 	public void setIsNumeric(Boolean isNumeric) {
 		this.isNumeric = isNumeric;
+	}
+
+	public boolean isIncludeValues() {
+		return includeValues;
+	}
+
+	public void setIncludeValues(boolean includeValues) {
+		this.includeValues = includeValues;
 	} 
 	
 	

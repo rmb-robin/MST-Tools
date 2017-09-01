@@ -104,7 +104,7 @@ public class LoadDataToMongo {
 		dd.setTimeStamps();
 		SentenceDaoImpl dao =  new SentenceDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		dao.saveSentences(sentences, null,null,false);
+		dao.saveSentences(sentences, null,null);
 	}
 	
 	
@@ -131,8 +131,8 @@ public class LoadDataToMongo {
 		return result;
 	}
 	
-	//@Test
-	public void run_Test(){
+	@Test
+	public void loadDynamicEdgeMetadata(){
 		List<DynamicEdgeCreationRule> input =new DynamicRuleProvider().getRules();
 		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();
 		ds.delete(ds.createQuery(DynamicEdgeCreationRule.class));

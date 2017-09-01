@@ -37,9 +37,9 @@ public class DiscreteDataDaoIntegrationTest {
 		
 		DiscreteDataDaoImpl dao = new DiscreteDataDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		List<DiscreteData> ids = dao.getDiscreteDataIds(dataFilter,"58c6f3ceaf3c420b90160803");
-		
-		int t = ids.size();
+//		List<DiscreteData> ids = dao.getDiscreteDatas(dataFilter,"58c6f3ceaf3c420b90160803");
+//		
+//		int t = ids.size();
 	
 	}
 	
@@ -51,9 +51,9 @@ public class DiscreteDataDaoIntegrationTest {
 
 		DiscreteDataDaoImpl dao = new DiscreteDataDaoImpl();
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		List<DiscreteData> dd = dao.getDiscreteDataIds(filter, "58c6f3ceaf3c420b90160803");
-		HashSet<LocalDate> distinctDates = new HashSet<>();
-		dd.forEach(a-> distinctDates.add(a.getReportFinalizedDate()));
-		distinctDates.forEach(a-> System.out.println(a));
+//		List<DiscreteData> dd = dao.getDiscreteDatas(filter, "58c6f3ceaf3c420b90160803");
+//		HashSet<LocalDate> distinctDates = new HashSet<>();
+//		dd.forEach(a-> distinctDates.add(a.getReportFinalizedDate()));
+//		distinctDates.forEach(a-> System.out.println(a));
 	}
 }

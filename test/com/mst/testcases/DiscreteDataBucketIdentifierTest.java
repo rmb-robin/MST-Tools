@@ -42,10 +42,10 @@ public class DiscreteDataBucketIdentifierTest {
 	//	sentence = "The abdominal aortic aneurysm measures 5.1 cm distal to the renal arteries. Vascular consultation is recommended.";
 	//	runTest(sentence, discreteData, "Bucket6"); //need change here to 7 per visit time. 
 		
-		discreteData.setPatientAge(32);
+		discreteData.setPatientAge(37);
 		//sentence = "There is an enlarged thyroid nodule that appears to be heterogeneous and measures 3.1cm. Consider follow-up ultrasound.";
 		
-		sentence =  "3.1x2.5 cm simple cyst in the left ovary.";
+		sentence =  "simple appearing 1 cm cyst within the left ovary.";
 		DiscreteDataCustomField field = new DiscreteDataCustomField();
 		field.setFieldName("MenopausalStatus");
 		field.setValue("premenopausal");

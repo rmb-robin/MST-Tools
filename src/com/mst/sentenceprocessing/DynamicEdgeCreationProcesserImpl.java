@@ -102,10 +102,10 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
 		
 		for(TokenRelationship tokenRelationship: tokenRelationships){
 			if(!condition.getFromTokens().isEmpty()){
-				if(!areTokensMatch(condition.getIsFromTokenSemanticType(), condition.getIsFromTokenPOSType(), tokenRelationship.getFromToken(),condition.getFromTokens()))
-					continue;
+				if(areTokensMatch(condition.getIsFromTokenSemanticType(), condition.getIsFromTokenPOSType(), tokenRelationship.getFromToken(),condition.getFromTokens()))
+					return true;
 			}
-			
+
 			if(!condition.getToTokens().isEmpty()){
 				if(areTokensMatch(condition.getIsToTokenSemanticType(), condition.getIsToTokenPOSType(), tokenRelationship.getToToken(),condition.getToTokens()))
 					return true;
