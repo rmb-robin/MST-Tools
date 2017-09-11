@@ -17,6 +17,7 @@ import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.discrete.DiscreteDataCustomField;
 import com.mst.model.discrete.Followup;
 import com.mst.model.discrete.FollowupProcedure;
+import com.mst.model.metadataTypes.DiscreteDataBucketIdenticationType;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
@@ -26,7 +27,13 @@ import com.mst.model.sentenceProcessing.WordToken;
 
 public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdentifier {
 
-	public DiscreteDataBucketIdentifierResult getBucket(DiscreteData discreteData, List<Sentence> sentences,  DisceteDataComplianceDisplayFields fields){
+	private class CompliantOnFollowupProcedure{
+		public boolean isCompliant;
+		public String matchedvalue; 
+	}
+	
+	
+	public DiscreteDataBucketIdentifierResult getBucket(DiscreteData discreteData,String resultType, List<Sentence> sentences,  DisceteDataComplianceDisplayFields fields){
 		for (Map.Entry<String, DiscreteDataBucketGroup> entry : fields.getBucketGroups().entrySet()) {
 			List<ComplianceDisplayFieldsBucketItem> filteredBuckets = findBucketsOnDiscrete(entry.getValue().getBucketItems(), discreteData);
 			if(filteredBuckets.isEmpty()) continue;
@@ -36,7 +43,10 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 				 if(bucket!=null) {
 					 DiscreteDataBucketIdentifierResult result = new DiscreteDataBucketIdentifierResult();
 					 result.setBucketName(bucket.getBucketName());
-					 result.setIsCompliant(areAllSentenceCompliant(sentences,bucket));
+					 if(resultType.equals(DiscreteDataBucketIdenticationType.compliance))
+							 result.setIsCompliant(areAllSentenceCompliant(sentences,bucket));
+					 else 
+						 result.setExpectedFollowup(bucket.getFollowUp());
 					 return result;
 				 }
 			   }
@@ -74,10 +84,9 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 		if(sentence.getTokenRelationships()==null || sentence.getTokenRelationships()==null) return false;
 		
 		if(!followup.getIsNumeric())
-			return isCompliantOnFollowupProcedure(followup,sentence);
+			return isCompliantOnFollowupProcedure(followup,sentence).isCompliant;
 		
 		return isCompliantOnTime(bucket,sentence);
-
 	}
 	
 	private boolean isCompliantOnTime(ComplianceDisplayFieldsBucketItem bucket, Sentence sentence){
@@ -98,18 +107,22 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 		return false;
 	}
 	
-	private boolean isCompliantOnFollowupProcedure(Followup followup, Sentence sentence){
+	private CompliantOnFollowupProcedure isCompliantOnFollowupProcedure(Followup followup, Sentence sentence){
 		
+		CompliantOnFollowupProcedure result = new CompliantOnFollowupProcedure();
 		Map<String,List<TokenRelationship>> relationshipMap = sentence.getTokenRelationsByNameMap();
 		for(FollowupProcedure procedure: followup.getProcedures()){
 			if(!relationshipMap.containsKey(procedure.getEdgeName())) continue;
 			
 			List<TokenRelationship> matchedRelationships = relationshipMap.get(procedure.getEdgeName());
 			for(TokenRelationship tokenRelationship: matchedRelationships){
-				if(tokenRelationship.isToFromTokenMatch(procedure.getValue())) return true;
+				if(tokenRelationship.isToFromTokenMatch(procedure.getValue())) {
+					result.matchedvalue = procedure.getValue();
+					result.isCompliant = true;
+				}
 			}
 		}
-		return false;
+		return result;
 	}
 	
 	private boolean isCompliantOnNumeric(WordToken cardinal, WordToken durationMeasure, TokenRelationship relationship,ComplianceDisplayFieldsBucketItem bucket){

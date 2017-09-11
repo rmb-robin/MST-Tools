@@ -8,5 +8,5 @@ import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.sentenceProcessing.Sentence;
 
 public interface DiscreteDataBucketIdentifier {
-	DiscreteDataBucketIdentifierResult getBucket(DiscreteData discreteData, List<Sentence> sentences,  DisceteDataComplianceDisplayFields fields);
+	DiscreteDataBucketIdentifierResult getBucket(DiscreteData discreteData,String resultType, List<Sentence> sentences,  DisceteDataComplianceDisplayFields fields);
 }

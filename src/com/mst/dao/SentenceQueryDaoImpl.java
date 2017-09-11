@@ -43,6 +43,17 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	private class IsEdgeMatchOnQueryResult{
 		public boolean isMatch; 
 		public boolean didTokenRelationsContainAnyMatches;
+		public Map<String,MatchInfo> matches;
+	}
+	
+	private class MatchInfo{
+		public String value; 
+		public String tokenType; 
+	}
+	
+	private class ShouldMatchOnSentenceEdgesResult{
+		public boolean isMatch; 
+		public TokenRelationship relationship;
 	}
 	
 	private MongoDatastoreProvider datastoreProvider;
@@ -155,10 +166,11 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		updateExistingResults(matchedIds);
 	}
 	
+	private Map<String, MatchInfo> matches; 
 	private boolean shouldByPassResult(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries,List<EdgeQuery> exclusionEdgeQueries){
 		IsEdgeMatchOnQueryResult edgeMatchOnQueryResult  = AreEdgesMatchOnQuery(existingtokenRelationships,edgeQueries);
+		matches = edgeMatchOnQueryResult.matches;
 		if(!edgeMatchOnQueryResult.isMatch) return true;
-		
 		edgeMatchOnQueryResult  = AreEdgesMatchOnQuery(existingtokenRelationships,exclusionEdgeQueries);
 		if(edgeMatchOnQueryResult.isMatch && edgeMatchOnQueryResult.didTokenRelationsContainAnyMatches) return true;
 		return false;
@@ -226,12 +238,16 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 	
 	
-	private TokenRelationship findFriendOfFriendEdges(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship){
+	private ShouldMatchOnSentenceEdgesResult findFriendOfFriendEdges(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship, HashSet<String> edgeNames){
 		
 		for(TokenRelationship relationship:relationships){
 			if(relationship.equals(originalRelationship)) continue;
-			if(shouldAddTokenFromRelationship(relationship,token)){
-				return relationship;
+			if(relationship.getEdgeName()==null)continue;
+			if(!edgeNames.contains(relationship.getEdgeName())) continue;
+			ShouldMatchOnSentenceEdgesResult result = shouldAddTokenFromRelationship(relationship,token);
+			if(result.isMatch){
+				result.relationship = relationship;
+				return result;
 			}
 		}
 		return null;
@@ -239,6 +255,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	private IsEdgeMatchOnQueryResult AreEdgesMatchOnQuery(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries){	
 		IsEdgeMatchOnQueryResult result = new IsEdgeMatchOnQueryResult();
+		result.matches = new HashMap<>();
 		Map<String,List<TokenRelationship>> relationshipsByEdgeName = convertSentenceRelationshipsToMap(existingtokenRelationships);
 		for(EdgeQuery edgeQuery: edgeQueries){
 			if(!relationshipsByEdgeName.containsKey(edgeQuery.getName()))continue;
@@ -258,17 +275,38 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			for(TokenRelationship relationship: tokenRelationships){
 				
 				if(isEdgeNumeric && !isEdgeInRange){
-					if(isTokenCardinal(relationship.getFromToken()))
+					if(isTokenCardinal(relationship.getFromToken())){
 						isEdgeInRange = isNumericInRange(edgeValuesList,relationship.getFromToken().getToken());
+						MatchInfo matchInfo = addMatchOnNumeric(isEdgeInRange,"from",relationship.getFromToken().getToken());
+						if(matchInfo!=null) 
+							result.matches.put(edgeQuery.getName(),matchInfo);
+					}
 					else if(isTokenCardinal(relationship.getToToken())) 
 						isEdgeInRange = isNumericInRange(edgeValuesList,relationship.getToToken().getToken());
+						MatchInfo matchInfo = addMatchOnNumeric(isEdgeInRange,"to",relationship.getToToken().getToken());
+						if(matchInfo!=null) 
+							result.matches.put(edgeQuery.getName(),matchInfo);
 				}
-				
 				if(!isEdgeNumeric){
 					if(!edgeValues.contains(relationship.getFromToken().getToken()) && 
 					   !edgeValues.contains(relationship.getToToken().getToken())) {
 						result.isMatch = false; 
 						return result;
+					}
+					else 
+					{
+						MatchInfo info = new MatchInfo();
+						if(edgeValues.contains(relationship.getFromToken().getToken()))
+						{
+							info.tokenType = "from";
+							info.value = relationship.getFromToken().getToken();
+						}
+						else 
+						{
+							info.tokenType = "to";
+							info.value = relationship.getToToken().getToken();
+						}
+						result.matches.put(edgeQuery.getName(),info);
 					}
 				}
 			}
@@ -280,6 +318,14 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		result.isMatch = true;
 		return result;
 		
+	}
+	
+	private MatchInfo addMatchOnNumeric(boolean isRange, String tokenType, String value){
+		if(!isRange) return null;
+		MatchInfo info = new MatchInfo();
+		info.tokenType = tokenType;
+		info.value = value; 
+		return info;
 	}
 	
 	private boolean isTokenCardinal(WordToken wordToken){
@@ -327,22 +373,28 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			String oppositeToken = null;
 			TokenRelationship foundRelationship=null;
 			SentenceQueryResult queryResult = null;
+			HashSet<String> edgeNameHash = new HashSet<>();
+			edgeQuery.forEach(a-> edgeNameHash.add(a.getName()) );
 			for(TokenRelationship relationship: sentenceDb.getTokenRelationships()){
-				if(shouldAddTokenFromRelationship(relationship,token))
+			  if(relationship.getEdgeName()==null)continue;
+			  if(!edgeNameHash.contains(relationship.getEdgeName()))continue;
+			  ShouldMatchOnSentenceEdgesResult edgesResult  = shouldAddTokenFromRelationship(relationship,token);
+			  if(edgesResult.isMatch)
 				{	
-					queryResult = createSentenceQueryResult(sentenceDb);
-					queryResult.getSentenceQueryEdgeResults().add(createSentenceQueryEdgeResult(relationship,EdgeResultTypes.primaryEdge));
+				    if(queryResult==null){
+				    	queryResult = createSentenceQueryResult(sentenceDb);
+				    	result.add(queryResult);
+				    }
+					queryResult.getSentenceQueryEdgeResults()
+						.add(createSentenceQueryEdgeResult(relationship,EdgeResultTypes.primaryEdge));
 					oppositeToken = getOppositeTokenFromRelationship(relationship,token);
 					foundRelationship = relationship;
-					break;
+					
+					ShouldMatchOnSentenceEdgesResult friendResult = findFriendOfFriendEdges(sentenceDb.getTokenRelationships(),oppositeToken,foundRelationship,edgeNameHash);
+					if(friendResult!=null)
+						queryResult.getSentenceQueryEdgeResults().add(createSentenceQueryEdgeResult(friendResult.relationship,EdgeResultTypes.friendOfFriend));
+					
 				}
-			}
-			
-			if(foundRelationship!=null){
-				TokenRelationship friendOfFriend = findFriendOfFriendEdges(sentenceDb.getTokenRelationships(),oppositeToken,foundRelationship);
-				if(friendOfFriend!=null)
-					queryResult.getSentenceQueryEdgeResults().add(createSentenceQueryEdgeResult(friendOfFriend,EdgeResultTypes.friendOfFriend));
-				result.add(queryResult);
 			}
 		}
 	     catch(Exception ex){
@@ -367,6 +419,13 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		queryEdgeResult.setEdgeName(relationship.getEdgeName());
 		queryEdgeResult.setFromToken(relationship.getFromToken().getToken());
 		queryEdgeResult.setToToken(relationship.getToToken().getToken());
+
+		if(matches.containsKey(relationship.getEdgeName())){
+			MatchInfo info = matches.get(relationship.getEdgeName());
+			queryEdgeResult.setTokenType(info.tokenType);
+			queryEdgeResult.setMatchedValue(info.value);
+		}
+		
 		queryEdgeResult.setEdgeResultType(edgeType);
 		return queryEdgeResult;
 	}
@@ -376,17 +435,26 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return relationship.getToToken().getToken();
 	}
 	
-	private boolean shouldAddTokenFromRelationship(TokenRelationship relation, String token){
-		if(relation.getFromToken()==null) return false;
-		if(relation.getToToken()==null) return false;
+	private ShouldMatchOnSentenceEdgesResult shouldAddTokenFromRelationship(TokenRelationship relation, String token){
+		ShouldMatchOnSentenceEdgesResult result = new ShouldMatchOnSentenceEdgesResult();
+		result.isMatch = false;
+		if(relation.getFromToken()==null) return result;
+		if(relation.getToToken()==null) return result;
 		
 		if(token.split(" ").length>1){
 			token = token.replace(" ","-");
 		}
 		
-		if(relation.getFromToken().getToken().equals(token)) return true;
-		if(relation.getToToken().getToken().equals(token)) return true;
-		return false;
+		if(relation.getFromToken().getToken().equals(token)) {
+			result.isMatch = true;
+			return result;
+		}
+		
+		if(relation.getToToken().getToken().equals(token)) {
+			result.isMatch = true;
+			return result;
+		}
+		return result;
 	}
 
 	public List<String> getEdgeNamesByTokens(List<String> tokens) {

@@ -12,6 +12,7 @@ import com.mst.model.discrete.DiscreteDataBucketIdentifierResult;
 import com.mst.model.discrete.DiscreteDataCustomField;
 import com.mst.model.discrete.Followup;
 import com.mst.model.discrete.FollowupProcedure;
+import com.mst.model.metadataTypes.DiscreteDataBucketIdenticationType;
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.Sentence;
@@ -120,7 +121,7 @@ public class DiscreteDataBucketIdentifierTest {
 		request.setConvertMeasurements(true);
 		request.getSenteceTexts().add(sentence);
 		List<Sentence> sentences = controller.processSentences(request);
-		DiscreteDataBucketIdentifierResult result = identifier.getBucket(discreteData, sentences, fields);
+		DiscreteDataBucketIdentifierResult result = identifier.getBucket(discreteData,DiscreteDataBucketIdenticationType.compliance, sentences, fields);
 		assertEquals(expectedBucketName,result.getBucketName());
 	}
 }

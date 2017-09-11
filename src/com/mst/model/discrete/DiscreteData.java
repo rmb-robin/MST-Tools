@@ -40,7 +40,7 @@ public class DiscreteData {
 	private String reportFinalizedById;
 	private LocalDate reportFinalizedDate; 
 	private int patientAge;
-
+	private Followup expectedFollowup; 
 	private LocalDate processingDate; 
 	
 	private String organizationId; 
@@ -212,6 +212,14 @@ public class DiscreteData {
 
 	public void setIsDuplicate(Boolean isDuplicate) {
 		this.isDuplicate = isDuplicate;
+	}
+
+	public Followup getExpectedFollowup() {
+		return expectedFollowup;
+	}
+
+	public void setExpectedFollowup(Followup expectedFollowup) {
+		this.expectedFollowup = expectedFollowup;
 	} 
 	
 }

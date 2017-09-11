@@ -7,6 +7,9 @@ public class SentenceQueryEdgeResult {
 	private String toToken;
 	private String EdgeResultType; 
 	
+	private String matchedValue; 
+	private String tokenType; 
+	
 	public String getEdgeName() {
 		return edgeName;
 	}
@@ -30,6 +33,18 @@ public class SentenceQueryEdgeResult {
 	}
 	public void setEdgeResultType(String edgeResultType) {
 		EdgeResultType = edgeResultType;
+	}
+	public String getMatchedValue() {
+		return matchedValue;
+	}
+	public void setMatchedValue(String matchedValue) {
+		this.matchedValue = matchedValue;
+	}
+	public String getTokenType() {
+		return tokenType;
+	}
+	public void setTokenType(String tokenType) {
+		this.tokenType = tokenType;
 	} 
 	
 	

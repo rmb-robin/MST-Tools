@@ -94,6 +94,7 @@ public class DiscreteDataComplianceFieldProvider {
 			FollowupProcedure followupProcedure = new FollowupProcedure();
 			followupProcedure.setEdgeName(splits[0]);
 			followupProcedure.setValue(splits[1]);
+			followupProcedure.setDisplayText("default display Text");
 			result.add(followupProcedure);
 		}
 		return result;
