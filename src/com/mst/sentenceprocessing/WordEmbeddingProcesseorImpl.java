@@ -15,7 +15,13 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 	
 	private String firstVerb = "verb+1";
 	private String secondVerb = "verb-1";
+	private String bothVerbs = "verb-verb";
 	private String defaultEdge ="token-token";
+	private String firstPrep = "prep+1";
+	private String secondPrep = "prep-1";
+	private String verbPrep = "verb-prep";
+	private String firstConjunction = "conj+1";
+	private String secondConjunction = "conj-1";
 	
 	public WordEmbeddingProcesseorImpl() {
 		factory = new TokenRelationshipFactoryImpl();
@@ -37,11 +43,23 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 	}
 
 	private String getEdgeName(WordToken first, WordToken second){
+		//if(first.isVerb())&second.isIN())  - changed the order - please check
+			//return verbpPrep;
+		//if(first.isVerb())&second.isVerb())
+			//return bothVerbs
 		if(first.isVerb()) 
 			return firstVerb;
 		if(second.isVerb())
 			return secondVerb;
-
+		if(first.isIN())
+			return firstPrep;
+		if(second.isIN())
+			return secondPrep;		
+		//if(first.isConjunction())
+			//return firstConjunction
+		//if(second.isConjunction())
+			//return secondConjunction			
+		
 		return defaultEdge;
 	}
 	
