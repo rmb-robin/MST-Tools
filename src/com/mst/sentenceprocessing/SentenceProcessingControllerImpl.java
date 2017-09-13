@@ -45,8 +45,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	private PrepPhraseRelationshipProcessor prepRelationshipProcessor;
 	private VerbPhraseProcessor verbPhraseProcessor;
 	private VerbProcessor verbProcessor;
-	private Tokenizer tokenizer;
-	private SentenceCleaner cleaner;
+    private SentenceFactory sentenceFactory;
 	private SentenceMeasureNormalizer sentenceMeasureNormalizer;
 	private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor;
 	private VerbExistanceProcessor verbExistanceProcessor;
@@ -65,8 +64,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		prepRelationshipProcessor = new PrepPhraseRelationshipProcessorImpl();
 		verbPhraseProcessor = new VerbPhraseProcessorImpl();
 		verbProcessor = new VerbProcessorImpl();
-		tokenizer = new Tokenizer();
-		cleaner  = new SentenceCleaner();
+		sentenceFactory = new SentenceFactory();
 		sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
 		negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
 		verbExistanceProcessor = new VerbExistanceProcessorImpl();
@@ -84,7 +82,7 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	public List<Sentence> processSentences(SentenceRequest request) throws Exception{
 		List<Sentence> sentences = new ArrayList<>();	
 		for(String sentenceText: request.getSenteceTexts()){
-			Sentence sentence = getSentence(sentenceText,request);
+			Sentence sentence = sentenceFactory.getSentence(sentenceText,request.getStudy(),request.getPractice(),request.getSource());
 			sentence = processSentence(sentence,request.isConvertMeasurements(),request.isConvertLargest());
 			sentences.add(sentence);
 		}
@@ -119,9 +117,19 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	
 	public SentenceProcessingResult processText(SentenceTextRequest request) throws Exception {		
 		
-		List<Sentence> sentences = getSentences(request);
+		List<Sentence> sentences = sentenceFactory.getSentences(request.getText(),request.getStudy(),request.getPractice(),request.getSource());
 		return processSentences(sentences, request.isConvertMeasurements(),request.isConvertLargest());
 	}
+	
+	//needed for 
+	//ngrams 
+	//pos 
+	//st
+	//normalize
+	// 
+	//Add new Alog - called WordEmbeddingProcesser. TokenRelationship
+	// 
+	
 	
 	private Sentence processSentence(Sentence sentence, boolean isConvertMeasurements,boolean isConvertLargest ) throws Exception{
 		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
@@ -158,35 +166,5 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		return sentence;
 	}
 	
-	private Sentence getSentence(String sentenceText,SentenceRequest request){
-		SentenceToken sentenceToken = tokenizer.splitSentencesNew(sentenceText).get(0);
-		return createSentence(sentenceToken,request.getStudy(),request.getPractice(),request.getSource(),0);
-	}
 	
-	private List<Sentence> getSentences(SentenceTextRequest request){
-		List<SentenceToken> sentenceTokens = tokenizer.splitSentencesNew(request.getText());
-		List<Sentence> result = new ArrayList<Sentence>();
-		 
-		int position = 1;
-		for(SentenceToken sentenceToken: sentenceTokens){
-			Sentence sentence = createSentence(sentenceToken, request.getStudy(),request.getPractice(), request.getSource(), position);
-			result.add(sentence);
-			position +=1;
-		}
-		return result;
-	}
-
-	private Sentence createSentence(SentenceToken sentenceToken, String study, String practice, String source,int position){
-		String cs = cleaner.cleanSentence(sentenceToken.getToken());
-		Sentence sentence = new Sentence(null, position);
-		List<String> words =  tokenizer.splitWordsInStrings(cs);
-		sentence.setOriginalWords(words);
-		
-		sentence.setPractice(practice);
-		sentence.setSource(source);
-		sentence.setStudy(study);
-		sentence.setNormalizedSentence(cs);
-		sentence.setOrigSentence(sentenceToken.getToken());
-		return sentence;
-	}
 }

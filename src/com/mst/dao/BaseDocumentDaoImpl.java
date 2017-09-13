@@ -23,6 +23,11 @@ public abstract class BaseDocumentDaoImpl<T> {
 		return keys.getId().toString();
 	}
 
+	public void saveCollection(List<T> entities){
+		 datastoreProvider.getDataStore().save(entities);
+	}
+	
+	
 	public T get(String id)  {
 		ObjectId objectId = new ObjectId(id);
 		return datastoreProvider.getDataStore().get(entityClass, objectId);
