@@ -9,6 +9,7 @@ import com.mst.interfaces.sentenceprocessing.PrepositionPhraseProcessor;
 import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
 import com.mst.interfaces.sentenceprocessing.SentenceDiscoveryProcessor;
 import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
+import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.interfaces.sentenceprocessing.WordEmbeddingProcessor;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.RecommandationRequest;
@@ -27,6 +28,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private SemanticTypeSentenceAnnotator stAnnotator;
 	private SentenceMeasureNormalizer sentenceMeasureNormalizer;
 	private WordEmbeddingProcessor wordEmbeddingProcessor; 
+	private VerbProcessor verbProcessor; 
 	
 	public SentenceDiscoveryProcessorImpl(){
 		sentenceFactory = new SentenceFactory();
@@ -35,6 +37,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
 		sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
 		wordEmbeddingProcessor = new WordEmbeddingProcesseorImpl();
+		verbProcessor = new VerbProcessorImpl();
 	}
 	
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
@@ -42,7 +45,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	}
 	
 	
-	public List<SentenceDiscovery> process(RecommandationRequest request){
+	public List<SentenceDiscovery> process(RecommandationRequest request) throws Exception{
 		
 		List<Sentence> sentences = sentenceFactory.getSentences(request.getText(),"","",request.getSource());
 		List<SentenceDiscovery> discoveries = new ArrayList<>();
@@ -53,6 +56,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			sentence.setTokenRelationships(new ArrayList<TokenRelationship>());
 			tokens = partOfSpeechAnnotator.annotate(tokens, this.sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
 			tokens = sentenceMeasureNormalizer.Normalize(tokens, true,true);
+			tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
 			sentence.setModifiedWordList(tokens);
 			
 			List<TokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);

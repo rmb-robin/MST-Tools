@@ -9,5 +9,5 @@ import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 public interface SentenceDiscoveryProcessor {
 
 	void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput);
-	List<SentenceDiscovery> process(RecommandationRequest request);
+	List<SentenceDiscovery> process(RecommandationRequest request) throws Exception;
 }

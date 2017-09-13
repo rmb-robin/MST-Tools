@@ -121,15 +121,6 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 		return processSentences(sentences, request.isConvertMeasurements(),request.isConvertLargest());
 	}
 	
-	//needed for 
-	//ngrams 
-	//pos 
-	//st
-	//normalize
-	// 
-	//Add new Alog - called WordEmbeddingProcesser. TokenRelationship
-	// 
-	
 	
 	private Sentence processSentence(Sentence sentence, boolean isConvertMeasurements,boolean isConvertLargest ) throws Exception{
 		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());

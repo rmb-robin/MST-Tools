@@ -6,6 +6,7 @@ import java.util.List;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.interfaces.sentenceprocessing.WordEmbeddingProcessor;
 import com.mst.model.metadataTypes.EdgeTypes;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
@@ -43,25 +44,36 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 	}
 
 	private String getEdgeName(WordToken first, WordToken second){
-		//if(first.isVerb())&second.isIN())  - changed the order - please check
-			//return verbpPrep;
-		//if(first.isVerb())&second.isVerb())
-			//return bothVerbs
+		
+		String firstPos = "";
+		if(first.getPos()!=null) 
+			firstPos = first.getPos();
+		
+		String secondPos = "";
+		if(second.getPos()!=null)
+			secondPos = second.getPos();
+		
+		if(first.isVerb()&& secondPos.equals(PartOfSpeachTypes.IN)) 
+			return verbPrep;
+		if(first.isVerb() && second.isVerb())
+			return bothVerbs;
 		if(first.isVerb()) 
 			return firstVerb;
 		if(second.isVerb())
 			return secondVerb;
-		if(first.isIN())
+		if(firstPos.equals(PartOfSpeachTypes.IN))
 			return firstPrep;
-		if(second.isIN())
+		if(secondPos.equals(PartOfSpeachTypes.IN))
 			return secondPrep;		
-		//if(first.isConjunction())
-			//return firstConjunction
-		//if(second.isConjunction())
-			//return secondConjunction			
+		
+		if(firstPos.equals(PartOfSpeachTypes.CC))
+			return firstConjunction;
+		if(secondPos.equals(PartOfSpeachTypes.CC))
+			return secondConjunction;			
 		
 		return defaultEdge;
 	}
+	
 	
 	
 	
