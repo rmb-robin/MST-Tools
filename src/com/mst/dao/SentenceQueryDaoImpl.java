@@ -111,6 +111,9 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			if(appender.equals("and")){
 				filterForAnd(sentenceQueryInstance);
 			}
+			
+			if(appender.equals("andnot"))
+				filterForAndNot(sentenceQueryInstance);
 		}
 		return new ArrayList<SentenceQueryResult>(queryResults.values());
 	}	
@@ -189,7 +192,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			}
 				
 			if(tokenMatch) continue;
-			if(shouldByPassResult(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges())) continue;
+			if(shouldByPassResultExclude(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges())) continue;
 		
 			matchedIds.add(entry.getKey());
 		 }
@@ -202,6 +205,13 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		IsEdgeMatchOnQueryResult edgeMatchOnQueryResult  = AreEdgesMatchOnQuery(existingtokenRelationships,edgeQueries);
 		matches = edgeMatchOnQueryResult.matches;
 		return !edgeMatchOnQueryResult.isMatch;
+	}
+	
+	
+	private boolean shouldByPassResultExclude(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries){
+		IsEdgeMatchOnQueryResult edgeMatchOnQueryResult  = AreEdgesMatchOnQuery(existingtokenRelationships,edgeQueries);
+		if(edgeMatchOnQueryResult.isMatch && edgeMatchOnQueryResult.didTokenRelationsContainAnyMatches) return true;
+		return false;
 	}
 	
 	private void updateExistingResults(HashSet<String> matchedIds){
