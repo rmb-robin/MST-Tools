@@ -5,8 +5,11 @@ import java.util.List;
 
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.interfaces.sentenceprocessing.WordEmbeddingProcessor;
+import com.mst.jsonSerializers.DeepCloner;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
+import com.mst.model.metadataTypes.WordEmbeddingTypes;
+import com.mst.model.sentenceProcessing.RecommandedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
@@ -14,23 +17,13 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 
 	private TokenRelationshipFactory factory; 
 	
-	private String firstVerb = "verb+1";
-	private String secondVerb = "verb-1";
-	private String bothVerbs = "verb-verb";
-	private String defaultEdge ="token-token";
-	private String firstPrep = "prep+1";
-	private String secondPrep = "prep-1";
-	private String verbPrep = "verb-prep";
-	private String firstConjunction = "conj+1";
-	private String secondConjunction = "conj-1";
-	
 	public WordEmbeddingProcesseorImpl() {
 		factory = new TokenRelationshipFactoryImpl();
 	}
 	
 	@Override
-	public List<TokenRelationship> process(List<WordToken> tokens) {
-		List<TokenRelationship> result = new ArrayList<>();
+	public List<RecommandedTokenRelationship> process(List<WordToken> tokens) {
+		List<RecommandedTokenRelationship> result = new ArrayList<>();
 		
 		for(int i =0;i<tokens.size();i++){
 			if(i+1<tokens.size())
@@ -39,8 +32,14 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 		return result;
 	}
 	
-	private TokenRelationship getWordEmbedding(WordToken first, WordToken second){
-	    return factory.create(getEdgeName(first, second), EdgeTypes.related, first, second);
+	private RecommandedTokenRelationship getWordEmbedding(WordToken first, WordToken second){
+		WordToken firstCloned = (WordToken) DeepCloner.deepClone(first);
+		WordToken secondCloned = (WordToken) DeepCloner.deepClone(second);
+		
+		TokenRelationship tokenRelationship =  factory.create(getEdgeName(first, second), EdgeTypes.related, firstCloned, secondCloned);
+		RecommandedTokenRelationship recommandedTokenRelationship = new RecommandedTokenRelationship();
+		recommandedTokenRelationship.setTokenRelationship(tokenRelationship);
+		return recommandedTokenRelationship;
 	}
 
 	private String getEdgeName(WordToken first, WordToken second){
@@ -54,27 +53,23 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 			secondPos = second.getPos();
 		
 		if(first.isVerb()&& secondPos.equals(PartOfSpeachTypes.IN)) 
-			return verbPrep;
+			return WordEmbeddingTypes.verbPrep;
 		if(first.isVerb() && second.isVerb())
-			return bothVerbs;
+			return WordEmbeddingTypes.bothVerbs;
 		if(first.isVerb()) 
-			return firstVerb;
+			return WordEmbeddingTypes.firstVerb;
 		if(second.isVerb())
-			return secondVerb;
+			return WordEmbeddingTypes.secondVerb;
 		if(firstPos.equals(PartOfSpeachTypes.IN))
-			return firstPrep;
+			return WordEmbeddingTypes.firstPrep;
 		if(secondPos.equals(PartOfSpeachTypes.IN))
-			return secondPrep;		
+			return WordEmbeddingTypes.secondPrep;		
 		
 		if(firstPos.equals(PartOfSpeachTypes.CC))
-			return firstConjunction;
+			return WordEmbeddingTypes.firstConjunction;
 		if(secondPos.equals(PartOfSpeachTypes.CC))
-			return secondConjunction;			
+			return WordEmbeddingTypes.secondConjunction;			
 		
-		return defaultEdge;
+		return WordEmbeddingTypes.defaultEdge;
 	}
-	
-	
-	
-	
 }

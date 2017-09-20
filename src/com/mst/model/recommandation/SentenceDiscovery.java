@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+import com.mst.model.sentenceProcessing.RecommandedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
@@ -23,7 +24,7 @@ public class SentenceDiscovery {
 	
 	private List<String> originalWords;
 	private List<WordToken> modifiedWordList = new ArrayList<>();
-	private List<TokenRelationship> wordEmbeddings = new ArrayList<>();
+	private List<RecommandedTokenRelationship> wordEmbeddings = new ArrayList<>();
 	private String source;
 	
 	public ObjectId getId() {
@@ -62,10 +63,10 @@ public class SentenceDiscovery {
 	public void setModifiedWordList(List<WordToken> modifiedWordList) {
 		this.modifiedWordList = modifiedWordList;
 	}
-	public List<TokenRelationship> getWordEmbeddings() {
+	public List<RecommandedTokenRelationship> getWordEmbeddings() {
 		return wordEmbeddings;
 	}
-	public void setWordEmbeddings(List<TokenRelationship> wordEmbeddings) {
+	public void setWordEmbeddings(List<RecommandedTokenRelationship> wordEmbeddings) {
 		this.wordEmbeddings = wordEmbeddings;
 	}
 	public String getSource() {

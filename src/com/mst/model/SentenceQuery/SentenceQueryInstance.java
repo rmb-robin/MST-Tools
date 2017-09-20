@@ -6,7 +6,7 @@ import java.util.List;
 public class SentenceQueryInstance {
 	private List<String> tokens; 
 	private List<EdgeQuery> edges;
-	private List<EdgeQuery> exclusiveEdges; 
+//	private List<EdgeQuery> exclusiveEdges; 
 	private String appender; 
 	
 	
@@ -14,7 +14,6 @@ public class SentenceQueryInstance {
 	public SentenceQueryInstance(){
 		tokens = new ArrayList<>();
 		edges = new ArrayList<>();
-		exclusiveEdges = new ArrayList<>();
 	}
 	
 	public List<String> getTokens() {
@@ -41,12 +40,12 @@ public class SentenceQueryInstance {
 		this.appender = appender;
 	}
 
-	public List<EdgeQuery> getExclusiveEdges() {
-		return exclusiveEdges;
-	}
-
-	public void setExclusiveEdges(List<EdgeQuery> exclusiveEdges) {
-		this.exclusiveEdges = exclusiveEdges;
-	}
-	
+//	public List<EdgeQuery> getExclusiveEdges() {
+//		return exclusiveEdges;
+//	}
+//
+//	public void setExclusiveEdges(List<EdgeQuery> exclusiveEdges) {
+//		this.exclusiveEdges = exclusiveEdges;
+//	}
+//	
 }

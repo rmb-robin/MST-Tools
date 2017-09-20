@@ -1,6 +1,7 @@
 package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
@@ -11,8 +12,11 @@ import com.mst.interfaces.sentenceprocessing.SentenceDiscoveryProcessor;
 import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.interfaces.sentenceprocessing.WordEmbeddingProcessor;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.RecommandationRequest;
+import com.mst.model.sentenceProcessing.RecommandedTokenRelationship;
+import com.mst.model.sentenceProcessing.RecommendedNounPhraseProcesser;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -29,6 +33,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private SentenceMeasureNormalizer sentenceMeasureNormalizer;
 	private WordEmbeddingProcessor wordEmbeddingProcessor; 
 	private VerbProcessor verbProcessor; 
+	private RecommendedNounPhraseProcesser nounPhraseProcesser;
 	
 	public SentenceDiscoveryProcessorImpl(){
 		sentenceFactory = new SentenceFactory();
@@ -38,6 +43,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
 		wordEmbeddingProcessor = new WordEmbeddingProcesseorImpl();
 		verbProcessor = new VerbProcessorImpl();
+		nounPhraseProcesser = new RecommendedNounPhraseProcesser();
 	}
 	
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
@@ -57,24 +63,47 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			tokens = partOfSpeechAnnotator.annotate(tokens, this.sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
 			tokens = sentenceMeasureNormalizer.Normalize(tokens, true,true);
 			tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
+	
+			tokens = filterTokens(tokens);
+			List<RecommandedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
+			wordEmbeddings = nounPhraseProcesser.process(wordEmbeddings);
 			sentence.setModifiedWordList(tokens);
-			
-			List<TokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
 			discoveries.add(convert(sentence, wordEmbeddings));
 		}
 		return discoveries;
 	}
 	
-	private SentenceDiscovery convert(Sentence sentence, List<TokenRelationship> wordEmbeddings){
+	private List<WordToken> filterTokens(List<WordToken> tokens){
+		List<WordToken> result = new ArrayList<>();
+		HashSet<String> byPassPOS = new HashSet<>();
+		byPassPOS.add(PartOfSpeachTypes.DET);
+		byPassPOS.add(PartOfSpeachTypes.PUNCTUATION);
+	
+		for(WordToken token: tokens){
+			if(token.getPos()!=null && byPassPOS.contains(token.getPos())) continue;
+			
+			result.add(token);	
+		}
+		return result;
+	}
+	
+	private SentenceDiscovery convert(Sentence sentence, List<RecommandedTokenRelationship> wordEmbeddings){
 		SentenceDiscovery sentenceDiscovery = new SentenceDiscovery();
 		sentenceDiscovery.setWordEmbeddings(wordEmbeddings);
 		sentenceDiscovery.setModifiedWordList(sentence.getModifiedWordList());
-		sentenceDiscovery.setNormalizedSentence(sentence.getNormalizedSentence());
+		sentenceDiscovery.setNormalizedSentence(getNormalizeSentenceFromTokens(sentence.getModifiedWordList()));
 		sentenceDiscovery.setOriginalWords(sentence.getOriginalWords());
 		sentenceDiscovery.setOrigSentence(sentence.getOrigSentence());
 		sentenceDiscovery.setProcessingDate(sentence.getProcessDate());
 		sentenceDiscovery.setSource(sentence.getSource());
 		return sentenceDiscovery;
 	}
-	
+
+	private String getNormalizeSentenceFromTokens(List<WordToken> tokens){
+		String result = "";
+		for(WordToken token: tokens){
+			result += token.getToken() + " ";
+		}
+		return result;
+	}
 }

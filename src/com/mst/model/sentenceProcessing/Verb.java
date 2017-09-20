@@ -1,9 +1,11 @@
 package com.mst.model.sentenceProcessing;
 
+import java.io.Serializable;
+
 import com.mst.model.metadataTypes.VerbTense;
 import com.mst.model.metadataTypes.VerbType;
 
-public class Verb {
+public class Verb implements Serializable {
 
 	private VerbType verbType; 
 	private VerbTense verbTense;

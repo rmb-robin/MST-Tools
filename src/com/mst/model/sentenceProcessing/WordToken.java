@@ -1,10 +1,12 @@
 package com.mst.model.sentenceProcessing;
 
+import java.io.Serializable;
+
 import com.mst.model.GenericToken;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 
 
-public class WordToken extends GenericToken {
+public class WordToken extends GenericToken implements Serializable {
 		
 	private String semanticType = null;
 	private String pos = null;  

@@ -159,21 +159,49 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			}
 				
 			if(!tokenMatch) continue;
-			if(shouldByPassResult(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges(), sentenceQueryInstance.getExclusiveEdges())) continue;
+			if(shouldByPassResult(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges())) continue;
+		
+			matchedIds.add(entry.getKey());
+		 }
+		updateExistingResults(matchedIds);
+	}
+
+	
+	private void filterForAndNot(SentenceQueryInstance sentenceQueryInstance){
+		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
+		HashSet<String> matchedIds = new HashSet<>();
+		for (Map.Entry<String, SentenceDb> entry : cumalativeSentenceResults.entrySet()) {
+			 boolean tokenMatch = false;
+			 for(String token: sentenceQueryInstance.getTokens()){
+				if(entry.getValue().getOrigSentence().contains(token)){
+					tokenMatch = true;
+				}
+			}
+			 
+			if(tokenMatch) continue;
+
+			HashSet<String> sentenceUniqueEdgeNames = new HashSet<>();
+			entry.getValue().getTokenRelationships().stream().forEach(a-> sentenceUniqueEdgeNames.add(a.getEdgeName()));
+			for(String edgeName: edgeQueriesByName.keySet()){
+				if(sentenceUniqueEdgeNames.contains(edgeName)){
+					tokenMatch = true;
+				}
+			}
+				
+			if(tokenMatch) continue;
+			if(shouldByPassResult(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges())) continue;
 		
 			matchedIds.add(entry.getKey());
 		 }
 		updateExistingResults(matchedIds);
 	}
 	
+	
 	private Map<String, MatchInfo> matches; 
-	private boolean shouldByPassResult(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries,List<EdgeQuery> exclusionEdgeQueries){
+	private boolean shouldByPassResult(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries){
 		IsEdgeMatchOnQueryResult edgeMatchOnQueryResult  = AreEdgesMatchOnQuery(existingtokenRelationships,edgeQueries);
 		matches = edgeMatchOnQueryResult.matches;
-		if(!edgeMatchOnQueryResult.isMatch) return true;
-		edgeMatchOnQueryResult  = AreEdgesMatchOnQuery(existingtokenRelationships,exclusionEdgeQueries);
-		if(edgeMatchOnQueryResult.isMatch && edgeMatchOnQueryResult.didTokenRelationsContainAnyMatches) return true;
-		return false;
+		return !edgeMatchOnQueryResult.isMatch;
 	}
 	
 	private void updateExistingResults(HashSet<String> matchedIds){
@@ -210,7 +238,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
 			 List<SentenceDb> sentences = query.asList();
 			 result.sentences.addAll(sentences);
-			 result.sentenceQueryResult.addAll(getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges(), sentenceQueryInstance.getExclusiveEdges()));
+			 result.sentenceQueryResult.addAll(getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges()));
 		}
 		return result;
 	}
@@ -359,16 +387,15 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return value.matches("[-+]?\\d*\\.?\\d+");
 	}
 	
-	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, List<EdgeQuery> exclusiveEdges){
+	private List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery){
 		 
 		List<SentenceQueryResult> result = new ArrayList<>();
 		for(SentenceDb sentenceDb : sentences){
 			try{
 			String id = sentenceDb.getId().toString();
 			if(processedSentences.contains(id))continue;
-			if(shouldByPassResult(sentenceDb.getTokenRelationships(),edgeQuery,exclusiveEdges)) continue;
+			if(shouldByPassResult(sentenceDb.getTokenRelationships(),edgeQuery)) continue;
 		
-			
 			processedSentences.add(id);
 			String oppositeToken = null;
 			TokenRelationship foundRelationship=null;
