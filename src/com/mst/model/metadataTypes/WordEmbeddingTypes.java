@@ -1,0 +1,14 @@
+package com.mst.model.metadataTypes;
+
+public class WordEmbeddingTypes {
+	public static String firstVerb = "verb+1";
+	public static String secondVerb = "verb-1";
+	public static String bothVerbs = "verb-verb";
+	public static String defaultEdge ="token-token";
+	public static String firstPrep = "prep+1";
+	public static String secondPrep = "prep-1";
+	public static String verbPrep = "verb-prep";
+	public static String firstConjunction = "conj+1";
+	public static String secondConjunction = "conj-1";
+	
+}

@@ -15,8 +15,7 @@ public class TokenRelationship {
 	private WordToken toToken; 
 	private WordToken fromToken;
 	
-	
-	
+
 	public String getEdgeName() {
 		if(edgeName==null) return "";
 		return edgeName;
@@ -75,4 +74,8 @@ public class TokenRelationship {
 			if(tokens.contains(toToken.getToken()))return true;
 		return false;
 	}	
+	
+	public String getFromTokenToTokenString(){
+		return this.fromToken.getToken()+this.toToken.getToken();
+	}
 }

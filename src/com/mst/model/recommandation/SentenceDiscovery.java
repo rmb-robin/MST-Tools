@@ -2,11 +2,14 @@ package com.mst.model.recommandation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Reference;
 
 import com.mst.model.sentenceProcessing.RecommandedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -24,8 +27,17 @@ public class SentenceDiscovery {
 	
 	private List<String> originalWords;
 	private List<WordToken> modifiedWordList = new ArrayList<>();
+	private Map<Integer, Integer> nounPhraseIndexes; 
+	
+	@Reference
 	private List<RecommandedTokenRelationship> wordEmbeddings = new ArrayList<>();
 	private String source;
+
+	
+	public SentenceDiscovery(){
+		nounPhraseIndexes = new HashMap<>();
+		wordEmbeddings = new ArrayList<>();
+	}
 	
 	public ObjectId getId() {
 		return id;
@@ -75,5 +87,12 @@ public class SentenceDiscovery {
 	public void setSource(String source) {
 		this.source = source;
 	}
-	
+
+	public Map<Integer, Integer> getNounPhraseIndexes() {
+		return nounPhraseIndexes;
+	}
+
+	public void setNounPhraseIndexes(Map<Integer, Integer> nounPhraseIndexes) {
+		this.nounPhraseIndexes = nounPhraseIndexes;
+	}
 }

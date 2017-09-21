@@ -7,5 +7,5 @@ import com.mst.model.recommandation.SentenceDiscovery;
 public interface SentenceDiscoveryDao extends IDao {
 
 	String save(SentenceDiscovery sentenceDiscovery);
-	void saveCollection(List<SentenceDiscovery> sentenceDiscoveries);
+	void saveSentenceDiscovieries(List<SentenceDiscovery> sentenceDiscoveries);
 }

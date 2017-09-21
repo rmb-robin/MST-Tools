@@ -15,8 +15,8 @@ import com.mst.interfaces.sentenceprocessing.WordEmbeddingProcessor;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.RecommandationRequest;
+import com.mst.model.sentenceProcessing.RecommandedNounPhraseResult;
 import com.mst.model.sentenceProcessing.RecommandedTokenRelationship;
-import com.mst.model.sentenceProcessing.RecommendedNounPhraseProcesser;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -66,11 +66,19 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	
 			tokens = filterTokens(tokens);
 			List<RecommandedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
-			wordEmbeddings = nounPhraseProcesser.process(wordEmbeddings);
+			RecommandedNounPhraseResult nounPhraseResult = nounPhraseProcesser.process(wordEmbeddings);
 			sentence.setModifiedWordList(tokens);
-			discoveries.add(convert(sentence, wordEmbeddings));
+			updatekeysOnRecommendedTokens(nounPhraseResult.getRecommandedTokenRelationships());
+			discoveries.add(convert(sentence, nounPhraseResult));
 		}
 		return discoveries;
+	}
+	
+	private void updatekeysOnRecommendedTokens(List<RecommandedTokenRelationship> wordEmbeddings ){
+		for(RecommandedTokenRelationship relationship: wordEmbeddings){
+			String key = relationship.getTokenRelationship().getFromTokenToTokenString();
+			relationship.setKey(key);
+		}
 	}
 	
 	private List<WordToken> filterTokens(List<WordToken> tokens){
@@ -87,9 +95,10 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		return result;
 	}
 	
-	private SentenceDiscovery convert(Sentence sentence, List<RecommandedTokenRelationship> wordEmbeddings){
+	private SentenceDiscovery convert(Sentence sentence, RecommandedNounPhraseResult nounPhraseResult){
 		SentenceDiscovery sentenceDiscovery = new SentenceDiscovery();
-		sentenceDiscovery.setWordEmbeddings(wordEmbeddings);
+		sentenceDiscovery.setWordEmbeddings(nounPhraseResult.getRecommandedTokenRelationships());
+		sentenceDiscovery.setNounPhraseIndexes(nounPhraseResult.getNounPhraseIndexes());
 		sentenceDiscovery.setModifiedWordList(sentence.getModifiedWordList());
 		sentenceDiscovery.setNormalizedSentence(getNormalizeSentenceFromTokens(sentence.getModifiedWordList()));
 		sentenceDiscovery.setOriginalWords(sentence.getOriginalWords());
