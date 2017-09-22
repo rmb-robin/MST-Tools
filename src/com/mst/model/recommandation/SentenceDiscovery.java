@@ -29,7 +29,6 @@ public class SentenceDiscovery {
 	private List<WordToken> modifiedWordList = new ArrayList<>();
 	private Map<Integer, Integer> nounPhraseIndexes; 
 	
-	@Reference
 	private List<RecommandedTokenRelationship> wordEmbeddings = new ArrayList<>();
 	private String source;
 

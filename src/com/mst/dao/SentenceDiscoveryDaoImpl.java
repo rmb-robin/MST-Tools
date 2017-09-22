@@ -21,18 +21,6 @@ public class SentenceDiscoveryDaoImpl extends BaseDocumentDaoImpl<SentenceDiscov
 
 	@Override
 	public void saveSentenceDiscovieries(List<SentenceDiscovery> sentenceDiscoveries) {
-		List<RecommandedTokenRelationship> allRecommendations =  getAllRecommendTokenRelationships(sentenceDiscoveries);
-		 datastoreProvider.getDataStore().save(allRecommendations);
-		super.saveCollection(sentenceDiscoveries);
-		
-	}
-
-	private List<RecommandedTokenRelationship> getAllRecommendTokenRelationships(List<SentenceDiscovery> sentenceDiscoveries){
-		List<RecommandedTokenRelationship> result = new ArrayList<>();
-		
-		for(SentenceDiscovery sentenceDiscovery: sentenceDiscoveries){
-			result.addAll(sentenceDiscovery.getWordEmbeddings());
-		}
-		return result;
+		super.saveCollection(sentenceDiscoveries);	
 	}
 }
