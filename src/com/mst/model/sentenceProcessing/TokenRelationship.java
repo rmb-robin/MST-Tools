@@ -4,6 +4,8 @@ import java.util.HashSet;
 
 import org.joda.time.DateTime;
 
+import com.mst.model.metadataTypes.SemanticTypes;
+
 public class TokenRelationship {
 
 	private String edgeName; 
@@ -75,7 +77,13 @@ public class TokenRelationship {
 		return false;
 	}	
 	
+	public String getOppositeToken(String token){
+		if(this.getToToken().getToken().equals(token)) return this.getFromToken().getToken();
+		return this.getToToken().getToken();
+	}
+	
 	public String getFromTokenToTokenString(){
 		return this.fromToken.getToken()+this.toToken.getToken();
 	}
+
 }

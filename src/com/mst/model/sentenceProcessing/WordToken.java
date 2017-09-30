@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.mst.model.GenericToken;
 import com.mst.model.metadataTypes.PropertyValueTypes;
+import com.mst.model.metadataTypes.SemanticTypes;
 
 
 public class WordToken extends GenericToken implements Serializable {
@@ -74,4 +75,10 @@ public class WordToken extends GenericToken implements Serializable {
 	public void setSubjectSetFromWildCard(boolean isSubjectSetFromWildCard) {
 		this.isSubjectSetFromWildCard = isSubjectSetFromWildCard;
 	}
+
+	public boolean isCardinal(){
+		if(this.getSemanticType()==null) return false;
+		return this.getSemanticType().equals(SemanticTypes.cardinalNumber);
+	}
+
 }

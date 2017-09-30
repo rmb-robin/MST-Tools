@@ -25,11 +25,19 @@ public class RecommendationEdgesVerificationProcesser {
 	}
 	
 	private List<RecommandedTokenRelationship> findMatchesFromExistingOnConsequtives(List<Integer> consecutiveTokensToken,List<RecommandedTokenRelationship> embeddedwords, Map<String,RecommandedTokenRelationship> existingMap){
-		if(consecutiveTokensToken.size()<1) return null;
+		if(consecutiveTokensToken.size()==0) return null;
 		int startIndex = consecutiveTokensToken.get(0);
 		int endIndex = consecutiveTokensToken.get(consecutiveTokensToken.size()-1);
 		
 		List<RecommandedTokenRelationship> result = new ArrayList<>();
+		if(consecutiveTokensToken.size()==1){
+			TokenRelationship relationship = embeddedwords.get(startIndex).getTokenRelationship();
+			RecommandedTokenRelationship matched = findOffofSingleMatch(relationship,existingMap);
+			if(matched!=null)
+				result.add(matched);
+			return result;
+		}
+	
 		for(int i = startIndex;i<endIndex;i++){
 			String from = embeddedwords.get(i).getTokenRelationship().getFromToken().getToken();
 			for(int j = i+1;j<=endIndex;j++){
@@ -42,8 +50,24 @@ public class RecommendationEdgesVerificationProcesser {
 				}
 			}
 		}
+		
+		TokenRelationship relationship = embeddedwords.get(endIndex).getTokenRelationship();
+		RecommandedTokenRelationship matched = findOffofSingleMatch(relationship,existingMap);
+		if(matched!=null)
+			result.add(matched);
+		
 		return result; 
 	}
+	
+	private RecommandedTokenRelationship findOffofSingleMatch(TokenRelationship tokenRelationship, Map<String,RecommandedTokenRelationship> existingMap ){
+		String key = tokenRelationship.getFromTokenToTokenString();
+		if(!existingMap.containsKey(key))return null;
+		
+		RecommandedTokenRelationship matchedRecommandedTokenRelationship = existingMap.get(key);
+		matchedRecommandedTokenRelationship.setIsVerified(true);
+		return matchedRecommandedTokenRelationship;
+	}
+	
 	
 	private Map<String, RecommandedTokenRelationship> convertExistingToMap(List<RecommandedTokenRelationship> existing){
 		Map<String, RecommandedTokenRelationship> result = new HashMap<>();
@@ -55,7 +79,7 @@ public class RecommendationEdgesVerificationProcesser {
 	}
 	
 	private List<RecommandedTokenRelationship> setVerifiedAndFindExistingMatches(int beginIndex,int endIndex, List<RecommandedTokenRelationship> embeddedwords, Map<String, RecommandedTokenRelationship> existingMap){
-		if(beginIndex>=endIndex) return null; 
+		if(beginIndex>endIndex) return null; 
 		List<RecommandedTokenRelationship> result = new ArrayList<>();
 		List<Integer> consecutiveTokensToken = new ArrayList<>();
 		for(int i = beginIndex;i<=endIndex;i++){
