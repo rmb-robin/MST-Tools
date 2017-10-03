@@ -1,16 +1,23 @@
 package com.mst.filter;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.mst.interfaces.filter.FriendOfFriendService;
 import com.mst.interfaces.filter.SentenceFilter;
 import com.mst.model.SentenceQuery.ShouldMatchOnSentenceEdgesResult;
+import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.util.TokenRelationshipUtil;
 
 public class FriendOfFriendServiceImpl implements FriendOfFriendService {
 
 	SentenceFilter sentenceFilter;
+	HashSet<String> edgeNames = EdgeNames.getExistenceSet();
+	HashSet<String> nonExistenceSetOnly = EdgeNames.getNonExistenceSetOnly();
+	
 	public FriendOfFriendServiceImpl(){
 		sentenceFilter = new SentenceFilterImpl();
 	}
@@ -29,5 +36,21 @@ public class FriendOfFriendServiceImpl implements FriendOfFriendService {
 		}
 		return null;
 	}
+	
+	public boolean shouldAddSentenceOnExistenceFriendOfFriend(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship){
+		
+		boolean isExistenceMatch = false;
+		while(true){
+			ShouldMatchOnSentenceEdgesResult  result =  findFriendOfFriendEdges(relationships, token, originalRelationship, edgeNames);
+			if(result == null) break;
+			
+			 originalRelationship = result.getRelationship();
+			 if(nonExistenceSetOnly.contains(originalRelationship.getEdgeName())) return false;
+			 if(originalRelationship.getEdgeName().equals(EdgeNames.existence))
+				 isExistenceMatch = true; 
+		}
+		return !isExistenceMatch;
+	}
+
 	
 }

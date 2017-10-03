@@ -51,13 +51,13 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 			String id = sentenceDb.getId().toString();
 			if(processedSentences.contains(id))continue;
 			if(shouldByPassResult(sentenceDb.getTokenRelationships(),edgeQuery,searchToken)) continue;
-		
-			processedSentences.add(id);
+		    
 			String oppositeToken = null;
 			TokenRelationship foundRelationship=null;
 			SentenceQueryResult queryResult = null;
 			HashSet<String> edgeNameHash = new HashSet<>();
 			edgeQuery.forEach(a-> edgeNameHash.add(a.getName()) );
+			boolean addFriendofFriendExistence=true;
 			for(TokenRelationship relationship: sentenceDb.getTokenRelationships()){
 			  if(relationship.getEdgeName()==null)continue;
 			  if(!edgeNameHash.contains(relationship.getEdgeName()))continue;
@@ -66,17 +66,26 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 				{	
 				    if(queryResult==null){
 				    	queryResult = SentenceQueryResultFactory.createSentenceQueryResult(sentenceDb);
-				    	result.add(queryResult);
 				    }
 					queryResult.getSentenceQueryEdgeResults()
 						.add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship,EdgeResultTypes.primaryEdge,matches));
 					oppositeToken = relationship.getOppositeToken(token);
 					foundRelationship = relationship;
 					
+					if(edgeNameHash.contains(EdgeNames.existence)){
+						addFriendofFriendExistence = friendOfFriendService.shouldAddSentenceOnExistenceFriendOfFriend(sentenceDb.getTokenRelationships(), oppositeToken, foundRelationship);
+						if(!addFriendofFriendExistence)break;
+					}
+					
 					ShouldMatchOnSentenceEdgesResult friendResult = friendOfFriendService.findFriendOfFriendEdges(sentenceDb.getTokenRelationships(),oppositeToken,foundRelationship,edgeNameHash);
 					if(friendResult!=null)
 						queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(friendResult.getRelationship(),EdgeResultTypes.friendOfFriend,matches));
 				}
+			}
+			
+			if(addFriendofFriendExistence && queryResult!=null){
+				result.add(queryResult);
+				processedSentences.add(id);
 			}
 		}
 	     catch(Exception ex){

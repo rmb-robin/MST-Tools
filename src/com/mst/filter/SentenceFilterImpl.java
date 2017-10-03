@@ -20,7 +20,7 @@ public class SentenceFilterImpl implements SentenceFilter {
 
 	public EdgeMatchOnQueryResult AreEdgesMatchOnQuery(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries, String searchToken){	
 		EdgeMatchOnQueryResult result = new EdgeMatchOnQueryResult();
-		Map<String,List<TokenRelationship>> relationshipsByEdgeName = TokenRelationshipUtil.convertSentenceRelationshipsToMap(existingtokenRelationships);
+		Map<String,List<TokenRelationship>> relationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingtokenRelationships);
 		for(EdgeQuery edgeQuery: edgeQueries){
 			HashSet<String> edgeValues = edgeQuery.getValuesLower();
 			if(edgeQuery.getName().equals(EdgeNames.existence)){
@@ -169,6 +169,18 @@ public class SentenceFilterImpl implements SentenceFilter {
 			return result;
 		}
 		return result;
+	}
+
+ 
+	public List<TokenRelationship> filterForExistenceTypeOnly(List<TokenRelationship> input) {
+		List<TokenRelationship> result = new ArrayList<>();
+		HashSet<String> edgeNameSet = EdgeNames.getExistenceSet();
+		for(TokenRelationship relationship: input){
+			String edgeName = relationship.getEdgeName();
+			if(edgeNameSet.contains(edgeName))
+				result.add(relationship);
+		}
+		return result; 
 	}
 	
 	
