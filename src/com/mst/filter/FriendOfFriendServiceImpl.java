@@ -39,18 +39,14 @@ public class FriendOfFriendServiceImpl implements FriendOfFriendService {
 	
 	public boolean shouldAddSentenceOnExistenceFriendOfFriend(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship){
 		
-		boolean isExistenceMatch = false;
-		while(true){
+		for(int i=0;i<5;i++){
 			ShouldMatchOnSentenceEdgesResult  result =  findFriendOfFriendEdges(relationships, token, originalRelationship, edgeNames);
-			if(result == null) break;
+			if(result == null) return false;
 			
 			 originalRelationship = result.getRelationship();
+			 token = originalRelationship.getOppositeToken(token);
 			 if(nonExistenceSetOnly.contains(originalRelationship.getEdgeName())) return false;
-			 if(originalRelationship.getEdgeName().equals(EdgeNames.existence))
-				 isExistenceMatch = true; 
 		}
-		return !isExistenceMatch;
+		return true;
 	}
-
-	
 }

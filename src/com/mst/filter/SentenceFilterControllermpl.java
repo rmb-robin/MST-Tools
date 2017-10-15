@@ -22,6 +22,7 @@ import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
+import com.mst.util.TokenRelationshipUtil;
 
 public class SentenceFilterControllermpl implements SentenceFilterController {
 	private HashSet<String> processedSentences; 
@@ -58,6 +59,7 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 			HashSet<String> edgeNameHash = new HashSet<>();
 			edgeQuery.forEach(a-> edgeNameHash.add(a.getName()) );
 			boolean addFriendofFriendExistence=true;
+			Map<String, List<TokenRelationship>> relationsByUniqueTofrom = TokenRelationshipUtil.getMapByDistinctToFrom(sentenceDb.getTokenRelationships());
 			for(TokenRelationship relationship: sentenceDb.getTokenRelationships()){
 			  if(relationship.getEdgeName()==null)continue;
 			  if(!edgeNameHash.contains(relationship.getEdgeName()))continue;
@@ -72,17 +74,18 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 					oppositeToken = relationship.getOppositeToken(token);
 					foundRelationship = relationship;
 					
-					if(edgeNameHash.contains(EdgeNames.existence)){
-						addFriendofFriendExistence = friendOfFriendService.shouldAddSentenceOnExistenceFriendOfFriend(sentenceDb.getTokenRelationships(), oppositeToken, foundRelationship);
-						if(!addFriendofFriendExistence)break;
-					}
-					
+//					if(edgeNameHash.contains(EdgeNames.existence ) && addFriendofFriendExistence){
+//						addFriendofFriendExistence = friendOfFriendService.shouldAddSentenceOnExistenceFriendOfFriend(sentenceDb.getTokenRelationships(), oppositeToken, foundRelationship);
+//						if(!addFriendofFriendExistence)break;
+//					}
+//					
 					ShouldMatchOnSentenceEdgesResult friendResult = friendOfFriendService.findFriendOfFriendEdges(sentenceDb.getTokenRelationships(),oppositeToken,foundRelationship,edgeNameHash);
 					if(friendResult!=null)
 						queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(friendResult.getRelationship(),EdgeResultTypes.friendOfFriend,matches));
 				}
 			}
-			
+
+			addFriendofFriendExistence = true;
 			if(addFriendofFriendExistence && queryResult!=null){
 				result.add(queryResult);
 				processedSentences.add(id);

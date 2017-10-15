@@ -32,4 +32,23 @@ public class TokenRelationshipUtil {
 		
 		return result; 
 	}
+	
+	public static Map<String, List<TokenRelationship>> getMapByDistinctToFrom(List<TokenRelationship> tokenRelationships){
+		Map<String, List<TokenRelationship>> result = new HashMap<>();
+		
+		for(TokenRelationship relationship : tokenRelationships){
+			String key = relationship.getFromToken().getToken();
+			addToMapByKey(key, result, relationship);
+			key = relationship.getToToken().getToken();
+			addToMapByKey(key, result, relationship);
+		}
+		return result;
+	}
+	
+    private static void addToMapByKey(String key, Map<String, List<TokenRelationship>> result, TokenRelationship relationship){
+    	if(!result.containsKey(key)){
+			result.put(key, new ArrayList<>());
+		}
+		result.get(key).add(relationship);
+    }
 }

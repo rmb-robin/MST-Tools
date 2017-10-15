@@ -99,6 +99,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		Map<String,EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
 		SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();
 
+		this.init();
 		for(String token: sentenceQueryInstance.getTokens()){
 			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
 			 query
@@ -112,8 +113,8 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			 
 			 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
 			 List<SentenceDb> sentences = query.asList();
-			 result.getSentences().addAll(sentences);
-
+			 
+			 
 			 result.getSentenceQueryResult().addAll(sentenceFilterController.getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges(), token));
 		}
 		return result;
