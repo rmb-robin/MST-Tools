@@ -6,7 +6,7 @@ import java.util.List;
 import org.mongodb.morphia.query.Query;
 
 import com.mst.interfaces.dao.RecommendedTokenRelationshipDao;
-import com.mst.model.sentenceProcessing.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommandedTokenRelationship;
 
 public class RecommendedTokenRelationshipDaoImpl extends BaseDocumentDaoImpl<RecommandedTokenRelationship> implements RecommendedTokenRelationshipDao {
 
@@ -19,6 +19,14 @@ public class RecommendedTokenRelationshipDaoImpl extends BaseDocumentDaoImpl<Rec
 		Query<RecommandedTokenRelationship> query = datastoreProvider.getDataStore().createQuery(RecommandedTokenRelationship.class);
 		 query
 		 .field("key").hasAnyOf(keys);
+		 return query.asList();
+	}
+
+	@Override
+	public List<RecommandedTokenRelationship> getVerified() {
+		Query<RecommandedTokenRelationship> query = datastoreProvider.getDataStore().createQuery(RecommandedTokenRelationship.class);
+		 query
+		 .field("isVerified").equal(true);
 		 return query.asList();
 	}
 }

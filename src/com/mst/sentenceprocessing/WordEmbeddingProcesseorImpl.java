@@ -9,7 +9,7 @@ import com.mst.jsonSerializers.DeepCloner;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
-import com.mst.model.sentenceProcessing.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommandedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 

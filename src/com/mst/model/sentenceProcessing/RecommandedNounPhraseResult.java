@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mst.model.recommandation.RecommandedTokenRelationship;
+
 public class RecommandedNounPhraseResult {
 
 	private List<RecommandedTokenRelationship> recommandedTokenRelationships;

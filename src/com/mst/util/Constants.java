@@ -211,52 +211,52 @@ public class Constants {
 //	    }
 //	}
 	
-//	public enum RedisDBx {
-//	    INSTANCE;
-//	    
-//	    private Jedis jedis;
-//
-//	    RedisDBx() {
-//	        try {
-//	            jedis = new Jedis(REDIS_DB_HOST);
-//		    	System.out.println("Established Redis connection");
-//	        } catch(Exception e) {
-//	            e.printStackTrace();
-//	        }
-//	    }
-//	    
-//	    public Jedis getInstance() {
-//	    	return jedis;
-//	    }
-//
-//	    public void close(){
-//	        jedis.close();
-//	    }
-//	}
+	public enum RedisDBx {
+	    INSTANCE;
+	    
+	    private Jedis jedis;
 
-//	public enum MyJedisPool {
-//	    INSTANCE;
-//	    
-//	    private JedisPool pool;
-//	    
-//	    MyJedisPool() {
-//	        try {
-//	        	JedisPoolConfig config = new JedisPoolConfig();
-//	        	pool = new JedisPool(config, REDIS_DB_HOST);
-//		    	System.out.println("Established Jedis Pool.");
-//	        } catch(Exception e) {
-//	            e.printStackTrace();
-//	        }
-//	    }
-//	    
-//	    public Jedis getResource() {
-//	    	return pool.getResource();
-//	    }
-//
-//	    public void close(){
-//	       pool.close();
-//	    }
-//	}
+	    RedisDBx() {
+	        try {
+	            jedis = new Jedis("10.210.192.4");
+		    	System.out.println("Established Redis connection");
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    public Jedis getInstance() {
+	    	return jedis;
+	    }
+
+	    public void close(){
+	        jedis.close();
+	    }
+	}
+
+	public enum MyJedisPool {
+	    INSTANCE;
+	    
+	    private JedisPool pool;
+	    
+	    MyJedisPool() {
+	        try {
+	        	JedisPoolConfig config = new JedisPoolConfig();
+	        	pool = new JedisPool(config, "10.210.192.4");
+		    	System.out.println("Established Jedis Pool.");
+	        } catch(Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    
+	    public Jedis getResource() {
+	    	return pool.getResource();
+	    }
+
+	    public void close(){
+	       pool.close();
+	    }
+	}
 	
 	public static long getTime() {
 		Calendar cal = Calendar.getInstance();

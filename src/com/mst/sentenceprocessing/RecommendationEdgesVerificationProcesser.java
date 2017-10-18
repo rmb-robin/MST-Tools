@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
+import com.mst.model.recommandation.RecommandedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
-import com.mst.model.sentenceProcessing.RecommandedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
