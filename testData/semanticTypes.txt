@@ -829,3 +829,68 @@ stages,neop-stage
 nabothian,bpoc
 thoracic,bpoc
 normally,qlco
+hypoechoic,qlco-com
+dermoid,qlco-com
+celiac axis,qlco
+superior mesenteric artery,bpoc
+sma,bpoc
+ima,bpoc
+inferior mesenteric artery,bpoc
+suprarenal,bpoc
+aortic root,bpoc
+sinotublar,bpoc
+thoracic aorta,bpoc
+annulus,bpoc
+aortic arch,bpoc
+bifurication,bpoc
+common iliac,bpoc
+evar,proc
+endovascular repair,proc
+stent,proc
+stents,proc
+stenting,proc
+graft,proc
+grafts,proc
+grafting,proc
+ectasia,dysn
+endoleak,dysn
+ulcer,dysn
+ulcers,dysn
+penetrating,qlco
+isthmus,bpoc
+increased,qlco
+uptake,dysn
+heterogeneous,qlco
+multinodular,qlco
+multi-nodular,qlco
+enlarged,qlco
+goiter,qlco
+thyromegaly,qlco
+thyroidectomy,proc
+thyroid bed,bpoc
+adnexum,bpoc
+follicles,dysn
+hydrosalpinx,dysn
+involuting,qlco
+pcos,dysn
+polycystic,dysn
+thick walled,qlco
+saccular,qlco-simple
+hypodensity,dysn
+hypodensities,dysn
+atherosclerotic,qlco
+decreased,qlco
+benign-appearing,qlco-neop
+cystic,qlco
+multiloculated,qlco-com
+enhancing,qlco-com
+hypoechogenic,qlco-com
+corpus,qlco-com
+hemorrhagic,qlco-com
+echogenic,qlco-com
+neoplasm,dysn
+neoplasms,dysn
+thin,qlco
+thick,qlco
+multiseptated,qlco-com
+nodular,dysn

@@ -102,3 +102,15 @@ sign,signs,signed,signing,consent,yes,yes
 place,places,placed,placing,position,yes
 position,positions,positioned,positioning,position,yes
 situate,situates,situated,situating,position,yes
+dilate, dilates, dilated, dilating, dilate,yes,no,no
+encode,encodes,encoded,encoding,encode,no,no,no
+induce,induces,induced,inducing,induce,no,no,no
+modulate,modulates,modulated,modulating,modulate,no,no,no
+operate,operates,operated,operating,operate,no,no,no
+link,links,linked,linking,link,no,no,no
+impair,impairs,impaired,impairing,impair,no,no,no
+remain,remains,remained,remaining,remain,no,no,no
+express,expresses,expressed,expressing,express,no,no,no
+inhibit,inhibits,inhibited,inhibiting,inhibit,no,no,no
+regulate,regulates,regulated,regulating,regulate,no,no,no
+infer,infers,inferring,inferred,infer,no,no,no 
