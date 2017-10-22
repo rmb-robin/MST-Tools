@@ -64,3 +64,5 @@ fusiform,f,dysn,t,null,disease modifier
 previous,f,dysn,t,null,disease history
 dysn,t,resection,f,null,procedure location
 sonographic,f,evidence,f,null,procedure
+qlco,t,bpoc,t,null,finding site modifier
+qlco-com,t,cyst,f,null,complex cyst modifiers

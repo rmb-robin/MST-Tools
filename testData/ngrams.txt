@@ -99,4 +99,5 @@ thoracic aorta,thoracic-aorta
 aortic root,aortic-root
 inferior mesenteric artery,inferior-mesenteric-artery
 superior mesenteric artery,superior-mesenteric-artery
-celiac axis,celiac-axis
+celiac axis,celiac-axis,
+subcentimeter,.9 cm

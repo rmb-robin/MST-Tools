@@ -894,3 +894,12 @@ thin,qlco
 thick,qlco
 multiseptated,qlco-com
 nodular,dysn
+dilation,dysn
+dilations,dysn
+dilatation,dysn
+dilatations,dysn
+celiac axis,bpoc
+saccular,qlco
+septation,dysn
+septations,dysn
+nabothian,qlco
