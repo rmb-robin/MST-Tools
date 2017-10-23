@@ -232,7 +232,6 @@ septated,qlco
 probably,qlco
 ducts,bpoc
 panels,proc
-dilatation,proc
 concurrent,qlco
 ovoids,qlco-shape
 ligament,bpoc
@@ -253,7 +252,6 @@ margins,qlco-sym
 lesions,dysn
 thigh,bpoc
 basilar,qlco
-dilatations,proc
 pre-menopausal,cond
 mother,family
 lip,bpoc
@@ -445,7 +443,6 @@ july,tempor-month
 posterior,qlco
 artery,bpoc
 symptoms,sympto
-dilations,proc
 t cells,bpoc-cell
 uterine,bpoc
 brother,family
@@ -728,7 +725,6 @@ concomitant,qlco
 resection,proc
 codeine,drugpr
 triple negatives,qlco
-dilation,proc
 superior,qlco
 hips,bpoc
 focals,qlco
