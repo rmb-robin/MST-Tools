@@ -822,7 +822,6 @@ tuesday,tempor-day
 currently,qlco-tempor
 infrarenal,bpoc
 stages,neop-stage
-nabothian,bpoc
 thoracic,bpoc
 normally,qlco
 hypoechoic,qlco-com
@@ -860,7 +859,6 @@ heterogeneous,qlco
 multinodular,qlco
 multi-nodular,qlco
 enlarged,qlco
-goiter,qlco
 thyromegaly,qlco
 thyroidectomy,proc
 thyroid bed,bpoc
@@ -871,7 +869,6 @@ involuting,qlco
 pcos,dysn
 polycystic,dysn
 thick walled,qlco
-saccular,qlco-simple
 hypodensity,dysn
 hypodensities,dysn
 atherosclerotic,qlco
@@ -898,4 +895,5 @@ celiac axis,bpoc
 saccular,qlco
 septation,dysn
 septations,dysn
-nabothian,qlco
+nabothian,qlco-simple
+goiter,dysn
