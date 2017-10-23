@@ -826,7 +826,6 @@ thoracic,bpoc
 normally,qlco
 hypoechoic,qlco-com
 dermoid,qlco-com
-celiac axis,qlco
 superior mesenteric artery,bpoc
 sma,bpoc
 ima,bpoc
@@ -891,9 +890,10 @@ dilation,dysn
 dilations,dysn
 dilatation,dysn
 dilatations,dysn
-celiac axis,bpoc
 saccular,qlco
-septation,dysn
-septations,dysn
 nabothian,qlco-simple
 goiter,dysn
+
+septation,dysn
+septations,dysn
+celiac axis,bpoc
