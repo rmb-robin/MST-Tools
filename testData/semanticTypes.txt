@@ -897,3 +897,6 @@ goiter,dysn
 septation,dysn
 septations,dysn
 celiac axis,bpoc
+septation,dysn
+septations,dysn
+celiac axis,bpoc
