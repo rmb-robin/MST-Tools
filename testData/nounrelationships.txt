@@ -59,7 +59,6 @@ clinically,f,abdominal,f,2,disease modifier
 evidence,f,seen,f,1,disease modifier
 incidental,f,dysn,t,null,new disease
 stable,f,dysn,t,null,disease stablity
-infrarenal,f,dysn,t,null,disease modifier
 fusiform,f,dysn,t,null,disease modifier
 previous,f,dysn,t,null,disease history
 dysn,t,resection,f,null,procedure location

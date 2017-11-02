@@ -102,3 +102,5 @@ superior mesenteric artery,superior-mesenteric-artery
 celiac axis,celiac-axis
 subcentimeter,.9 cm
 milimetric,.9 cm
+millimetric,.9 cm
+sub-centerimeter,.9 cm

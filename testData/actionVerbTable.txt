@@ -20,7 +20,7 @@ report,reports,reported,reporting,define,yes,yes
 represent,represents,represented,representing,define,yes
 resemble,resembles,resembled,resembling,appear,yes
 appear,appears,appeared,appearing,appear,yes
-see,sees,saw,seeing,view,yes
+see,sees,seen,seeing,view,yes
 develop,develops,developed,developing,develop,yes
 deny,denies,denied,denying,deny,no,no,yes
 accompany,accompanies,accompanied,accompanying,action,yes
@@ -114,3 +114,9 @@ express,expresses,expressed,expressing,express,no,no,no
 inhibit,inhibits,inhibited,inhibiting,inhibit,no,no,no
 regulate,regulates,regulated,regulating,regulate,no,no,no
 infer,infers,inferring,inferred,infer,no,no,no 
+cause,causes,causing,caused,cause,no,no,no
+work,works,working,worked,work,no,no,no
+drive,drives,driving,drove,drive,no,no,no
+meet,meets,meeting,met,meet,no,no,no
+park,parks,parking,parked,park,no,no,no
+diagnose,diagnoses,diagnosing,diagnosed,diagnose,no,no,no
