@@ -1,5 +1,6 @@
 package com.mst.filter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,22 @@ public class FriendOfFriendServiceImpl implements FriendOfFriendService {
 		}
 		return null;
 	}
+	
+	public List<TokenRelationship> getFriendOfFriendForBothTokens(List<TokenRelationship> relationships,TokenRelationship originalRelationship){
+		List<TokenRelationship> results = new ArrayList<TokenRelationship>();
+		
+		for(TokenRelationship relationship:relationships){
+			if(relationship.equals(originalRelationship)) continue;
+			ShouldMatchOnSentenceEdgesResult result = sentenceFilter.shouldAddTokenFromRelationship(relationship,originalRelationship.getToToken().getToken());
+			if(result.isMatch()){
+				results.add(relationship);
+				continue;	
+			}
+		}
+		
+		return results;
+	}
+	
 	
 	public boolean shouldAddSentenceOnExistenceFriendOfFriend(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship){
 		

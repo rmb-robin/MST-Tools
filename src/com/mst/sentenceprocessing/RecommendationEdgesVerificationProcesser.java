@@ -21,7 +21,40 @@ public class RecommendationEdgesVerificationProcesser {
 			if(matched!=null) 
 				sentenceDiscovery.getWordEmbeddings().addAll(matched);
 		}
+		setverifiedOnPrepPhrases(sentenceDiscovery.getWordEmbeddings());
 		return sentenceDiscovery.getWordEmbeddings();
+	}
+
+	private void setverifiedOnPrepPhrases(List<RecommandedTokenRelationship> embeddedwords){
+	
+		for(int i =0; i<embeddedwords.size();i++) {
+			RecommandedTokenRelationship recommandedTokenRelationship = embeddedwords.get(i);
+			TokenRelationship relationship = recommandedTokenRelationship.getTokenRelationship();
+			String edgeName = relationship.getEdgeName();
+			if(edgeName.equals(WordEmbeddingTypes.firstPrep) || edgeName.equals(WordEmbeddingTypes.secondPrep)) {
+				recommandedTokenRelationship.setIsVerified(true);
+				continue;
+			}
+			
+			if(edgeName.equals(WordEmbeddingTypes.firstVerb) || edgeName.equals(WordEmbeddingTypes.secondVerb)){
+				if(i+1 >=embeddedwords.size()){
+					recommandedTokenRelationship.setIsVerified(true);
+					return; 
+				}
+				RecommandedTokenRelationship nextTokenToken = findNextTokenToken(i+1, embeddedwords);
+				if(nextTokenToken==null) continue; 
+				if(!relationship.getFromToken().getToken().equals(nextTokenToken.getTokenRelationship().getToToken()))
+					recommandedTokenRelationship.setIsVerified(true);
+			}		
+		}
+	}
+		
+	private RecommandedTokenRelationship findNextTokenToken(int index,List<RecommandedTokenRelationship> embeddedwords){
+		for(int i = index; i<embeddedwords.size();i++){
+			RecommandedTokenRelationship recommandedTokenRelationship = embeddedwords.get(i);
+			if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge))return recommandedTokenRelationship;
+		}
+		return null;
 	}
 	
 	private List<RecommandedTokenRelationship> findMatchesFromExistingOnConsequtives(List<Integer> consecutiveTokensToken,List<RecommandedTokenRelationship> embeddedwords, Map<String,RecommandedTokenRelationship> existingMap){

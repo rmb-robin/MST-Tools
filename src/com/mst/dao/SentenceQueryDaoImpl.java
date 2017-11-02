@@ -26,6 +26,7 @@ import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryInstanceResult;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
+import com.mst.model.SentenceQuery.SentenceQueryTextInput;
 import com.mst.model.SentenceQuery.SentenceReprocessingInput;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.graph.Edge;
@@ -94,6 +95,29 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		}
 		return new ArrayList<SentenceQueryResult>(sentenceFilterController.getQueryResults().values());
 	}	
+	
+	@Override
+	public List<SentenceQueryResult> getSentencesByText(SentenceQueryTextInput input) {
+		List<SentenceQueryResult> result = new ArrayList<SentenceQueryResult>();
+		Datastore datastore =  datastoreProvider.getDataStore();
+		Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
+		 query
+		 .field("origSentence").contains(input.getText()) 
+		 .field("organizationId").equal(input.getOrganizationId());
+		 
+		 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
+		 List<SentenceDb> sentences = query.asList();
+		
+		 
+		for(SentenceDb db:sentences){
+			SentenceQueryResult queryResult = new SentenceQueryResult();
+			queryResult.setDiscreteData(db.getDiscreteData());
+			queryResult.setSentence(db.getOrigSentence());
+			queryResult.setSentenceId(db.getId().toString());
+			result.add(queryResult);
+		}
+		return result;
+	}
 
 	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete){
 		Map<String,EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
@@ -165,4 +189,6 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		 .field("discreteData").hasAnyOf(discreteData);
 		 return query.asList();
 	}
+
+
   } 

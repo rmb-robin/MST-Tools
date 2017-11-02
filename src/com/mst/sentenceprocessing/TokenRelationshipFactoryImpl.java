@@ -1,5 +1,7 @@
 package com.mst.sentenceprocessing;
 
+import java.util.UUID;
+
 import org.joda.time.DateTime;
 
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
@@ -12,6 +14,7 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 	@Override
 	public TokenRelationship create(String edgeName, String frameName, WordToken fromToken,WordToken toToken) {
 		TokenRelationship tokenRelationship = new TokenRelationship();
+		tokenRelationship.setUniqueIdentifier(UUID.randomUUID().toString());
 		tokenRelationship.setEdgeName(edgeName);
 		tokenRelationship.setFrameName(frameName);
 	
