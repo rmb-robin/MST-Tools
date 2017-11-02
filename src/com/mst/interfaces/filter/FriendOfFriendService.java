@@ -10,4 +10,6 @@ import com.mst.model.sentenceProcessing.TokenRelationship;
 public interface FriendOfFriendService {
 	ShouldMatchOnSentenceEdgesResult findFriendOfFriendEdges(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship, HashSet<String> edgeNames);
 	boolean shouldAddSentenceOnExistenceFriendOfFriend(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship);
+	List<TokenRelationship> getFriendOfFriendForBothTokens(List<TokenRelationship> relationships,TokenRelationship originalRelationship);
+
 }

@@ -67,6 +67,7 @@ public class SentenceFilterImpl implements SentenceFilter {
 				if(!isEdgeNumeric){
 					if(!edgeValues.contains(relationship.getFromToken().getToken()) && 
 					   !edgeValues.contains(relationship.getToToken().getToken())) {
+						if(!relationship.equals(tokenRelationships.get(tokenRelationships.size()-1))) continue;
 						result.setMatch(false); 
 						return result;
 					}

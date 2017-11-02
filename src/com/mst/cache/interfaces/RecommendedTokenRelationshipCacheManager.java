@@ -9,4 +9,5 @@ public interface RecommendedTokenRelationshipCacheManager {
 	void reload(String key, List<RecommandedTokenRelationship> relations);
 	List<RecommandedTokenRelationship> getListByKey(String key);
 	void addItem(String key, RecommandedTokenRelationship relation);
+	RecommandedTokenRelationship getItem(String key);
 }

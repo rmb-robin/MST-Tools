@@ -53,7 +53,8 @@ public class RecommendedNounPhraseProcesser {
 			RecommandedTokenRelationship recommandedTokenRelationship =  wordEmbeddings.get(i);
 			TokenRelationship tokenRelationship = recommandedTokenRelationship.getTokenRelationship();
 			String type = tokenRelationship.getEdgeName();
-			if(type.equals(WordEmbeddingTypes.defaultEdge))
+			if(type.equals(WordEmbeddingTypes.defaultEdge) || type.equals(WordEmbeddingTypes.secondPrep) ||
+					type.equals(WordEmbeddingTypes.secondVerb))
 					result.put(i, recommandedTokenRelationship);
 		}
 		return result;

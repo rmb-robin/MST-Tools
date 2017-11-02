@@ -1,6 +1,9 @@
 package com.mst.model.sentenceProcessing;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 
@@ -8,9 +11,16 @@ import com.mst.model.metadataTypes.SemanticTypes;
 
 public class TokenRelationship {
 
+	public TokenRelationship(){
+		links = new ArrayList<>();
+	}
+	
+	
 	private String edgeName; 
 	private String frameName; 
 	private DateTime createdTime; 
+	private String uniqueIdentifier;
+	private List<String> links;
 	
 	
 	//should reference Ids maybe...
@@ -84,6 +94,18 @@ public class TokenRelationship {
 	
 	public String getFromTokenToTokenString(){
 		return this.fromToken.getToken()+this.toToken.getToken();
+	}
+	public String getUniqueIdentifier() {
+		return uniqueIdentifier;
+	}
+	public void setUniqueIdentifier(String uniqueIdentifier) {
+		this.uniqueIdentifier = uniqueIdentifier;
+	}
+	public List<String> getLinks() {
+		return links;
+	}
+	public void setLinks(List<String> links) {
+		this.links = links;
 	}
 
 }

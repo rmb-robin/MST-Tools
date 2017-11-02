@@ -18,7 +18,9 @@ public class RecommendedTokenRelationshipCacheManagerImpl extends CacheManagerBa
 	public void reload(String key, List<RecommandedTokenRelationship> relationships) {
 		key = createkey(key);
 		for(RecommandedTokenRelationship relationship: relationships){
-			redisManager.addToSet(key, objectToString(relationship));
+			String json = objectToString(relationship);
+			redisManager.addToSet(key, json);
+			redisManager.addItem(relationship.getTokenRelationship().getUniqueIdentifier(), json);
 		}
 	}
 
@@ -33,12 +35,20 @@ public class RecommendedTokenRelationshipCacheManagerImpl extends CacheManagerBa
 		}
 		return result;
 	}
+	
+	
 
 	@Override
 	public void addItem(String key, RecommandedTokenRelationship relationship) {
 		key = createkey(key);
-		redisManager.addToSet(key, objectToString(relationship));
+		String json = objectToString(relationship);
+		redisManager.addToSet(key, json);
+		redisManager.addItem(relationship.getTokenRelationship().getUniqueIdentifier(), json);
 	}
 
+	@Override
+	public RecommandedTokenRelationship getItem(String key) {
+		return stringToObject(redisManager.getItem(key));
+	}
 }
  

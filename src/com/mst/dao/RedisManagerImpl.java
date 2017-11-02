@@ -24,4 +24,14 @@ public class RedisManagerImpl implements RedisManager {
 	public Set<String> getSet(String key) {
 		return jedis.smembers(key);
 	}
+
+	@Override
+	public void addItem(String key, String value) {
+		jedis.set(key, value);
+	}
+
+	@Override
+	public String getItem(String key) {
+		return jedis.get(key);
+	}
 }
