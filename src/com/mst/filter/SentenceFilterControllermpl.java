@@ -73,12 +73,7 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 						.add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship,EdgeResultTypes.primaryEdge,matches));
 					oppositeToken = relationship.getOppositeToken(token);
 					foundRelationship = relationship;
-					
-//					if(edgeNameHash.contains(EdgeNames.existence ) && addFriendofFriendExistence){
-//						addFriendofFriendExistence = friendOfFriendService.shouldAddSentenceOnExistenceFriendOfFriend(sentenceDb.getTokenRelationships(), oppositeToken, foundRelationship);
-//						if(!addFriendofFriendExistence)break;
-//					}
-//					
+
 					ShouldMatchOnSentenceEdgesResult friendResult = friendOfFriendService.findFriendOfFriendEdges(sentenceDb.getTokenRelationships(),oppositeToken,foundRelationship,edgeNameHash);
 					if(friendResult!=null)
 						queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(friendResult.getRelationship(),EdgeResultTypes.friendOfFriend,matches));
