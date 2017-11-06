@@ -27,8 +27,6 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 	private boolean include(SentenceDiscovery sentenceDiscovery,String left, String right){
 		if(sentenceDiscovery.getWordEmbeddings()==null || sentenceDiscovery.getWordEmbeddings().isEmpty())return false;
 	
-		boolean isLeftMatch = false;
-		boolean isRightMatch = false;
 		for(int i = 0;i<sentenceDiscovery.getWordEmbeddings().size();i++){
 			RecommandedTokenRelationship recommandedTokenRelationship = sentenceDiscovery.getWordEmbeddings().get(i);
 			String fromToken = recommandedTokenRelationship.getTokenRelationship().getFromToken().getToken();
@@ -37,34 +35,33 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 			//left.
 			if(fromToken.equals(left))
 			{
-				if(!isLeftMatch && edgeName.equals(WordEmbeddingTypes.firstVerb) 
+				if(edgeName.equals(WordEmbeddingTypes.firstVerb) 
 						&& isLeftMatchVerb(fromToken,sentenceDiscovery.getWordEmbeddings(), i+1, true)){
 					if(!includeOnTokenTokenRight(sentenceDiscovery.getWordEmbeddings(),i+1)) return false;
-					isLeftMatch = true;
+					return true;
 				}
 				
-				if(!isLeftMatch && edgeName.equals(WordEmbeddingTypes.defaultEdge) && 
-			       isLeftMatchVerb(fromToken,sentenceDiscovery.getWordEmbeddings(), i+1, true)){
+				if(edgeName.equals(WordEmbeddingTypes.defaultEdge) && 
+			       isLeftMatchVerb(fromToken,sentenceDiscovery.getWordEmbeddings(), i+1, false)){
 					if(!includeOnTokenTokenLeft(sentenceDiscovery.getWordEmbeddings(),i-1)) return false;
-					isLeftMatch = true;
+					return true;
 				}
 			}
 		
 			//right.
-			if(!isRightMatch && toToken.equals(right) && edgeName.equals(WordEmbeddingTypes.defaultEdge) 
+			if(toToken.equals(right) && edgeName.equals(WordEmbeddingTypes.defaultEdge) 
 					&& isRightMatchVerb(toToken,sentenceDiscovery.getWordEmbeddings(), i+1)){
 				
 				if(!includeOnTokenTokenRight(sentenceDiscovery.getWordEmbeddings(),i+1)) return false;
-				isRightMatch = true;
+				return true;
 				
 			}
 			
 			if(isRightMatchOnToAndFromToken(edgeName, toToken, fromToken, right)){
 				if(!includeOnTokenTokenRight(sentenceDiscovery.getWordEmbeddings(),i+1)) return false;
-				isRightMatch = true;
+				return true;
 				
 			}
-			if(isLeftMatch && isRightMatch) return true;
 		}
 	
 		return false;
@@ -90,8 +87,8 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 	}
 	
 	private boolean isLeftMatchVerb(String fromToken, List<RecommandedTokenRelationship> wordEmbeddings, int index, boolean isFirst){
-		if(index<=wordEmbeddings.size()) return false;
-		for(int i = index;i<wordEmbeddings.size();i++){
+	//	if(index>=wordEmbeddings.size()) return false;
+		for(int i = 0;i<wordEmbeddings.size();i++){
 			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!recommandedTokenRelationship.getTokenRelationship().getToToken().getToken().equals(fromToken))continue;
@@ -110,11 +107,9 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 		return false;
 	}
 	
-
-	
 	private boolean isRightMatchVerb(String toToken, List<RecommandedTokenRelationship> wordEmbeddings, int index){
-		if(index<=wordEmbeddings.size()) return false;
-		for(int i = index;i<wordEmbeddings.size();i++){
+	//	if(index>=wordEmbeddings.size()) return false;
+		for(int i = 0;i<wordEmbeddings.size();i++){
 			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!recommandedTokenRelationship.getTokenRelationship().getFromToken().getToken().equals(toToken))continue;
@@ -125,24 +120,26 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 	
 	
 	private boolean includeOnTokenTokenRight(List<RecommandedTokenRelationship> wordEmbeddings, int index){
-		if(index<=wordEmbeddings.size()) return false;
-		for(int i = index;i<wordEmbeddings.size();i++){
+//		if(index>=wordEmbeddings.size()) return false;
+		for(int i = 0;i<wordEmbeddings.size();i++){
 			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!edgeName.equals(WordEmbeddingTypes.defaultEdge))continue;
-			if(recommandedTokenRelationship.getIsVerified()) return true;
+		//	if(recommandedTokenRelationship.getIsVerified()) return true;
+			return true;
 		}
 		return false;
 	}
 
 	
 	private boolean includeOnTokenTokenLeft(List<RecommandedTokenRelationship> wordEmbeddings, int index){
-		if(index>0) return false;
-		for(int i = index;i>=0;i--){
+	//	if(index<0) return false;
+		for(int i = wordEmbeddings.size()-1;i>=0;i--){
 			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!edgeName.equals(WordEmbeddingTypes.defaultEdge))continue;
-			if(recommandedTokenRelationship.getIsVerified()) return true;
+			//if(recommandedTokenRelationship.getIsVerified()) return true;
+			return true;
 		}
 		return false;
 	}

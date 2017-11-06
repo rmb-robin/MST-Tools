@@ -95,6 +95,11 @@ public class TokenRelationship {
 	public String getFromTokenToTokenString(){
 		return this.fromToken.getToken()+this.toToken.getToken();
 	}
+	
+	public String getFromTokenToTokenStringWithSpace(){
+		return this.fromToken.getToken()+ " " + this.toToken.getToken();
+	}
+	
 	public String getUniqueIdentifier() {
 		return uniqueIdentifier;
 	}

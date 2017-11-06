@@ -1,11 +1,13 @@
 package com.mst.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
@@ -15,6 +17,7 @@ import org.mongodb.morphia.query.QueryResults;
 
 import com.mst.filter.SentenceDiscoveryFilterImpl;
 import com.mst.filter.SentenceFilterControllermpl;
+import com.mst.filter.SentenceQueryResultFactory;
 import com.mst.interfaces.DiscreteDataDao;
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceQueryDao;
@@ -35,6 +38,8 @@ import com.mst.model.graph.Edge;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
+import com.mst.model.metadataTypes.WordEmbeddingTypes;
+import com.mst.model.recommandation.RecommandedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -105,28 +110,23 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		sentenceDiscoveryFilter = new SentenceDiscoveryFilterImpl();
 		List<SentenceQueryResult> result = new ArrayList<SentenceQueryResult>();
 		Datastore datastore =  datastoreProvider.getDataStore();
+		Pattern pattern = Pattern.compile(input.getText(), Pattern.CASE_INSENSITIVE);
 		Query<SentenceDiscovery> query = datastore.createQuery(SentenceDiscovery.class);
-		 query
-		 .field("origSentence").contains(input.getText());
+		query
+		.field("origSentence").equal(pattern);
 		 
-		 List<SentenceDiscovery> sentences = query.asList();
-		 sentences = sentenceDiscoveryFilter.filter(sentences, input.getText());
-		 
+		List<SentenceDiscovery> sentences = query.asList();
+		sentences = sentenceDiscoveryFilter.filter(sentences, input.getText());
+		SentenceQueryResultFactory factory = new SentenceQueryResultFactory(); 
 		for(SentenceDiscovery db:sentences){
 			SentenceQueryResult queryResult = new SentenceQueryResult();
 			queryResult.setSentence(db.getOrigSentence());
 			queryResult.setSentenceId(db.getId().toString());
+			queryResult.getSentenceQueryEdgeResults().add(factory.createSentenceQueryResultForDiscovery(input.getText(), db));
 			result.add(queryResult);
 		}
 		return result;
 	}
-	
-	
-	
-	
-
-	
-	
 
 	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete){
 		Map<String,EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
