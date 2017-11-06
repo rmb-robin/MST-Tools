@@ -13,10 +13,12 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.QueryResults;
 
+import com.mst.filter.SentenceDiscoveryFilterImpl;
 import com.mst.filter.SentenceFilterControllermpl;
 import com.mst.interfaces.DiscreteDataDao;
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceQueryDao;
+import com.mst.interfaces.filter.SentenceDiscoveryFilter;
 import com.mst.interfaces.filter.SentenceFilterController;
 import com.mst.model.SemanticType;
 import com.mst.model.SentenceQuery.DiscreteDataFilter;
@@ -33,6 +35,7 @@ import com.mst.model.graph.Edge;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
+import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
@@ -45,7 +48,8 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 
 	private SentenceFilterController sentenceFilterController; 
 	private DiscreteDataDao discreteDataDao; 
-	
+	private SentenceDiscoveryFilter sentenceDiscoveryFilter; 
+			
 	@Override
 	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
 		this.datastoreProvider = provider;	
@@ -98,26 +102,31 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	@Override
 	public List<SentenceQueryResult> getSentencesByText(SentenceQueryTextInput input) {
+		sentenceDiscoveryFilter = new SentenceDiscoveryFilterImpl();
 		List<SentenceQueryResult> result = new ArrayList<SentenceQueryResult>();
 		Datastore datastore =  datastoreProvider.getDataStore();
-		Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
+		Query<SentenceDiscovery> query = datastore.createQuery(SentenceDiscovery.class);
 		 query
-		 .field("origSentence").contains(input.getText()) 
-		 .field("organizationId").equal(input.getOrganizationId());
+		 .field("origSentence").contains(input.getText());
 		 
-		 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
-		 List<SentenceDb> sentences = query.asList();
-		
+		 List<SentenceDiscovery> sentences = query.asList();
+		 sentences = sentenceDiscoveryFilter.filter(sentences, input.getText());
 		 
-		for(SentenceDb db:sentences){
+		for(SentenceDiscovery db:sentences){
 			SentenceQueryResult queryResult = new SentenceQueryResult();
-			queryResult.setDiscreteData(db.getDiscreteData());
 			queryResult.setSentence(db.getOrigSentence());
 			queryResult.setSentenceId(db.getId().toString());
 			result.add(queryResult);
 		}
 		return result;
 	}
+	
+	
+	
+	
+
+	
+	
 
 	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete){
 		Map<String,EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
