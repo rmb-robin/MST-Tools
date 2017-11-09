@@ -125,7 +125,30 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			queryResult.getSentenceQueryEdgeResults().add(factory.createSentenceQueryResultForDiscovery(input.getText(), db));
 			result.add(queryResult);
 		}
+		return filterTextSentences(result);
+	}
+	
+	private List<SentenceQueryResult> filterTextSentences(List<SentenceQueryResult> sentences){
+		List<SentenceQueryResult> result = new ArrayList<>();
+		
+		for(SentenceQueryResult sentenceQueryResult: sentences){
+			SentenceQueryEdgeResult edge = sentenceQueryResult.getSentenceQueryEdgeResults().get(0);
+			if(edge.getEdgeName()==null) continue;
+			if(edge.getEdgeResultType()==null) continue;
+			if(edge.getFromToken()==null) continue;
+			if(edge.getToToken()==null) continue;
+			if(edge.getTokenType()==null) continue;
+			if(edge.getMatchedValue()==null) continue;
+			if(isMatchTokenMatch(edge))
+				result.add(sentenceQueryResult);
+		}
 		return result;
+	}
+	
+	private boolean isMatchTokenMatch(SentenceQueryEdgeResult edge){
+		if(edge.getMatchedValue().trim().equals(edge.getToToken().trim()))return true;
+		if(edge.getMatchedValue().trim().equals(edge.getFromToken().trim()))return true;
+		return false;
 	}
 
 	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete){
@@ -147,12 +170,27 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
 			 List<SentenceDb> sentences = query.asList();
 			 
-			 
-			 result.getSentenceQueryResult().addAll(sentenceFilterController.getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges(), token));
+			 List<SentenceQueryResult> queryResults = sentenceFilterController.getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges(), token);
+			 result.getSentenceQueryResult().addAll(queryResults);
+			 result.getSentences().addAll(getMatchedSentences(queryResults, sentences));
 		}
 		return result;
 	}
 
+	
+	private List<SentenceDb> getMatchedSentences(List<SentenceQueryResult> queryResults, List<SentenceDb> sentences){
+		HashSet<String> ids = new HashSet<>();
+		for(SentenceQueryResult q: queryResults){
+			ids.add(q.getSentenceId());
+		}
+		List<SentenceDb> result = new ArrayList<>();
+		for(SentenceDb s: sentences){
+			if(ids.contains(s.getId().toString()))
+				result.add(s);
+		}
+		return result;
+	}
+	
 	
 	public List<String> getEdgeNamesByTokens(List<String> tokens) {
 		Datastore datastore =  datastoreProvider.getDataStore();

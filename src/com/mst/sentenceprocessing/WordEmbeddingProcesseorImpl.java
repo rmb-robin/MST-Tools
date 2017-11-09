@@ -68,8 +68,12 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 		if(firstPos.equals(PartOfSpeachTypes.CC))
 			return WordEmbeddingTypes.firstConjunction;
 		if(secondPos.equals(PartOfSpeachTypes.CC))
-			return WordEmbeddingTypes.secondConjunction;			
+			return WordEmbeddingTypes.secondConjunction;	
 		
+		if(firstPos.equals(PartOfSpeachTypes.DP))
+			return WordEmbeddingTypes.firstDependentSignal;
+		if(secondPos.equals(PartOfSpeachTypes.DP))
+			return WordEmbeddingTypes.secondDependentSignal;	
 		return WordEmbeddingTypes.defaultEdge;
 	}
 }

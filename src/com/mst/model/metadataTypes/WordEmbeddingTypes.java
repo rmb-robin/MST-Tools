@@ -10,5 +10,6 @@ public class WordEmbeddingTypes {
 	public static String verbPrep = "verb-prep";
 	public static String firstConjunction = "conj+1";
 	public static String secondConjunction = "conj-1";
-	
+	public static String secondDependentSignal = "DP-1";
+	public static String firstDependentSignal = "DP+1";
 }

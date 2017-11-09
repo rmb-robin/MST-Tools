@@ -1,6 +1,7 @@
 package com.mst.autocomplete.implementation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import com.mst.autocomplete.interfaces.RecommendedTokenRelationshipAutocompleteQuery;
@@ -67,7 +68,7 @@ public class RecommendedTokenRelationshipAutocompleteQueryImpl implements Recomm
 	}
 	
 	private List<String> processMultipleTokens(List<String> tokens){
-		List<String> result = new ArrayList<>();
+		HashSet<String> result = new HashSet<>();
 		
 		List<RecommandedTokenRelationship> relationships = cacheManager.getListByKey(tokens.get(0));
 		List<RecommandedTokenRelationship> filtered = new ArrayList<>();
@@ -78,16 +79,16 @@ public class RecommendedTokenRelationshipAutocompleteQueryImpl implements Recomm
 			if(tokenRelationship.getLinks().isEmpty()) continue;
 			result.addAll(getNextToken(recommandedTokenRelationship, tokens, true));	
 		}		
-		return result;
+		return new ArrayList<String>(result);
 	}
 	
 	private List<String> processSingleToken(String token){
-		List<String> result = new ArrayList<>();
+		HashSet<String> result = new HashSet<>();
 		List<RecommandedTokenRelationship> relationships = cacheManager.getListByKey(token);
 		for(RecommandedTokenRelationship recommandedTokenRelationship: relationships){
 			result.add(token + " " + recommandedTokenRelationship.getTokenRelationship().getOppositeToken(token));
 		}
-		return result;
+		return new ArrayList<String>(result);
 	}
 	
 	
