@@ -20,7 +20,7 @@ report,reports,reported,reporting,define,yes,yes
 represent,represents,represented,representing,define,yes
 resemble,resembles,resembled,resembling,appear,yes
 appear,appears,appeared,appearing,appear,yes
-see,sees,saw,seeing,view,yes
+see,sees,seen,seeing,view,yes
 develop,develops,developed,developing,develop,yes
 deny,denies,denied,denying,deny,no,no,yes
 accompany,accompanies,accompanied,accompanying,action,yes
@@ -72,7 +72,7 @@ decompress,decompresses,decompressed,decompressing,change value,yes,yes
 decrease,decreases,decreased,decreasing,change value,yes,yes
 deflate,deflates,deflated,deflating,change value,yes,yes
 degenerate,degenerates,degenerated,degenerating,change value,yes,yes
-down regulate,down regulates,down regulated,down regulating,change value,yes,yes
+downregulate,downregulates,downregulated,downregulating,change value,yes,yes
 enhance,enhances,enhanced,enhancing,change value,yes,yes
 enlarge,enlarges,enlarged,enlarging,change value,yes,yes
 extend,extends,extended,extending,change value,yes,yes
@@ -102,3 +102,22 @@ sign,signs,signed,signing,consent,yes,yes
 place,places,placed,placing,position,yes
 position,positions,positioned,positioning,position,yes
 situate,situates,situated,situating,position,yes
+dilate, dilates, dilated, dilating, dilate,yes,no,no
+encode,encodes,encoded,encoding,encode,no,no,no
+induce,induces,induced,inducing,induce,no,no,no
+modulate,modulates,modulated,modulating,modulate,no,no,no
+operate,operates,operated,operating,operate,no,no,no
+link,links,linked,linking,link,no,no,no
+impair,impairs,impaired,impairing,impair,no,no,no
+remain,remains,remained,remaining,remain,no,no,no
+express,expresses,expressed,expressing,express,no,no,no
+inhibit,inhibits,inhibited,inhibiting,inhibit,no,no,no
+regulate,regulates,regulated,regulating,regulate,no,no,no
+infer,infers,inferring,inferred,infer,no,no,no 
+cause,causes,causing,caused,cause,no,no,no
+work,works,working,worked,work,no,no,no
+drive,drives,driving,drove,drive,no,no,no
+meet,meets,meeting,met,meet,no,no,no
+park,parks,parking,parked,park,no,no,no
+diagnose,diagnoses,diagnosing,diagnosed,diagnose,no,no,no
+suppress,suppresses,suppressing,suppressed,suppress,no,no,no

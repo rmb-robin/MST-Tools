@@ -232,7 +232,6 @@ septated,qlco
 probably,qlco
 ducts,bpoc
 panels,proc
-dilatation,proc
 concurrent,qlco
 ovoids,qlco-shape
 ligament,bpoc
@@ -253,7 +252,6 @@ margins,qlco-sym
 lesions,dysn
 thigh,bpoc
 basilar,qlco
-dilatations,proc
 pre-menopausal,cond
 mother,family
 lip,bpoc
@@ -445,7 +443,6 @@ july,tempor-month
 posterior,qlco
 artery,bpoc
 symptoms,sympto
-dilations,proc
 t cells,bpoc-cell
 uterine,bpoc
 brother,family
@@ -663,7 +660,6 @@ vulva,bpoc
 current,qlco-tempor
 min,qlco-measu
 heel,bpoc
-benign,qlco-neop
 mammogram,proc
 high-grade,qlco
 measurements,qlco-area
@@ -700,7 +696,6 @@ dense,qlco
 nausea,sympto
 gastrointestinal,bpoc
 horseshoe,qlco-shape
-dominant follicle,qlco-simple
 thyroid,bpoc
 mr with iv contrast,proc
 silhouette,qlco
@@ -728,7 +723,6 @@ concomitant,qlco
 resection,proc
 codeine,drugpr
 triple negatives,qlco
-dilation,proc
 superior,qlco
 hips,bpoc
 focals,qlco
@@ -826,6 +820,86 @@ tuesday,tempor-day
 currently,qlco-tempor
 infrarenal,bpoc
 stages,neop-stage
-nabothian,bpoc
 thoracic,bpoc
 normally,qlco
+hypoechoic,qlco-com
+dermoid,qlco-com
+superior mesenteric artery,bpoc
+sma,bpoc
+ima,bpoc
+inferior mesenteric artery,bpoc
+suprarenal,bpoc
+aortic root,bpoc
+sinotublar,bpoc
+thoracic aorta,bpoc
+annulus,bpoc
+aortic arch,bpoc
+bifurication,bpoc
+common iliac,bpoc
+evar,proc
+endovascular repair,proc
+stent,proc
+stents,proc
+stenting,proc
+graft,proc
+grafts,proc
+grafting,proc
+ectasia,dysn
+endoleak,dysn
+ulcer,dysn
+ulcers,dysn
+penetrating,qlco
+isthmus,bpoc
+increased,qlco
+uptake,dysn
+heterogeneous,qlco
+multinodular,qlco
+multi-nodular,qlco
+enlarged,qlco
+thyromegaly,qlco
+thyroidectomy,proc
+thyroid bed,bpoc
+adnexum,bpoc
+follicles,dysn
+hydrosalpinx,dysn
+involuting,qlco
+pcos,dysn
+polycystic,dysn
+thick walled,qlco
+hypodensity,dysn
+hypodensities,dysn
+atherosclerotic,qlco
+decreased,qlco
+benign-appearing,qlco-neop
+cystic,qlco
+multiloculated,qlco-com
+enhancing,qlco-com
+hypoechogenic,qlco-com
+corpus,qlco-com
+hemorrhagic,qlco-com
+echogenic,qlco-com
+neoplasm,dysn
+neoplasms,dysn
+thin,qlco
+thick,qlco
+multiseptated,qlco-com
+nodular,dysn
+dilation,dysn
+dilations,dysn
+dilatation,dysn
+dilatations,dysn
+saccular,qlco
+nabothian,qlco-simple
+goiter,dysn
+septation,dysn
+septations,dysn
+celiac axis,bpoc
+septation,dysn
+septations,dysn
+celiac axis,bpoc
+septation,dysn
+septations,dysn
+celiac axis,bpoc
+dominant follicle,dysn
+dominant follicles,dysn
+benign,qlco-simple

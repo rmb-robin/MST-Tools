@@ -93,3 +93,15 @@ at least,at-least
 MR with IV contrast,MR-with-iv-contrast
 dominant follicular,dominant-follicular
 endovascular aneurysm repair,endovascular-aneurysm-repair
+common iliac,common-iliac
+aortic arch,aortic-arch
+thoracic aorta,thoracic-aorta
+aortic root,aortic-root
+inferior mesenteric artery,inferior-mesenteric-artery
+superior mesenteric artery,superior-mesenteric-artery
+celiac axis,celiac-axis
+subcentimeter,.9 cm
+milimetric,.9 cm
+millimetric,.9 cm
+sub-centimeter,.9 cm
+dominant follicles,dominant-follicles
