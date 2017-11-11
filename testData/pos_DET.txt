@@ -3,6 +3,3 @@ this
 a
 an
 any
-you
-we
-us
