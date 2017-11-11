@@ -164,6 +164,29 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 		 }
 		updateExistingResults(matchedIds);
 	}
+	
+	public void filterForAndNotAll(SentenceQueryInstance sentenceQueryInstance){
+		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
+		HashSet<String> matchedIds = new HashSet<>();
+		List<String> unmatchedTokens = new ArrayList<String>();
+		for (Map.Entry<String, SentenceDb> entry : cumalativeSentenceResults.entrySet()) {
+			int tokenMatchCount=0;
+			HashSet<String> sentenceUniqueEdgeNames = new HashSet<>();
+			entry.getValue().getTokenRelationships().stream().forEach(a-> sentenceUniqueEdgeNames.add(a.getEdgeName()));
+			for(String edgeName: edgeQueriesByName.keySet()){
+				if(sentenceUniqueEdgeNames.contains(edgeName)){
+					tokenMatchCount+=1;
+				}
+			}
+				
+			if(tokenMatchCount==edgeQueriesByName.size()) continue;
+			for(String token: unmatchedTokens){
+				if(shouldByPassResultExclude(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges(), token)) continue;
+			}
+			matchedIds.add(entry.getKey());
+		 }
+		updateExistingResults(matchedIds);
+	}
 		
 	
 

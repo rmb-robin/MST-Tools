@@ -13,6 +13,7 @@ public interface SentenceFilterController {
 	List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, String searchToken);
 	void filterForAndNot(SentenceQueryInstance sentenceQueryInstance);
 	void filterForAnd(SentenceQueryInstance sentenceQueryInstance);
+	void filterForAndNotAll(SentenceQueryInstance sentenceQueryInstance);
 	Map<String,SentenceQueryResult>  getQueryResults();
 	void addSentencesToResult(SentenceQueryInstanceResult result);
 	Map<String, EdgeQuery> convertEdgeQueryToDictionary(SentenceQueryInstance input);
