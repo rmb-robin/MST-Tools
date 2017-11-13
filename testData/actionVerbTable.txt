@@ -121,3 +121,8 @@ meet,meets,meeting,met,meet,no,no,no
 park,parks,parking,parked,park,no,no,no
 diagnose,diagnoses,diagnosing,diagnosed,diagnose,no,no,no
 suppress,suppresses,suppressing,suppressed,suppress,no,no,no
+found,founds,founded,founding,found,yes,yes
+co-found,co-founds,co-founded,co-founding,co-found,yes,yes
+equal,equals,equaled,equaling,equal,yes,yes
+start,starts,started,starting,start,yes,yes
+begin,begins,began,beginning,begin,yes,yes
