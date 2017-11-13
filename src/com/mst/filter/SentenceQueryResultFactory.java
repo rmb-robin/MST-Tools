@@ -127,7 +127,7 @@ public class SentenceQueryResultFactory {
     	if(!edgeName.equals(WordEmbeddingTypes.defaultEdge)) return false; 
 
 		if(isLeft)
-			verbMinusOneTokenTokens.add(recommandedTokenRelationship);
+			verbMinusOneTokenTokens.add(0,recommandedTokenRelationship);
 		else 
 			verbPlusOneTokenTokens.add(recommandedTokenRelationship);
 		return true;
@@ -209,10 +209,10 @@ public class SentenceQueryResultFactory {
 		for(RecommandedTokenRelationship recommandedTokenRelationship: relationships){
 			TokenRelationship relation = recommandedTokenRelationship.getTokenRelationship();
 			if(!result.contains(relation.getFromToken().getToken()))
-				result +=  relation.getFromToken().getToken();
+				result +=  relation.getFromToken().getToken() + " ";
 				
 			if(!result.contains(relation.getToToken().getToken())) {
-				String append = " " + relation.getToToken().getToken() + " ";
+				String append = relation.getToToken().getToken() + " ";
 				result +=  append;
 			}
 		}
@@ -231,6 +231,6 @@ public class SentenceQueryResultFactory {
 			String append = token + " ";
 			matched += append;
 		}
-		edgeResult.setMatchedValue(matched);
+		edgeResult.setMatchedValue(matched.trim());
 	}
 }
