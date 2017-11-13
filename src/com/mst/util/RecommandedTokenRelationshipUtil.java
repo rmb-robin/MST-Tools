@@ -46,4 +46,11 @@ public class RecommandedTokenRelationshipUtil {
     	}
     	return result;
     }
+    
+    public static RecommandedTokenRelationship getByEdgeName(List<RecommandedTokenRelationship> recommandedTokenRelationships, String edgeName){
+    	for(RecommandedTokenRelationship recommandedTokenRelationship: recommandedTokenRelationships){
+    		if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(edgeName))return recommandedTokenRelationship;
+    	}
+    	return null;
+    }
 }

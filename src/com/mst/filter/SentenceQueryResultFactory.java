@@ -17,6 +17,7 @@ import com.mst.model.recommandation.RecommandedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.util.RecommandedTokenRelationshipUtil;
 
 public class SentenceQueryResultFactory {
 
@@ -26,12 +27,12 @@ public class SentenceQueryResultFactory {
 	private List<RecommandedTokenRelationship> verbPlusOneTokenTokens;
 	private RecommandedTokenRelationship verbMinusOne = null;
 	private RecommandedTokenRelationship verbPlusOne = null;
-	
+	private RecommandedTokenRelationship verbverb = null;
 	private int verbMinusOneIndex, verbPlusOneIndex = 0;
 	private SentenceQueryEdgeResult edgeResult; 
 	private List<String> tokensHash;
 	private boolean edgeFound; 
-	
+	private boolean verbverbCheck; 
 	
 	public static SentenceQueryResult createSentenceQueryResult(SentenceDb sentenceDb){
 		SentenceQueryResult result = new SentenceQueryResult();
@@ -61,14 +62,22 @@ public class SentenceQueryResultFactory {
 	
 	private void init(){
 		edgeFound = false; 
-	    verbMinusOneTokenTokens = new ArrayList<>();
+		verbverbCheck = false;
+		verbMinusOneTokenTokens = new ArrayList<>();
 		verbPlusOneTokenTokens = new ArrayList<>();
 		verbMinusOneIndex =0; verbPlusOneIndex = 0;
 		verbMinusOne = null;
 		verbPlusOne = null;
-
+		verbverb = null;
 		edgeResult = new SentenceQueryEdgeResult();
 		edgeResult.setEdgeResultType(EdgeResultTypes.primaryEdge);
+	}
+	
+	
+	private boolean verbverbCheck(RecommandedTokenRelationship recommandedTokenRelationship){
+		if(verbverb==null) return false;
+		if(verbverb.getTokenRelationship().getFromToken().getToken().equals(recommandedTokenRelationship.getTokenRelationship().getToToken().getToken()))return true;
+		return false;	
 	}
 	
     private void processVerbRelationship(RecommandedTokenRelationship recommandedTokenRelationship,int i,String edgeName){
@@ -78,28 +87,39 @@ public class SentenceQueryResultFactory {
     		verbMinusOneIndex = i;
     		verbMinusOne = recommandedTokenRelationship;
     		 token = recommandedTokenRelationship.getTokenRelationship().getToToken().getToken();
-    	}
+    		 verbverbCheck = verbverbCheck(recommandedTokenRelationship);
     	
-		if(!edgeFound){
-			if(tokensHash.contains(token)) tokensHash.remove(token);
-			edgeResult.setEdgeName(token);
-			edgeResult.setTokenType("from");
-			edgeFound = true;
-		}
+    	
+			if(!edgeFound){
+				if(tokensHash.contains(token)) tokensHash.remove(token); 
+				if(!verbverbCheck){
+					edgeResult.setEdgeName(token);
+					edgeResult.setTokenType("from");
+					edgeFound = true;
+				}
+			}
 		
+    	}
 		if(edgeName.equals(WordEmbeddingTypes.firstVerb) || edgeName.equals(WordEmbeddingTypes.verbPrep)){
     		verbPlusOneIndex = i;
     		verbPlusOne = recommandedTokenRelationship;
-    		token = recommandedTokenRelationship.getTokenRelationship().getFromToken().getToken();
-    	}
-		
+
 		if(!edgeFound){
-			token = recommandedTokenRelationship.getTokenRelationship().getToToken().getToken();
+			
+			if(verbverbCheck){
+				token = recommandedTokenRelationship.getTokenRelationship().getFromToken().getToken();
+				edgeResult.setTokenType("from");
+			}
+			else 
+			{				
+				token = recommandedTokenRelationship.getTokenRelationship().getToToken().getToken();
+				edgeResult.setTokenType("to");
+			}
 			if(tokensHash.contains(token)) tokensHash.remove(token);
 			edgeResult.setEdgeName(token);	
-			edgeResult.setTokenType("to");
 			edgeFound = true;
-		}		
+		}	
+	  }
     }
     
     private boolean processDefaultRelationship(RecommandedTokenRelationship recommandedTokenRelationship,boolean isLeft){	
@@ -165,6 +185,7 @@ public class SentenceQueryResultFactory {
 		String[] tokens = text.split(" ");
 		tokensHash = new ArrayList<>(Arrays.asList(tokens));
 		List<RecommandedTokenRelationship> edges = filteredWordEmbeddings(sentenceDiscovery.getWordEmbeddings());
+		verbverb = RecommandedTokenRelationshipUtil.getByEdgeName(edges, WordEmbeddingTypes.bothVerbs); 
 		
 		for(int i =0;i<edges.size();i++) {
 			RecommandedTokenRelationship recommandedTokenRelationship = edges.get(i);
