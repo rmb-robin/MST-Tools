@@ -7,8 +7,11 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+import com.mst.model.raw.HL7Element;
+
 @Entity("hl7Details")
 public class HL7Details {
+	
 	@Id
 	private ObjectId id;
 	private String org;
@@ -16,6 +19,8 @@ public class HL7Details {
 	private HL7Element date;
 	private HL7FreeText text = new HL7FreeText();
 	private List<HL7Element> discrete = new ArrayList<>();
+	private boolean convertMeasurements = true;
+	private boolean convertLargest = true;
 	
 	public ObjectId getId() {
 		return id;
@@ -24,7 +29,7 @@ public class HL7Details {
 	public void setId(ObjectId id) {
 		this.id = id;
 	}
-	
+
 	public String getOrg() {
 		return org;
 	}
@@ -63,5 +68,21 @@ public class HL7Details {
 	
 	public void setDiscrete(List<HL7Element> discrete) {
 		this.discrete = discrete;
+	}
+
+	public boolean isConvertMeasurements() {
+		return convertMeasurements;
+	}
+
+	public void setConvertMeasurements(boolean convertMeasurements) {
+		this.convertMeasurements = convertMeasurements;
+	}
+
+	public boolean isConvertLargest() {
+		return convertLargest;
+	}
+
+	public void setConvertLargest(boolean convertLargest) {
+		this.convertLargest = convertLargest;
 	}
 }

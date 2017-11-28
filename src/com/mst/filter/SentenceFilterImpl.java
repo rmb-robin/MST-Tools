@@ -55,10 +55,12 @@ public class SentenceFilterImpl implements SentenceFilter {
 					if(relationship.getFromToken().isCardinal()){
 						isEdgeInRange = isNumericInRange(edgeValuesList,relationship.getFromToken().getToken());
 						MatchInfo matchInfo = createMatchInfo(isEdgeInRange,"from",relationship.getFromToken().getToken());
-						if(matchInfo!=null) 
+						if(matchInfo!=null) {
 							result.getMatches().put(edgeQuery.getName(),matchInfo);
+							continue;
+						}
 					}
-					else if(relationship.getToToken().isCardinal()) 
+					if(relationship.getToToken().isCardinal()) 
 						isEdgeInRange = isNumericInRange(edgeValuesList,relationship.getToToken().getToken());
 						MatchInfo matchInfo = createMatchInfo(isEdgeInRange,"to",relationship.getToToken().getToken());
 						if(matchInfo!=null) 

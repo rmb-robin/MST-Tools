@@ -3,6 +3,8 @@ package com.mst.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mst.model.raw.HL7Element;
+
 public class HL7FreeText {
 	private String delimiter = " "; // the delimiter to output when grouping multiple HL7 fields into one free text body
 	List<HL7Element> hl7Elements = new ArrayList<>();
