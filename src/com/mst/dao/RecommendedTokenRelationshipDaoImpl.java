@@ -16,7 +16,7 @@ public class RecommendedTokenRelationshipDaoImpl extends BaseDocumentDaoImpl<Rec
 
 	@Override
 	public List<RecommandedTokenRelationship> queryByKey(HashSet<String> keys) {
-		Query<RecommandedTokenRelationship> query = datastoreProvider.getDataStore().createQuery(RecommandedTokenRelationship.class);
+		Query<RecommandedTokenRelationship> query = datastoreProvider.getDefaultDb().createQuery(RecommandedTokenRelationship.class);
 		 query
 		 .field("key").hasAnyOf(keys);
 		 return query.asList();
@@ -24,7 +24,7 @@ public class RecommendedTokenRelationshipDaoImpl extends BaseDocumentDaoImpl<Rec
 
 	@Override
 	public List<RecommandedTokenRelationship> getVerified() {
-		Query<RecommandedTokenRelationship> query = datastoreProvider.getDataStore().createQuery(RecommandedTokenRelationship.class);
+		Query<RecommandedTokenRelationship> query = datastoreProvider.getDefaultDb().createQuery(RecommandedTokenRelationship.class);
 		 query
 		 .field("isVerified").equal(true);
 		 return query.asList();

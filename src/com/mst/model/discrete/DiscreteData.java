@@ -51,8 +51,10 @@ public class DiscreteData {
 	private String orderControl;
 	private Boolean isDuplicate;
 
+	private String rawFileId; 
+	
 	public DiscreteData(){
-		customFields = new ArrayList<>();
+		customFields = new ArrayList<DiscreteDataCustomField>();
 	}
 
 	public String getReportFinalizedById() {
@@ -220,6 +222,14 @@ public class DiscreteData {
 
 	public void setExpectedFollowup(Followup expectedFollowup) {
 		this.expectedFollowup = expectedFollowup;
+	}
+
+	public String getRawFileId() {
+		return rawFileId;
+	}
+
+	public void setRawFileId(String rawFileId) {
+		this.rawFileId = rawFileId;
 	} 
 	
 }

@@ -30,7 +30,7 @@ public class RejectedReportDaoImpl extends BaseDocumentDaoImpl<RejectedReport> i
 		Date nexDate = Date.from(localDate.plusDays(1).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 		Date prevDate = Date.from(localDate.plusDays(-1).atTime(11, 59).atZone(ZoneId.systemDefault()).toInstant());
 		
-		Query<RejectedReport> query = datastoreProvider.getDataStore().createQuery(RejectedReport.class);
+		Query<RejectedReport> query = datastoreProvider.getDefaultDb().createQuery(RejectedReport.class);
 		 query
 		 	.field("organizationId").equal(orgId);
 		 	

@@ -4,5 +4,6 @@ import org.mongodb.morphia.Datastore;
 
 public interface MongoDatastoreProvider {
 
-	Datastore getDataStore();
+	Datastore getDefaultDb();
+	Datastore getRawDb();
 }

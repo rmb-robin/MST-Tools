@@ -26,7 +26,7 @@ public class QueryBuildHelperTest {
 	//@Test 
 	public void buildQuery(){
 		datastoreProvider = new MongoDatastoreProviderDefault();
-		Query<SentenceDb> query = datastoreProvider.getDataStore().createQuery(SentenceDb.class); 
+		Query<SentenceDb> query = datastoreProvider.getDefaultDb().createQuery(SentenceDb.class); 
 		
 		query
 		.field("origSentence").contains("cyst")

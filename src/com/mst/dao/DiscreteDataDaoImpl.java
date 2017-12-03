@@ -36,7 +36,7 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 	}
 	
 	public List<DiscreteData> getDiscreteDatas(DiscreteDataFilter dataFilter, String orgId, boolean allValues){
-		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
+		Query<DiscreteData> query = datastoreProvider.getDefaultDb().createQuery(DiscreteData.class);
 		query.disableValidation();
 		
 		query.field("organizationId").equal(orgId);
@@ -129,7 +129,7 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 	
 	private Query<DiscreteData> getQueryByOrgNameAndDate(String orgId, LocalDate localDate){
 		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
+		Query<DiscreteData> query = datastoreProvider.getDefaultDb().createQuery(DiscreteData.class);
 		 query
 		 .field("organizationId").equal(orgId)
 		 .filter("processingDate =", date);
@@ -140,7 +140,7 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		List<ObjectId> objectids = new ArrayList<>();
 		ids.forEach(a-> objectids.add(new ObjectId(a)));
 		
-		Query<DiscreteData> query = datastoreProvider.getDataStore().createQuery(DiscreteData.class);
+		Query<DiscreteData> query = datastoreProvider.getDefaultDb().createQuery(DiscreteData.class);
 		 query
 		 .field("id").hasAnyOf(objectids);
 		 return query.asList();
@@ -155,6 +155,6 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 
 	@Override
 	public void saveCollection(List<DiscreteData> discreteDatas) {
-		datastoreProvider.getDataStore().save(discreteDatas);
+		datastoreProvider.getDefaultDb().save(discreteDatas);
 	}
 }

@@ -27,7 +27,7 @@ public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements 
 	}
 
 	public void saveSentences(List<SentenceDb> sentences, DiscreteData discreteData,SentenceProcessingFailures failures) {
-		Datastore ds = datastoreProvider.getDataStore();
+		Datastore ds = datastoreProvider.getDefaultDb();
 		if(discreteData!=null){
 				discreteDataDao.save(discreteData, false);
 				
@@ -50,7 +50,7 @@ public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements 
 	
 	public void saveReprocess(List<SentenceDb> sentences,SentenceProcessingFailures failures){
 		if(sentences.isEmpty()) return ;
-		Datastore ds = datastoreProvider.getDataStore();
+		Datastore ds = datastoreProvider.getDefaultDb();
 		ds.save(sentences);
 		
 		String orgId = sentences.get(0).getOrganizationId();
@@ -69,7 +69,7 @@ public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements 
 		LocalDate localDate = LocalDate.of(2017,7, 20);
 		Date date = Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
 		
-		Query<SentenceDb> query = datastoreProvider.getDataStore().createQuery(SentenceDb.class);
+		Query<SentenceDb> query = datastoreProvider.getDefaultDb().createQuery(SentenceDb.class);
 		query.field("organizationId").equal(orgId);
 		query
 		 .filter("processingDate >", date);

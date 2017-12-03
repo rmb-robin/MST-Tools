@@ -3,12 +3,15 @@ package com.mst.model.raw;
 import java.time.LocalDate;
 
 import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Converters;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mst.jsonSerializers.ObjectIdJsonSerializer;
+import com.mst.util.LocalDateConverter;
 
+@Converters(LocalDateConverter.class)
 @Entity("rawreportfiles")
 public class RawReportFile {
 

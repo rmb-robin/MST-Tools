@@ -11,7 +11,7 @@ public class Hl7DetailsDaoImpl  extends BaseDocumentDaoImpl<HL7Details> implemen
 	}
 
 	public List<HL7Details> getByOrgName(String orgName) {
-		return datastoreProvider.getDataStore().createQuery(HL7Details.class)
+		return datastoreProvider.getDefaultDb().createQuery(HL7Details.class)
 		.field("org").equalIgnoreCase(orgName)
 		.asList();
 	}

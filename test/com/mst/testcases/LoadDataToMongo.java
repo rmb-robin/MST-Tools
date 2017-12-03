@@ -143,7 +143,7 @@ public class LoadDataToMongo {
 	//@Test
 	public void loadDynamicEdgeMetadata(){
 		List<DynamicEdgeCreationRule> input =new DynamicRuleProvider().getRules();
-		Datastore ds = new MongoDatastoreProviderDefault().getDataStore();
+		Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
 		ds.delete(ds.createQuery(DynamicEdgeCreationRule.class));
 		ds.save(input);
 	}

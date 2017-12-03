@@ -71,7 +71,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
 		sentenceFilterController = new SentenceFilterControllermpl();
-		Datastore datastore =  datastoreProvider.getDataStore();
+		Datastore datastore =  datastoreProvider.getDefaultDb();
 
 		boolean filterOnDiscreteData = false;
 		List<DiscreteData> discreteDataIds = null;
@@ -112,7 +112,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	public List<SentenceQueryResult> getSentencesByText(SentenceQueryTextInput input) {
 		sentenceDiscoveryFilter = new SentenceDiscoveryFilterImpl();
 		List<SentenceQueryResult> result = new ArrayList<SentenceQueryResult>();
-		Datastore datastore =  datastoreProvider.getDataStore();
+		Datastore datastore =  datastoreProvider.getDefaultDb();
 		Pattern pattern = Pattern.compile(input.getText(), Pattern.CASE_INSENSITIVE);
 		Query<SentenceDiscovery> query = datastore.createQuery(SentenceDiscovery.class);
 		query
@@ -196,7 +196,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	
 	public List<String> getEdgeNamesByTokens(List<String> tokens) {
-		Datastore datastore =  datastoreProvider.getDataStore();
+		Datastore datastore =  datastoreProvider.getDefaultDb();
 		HashSet<String> edgeNames = new HashSet<>();
 		for(String token: tokens){
 			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
@@ -220,7 +220,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 
 	public List<SentenceDb> getSentencesForReprocess(SentenceReprocessingInput input) {
-		Query<SentenceDb> query =   datastoreProvider.getDataStore().createQuery(SentenceDb.class);
+		Query<SentenceDb> query =   datastoreProvider.getDefaultDb().createQuery(SentenceDb.class);
 		 query
 		 .search(input.getToken())
 		 .field("organizationId").equal(input.getOrganizationId())
@@ -234,7 +234,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		init();
 		List<DiscreteData> discreteData = discreteDataDao.getByIds(ids);
 		if(discreteData.isEmpty()) return new ArrayList<SentenceDb>();
-		Query<SentenceDb> query =   datastoreProvider.getDataStore().createQuery(SentenceDb.class);
+		Query<SentenceDb> query =   datastoreProvider.getDefaultDb().createQuery(SentenceDb.class);
 		 query
 		 .field("discreteData").hasAnyOf(discreteData);
 		 return query.asList();
