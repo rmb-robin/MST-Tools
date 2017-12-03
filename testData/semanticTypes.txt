@@ -513,7 +513,6 @@ additional,qlco
 nodules,dysn
 physiologic,qlco-simple
 back,bpoc
-dominant follicles,qlco-simple
 duration,tempor
 ovoid,qlco-shape
 xrays,proc
