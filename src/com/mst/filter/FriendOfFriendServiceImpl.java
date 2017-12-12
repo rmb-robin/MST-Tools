@@ -28,7 +28,7 @@ public class FriendOfFriendServiceImpl implements FriendOfFriendService {
 		for(TokenRelationship relationship:relationships){
 			if(relationship.equals(originalRelationship)) continue;
 			if(relationship.getEdgeName()==null)continue;
-			if(!edgeNames.contains(relationship.getEdgeName())) continue;
+			if(!edgeNames.contains(relationship.getEdgeName())) continue; //removing for now...
 			ShouldMatchOnSentenceEdgesResult result = sentenceFilter.shouldAddTokenFromRelationship(relationship,token);
 			if(result.isMatch()){
 				result.setRelationship(relationship);

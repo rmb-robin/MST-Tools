@@ -31,6 +31,8 @@ public class RejectedReport {
 	private List<String> missingFields; 
 	private LocalDate processingDate; 
 	private String readingLocation;
+	private String rawFileId; 
+	
 	
 	//private LocalDateTime processingTime; 
 	
@@ -104,5 +106,17 @@ public class RejectedReport {
 
 	public void setReadingLocation(String readingLocation) {
 		this.readingLocation = readingLocation;
+	}
+
+
+
+	public String getRawFileId() {
+		return rawFileId;
+	}
+
+
+
+	public void setRawFileId(String rawFileId) {
+		this.rawFileId = rawFileId;
 	}
 }

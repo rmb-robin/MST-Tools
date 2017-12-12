@@ -5,6 +5,8 @@ import java.util.List;
 
 public class SentenceQueryInput {
 
+	private boolean isNotAndAll;
+	
 	private List<SentenceQueryInstance> sentenceQueryInstances; 
 	private String organizationId; 
 	private DiscreteDataFilter discreteDataFilter;
@@ -34,5 +36,13 @@ public class SentenceQueryInput {
 
 	public void setDiscreteDataFilters(DiscreteDataFilter discreteDataFilter) {
 		this.discreteDataFilter = discreteDataFilter;
+	}
+
+	public boolean getIsNotAndAll() {
+		return isNotAndAll;
+	}
+
+	public void setNotAndAll(boolean isNotAndAll) {
+		this.isNotAndAll = isNotAndAll;
 	}
 }

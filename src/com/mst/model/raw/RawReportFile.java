@@ -1,6 +1,8 @@
 package com.mst.model.raw;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Converters;
@@ -15,15 +17,21 @@ import com.mst.util.LocalDateConverter;
 @Entity("rawreportfiles")
 public class RawReportFile {
 
+	
+	public  RawReportFile() {
+		submittedDates = new ArrayList<>();
+	}
+	
 	@Id
 	@JsonSerialize(using=ObjectIdJsonSerializer.class)
 	private ObjectId id;
 	private String content; 
-	private LocalDate submittedDate; 
-	private LocalDate processedDate;
+	private List<LocalDate> submittedDates; 
 	private boolean isProcessed;
 	private String orgId; 
-
+	private String orgName; 
+	
+	
 	public ObjectId getId() {
 		return id;
 	}
@@ -36,18 +44,9 @@ public class RawReportFile {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public LocalDate getSubmittedDate() {
-		return submittedDate;
-	}
-	public void setSubmittedDate(LocalDate submittedDate) {
-		this.submittedDate = submittedDate;
-	}
-	public LocalDate getProcessedDate() {
-		return processedDate;
-	}
-	public void setProcessedDate(LocalDate processedDate) {
-		this.processedDate = processedDate;
-	}
+
+
+	
 	public boolean getIsProcessed() {
 		return isProcessed;
 	}
@@ -59,6 +58,18 @@ public class RawReportFile {
 	}
 	public void setOrgId(String orgId) {
 		this.orgId = orgId;
+	}
+	public List<LocalDate> getSubmittedDates() {
+		return submittedDates;
+	}
+	public void setSubmittedDates(List<LocalDate> submittedDates) {
+		this.submittedDates = submittedDates;
+	}
+	public String getOrgName() {
+		return orgName;
+	}
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
 	} 
 	
 
