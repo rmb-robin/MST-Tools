@@ -148,13 +148,17 @@ public class LoadDataToMongo {
 		ds.save(input);
 	}
 	
+	//http://10.210.192.4
 	@Test
 	public void loadRawHl7IntoAPI(){
-		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save";
+		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save"; 
+				
+				//"localhost:8080/mst-sentence-service/webapi/rawreport/save";
 		String body = new TestHl7Provider().getInput();
 		callPOSTService(endPoint, body);
 	}
 
+	//
 	 private String callPOSTService(String endpoint, String body) {
 	    	String ret = null;
 	    	
@@ -173,6 +177,7 @@ public class LoadDataToMongo {
 	    		RawReportFile file = new RawReportFile();
 	    		file.setContent(body);
 	    		file.setOrgId("5972aedebde4270bc53b23e3");
+	    		file.setOrgName("rad");
 	    		Gson gson = new Gson();
 	    	
 	    		streamWriter.write(	gson.toJson(file));

@@ -4,10 +4,11 @@ import java.util.List;
 
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.RecommandationRequest;
+import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 
 public interface SentenceDiscoveryProcessor {
 
 	void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput);
-	List<SentenceDiscovery> process(RecommandationRequest request) throws Exception;
+	List<SentenceDiscovery> process(SentenceTextRequest request) throws Exception;
 }

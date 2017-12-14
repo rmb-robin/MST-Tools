@@ -16,6 +16,7 @@ import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.recommandation.RecommandedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.RecommandationRequest;
+import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.RecommandedNounPhraseResult;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
@@ -51,7 +52,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	}
 	
 	
-	public List<SentenceDiscovery> process(RecommandationRequest request) throws Exception{
+	public List<SentenceDiscovery> process(SentenceTextRequest request) throws Exception{
 		
 		List<Sentence> sentences = sentenceFactory.getSentences(request.getText(),"","",request.getSource());
 		List<SentenceDiscovery> discoveries = new ArrayList<>();
@@ -105,6 +106,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		sentenceDiscovery.setOrigSentence(sentence.getOrigSentence());
 		sentenceDiscovery.setProcessingDate(sentence.getProcessDate());
 		sentenceDiscovery.setSource(sentence.getSource());
+		sentenceDiscovery.setStudy(sentence.getStudy());
+		sentenceDiscovery.setPractice(sentence.getPractice());
 		return sentenceDiscovery;
 	}
 

@@ -8,13 +8,21 @@ import java.util.Map;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Field;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.Index;
+import org.mongodb.morphia.annotations.Indexes;
 import org.mongodb.morphia.annotations.Reference;
+import org.mongodb.morphia.utils.IndexType;
 
+import com.mst.model.discrete.DiscreteData;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
 @Entity("sentenceDiscoveries")
+@Indexes({
+    @Index(fields = {@Field(value = "origSentence", type = IndexType.TEXT)})
+})
 public class SentenceDiscovery {
 
 	@Id
@@ -23,14 +31,19 @@ public class SentenceDiscovery {
 	private String origSentence;
 	private String normalizedSentence;
 	private LocalDate processingDate;
+	private String organizationId; 
+	private boolean didFail;
+	
 	
 	private List<String> originalWords;
 	private List<WordToken> modifiedWordList = new ArrayList<>();
 	private Map<Integer, Integer> nounPhraseIndexes; 
 	
 	private List<RecommandedTokenRelationship> wordEmbeddings = new ArrayList<>();
-	private String source;
-
+	private String source, practice, study;
+	
+	@Reference
+	private DiscreteData discreteData;
 	
 	public SentenceDiscovery(){
 		nounPhraseIndexes = new HashMap<>();
@@ -92,5 +105,45 @@ public class SentenceDiscovery {
 
 	public void setNounPhraseIndexes(Map<Integer, Integer> nounPhraseIndexes) {
 		this.nounPhraseIndexes = nounPhraseIndexes;
+	}
+
+	public String getPractice() {
+		return practice;
+	}
+
+	public void setPractice(String practice) {
+		this.practice = practice;
+	}
+
+	public String getStudy() {
+		return study;
+	}
+
+	public void setStudy(String study) {
+		this.study = study;
+	}
+
+	public String getOrganizationId() {
+		return organizationId;
+	}
+
+	public void setOrganizationId(String organizationId) {
+		this.organizationId = organizationId;
+	}
+
+	public boolean isDidFail() {
+		return didFail;
+	}
+
+	public void setDidFail(boolean didFail) {
+		this.didFail = didFail;
+	}
+
+	public DiscreteData getDiscreteData() {
+		return discreteData;
+	}
+
+	public void setDiscreteData(DiscreteData discreteData) {
+		this.discreteData = discreteData;
 	}
 }
