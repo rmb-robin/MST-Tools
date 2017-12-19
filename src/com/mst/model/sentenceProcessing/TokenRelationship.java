@@ -21,6 +21,8 @@ public class TokenRelationship {
 	private DateTime createdTime; 
 	private String uniqueIdentifier;
 	private List<String> links;
+	private String namedEdge; 
+	
 	
 	
 	//should reference Ids maybe...
@@ -111,6 +113,12 @@ public class TokenRelationship {
 	}
 	public void setLinks(List<String> links) {
 		this.links = links;
+	}
+	public String getNamedEdge() {
+		return namedEdge;
+	}
+	public void setNamedEdge(String namedEdge) {
+		this.namedEdge = namedEdge;
 	}
 
 }

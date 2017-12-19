@@ -21,8 +21,7 @@ import jdk.nashorn.internal.parser.TokenKind;
 
 public class NounRelationshipProcessor extends RelationshipProcessorBase implements RelationshipProcessor {
 
-	protected Map<String, List<RelationshipMapping>> relationshipMap;
-	protected Map<String, List<RelationshipMapping>> semanticTypeRelationshipMap; 
+
 	private HashSet<String> posTypes;
 	
 	public NounRelationshipProcessor(){
@@ -49,6 +48,9 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 	}
 	
 	
+	
+	
+	//not needed.
 	private void assignNounPhraseAnnotations(List<TokenRelationship> relationships){
 		
 		if(relationships.size()==0)return;
@@ -92,27 +94,10 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 		}
 	}
 	
-	private void setrelationshipMaps(List<RelationshipMapping> relationshipMappings){
-		relationshipMap  = new HashMap<>();
-		semanticTypeRelationshipMap = new HashMap<>();
-		for(RelationshipMapping nounRelationship : relationshipMappings){
-			if(nounRelationship.getIsFromSemanticType())
-				setRelationshipMap(semanticTypeRelationshipMap,nounRelationship);
-			else 
-				setRelationshipMap(relationshipMap,nounRelationship);
-		}
-	}
+	//need will use..
+
 	
-	private RelationshipMapping findMapping(Map<String, List<RelationshipMapping>> map, WordToken fromWordToken, WordToken toWordToken){
-		String key = fromWordToken.getToken().toLowerCase();
-		if(!map.containsKey(key)) return null;
-		
-		for(RelationshipMapping relationshipMapping : map.get(key)){
-			if(isWordTokenMatchToRelationship(relationshipMapping.getIsToSemanticType(),false, relationshipMapping.getToToken(), toWordToken))
-				return relationshipMapping;
-		}
-		return null;
-	}
+	
  
 	private boolean shouldGetRelationshipsForFromToken(WordToken FromToken){
 		if(FromToken.getSemanticType()!=null){
@@ -126,11 +111,7 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 		return false;
 	}
 	
-	private void setRelationshipMap(Map<String, List<RelationshipMapping>> map,RelationshipMapping nounRelationship){
-		if(!map.containsKey(nounRelationship.getFromToken()))
-			map.put(nounRelationship.getFromToken().toLowerCase(), new ArrayList<RelationshipMapping>());
-		map.get(nounRelationship.getFromToken()).add(nounRelationship);
-	}
+
 
 	private List<TokenRelationship> processSingleToken(WordToken wordToken){
 		List<TokenRelationship> tokenRelationships = new ArrayList<>();
@@ -177,6 +158,7 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 	}
 
 	
+	
 	private List<TokenRelationship> processSingleNounRelationship(RelationshipMapping relationshipMapping, int startIndex){
 		List<TokenRelationship> result = new ArrayList<TokenRelationship>();
 		if(relationshipMapping.getIsToWildcard())
@@ -185,7 +167,8 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 			return result;
 		}
 		
-		int endIndex =  getEndIndex(startIndex,relationshipMapping.getMaxDistance());
+		int maxDistance = 7;
+		int endIndex =  getEndIndex(startIndex,maxDistance);
 		for(int i = startIndex+1; i<=endIndex;i++){
 			WordToken toToken = wordTokens.get(i);
 			if(isWordTokenMatchToRelationship(relationshipMapping.getIsToSemanticType(), false,relationshipMapping.getToToken(), toToken))
@@ -194,11 +177,13 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 		return result;
 	}
 
+	
 	private TokenRelationship createRelationshipAndAnnotateWordTokens(String edgeName,WordToken fromToken,WordToken toToken){
 		//fromToken.setPropertyValueType(PropertyValueTypes.NounPhraseBegin);
 		//toToken.setPropertyValueType(PropertyValueTypes.NounPhraseEnd);
 		return tokenRelationshipFactory.create(edgeName, EdgeTypes.related, fromToken,toToken);
 	}
+	
 	
 	protected RelationshipMapping findRelationWildcardFrom(WordToken wordToken){
 		List<RelationshipMapping> nounRelationships = relationshipMap.get(wildcard);

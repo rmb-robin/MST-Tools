@@ -1,8 +1,13 @@
 package com.mst.sentenceprocessing;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
+import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.sentenceProcessing.RelationshipMapping;
 import com.mst.model.sentenceProcessing.WordToken;
 
 public abstract class RelationshipProcessorBase {
@@ -11,6 +16,9 @@ public abstract class RelationshipProcessorBase {
 	protected final String wildcard = "*";
 	protected List<WordToken> wordTokens; 
 
+	protected Map<String, List<RelationshipMapping>> relationshipMap;
+	protected Map<String, List<RelationshipMapping>> semanticTypeRelationshipMap; 
+	
 	public RelationshipProcessorBase(){
 		tokenRelationshipFactory = new TokenRelationshipFactoryImpl();
 	}
@@ -30,4 +38,23 @@ public abstract class RelationshipProcessorBase {
 		if(tokenCompareVlaue==null) return false;
 		return tokenCompareVlaue.equals(relationshipToToken);
 	}
+	
+	protected void setrelationshipMaps(List<RelationshipMapping> relationshipMappings){
+		relationshipMap  = new HashMap<>();
+		semanticTypeRelationshipMap = new HashMap<>();
+		for(RelationshipMapping nounRelationship : relationshipMappings){
+			if(nounRelationship.getIsFromSemanticType())
+				setRelationshipMap(semanticTypeRelationshipMap,nounRelationship);
+			else 
+				setRelationshipMap(relationshipMap,nounRelationship);
+		}
+	}
+	
+	protected void setRelationshipMap(Map<String, List<RelationshipMapping>> map,RelationshipMapping nounRelationship){
+		if(!map.containsKey(nounRelationship.getFromToken()))
+			map.put(nounRelationship.getFromToken().toLowerCase(), new ArrayList<RelationshipMapping>());
+		map.get(nounRelationship.getFromToken()).add(nounRelationship);
+	}
+	
+
  }

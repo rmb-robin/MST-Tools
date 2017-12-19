@@ -35,6 +35,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private WordEmbeddingProcessor wordEmbeddingProcessor; 
 	private VerbProcessor verbProcessor; 
 	private RecommendedNounPhraseProcesser nounPhraseProcesser;
+	 
+	
 	
 	public SentenceDiscoveryProcessorImpl(){
 		sentenceFactory = new SentenceFactory();
@@ -45,7 +47,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		wordEmbeddingProcessor = new WordEmbeddingProcesseorImpl();
 		verbProcessor = new VerbProcessorImpl();
 		nounPhraseProcesser = new RecommendedNounPhraseProcesser();
-	}
+}
+	
 	
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
 		this.sentenceProcessingMetaDataInput = sentenceProcessingMetaDataInput;
@@ -70,7 +73,13 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			RecommandedNounPhraseResult nounPhraseResult = nounPhraseProcesser.process(wordEmbeddings);
 			sentence.setModifiedWordList(tokens);
 			updatekeysOnRecommendedTokens(nounPhraseResult.getRecommandedTokenRelationships());
-			discoveries.add(convert(sentence, nounPhraseResult));
+			SentenceDiscovery discovery =  convert(sentence, nounPhraseResult);
+			
+			
+			//might need to move out. 
+			nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(),this.sentenceProcessingMetaDataInput.getNounRelationshipsInput());
+			
+			discoveries.add(discovery);
 		}
 		return discoveries;
 	}

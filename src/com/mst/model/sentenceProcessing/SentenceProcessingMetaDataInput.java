@@ -15,13 +15,17 @@ public class SentenceProcessingMetaDataInput {
 	private ObjectId id;
 	private List<NGramsModifierEntity> ngramsInput;
 	private PartOfSpeechAnnotatorEntity partOfSpeechAnnotatorEntity;
-	private Map<String, String> semanticTypes;
-	private RelationshipInput nounRelationshipsInput;
+	private Map<String, String> semanticTypes;  
 	private VerbProcessingInput verbProcessingInput;
-	private PrepositionPhraseProcessingInput phraseProcessingInput;
 	private VerbPhraseInput verbPhraseInput;
-	private List<PrepPhraseRelationshipMapping> phraseRelationshipMappings;
 	private List<DynamicEdgeCreationRule> dynamicEdgeCreationRules;
+	private PrepositionPhraseProcessingInput phraseProcessingInput;	
+	
+	private RelationshipInput nounRelationshipsInput;   //THis should be the standard.. 
+	private RelationshipInput phraseRelationshipMappings;
+	
+	
+	
 	
 	public List<NGramsModifierEntity> getNgramsInput() {
 		return ngramsInput;
@@ -65,10 +69,10 @@ public class SentenceProcessingMetaDataInput {
 	public void setVerbPhraseInput(VerbPhraseInput verbPhraseInput) {
 		this.verbPhraseInput = verbPhraseInput;
 	}
-	public List<PrepPhraseRelationshipMapping> getPhraseRelationshipMappings() {
+	public RelationshipInput getPhraseRelationshipMappings() {
 		return phraseRelationshipMappings;
 	}
-	public void setPhraseRelationshipMappings(List<PrepPhraseRelationshipMapping> phraseRelationshipMappings) {
+	public void setPhraseRelationshipMappings(RelationshipInput phraseRelationshipMappings) {
 		this.phraseRelationshipMappings = phraseRelationshipMappings;
 	}
 	public ObjectId getId() {
