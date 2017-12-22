@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 
 public class RecommandedNounPhraseResult {
 
-	private List<RecommandedTokenRelationship> recommandedTokenRelationships;
+	private List<RecommendedTokenRelationship> recommandedTokenRelationships;
 	private Map<Integer, Integer> nounPhraseIndexes; 
 	
 	public RecommandedNounPhraseResult(){
@@ -17,11 +17,11 @@ public class RecommandedNounPhraseResult {
 		nounPhraseIndexes = new HashMap<>();
 	}
 
-	public List<RecommandedTokenRelationship> getRecommandedTokenRelationships() {
+	public List<RecommendedTokenRelationship> getRecommandedTokenRelationships() {
 		return recommandedTokenRelationships;
 	}
 
-	public void setRecommandedTokenRelationships(List<RecommandedTokenRelationship> recommandedTokenRelationships) {
+	public void setRecommandedTokenRelationships(List<RecommendedTokenRelationship> recommandedTokenRelationships) {
 		this.recommandedTokenRelationships = recommandedTokenRelationships;
 	}
 

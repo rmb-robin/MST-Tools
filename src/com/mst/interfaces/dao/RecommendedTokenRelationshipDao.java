@@ -3,12 +3,12 @@ package com.mst.interfaces.dao;
 import java.util.HashSet;
 import java.util.List;
 
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 
 public interface RecommendedTokenRelationshipDao extends IDao {
 
-	List<RecommandedTokenRelationship> queryByKey(HashSet<String> keys);
-	void saveCollection(List<RecommandedTokenRelationship> recommandedTokenRelationships);
-	List<RecommandedTokenRelationship> getVerified();
+	List<RecommendedTokenRelationship> queryByKey(HashSet<String> keys);
+	void saveCollection(List<RecommendedTokenRelationship> recommandedTokenRelationships);
+	List<RecommendedTokenRelationship> getVerified();
 	
 }

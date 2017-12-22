@@ -39,7 +39,7 @@ public class SentenceDiscovery {
 	private List<WordToken> modifiedWordList = new ArrayList<>();
 	private Map<Integer, Integer> nounPhraseIndexes; 
 	
-	private List<RecommandedTokenRelationship> wordEmbeddings = new ArrayList<>();
+	private List<RecommendedTokenRelationship> wordEmbeddings = new ArrayList<>();
 	private String source, practice, study;
 	
 	@Reference
@@ -86,10 +86,10 @@ public class SentenceDiscovery {
 	public void setModifiedWordList(List<WordToken> modifiedWordList) {
 		this.modifiedWordList = modifiedWordList;
 	}
-	public List<RecommandedTokenRelationship> getWordEmbeddings() {
+	public List<RecommendedTokenRelationship> getWordEmbeddings() {
 		return wordEmbeddings;
 	}
-	public void setWordEmbeddings(List<RecommandedTokenRelationship> wordEmbeddings) {
+	public void setWordEmbeddings(List<RecommendedTokenRelationship> wordEmbeddings) {
 		this.wordEmbeddings = wordEmbeddings;
 	}
 	public String getSource() {

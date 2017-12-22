@@ -116,6 +116,14 @@ public class LoadDataToMongo {
 		dao.saveSentences(sentences, null,null);
 	}
 	
+	@Test
+	public void loadMetaData(){
+    	SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
+    	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
+    	ds.delete(ds.createQuery(SentenceProcessingMetaDataInput.class));
+    	ds.save(input); 
+	}
+	
 	
 	//@Test
 	public void loadDiscreteDataComplianceFields(){
@@ -149,7 +157,7 @@ public class LoadDataToMongo {
 	}
 	
 	//http://10.210.192.4
-	@Test
+//	@Test
 	public void loadRawHl7IntoAPI(){
 		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save"; 
 				

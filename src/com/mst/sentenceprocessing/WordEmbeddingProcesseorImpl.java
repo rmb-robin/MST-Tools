@@ -9,7 +9,7 @@ import com.mst.jsonSerializers.DeepCloner;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
@@ -22,8 +22,8 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 	}
 	
 	@Override
-	public List<RecommandedTokenRelationship> process(List<WordToken> tokens) {
-		List<RecommandedTokenRelationship> result = new ArrayList<>();
+	public List<RecommendedTokenRelationship> process(List<WordToken> tokens) {
+		List<RecommendedTokenRelationship> result = new ArrayList<>();
 		
 		for(int i =0;i<tokens.size();i++){
 			if(i+1<tokens.size())
@@ -32,14 +32,10 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 		return result;
 	}
 	
-	private RecommandedTokenRelationship getWordEmbedding(WordToken first, WordToken second){
+	private RecommendedTokenRelationship getWordEmbedding(WordToken first, WordToken second){
 		WordToken firstCloned = (WordToken) DeepCloner.deepClone(first);
 		WordToken secondCloned = (WordToken) DeepCloner.deepClone(second);
-		
-		TokenRelationship tokenRelationship =  factory.create(getEdgeName(first, second), EdgeTypes.related, firstCloned, secondCloned);
-		RecommandedTokenRelationship recommandedTokenRelationship = new RecommandedTokenRelationship();
-		recommandedTokenRelationship.setTokenRelationship(tokenRelationship);
-		return recommandedTokenRelationship;
+		return factory.createRecommendedRelationship(getEdgeName(first, second), EdgeTypes.related, firstCloned, secondCloned);
 	}
 
 	private String getEdgeName(WordToken first, WordToken second){

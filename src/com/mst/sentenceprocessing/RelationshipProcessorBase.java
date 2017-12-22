@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.sentenceProcessing.RelationshipMapping;
 import com.mst.model.sentenceProcessing.WordToken;
 

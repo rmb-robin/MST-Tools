@@ -13,7 +13,7 @@ import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -23,11 +23,11 @@ public class SentenceQueryResultFactory {
 
 	//private boolean foundEdgeName = false;
 
-	private List<RecommandedTokenRelationship> verbMinusOneTokenTokens;
-	private List<RecommandedTokenRelationship> verbPlusOneTokenTokens;
-	private RecommandedTokenRelationship verbMinusOne = null;
-	private RecommandedTokenRelationship verbPlusOne = null;
-	private RecommandedTokenRelationship verbverb = null;
+	private List<RecommendedTokenRelationship> verbMinusOneTokenTokens;
+	private List<RecommendedTokenRelationship> verbPlusOneTokenTokens;
+	private RecommendedTokenRelationship verbMinusOne = null;
+	private RecommendedTokenRelationship verbPlusOne = null;
+	private RecommendedTokenRelationship verbverb = null;
 	private int verbMinusOneIndex, verbPlusOneIndex = 0;
 	private SentenceQueryEdgeResult edgeResult; 
 	private List<String> tokensHash;
@@ -74,13 +74,13 @@ public class SentenceQueryResultFactory {
 	}
 	
 	
-	private boolean verbverbCheck(RecommandedTokenRelationship recommandedTokenRelationship){
+	private boolean verbverbCheck(RecommendedTokenRelationship recommandedTokenRelationship){
 		if(verbverb==null) return false;
 		if(verbverb.getTokenRelationship().getFromToken().getToken().equals(recommandedTokenRelationship.getTokenRelationship().getToToken().getToken()))return true;
 		return false;	
 	}
 	
-    private void processVerbRelationship(RecommandedTokenRelationship recommandedTokenRelationship,int i,String edgeName){
+    private void processVerbRelationship(RecommendedTokenRelationship recommandedTokenRelationship,int i,String edgeName){
     	String token = null;
     	
     	if(edgeName.equals(WordEmbeddingTypes.secondVerb)) {
@@ -122,7 +122,7 @@ public class SentenceQueryResultFactory {
 	  }
     }
     
-    private boolean processDefaultRelationship(RecommandedTokenRelationship recommandedTokenRelationship,boolean isLeft){	
+    private boolean processDefaultRelationship(RecommendedTokenRelationship recommandedTokenRelationship,boolean isLeft){	
     	String edgeName = recommandedTokenRelationship.getTokenRelationship().getEdgeName();
     	if(!edgeName.equals(WordEmbeddingTypes.defaultEdge)) return false; 
 
@@ -134,14 +134,14 @@ public class SentenceQueryResultFactory {
     }
 		
     
-    private void findDefaultEdge(List<RecommandedTokenRelationship> wordEmbeddings){
+    private void findDefaultEdge(List<RecommendedTokenRelationship> wordEmbeddings){
     	
     		boolean found = false;
     		int count = 0;
 			
     		if(verbPlusOneIndex+1 < wordEmbeddings.size()){
     			for(int i = verbPlusOneIndex+1;i<wordEmbeddings.size();i++){
-        			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
+        			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
         			if(count>=2) break;
         			if(!processDefaultRelationship(recommandedTokenRelationship, false)&& found) break;
         			else 
@@ -157,7 +157,7 @@ public class SentenceQueryResultFactory {
 			
     		if(verbMinusOneIndex-1 < 0) return; 
     		for(int i =verbMinusOneIndex-1;i>=0; i--){
-    			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
+    			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
     			if(count>=2) break;
     			if(!processDefaultRelationship(recommandedTokenRelationship, true) && found) break;
     			else {
@@ -167,10 +167,10 @@ public class SentenceQueryResultFactory {
     	}
     }
     
-    private List<RecommandedTokenRelationship> filteredWordEmbeddings(List<RecommandedTokenRelationship> input){
+    private List<RecommendedTokenRelationship> filteredWordEmbeddings(List<RecommendedTokenRelationship> input){
     	HashSet<String> map = new HashSet<>();
-    	List<RecommandedTokenRelationship> result = new ArrayList<>();
-    	for(RecommandedTokenRelationship recommandedTokenRelationship: input){
+    	List<RecommendedTokenRelationship> result = new ArrayList<>();
+    	for(RecommendedTokenRelationship recommandedTokenRelationship: input){
     		if(map.contains(recommandedTokenRelationship.getKey())) continue;
     		result.add(recommandedTokenRelationship);
     		map.add(recommandedTokenRelationship.getKey());
@@ -184,11 +184,11 @@ public class SentenceQueryResultFactory {
 		init();
 		String[] tokens = text.split(" ");
 		tokensHash = new ArrayList<>(Arrays.asList(tokens));
-		List<RecommandedTokenRelationship> edges = filteredWordEmbeddings(sentenceDiscovery.getWordEmbeddings());
+		List<RecommendedTokenRelationship> edges = filteredWordEmbeddings(sentenceDiscovery.getWordEmbeddings());
 		verbverb = RecommandedTokenRelationshipUtil.getByEdgeName(edges, WordEmbeddingTypes.bothVerbs); 
 		
 		for(int i =0;i<edges.size();i++) {
-			RecommandedTokenRelationship recommandedTokenRelationship = edges.get(i);
+			RecommendedTokenRelationship recommandedTokenRelationship = edges.get(i);
 			String edgeName = recommandedTokenRelationship.getTokenRelationship().getEdgeName();
 			if(edgeName.equals(WordEmbeddingTypes.firstVerb) || edgeName.equals(WordEmbeddingTypes.secondVerb) || 
 				edgeName.equals(WordEmbeddingTypes.verbPrep))
@@ -203,10 +203,10 @@ public class SentenceQueryResultFactory {
 		return edgeResult;
 	}
 	
-	private String getTokenValue(List<RecommandedTokenRelationship> relationships){
+	private String getTokenValue(List<RecommendedTokenRelationship> relationships){
 		String result = "";
 		
-		for(RecommandedTokenRelationship recommandedTokenRelationship: relationships){
+		for(RecommendedTokenRelationship recommandedTokenRelationship: relationships){
 			TokenRelationship relation = recommandedTokenRelationship.getTokenRelationship();
 			if(!result.contains(relation.getFromToken().getToken()))
 				result +=  relation.getFromToken().getToken() + " ";

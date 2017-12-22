@@ -44,7 +44,7 @@ public class NegationTokenRelationshipProcessorTest {
 	
 	SemanticTypeSentenceAnnotatorImpl stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
 	SemanticTypeHardCodedProvider stprovider = new SemanticTypeHardCodedProvider();
-	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getNounRelationships(7);
+	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getRelationships("");
 	RelationshipProcessor nounrelationshipProcessor = new NounRelationshipProcessor();
 
 	PrepPhraseRelationshipProcessorImpl prepRelationshipProcessor = new PrepPhraseRelationshipProcessorImpl();

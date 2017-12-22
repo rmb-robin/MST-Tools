@@ -7,17 +7,19 @@ import java.util.List;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
 import com.mst.interfaces.sentenceprocessing.PrepositionPhraseProcessor;
+import com.mst.interfaces.sentenceprocessing.RecommandedSubjectAnnotator;
 import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
 import com.mst.interfaces.sentenceprocessing.SentenceDiscoveryProcessor;
 import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.interfaces.sentenceprocessing.WordEmbeddingProcessor;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.RecommandationRequest;
 import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.RecommandedNounPhraseResult;
+import com.mst.model.sentenceProcessing.RecommandedSubjectAnnotatorImpl;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -34,8 +36,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private SentenceMeasureNormalizer sentenceMeasureNormalizer;
 	private WordEmbeddingProcessor wordEmbeddingProcessor; 
 	private VerbProcessor verbProcessor; 
-	private RecommendedNounPhraseProcesser nounPhraseProcesser;
-	 
+	private RecommendedNounPhraseProcesserImpl nounPhraseProcesser;
+	private RecommandedSubjectAnnotator subjectAnnotator; 
 	
 	
 	public SentenceDiscoveryProcessorImpl(){
@@ -46,8 +48,9 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
 		wordEmbeddingProcessor = new WordEmbeddingProcesseorImpl();
 		verbProcessor = new VerbProcessorImpl();
-		nounPhraseProcesser = new RecommendedNounPhraseProcesser();
-}
+		nounPhraseProcesser = new RecommendedNounPhraseProcesserImpl();
+		subjectAnnotator = new RecommandedSubjectAnnotatorImpl();
+	}
 	
 	
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
@@ -69,28 +72,18 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
 	
 			tokens = filterTokens(tokens);
-			List<RecommandedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
+			List<RecommendedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
 			RecommandedNounPhraseResult nounPhraseResult = nounPhraseProcesser.process(wordEmbeddings);
 			sentence.setModifiedWordList(tokens);
-			updatekeysOnRecommendedTokens(nounPhraseResult.getRecommandedTokenRelationships());
-			SentenceDiscovery discovery =  convert(sentence, nounPhraseResult);
-			
-			
-			//might need to move out. 
-			nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(),this.sentenceProcessingMetaDataInput.getNounRelationshipsInput());
-			
+			SentenceDiscovery discovery =  convert(sentence, nounPhraseResult);		
+			discovery.getWordEmbeddings().addAll(nounPhraseProcesser.addEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
+			subjectAnnotator.annotate(discovery);
 			discoveries.add(discovery);
 		}
 		return discoveries;
 	}
 	
-	private void updatekeysOnRecommendedTokens(List<RecommandedTokenRelationship> wordEmbeddings ){
-		for(RecommandedTokenRelationship relationship: wordEmbeddings){
-			String key = relationship.getTokenRelationship().getFromTokenToTokenString();
-			relationship.setKey(key);
-		}
-	}
-	
+
 	private List<WordToken> filterTokens(List<WordToken> tokens){
 		List<WordToken> result = new ArrayList<>();
 		HashSet<String> byPassPOS = new HashSet<>();

@@ -6,18 +6,18 @@ import java.util.Set;
 
 import com.mst.cache.interfaces.RecommendedTokenRelationshipCacheManager;
 import com.mst.model.metadataTypes.CacheKeyTypes;
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 
-public class RecommendedTokenRelationshipCacheManagerImpl extends CacheManagerBase<RecommandedTokenRelationship> implements RecommendedTokenRelationshipCacheManager {
+public class RecommendedTokenRelationshipCacheManagerImpl extends CacheManagerBase<RecommendedTokenRelationship> implements RecommendedTokenRelationshipCacheManager {
 
 	
 	public RecommendedTokenRelationshipCacheManagerImpl(){
-		super(CacheKeyTypes.recommendedEdges,RecommandedTokenRelationship.class);
+		super(CacheKeyTypes.recommendedEdges,RecommendedTokenRelationship.class);
 	}
 
-	public void reload(String key, List<RecommandedTokenRelationship> relationships) {
+	public void reload(String key, List<RecommendedTokenRelationship> relationships) {
 		key = createkey(key);
-		for(RecommandedTokenRelationship relationship: relationships){
+		for(RecommendedTokenRelationship relationship: relationships){
 			String json = objectToString(relationship);
 			redisManager.addToSet(key, json);
 			redisManager.addItem(relationship.getTokenRelationship().getUniqueIdentifier(), json);
@@ -25,10 +25,10 @@ public class RecommendedTokenRelationshipCacheManagerImpl extends CacheManagerBa
 	}
 
 	@Override
-	public List<RecommandedTokenRelationship> getListByKey(String key) {
+	public List<RecommendedTokenRelationship> getListByKey(String key) {
 		key = createkey(key);
 		Set<String> cacheValues = redisManager.getSet(key);
-		List<RecommandedTokenRelationship> result = new ArrayList<>();
+		List<RecommendedTokenRelationship> result = new ArrayList<>();
 		
 		for(String json: cacheValues){
 			result.add(stringToObject(json));
@@ -39,7 +39,7 @@ public class RecommendedTokenRelationshipCacheManagerImpl extends CacheManagerBa
 	
 
 	@Override
-	public void addItem(String key, RecommandedTokenRelationship relationship) {
+	public void addItem(String key, RecommendedTokenRelationship relationship) {
 		key = createkey(key);
 		String json = objectToString(relationship);
 		redisManager.addToSet(key, json);
@@ -47,7 +47,7 @@ public class RecommendedTokenRelationshipCacheManagerImpl extends CacheManagerBa
 	}
 
 	@Override
-	public RecommandedTokenRelationship getItem(String key) {
+	public RecommendedTokenRelationship getItem(String key) {
 		return stringToObject(redisManager.getItem(key));
 	}
 }

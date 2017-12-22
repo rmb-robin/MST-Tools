@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.metadataTypes.PropertyValueTypes;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
@@ -30,4 +31,14 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 		}
 		return tokenRelationship;
 	}
+	
+	public RecommendedTokenRelationship createRecommendedRelationship(String edgeName, String frameName, WordToken fromToken,WordToken toToken){
+		RecommendedTokenRelationship recommandedTokenRelationship = new RecommendedTokenRelationship();
+		recommandedTokenRelationship.setTokenRelationship(create(edgeName,frameName,fromToken,toToken));
+		String key = recommandedTokenRelationship.getTokenRelationship().getFromTokenToTokenString();
+		recommandedTokenRelationship.setKey(key);
+		return recommandedTokenRelationship;
+	}
+	
+	
 }

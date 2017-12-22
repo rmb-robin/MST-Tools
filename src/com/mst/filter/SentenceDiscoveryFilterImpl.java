@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.mst.interfaces.filter.SentenceDiscoveryFilter;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 
 public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
@@ -28,7 +28,7 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 		if(sentenceDiscovery.getWordEmbeddings()==null || sentenceDiscovery.getWordEmbeddings().isEmpty())return false;
 	
 		for(int i = 0;i<sentenceDiscovery.getWordEmbeddings().size();i++){
-			RecommandedTokenRelationship recommandedTokenRelationship = sentenceDiscovery.getWordEmbeddings().get(i);
+			RecommendedTokenRelationship recommandedTokenRelationship = sentenceDiscovery.getWordEmbeddings().get(i);
 			String fromToken = recommandedTokenRelationship.getTokenRelationship().getFromToken().getToken();
 			String toToken = recommandedTokenRelationship.getTokenRelationship().getToToken().getToken();
 			String edgeName = getEdgeName(recommandedTokenRelationship);
@@ -82,14 +82,14 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 
 	
 	
-	private String getEdgeName(RecommandedTokenRelationship recommandedTokenRelationship){
+	private String getEdgeName(RecommendedTokenRelationship recommandedTokenRelationship){
 		return recommandedTokenRelationship.getTokenRelationship().getEdgeName();
 	}
 	
-	private boolean isLeftMatchVerb(String fromToken, List<RecommandedTokenRelationship> wordEmbeddings, int index, boolean isFirst){
+	private boolean isLeftMatchVerb(String fromToken, List<RecommendedTokenRelationship> wordEmbeddings, int index, boolean isFirst){
 	//	if(index>=wordEmbeddings.size()) return false;
 		for(int i = 0;i<wordEmbeddings.size();i++){
-			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
+			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!recommandedTokenRelationship.getTokenRelationship().getToToken().getToken().equals(fromToken))continue;
 			
@@ -107,10 +107,10 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 		return false;
 	}
 	
-	private boolean isRightMatchVerb(String toToken, List<RecommandedTokenRelationship> wordEmbeddings, int index){
+	private boolean isRightMatchVerb(String toToken, List<RecommendedTokenRelationship> wordEmbeddings, int index){
 	//	if(index>=wordEmbeddings.size()) return false;
 		for(int i = 0;i<wordEmbeddings.size();i++){
-			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
+			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!recommandedTokenRelationship.getTokenRelationship().getFromToken().getToken().equals(toToken))continue;
 			if(edgeName.equals(WordEmbeddingTypes.secondVerb)) return true;
@@ -119,26 +119,22 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 	}
 	
 	
-	private boolean includeOnTokenTokenRight(List<RecommandedTokenRelationship> wordEmbeddings, int index){
-//		if(index>=wordEmbeddings.size()) return false;
+	private boolean includeOnTokenTokenRight(List<RecommendedTokenRelationship> wordEmbeddings, int index){
 		for(int i = 0;i<wordEmbeddings.size();i++){
-			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
+			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!edgeName.equals(WordEmbeddingTypes.defaultEdge))continue;
-		//	if(recommandedTokenRelationship.getIsVerified()) return true;
 			return true;
 		}
 		return false;
 	}
 
 	
-	private boolean includeOnTokenTokenLeft(List<RecommandedTokenRelationship> wordEmbeddings, int index){
-	//	if(index<0) return false;
+	private boolean includeOnTokenTokenLeft(List<RecommendedTokenRelationship> wordEmbeddings, int index){
 		for(int i = wordEmbeddings.size()-1;i>=0;i--){
-			RecommandedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
+			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!edgeName.equals(WordEmbeddingTypes.defaultEdge))continue;
-			//if(recommandedTokenRelationship.getIsVerified()) return true;
 			return true;
 		}
 		return false;

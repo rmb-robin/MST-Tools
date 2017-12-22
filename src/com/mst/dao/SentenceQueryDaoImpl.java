@@ -39,7 +39,7 @@ import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;

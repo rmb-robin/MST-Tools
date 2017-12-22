@@ -6,25 +6,25 @@ import java.util.List;
 import org.mongodb.morphia.query.Query;
 
 import com.mst.interfaces.dao.RecommendedTokenRelationshipDao;
-import com.mst.model.recommandation.RecommandedTokenRelationship;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 
-public class RecommendedTokenRelationshipDaoImpl extends BaseDocumentDaoImpl<RecommandedTokenRelationship> implements RecommendedTokenRelationshipDao {
+public class RecommendedTokenRelationshipDaoImpl extends BaseDocumentDaoImpl<RecommendedTokenRelationship> implements RecommendedTokenRelationshipDao {
 
 	public RecommendedTokenRelationshipDaoImpl() {
-		super(RecommandedTokenRelationship.class);
+		super(RecommendedTokenRelationship.class);
 	}
 
 	@Override
-	public List<RecommandedTokenRelationship> queryByKey(HashSet<String> keys) {
-		Query<RecommandedTokenRelationship> query = datastoreProvider.getDefaultDb().createQuery(RecommandedTokenRelationship.class);
+	public List<RecommendedTokenRelationship> queryByKey(HashSet<String> keys) {
+		Query<RecommendedTokenRelationship> query = datastoreProvider.getDefaultDb().createQuery(RecommendedTokenRelationship.class);
 		 query
 		 .field("key").hasAnyOf(keys);
 		 return query.asList();
 	}
 
 	@Override
-	public List<RecommandedTokenRelationship> getVerified() {
-		Query<RecommandedTokenRelationship> query = datastoreProvider.getDefaultDb().createQuery(RecommandedTokenRelationship.class);
+	public List<RecommendedTokenRelationship> getVerified() {
+		Query<RecommendedTokenRelationship> query = datastoreProvider.getDefaultDb().createQuery(RecommendedTokenRelationship.class);
 		 query
 		 .field("isVerified").equal(true);
 		 return query.asList();

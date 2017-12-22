@@ -12,4 +12,7 @@ public class WordEmbeddingTypes {
 	public static String secondConjunction = "conj-1";
 	public static String secondDependentSignal = "DP-1";
 	public static String firstDependentSignal = "DP+1";
+	public static String negativeToken = "neg-token";
+	public static String verbMinusNeg = " verb-neg";
+	public static String verbPlusNeg = "verb+neg";
 }

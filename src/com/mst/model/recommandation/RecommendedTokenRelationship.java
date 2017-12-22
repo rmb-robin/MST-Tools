@@ -14,7 +14,7 @@ import com.mst.model.sentenceProcessing.TokenRelationship;
 @Indexes({
     @Index(fields = {@Field(value = "key", type = IndexType.TEXT)})
 })
-public class RecommandedTokenRelationship {
+public class RecommendedTokenRelationship {
 
 	@Id
 	private ObjectId id;

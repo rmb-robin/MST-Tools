@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 
 public class NounRelationshipProcessorTest {
 
-	RelationshipInput input = new RelationshipInputProviderFileImpl().getNounRelationships(7);
+	RelationshipInput input = new RelationshipInputProviderFileImpl().getRelationships("");
 	Map<Integer, List<TokenRelationship>> expectedMap = new NounrRelationshipExpectedProvider().get();
 	
 	NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
@@ -111,7 +111,7 @@ public class NounRelationshipProcessorTest {
 			System.out.println(r.getToToken());
 			System.out.println(r.getIsToSemanticType());
 
-			System.out.println(r.getMaxDistance());
+
 			System.out.println(r.getEdgeName());
 			System.out.println("**************************************");
 		}
