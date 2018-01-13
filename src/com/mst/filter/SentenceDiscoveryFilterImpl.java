@@ -32,6 +32,7 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 			String fromToken = recommandedTokenRelationship.getTokenRelationship().getFromToken().getToken();
 			String toToken = recommandedTokenRelationship.getTokenRelationship().getToToken().getToken();
 			String edgeName = getEdgeName(recommandedTokenRelationship);
+	
 			//left.
 			if(fromToken.equals(left))
 			{

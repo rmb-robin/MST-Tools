@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.joda.time.DateTime;
 
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 
 public class TokenRelationship {
@@ -100,6 +101,19 @@ public class TokenRelationship {
 	
 	public String getFromTokenToTokenStringWithSpace(){
 		return this.fromToken.getToken()+ " " + this.toToken.getToken();
+	}
+	
+	public boolean isNegationEdge(){
+		if(this.fromToken!=null && this.fromToken.getPos()!=null){
+			if(this.fromToken.getPos().equals(PartOfSpeachTypes.NEG))
+				return true;
+		}
+		
+		if(this.toToken!=null && this.toToken.getPos()!=null){
+			if(this.toToken.getPos().equals(PartOfSpeachTypes.NEG))
+				return true;
+		}
+		return false;
 	}
 	
 	public String getUniqueIdentifier() {

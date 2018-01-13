@@ -12,6 +12,8 @@ import com.mst.model.sentenceProcessing.SentenceProcessingResult;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
+import com.mst.util.TokenRelationshipUtil;
+
 import static org.junit.Assert.*;
 
 
@@ -33,7 +35,7 @@ public class AdditionalExistenceEdgeProcesserTest {
 		SentenceProcessingResult result = sentenceController.processText(getRequest("anechoic interpolar cyst measures up to 1 cm in diameter."));
 		Sentence sentence = result.getSentences().get(0);
 
-		List<TokenRelationship> relationships =  sentence.getTokenRelationshipsByEdgeName(EdgeNames.existence);
+		List<TokenRelationship> relationships =  TokenRelationshipUtil.getTokenRelationshipsByEdgeName(EdgeNames.existence, sentence.getTokenRelationships());
 		assertEquals(1, relationships.size());
 		
 		TokenRelationship first = relationships.get(0);
@@ -44,7 +46,7 @@ public class AdditionalExistenceEdgeProcesserTest {
 		result = sentenceController.processText(getRequest("simple right ovarian cyst."));
 		sentence = result.getSentences().get(0);
 
-		relationships =  sentence.getTokenRelationshipsByEdgeName(EdgeNames.existence);
+		relationships =  TokenRelationshipUtil.getTokenRelationshipsByEdgeName(EdgeNames.existence, sentence.getTokenRelationships());
 		assertEquals(1, relationships.size());
 		
 		

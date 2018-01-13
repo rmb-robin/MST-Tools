@@ -34,17 +34,22 @@ public class SentenceQueryResultFactory {
 	private boolean edgeFound; 
 	private boolean verbverbCheck; 
 	
-	public static SentenceQueryResult createSentenceQueryResult(SentenceDb sentenceDb){
+	public static SentenceQueryResult createSentenceQueryResult(SentenceDiscovery sentenceDiscovery){
 		SentenceQueryResult result = new SentenceQueryResult();
-		result.setSentence(sentenceDb.getNormalizedSentence());
-		result.setSentenceId(sentenceDb.getId().toString());
-		result.setDiscreteData(sentenceDb.getDiscreteData());
+		result.setSentence(sentenceDiscovery.getNormalizedSentence());
+		result.setSentenceId(sentenceDiscovery.getId().toString());
+		result.setDiscreteData(sentenceDiscovery.getDiscreteData());
 		return result;
 	}
 	
 	public static SentenceQueryEdgeResult createSentenceQueryEdgeResult(TokenRelationship relationship, String edgeType,Map<String, MatchInfo> matches){
 		SentenceQueryEdgeResult queryEdgeResult = new SentenceQueryEdgeResult();
-		queryEdgeResult.setEdgeName(relationship.getEdgeName());
+		
+		if(relationship.getNamedEdge()!=null)
+			queryEdgeResult.setEdgeName(relationship.getNamedEdge());
+		else 
+			queryEdgeResult.setEdgeName(relationship.getEdgeName());
+				
 		queryEdgeResult.setFromToken(relationship.getFromToken().getToken());
 		queryEdgeResult.setToToken(relationship.getToToken().getToken());
 

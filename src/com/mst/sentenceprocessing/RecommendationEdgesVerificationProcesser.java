@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
@@ -31,6 +32,11 @@ public class RecommendationEdgesVerificationProcesser {
 			RecommendedTokenRelationship recommandedTokenRelationship = embeddedwords.get(i);
 			TokenRelationship relationship = recommandedTokenRelationship.getTokenRelationship();
 			String edgeName = relationship.getEdgeName();
+			
+			//do it here.. 
+			if(edgeName.equals(EdgeNames.existence))
+				recommandedTokenRelationship.setIsVerified(true);
+	
 			if(edgeName.equals(WordEmbeddingTypes.firstPrep) || edgeName.equals(WordEmbeddingTypes.secondPrep)) {
 				recommandedTokenRelationship.setIsVerified(true);
 				continue;

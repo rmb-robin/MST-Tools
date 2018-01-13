@@ -55,19 +55,6 @@ public class Sentence {
 		return null;
 	}
 	
-	
-	public List<TokenRelationship> getTokenRelationshipsByEdgeName(String edgeName){
-		List<TokenRelationship> result = new ArrayList<>();
-		if(this.tokenRelationships==null) return result;
-		
-		for(TokenRelationship tokenRelationship: this.tokenRelationships){
-			if(tokenRelationship.getEdgeName().equals(""))continue;
-			if(tokenRelationship.getEdgeName().equals(edgeName))
-				result.add(tokenRelationship);
-		}
-		return result;
-	}
-	
 	public Map<String,List<TokenRelationship>> getTokenRelationsByNameMap(){
 		HashMap<String,List<TokenRelationship>> result = new HashMap<>();
 		if(this.tokenRelationships==null) return result;

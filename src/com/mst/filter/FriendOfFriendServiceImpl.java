@@ -23,12 +23,15 @@ public class FriendOfFriendServiceImpl implements FriendOfFriendService {
 		sentenceFilter = new SentenceFilterImpl();
 	}
 	
+	
+	
+	
 	public ShouldMatchOnSentenceEdgesResult findFriendOfFriendEdges(List<TokenRelationship> relationships, String token, TokenRelationship originalRelationship, HashSet<String> edgeNames){
 		
 		for(TokenRelationship relationship:relationships){
 			if(relationship.equals(originalRelationship)) continue;
 			if(relationship.getEdgeName()==null)continue;
-			if(!edgeNames.contains(relationship.getEdgeName())) continue; //removing for now...
+			if(!TokenRelationshipUtil.isEdgeMatchFromHas(relationship, edgeNames))continue; //removing for now...
 			ShouldMatchOnSentenceEdgesResult result = sentenceFilter.shouldAddTokenFromRelationship(relationship,token);
 			if(result.isMatch()){
 				result.setRelationship(relationship);

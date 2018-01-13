@@ -1,7 +1,10 @@
 package com.mst.model.sentenceProcessing;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
@@ -86,5 +89,19 @@ public class SentenceProcessingMetaDataInput {
 	}
 	public void setDynamicEdgeCreationRules(List<DynamicEdgeCreationRule> dynamicEdgeCreationRules) {
 		this.dynamicEdgeCreationRules = dynamicEdgeCreationRules;
+	}
+	
+	public Map<String, List<String>> getSemanticTypesByTypeName(){
+		if(this.getSemanticTypes()==null) return new HashMap<String,List<String>>();
+		Map<String,List<String>> result = new HashMap<String,List<String>>();
+		
+		for(Entry<String,String> entry: this.getSemanticTypes().entrySet()){
+			if(!result.containsKey(entry.getValue()))
+					result.put(entry.getValue(),new ArrayList<String>());
+			
+			result.get(entry.getValue()).add(entry.getKey());
+		}
+		return result;
+		
 	}
 }

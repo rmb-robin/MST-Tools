@@ -11,6 +11,8 @@ public class EdgeQuery {
 	private HashSet<String> lowerValues = null;
 	private Boolean isNumeric = null;
 	private boolean includeValues; 
+	private boolean isNamedEdge;
+	
 	
 	public EdgeQuery(){
 		values = new HashSet<>();
@@ -57,5 +59,12 @@ public class EdgeQuery {
 		this.includeValues = includeValues;
 	} 
 	
+	public boolean getIsNamedEdge() {
+		return isNamedEdge;
+	}
+
+	public void setIsNamedEdge(boolean isNamedEdge) {
+		this.isNamedEdge = isNamedEdge;
+	}
 	
 }

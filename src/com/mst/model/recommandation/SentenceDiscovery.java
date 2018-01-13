@@ -17,6 +17,7 @@ import org.mongodb.morphia.utils.IndexType;
 
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.model.sentenceProcessing.Verb;
 import com.mst.model.sentenceProcessing.WordToken;
 
 @Entity("sentenceDiscoveries")
@@ -48,6 +49,20 @@ public class SentenceDiscovery {
 	public SentenceDiscovery(){
 		nounPhraseIndexes = new HashMap<>();
 		wordEmbeddings = new ArrayList<>();
+	}
+	
+	public boolean doesSentenceContainVerb(){
+		for(WordToken token: modifiedWordList){
+			if(token.isVerb()) return true;
+		}
+		return false;
+	}
+	
+	public void addHasVerb(){
+		WordToken hasToken = new WordToken();
+		hasToken.setToken("has");
+		hasToken.setVerb(new Verb());
+		modifiedWordList.add(0, hasToken);
 	}
 	
 	public ObjectId getId() {

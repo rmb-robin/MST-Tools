@@ -19,6 +19,7 @@ public class RecommendedNegativeRelationshipFactoryImpl {
 		
 		for(int i =0;i<wordTokens.size();i++){
 			WordToken wordToken = wordTokens.get(i);
+			if(wordToken.getPos()==null) continue;
 			if(!wordToken.getPos().equals(PartOfSpeachTypes.NEG))continue;
 			RecommendedTokenRelationship edge = createEdge(i, wordTokens);
 			if(edge!=null) result.add(edge);

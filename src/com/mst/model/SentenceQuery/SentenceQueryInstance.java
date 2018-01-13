@@ -8,9 +8,9 @@ public class SentenceQueryInstance {
 	private List<EdgeQuery> edges;
 //	private List<EdgeQuery> exclusiveEdges; 
 	private String appender; 
+	private boolean isSt; 
 	
-	
-	
+
 	public SentenceQueryInstance(){
 		tokens = new ArrayList<>();
 		edges = new ArrayList<>();
@@ -39,6 +39,16 @@ public class SentenceQueryInstance {
 	public void setAppender(String appender) {
 		this.appender = appender;
 	}
+
+	public boolean getIsSt() {
+		return isSt;
+	}
+
+	public void setIsSt(boolean isSt) {
+		this.isSt = isSt;
+	}
+
+
 
 //	public List<EdgeQuery> getExclusiveEdges() {
 //		return exclusiveEdges;

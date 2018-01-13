@@ -24,6 +24,7 @@ import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
+import com.mst.util.TokenRelationshipUtil;
 
 public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdentifier {
 
@@ -90,9 +91,9 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 	}
 	
 	private boolean isCompliantOnTime(ComplianceDisplayFieldsBucketItem bucket, Sentence sentence){
-		List<TokenRelationship> suppCareEdges = sentence.getTokenRelationshipsByEdgeName(EdgeNames.suppcare);
+		List<TokenRelationship> suppCareEdges = TokenRelationshipUtil.getTokenRelationshipsByEdgeName(EdgeNames.suppcare, sentence.getTokenRelationships());
 		if(suppCareEdges.isEmpty()) return false;
-		List<TokenRelationship> matched = sentence.getTokenRelationshipsByEdgeName(EdgeNames.time);
+		List<TokenRelationship> matched = TokenRelationshipUtil.getTokenRelationshipsByEdgeName(EdgeNames.time, sentence.getTokenRelationships());
 		if(matched.size()==0) return false;
 		
 		for(TokenRelationship relationship : matched){
@@ -142,7 +143,7 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 		if(sentence.getTokenRelationships()==null)return null; 
 		if(sentence.getTokenRelationships().isEmpty())return null; 
 			
-		List<TokenRelationship> unitOfMeasureEdges = sentence.getTokenRelationshipsByEdgeName(EdgeNames.unitOfMeasure);
+		List<TokenRelationship> unitOfMeasureEdges = TokenRelationshipUtil.getTokenRelationshipsByEdgeName(EdgeNames.unitOfMeasure,sentence.getTokenRelationships());
 		if(unitOfMeasureEdges==null) return null;
 		
 		for(TokenRelationship tokenRelationship: unitOfMeasureEdges){

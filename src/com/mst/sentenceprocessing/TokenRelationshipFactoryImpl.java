@@ -1,5 +1,7 @@
 package com.mst.sentenceprocessing;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
@@ -40,5 +42,23 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 		return recommandedTokenRelationship;
 	}
 	
+	public RecommendedTokenRelationship createRecommendedRelationshipFromTokenRelationship(TokenRelationship tokenRelationship){
+		RecommendedTokenRelationship recommandedTokenRelationship = new RecommendedTokenRelationship();
+		recommandedTokenRelationship.setTokenRelationship(tokenRelationship);
+		String key = recommandedTokenRelationship.getTokenRelationship().getFromTokenToTokenString();
+		recommandedTokenRelationship.setKey(key);
+		return recommandedTokenRelationship;
+	}
 	
+	public List<RecommendedTokenRelationship> createRecommendedRelationshipsFromTokenRelationships(List<TokenRelationship> tokenRelationships){
+		if(tokenRelationships==null) return null;
+		List<RecommendedTokenRelationship> result = new ArrayList<>();
+		for(TokenRelationship tokenRelationship: tokenRelationships){
+			result.add(createRecommendedRelationshipFromTokenRelationship(tokenRelationship));
+		}
+		return result;
+	}
+	
+	
+
 }

@@ -8,6 +8,7 @@ import com.mst.model.SentenceQuery.EdgeQuery;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.metadataTypes.EdgeNames;
+import com.mst.model.metadataTypes.QueryAppenderTypes;
 
 public class NotAndAllRequestFactoryImpl implements NotAndAllRequestFactory {
 
@@ -15,7 +16,7 @@ public class NotAndAllRequestFactoryImpl implements NotAndAllRequestFactory {
 	public SentenceQueryInput create(SentenceQueryInput input) {
 		SentenceQueryInstance instance =  input.getSentenceQueryInstances().get(0);
 		input.getSentenceQueryInstances().addAll(0,createPermitations(instance));
-		instance.setAppender("andnotall");
+		instance.setAppender(QueryAppenderTypes.ANDNOTALL);
 		List<String> newTokens = new ArrayList<>();
 		newTokens.add("$$");
 		instance.setTokens(newTokens);
@@ -46,7 +47,7 @@ public class NotAndAllRequestFactoryImpl implements NotAndAllRequestFactory {
 				SentenceQueryInstance instance = new SentenceQueryInstance();
 				instance.setTokens(andNotAllInstance.getTokens());
 				if(i>0)
-					instance.setAppender("or");
+					instance.setAppender(QueryAppenderTypes.OR);
 				instance.getEdges().add(edgeQueries.get(i));
 				int k = j;
 				while(instance.getEdges().size()< maxNumberOfEdges){
@@ -66,7 +67,7 @@ public class NotAndAllRequestFactoryImpl implements NotAndAllRequestFactory {
 			SentenceQueryInstance instance = new SentenceQueryInstance();
 			instance.setTokens(andNotAllInstance.getTokens());
 			if(i>0)
-				instance.setAppender("or");
+				instance.setAppender(QueryAppenderTypes.OR);
 			instance.getEdges().add(edgeQueries.get(i));
 			
 			int j=i+1;

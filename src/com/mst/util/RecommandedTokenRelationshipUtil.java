@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -68,4 +69,27 @@ public class RecommandedTokenRelationshipUtil {
 		return result;
 	}
     
+    public static List<RecommendedTokenRelationship> filterByEdgeNames(HashSet<String> edgeNames, List<RecommendedTokenRelationship> recommendedTokenRelationships){
+    	List<RecommendedTokenRelationship> result = new ArrayList<>();
+    	
+    	for(RecommendedTokenRelationship relationship: recommendedTokenRelationships){
+    		if(edgeNames.contains(relationship.getTokenRelationship().getEdgeName()))
+    				result.add(relationship);
+    	}
+    	return result;
+    }
+    
+    public static boolean doRelationshipsContainVerb(List<RecommendedTokenRelationship> relationships){
+    	for(RecommendedTokenRelationship relationship: relationships){
+    		String edgeName = relationship.getTokenRelationship().getEdgeName();
+    		if(edgeName.equals(WordEmbeddingTypes.bothVerbs)) return true;
+    		if(edgeName.equals(WordEmbeddingTypes.firstVerb)) return true;
+    		if(edgeName.equals(WordEmbeddingTypes.secondVerb)) return true;  		
+    	}
+    	return false;  
+    }
+	
+    public static boolean isDefault(RecommendedTokenRelationship edge){
+		return edge.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge);
+	}
 }

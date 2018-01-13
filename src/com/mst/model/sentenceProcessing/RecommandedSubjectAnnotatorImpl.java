@@ -8,26 +8,53 @@ import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
+import com.mst.util.RecommandedTokenRelationshipUtil;
 
 public class RecommandedSubjectAnnotatorImpl implements RecommandedSubjectAnnotator {
 
-	private boolean isDefault(RecommendedTokenRelationship edge){
-		return edge.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge);
-	}
-
 	public void annotate(SentenceDiscovery discovery){
-		
+		boolean isSubjectComplimentSet = false;
 		List<RecommendedTokenRelationship> relationships = discovery.getWordEmbeddings();
 		for(int i =0;i<relationships.size();i++){
 			RecommendedTokenRelationship recommandedTokenRelationship = relationships.get(i);
-			if(isDefault(recommandedTokenRelationship)){
-				processSubjectCompliment(i, relationships);
+			if(RecommandedTokenRelationshipUtil.isDefault(recommandedTokenRelationship)){
+				boolean isSet = processSubjectCompliment(i, relationships);
+				if(!isSubjectComplimentSet)
+					isSubjectComplimentSet = isSet;
 			}
-			
+		
 			if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.secondVerb))
 				processSubject(i, relationships);
 		}
+		if(!isSubjectComplimentSet)
+			setSubjectComplimentOnVerb(relationships);
 	}
+	
+	private void setSubjectComplimentOnVerb(List<RecommendedTokenRelationship> relationships){
+		for(int i =0;i<relationships.size();i++){
+			RecommendedTokenRelationship recommandedTokenRelationship = relationships.get(i);
+			 if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.firstVerb))
+			{
+				setSubjectComplement(recommandedTokenRelationship);
+				return;
+			}
+			else if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.bothVerbs)){
+				if(i+1>=relationships.size()){
+					setSubjectComplement(recommandedTokenRelationship);
+					return;
+				}
+				if(relationships.get(i+1).getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.bothVerbs)){ 
+					setSubjectComplement(relationships.get(i+1));
+					return;
+				}
+				else {
+					setSubjectComplement(recommandedTokenRelationship);
+					return;
+				}
+			}
+		}
+	}
+	
 	
 	private void processSubject(int index, List<RecommendedTokenRelationship> relationships){
 		for(int i = index; i>=0;i--){
@@ -54,34 +81,44 @@ public class RecommandedSubjectAnnotatorImpl implements RecommandedSubjectAnnota
 		recommandedTokenRelationship.getTokenRelationship().getToToken().setPropertyValueType(PropertyValueTypes.SubjectComplement);
 	}
 	
-	private void processSubjectCompliment(int index, List<RecommendedTokenRelationship> relationships){
+	private boolean processSubjectCompliment(int index, List<RecommendedTokenRelationship> relationships){
 	
 		for(int i = index; i<relationships.size();i++){
 			RecommendedTokenRelationship recommandedTokenRelationship = relationships.get(i);
-			if(!isDefault(recommandedTokenRelationship))return;
+			if(!RecommandedTokenRelationshipUtil.isDefault(recommandedTokenRelationship))return false;
 			
 
 			if(i+1>=relationships.size()){
 				if(isPunc(recommandedTokenRelationship)){
 					setSubjectComplement(relationships.get(i-1));
 				}
-				return;
+				if(i+1 == relationships.size()) {
+					setSubjectComplement(recommandedTokenRelationship);
+					return true;
+				}
 			}
 			
 			RecommendedTokenRelationship nextRecommandedTokenRelationship = relationships.get(i+1);
-			if(!isDefault(nextRecommandedTokenRelationship))return;
+			
+			if(nextRecommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.secondPrep)){
+				setSubjectComplement(recommandedTokenRelationship);
+				return true;
+			}
+		
+			if(!RecommandedTokenRelationshipUtil.isDefault(nextRecommandedTokenRelationship))return false;
 			if(i+1==relationships.size()-1){
 				if(isPunc(nextRecommandedTokenRelationship)){
 					setSubjectComplement(recommandedTokenRelationship);
-					return;
+					return true;
 				}
 			}
 
 			if(!recommandedTokenRelationship.getTokenRelationship().getToToken().getToken().equals(nextRecommandedTokenRelationship.getTokenRelationship().getFromToken().getToken())){
 				setSubjectComplement(recommandedTokenRelationship);
-				return;
+				return true;
 			}
 		
 		}
+		return false;
 	}
 }

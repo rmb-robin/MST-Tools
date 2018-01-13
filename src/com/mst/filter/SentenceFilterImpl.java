@@ -18,13 +18,33 @@ import com.mst.util.TokenRelationshipUtil;
 
 public class SentenceFilterImpl implements SentenceFilter {
 
+	
+	private boolean isEdgeNotinQuery(EdgeQuery edgeQuery, Map<String,List<TokenRelationship>> namedRelationshipsByEdgeName, Map<String,List<TokenRelationship>> notNamedRelationshipsByEdgeName){
+		if(edgeQuery.getIsNamedEdge()){
+			return namedRelationshipsByEdgeName.containsKey(edgeQuery.getName());
+		}
+		return notNamedRelationshipsByEdgeName.containsKey(edgeQuery.getName());
+	}
+	
+	private List<TokenRelationship> getTokenRelationshipByQueryEdgeName(EdgeQuery edgeQuery, Map<String,List<TokenRelationship>> namedRelationshipsByEdgeName, Map<String,List<TokenRelationship>> notNamedRelationshipsByEdgeName){
+		if(edgeQuery.getIsNamedEdge()){
+			return namedRelationshipsByEdgeName.get(edgeQuery.getName());
+		}
+		return notNamedRelationshipsByEdgeName.get(edgeQuery.getName());
+	}
+	
 	public EdgeMatchOnQueryResult AreEdgesMatchOnQuery(List<TokenRelationship> existingtokenRelationships,List<EdgeQuery> edgeQueries, String searchToken){	
 		EdgeMatchOnQueryResult result = new EdgeMatchOnQueryResult();
-		Map<String,List<TokenRelationship>> relationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingtokenRelationships);
+		Map<String,List<TokenRelationship>> namedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingtokenRelationships, true);
+		Map<String,List<TokenRelationship>> notNamedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingtokenRelationships,false);
+		
+		
+		
 		for(EdgeQuery edgeQuery: edgeQueries){
 			HashSet<String> edgeValues = edgeQuery.getValuesLower();
 			if(edgeQuery.getName().equals(EdgeNames.existence)){
-				if(!isMatchOnExistence(relationshipsByEdgeName, searchToken)) {
+				//TO DO come back..
+				if(!isMatchOnExistence(notNamedRelationshipsByEdgeName, searchToken)) {
 					result.setMatch(false); 
 					return result;
 				}
@@ -36,13 +56,13 @@ public class SentenceFilterImpl implements SentenceFilter {
 				}	
 			}
 			else { 
-				if(!relationshipsByEdgeName.containsKey(edgeQuery.getName()))continue;
+				if(!isEdgeNotinQuery(edgeQuery,namedRelationshipsByEdgeName,notNamedRelationshipsByEdgeName)) continue;
 				if(edgeValues==null || edgeValues.isEmpty()) continue;
 			}
 			result.setDidTokenRelationsContainAnyMatches(true);
 			List<String> edgeValuesList = new ArrayList<>(edgeValues);
 			
-			List<TokenRelationship> tokenRelationships = relationshipsByEdgeName.get(edgeQuery.getName());
+			List<TokenRelationship> tokenRelationships = getTokenRelationshipByQueryEdgeName(edgeQuery,namedRelationshipsByEdgeName, notNamedRelationshipsByEdgeName);
 			
 			if(edgeQuery.getIsNumeric()==null)
 				edgeQuery.setIsNumeric(isEdgeQueryNumeric(edgeValuesList));
@@ -175,16 +195,6 @@ public class SentenceFilterImpl implements SentenceFilter {
 	}
 
  
-	public List<TokenRelationship> filterForExistenceTypeOnly(List<TokenRelationship> input) {
-		List<TokenRelationship> result = new ArrayList<>();
-		HashSet<String> edgeNameSet = EdgeNames.getExistenceSet();
-		for(TokenRelationship relationship: input){
-			String edgeName = relationship.getEdgeName();
-			if(edgeNameSet.contains(edgeName))
-				result.add(relationship);
-		}
-		return result; 
-	}
 	
 	
 	

@@ -26,6 +26,7 @@ import com.mst.interfaces.filter.SentenceFilterController;
 import com.mst.model.SemanticType;
 import com.mst.model.SentenceQuery.DiscreteDataFilter;
 import com.mst.model.SentenceQuery.EdgeQuery;
+import com.mst.model.SentenceQuery.EdgeQueryMapResult;
 import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
@@ -37,6 +38,7 @@ import com.mst.model.discrete.DiscreteData;
 import com.mst.model.graph.Edge;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeResultTypes;
+import com.mst.model.metadataTypes.QueryAppenderTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
@@ -90,19 +92,19 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			
 			if(sentenceQueryInstance.getAppender()==null) continue;
 			String appender = sentenceQueryInstance.getAppender().toLowerCase();
-			if(appender.equals("or")){
+			if(appender.equals(QueryAppenderTypes.OR)){
 				sentenceFilterController.addSentencesToResult(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId(),discreteDataIds,filterOnDiscreteData));
 				continue;
 			}
 			
-			if(appender.equals("and")){
+			if(appender.equals(QueryAppenderTypes.AND)){
 				sentenceFilterController.filterForAnd(sentenceQueryInstance);
 			}
 			
-			if(appender.equals("andnot"))
+			if(appender.equals(QueryAppenderTypes.ANDNOT))
 				sentenceFilterController.filterForAndNot(sentenceQueryInstance);
 			
-			if(appender.equals("andnotall"))
+			if(appender.equals(QueryAppenderTypes.ANDNOTALL))
 				sentenceFilterController.filterForAndNotAll(sentenceQueryInstance);
 		}
 		return new ArrayList<SentenceQueryResult>(sentenceFilterController.getQueryResults().values());
@@ -154,24 +156,36 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return false;
 	}
 
+ 
+	
 	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete){
-		Map<String,EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
+		EdgeQueryMapResult   mapResult  = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
+
 		SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();
 
+		
+		
 		this.init();
 		for(String token: sentenceQueryInstance.getTokens()){
-			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
+			Query<SentenceDiscovery> query = datastore.createQuery(SentenceDiscovery.class);
 			 query
 			 .search(token)
-			 .field("tokenRelationships.edgeName").hasAllOf(edgeQueriesByName.keySet())
 			 .field("organizationId").equal(organizationId);
+			 
+			 
+			 if(!mapResult.getNonNamedEdges().isEmpty())
+				 query.field("wordEmbeddings.tokenRelationship.edgeName").hasAllOf(mapResult.getNonNamedEdges().keySet());
+				 
+			 if(!mapResult.getNamedEdges().isEmpty()){
+				 query.field("wordEmbeddings.tokenRelationship.namedEdge").hasAllOf(mapResult.getNamedEdges().keySet());
+			 }
 			 
 			 if(filterForDiscrete)
 				 query.field("discreteData").hasAnyOf(discreteDataIds);
 			 
 			 
-			 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
-			 List<SentenceDb> sentences = query.asList();
+			 query.retrievedFields(true, "id", "wordEmbeddings", "normalizedSentence","origSentence", "discreteData");
+			 List<SentenceDiscovery> sentences = query.asList();
 			 
 			 List<SentenceQueryResult> queryResults = sentenceFilterController.getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges(), token);
 			 result.getSentenceQueryResult().addAll(queryResults);
@@ -181,13 +195,13 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 
 	
-	private List<SentenceDb> getMatchedSentences(List<SentenceQueryResult> queryResults, List<SentenceDb> sentences){
+	private List<SentenceDiscovery> getMatchedSentences(List<SentenceQueryResult> queryResults, List<SentenceDiscovery> sentences){
 		HashSet<String> ids = new HashSet<>();
 		for(SentenceQueryResult q: queryResults){
 			ids.add(q.getSentenceId());
 		}
-		List<SentenceDb> result = new ArrayList<>();
-		for(SentenceDb s: sentences){
+		List<SentenceDiscovery> result = new ArrayList<>();
+		for(SentenceDiscovery s: sentences){
 			if(ids.contains(s.getId().toString()))
 				result.add(s);
 		}
