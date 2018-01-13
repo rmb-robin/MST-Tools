@@ -1,0 +1,11 @@
+prep-for,existence,positive,f,f,dysn,t,f
+prep-for,existence-no,negative,f,f,dysn,t,f
+prep-of,existence-maybe,suggestive,f,f,dysn,t,f
+prep-without,existence-no,dysn,t,f,sympto,t,f
+prep-in,supp care,follow-up,f,f,tempor,t,f,
+prep-without,existence-no,calcifications,f,f,dysn,t,f
+prep-with,history review,correlation,f,f,history,f,f
+prep-to,range value,up,f,f,uom,t,f
+prep-of,existence,evidence,f,f,dysn,t,f
+prep-of,existence,evidence,f,f,neop-can,t,f,
+prep-without,existence-no,dysn,t,f,dysn,t,f

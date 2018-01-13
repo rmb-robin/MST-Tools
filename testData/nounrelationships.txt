@@ -1,0 +1,13 @@
+token-token,assay type,cancer,f,f,panel,f,f
+token-token,disease severity,cancer,f,f,stage,f,f
+token-token,parameters,current,f,f,criteria,f,f
+token-token,assay brand,genedx,f,f,panel,f,f
+token-token,disease appearance,appearing,f,f,dysn,t,f
+token-token,diagnostic parameters,testing,f,f,criteria,f,f
+token-token,disease severity,benign,f,f,dysn,t,f
+token-token,disease severity,malignant,f,f,dysn,t,f
+token-token,measure,mm,f,f,dysn,t,f
+token-token,measure,cm,f,f,dysn,t,f
+token-token,disease severity,invasive,f,f,neop,t,f
+token-token,disease severity,noninvasive,f,f,neop,t,f
+token-token,laterality,left,f,f,bpoc,t,f
