@@ -140,39 +140,16 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 
 
 	public void filterForAndNot(SentenceQueryInstance sentenceQueryInstance){
-	EdgeQueryMapResult   mapResult = convertEdgeQueryToDictionary(sentenceQueryInstance);
-	Map<String,EdgeQuery> edgeQueriesByName = mapResult.getNonNamedEdges();	
 	HashSet<String> matchedIds = new HashSet<>();
-		List<String> unmatchedTokens = new ArrayList<String>();
 		for (Map.Entry<String, SentenceDiscovery> entry : cumalativeSentenceResults.entrySet()) {
 			List<TokenRelationship> relationships = RecommandedTokenRelationshipUtil.getTokenRelationshipsFromRecommendedTokenRelationships(entry.getValue().getWordEmbeddings()); 
 			 
-			 boolean tokenMatch = false;
-			 for(String token: sentenceQueryInstance.getTokens()){
-				if(entry.getValue().getOrigSentence().contains(token)){
-					tokenMatch = true;
-				}
-				else
-				{
-					unmatchedTokens.add(token);
-				}
+			boolean shouldExclude=false; 
+			for(String token: sentenceQueryInstance.getTokens()){
+				shouldExclude =shouldByPassResultExclude(relationships,sentenceQueryInstance.getEdges(), token);
+				if(shouldExclude) break;
 			}
-			 
-			if(tokenMatch) continue;
-
-			HashSet<String> sentenceUniqueEdgeNames = new HashSet<>();
-			relationships.stream().forEach(a-> sentenceUniqueEdgeNames.add(a.getEdgeName()));
-			for(String edgeName: edgeQueriesByName.keySet()){
-				if(sentenceUniqueEdgeNames.contains(edgeName)){
-					tokenMatch = true;
-				}
-			}
-				
-			if(tokenMatch) continue;
-			
-			for(String token: unmatchedTokens){
-				if(shouldByPassResultExclude(relationships,sentenceQueryInstance.getEdges(), token)) continue;
-			}
+			if(shouldExclude) continue;
 			matchedIds.add(entry.getKey());
 		 }
 		updateExistingResults(matchedIds);

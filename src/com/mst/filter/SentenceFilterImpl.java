@@ -37,9 +37,7 @@ public class SentenceFilterImpl implements SentenceFilter {
 		EdgeMatchOnQueryResult result = new EdgeMatchOnQueryResult();
 		Map<String,List<TokenRelationship>> namedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingtokenRelationships, true);
 		Map<String,List<TokenRelationship>> notNamedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingtokenRelationships,false);
-		
-		
-		
+
 		for(EdgeQuery edgeQuery: edgeQueries){
 			HashSet<String> edgeValues = edgeQuery.getValuesLower();
 			if(edgeQuery.getName().equals(EdgeNames.existence)){
@@ -89,9 +87,7 @@ public class SentenceFilterImpl implements SentenceFilter {
 				if(!isEdgeNumeric){
 					if(!edgeValues.contains(relationship.getFromToken().getToken()) && 
 					   !edgeValues.contains(relationship.getToToken().getToken())) {
-						if(!relationship.equals(tokenRelationships.get(tokenRelationships.size()-1))) continue;
-						result.setMatch(false); 
-						return result;
+						continue;
 					}
 					else 
 					{
@@ -116,7 +112,13 @@ public class SentenceFilterImpl implements SentenceFilter {
 			}
 		}
 		
-		result.setMatch(true);
+		if(result.getMatches().isEmpty())
+		{
+			result.setMatch(false);
+		}
+		else {
+			result.setMatch(true);
+		}
 		return result;
 	}
 	

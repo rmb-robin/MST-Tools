@@ -11,3 +11,18 @@ token-token,measure,cm,f,f,dysn,t,f
 token-token,disease severity,invasive,f,f,neop,t,f
 token-token,disease severity,noninvasive,f,f,neop,t,f
 token-token,laterality,left,f,f,bpoc,t,f
+token-token,laterality,right,f,f,bpoc,t,f
+token-token,laterality,bilateral,f,f,bpoc,t,f
+token-token,unit of measure,cardinal number,t,f,cm,f,f
+token-token,unit of measure,cardinal number,t,f,mm,f,f
+token-token,measurement,cardinal number,t,f,cm,f,f
+token-token,measurement,cardinal number,t,f,mm,f,f
+token-token,disease location,bpoc,t,f,dysn,t,f
+token-token,simple cyst modifiers,qlco-simple,t,f,cyst,f,f
+token-token,simple cyst modifiers,qlco-simple,t,f,cysts,f,f
+token-token,complex cyst modifiers,qlco-com,t,f,cyst,f,f
+token-token,complex cyst modifiers,qlco-com,t,f,cysts,f,f
+token-token,neoplasm severity,qlco-neop,t,f,disease,f,t
+token-token,disease modifier,fusiform,f,f,dysnt,f,f
+token-token,finding site modifier,qlco,t,f,bpoc,t,f
+token-token,radiation dosage,cardinal number,t,f,cgy,f,f
