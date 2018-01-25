@@ -10,6 +10,7 @@ import org.mongodb.morphia.query.Query;
 import com.mst.interfaces.dao.Hl7DetailsDao; 
 import com.mst.model.HL7Details;
 import com.mst.model.discrete.DiscreteData;
+import com.mst.model.raw.AllHl7Elements;
  
 public class Hl7DetailsDaoImpl  extends BaseDocumentDaoImpl<HL7Details> implements Hl7DetailsDao  {
 
@@ -23,4 +24,14 @@ public class Hl7DetailsDaoImpl  extends BaseDocumentDaoImpl<HL7Details> implemen
 		.asList();
 	}
 
+	@Override
+	public AllHl7Elements getAllElements() {
+		return datastoreProvider.getDefaultDb().createQuery(AllHl7Elements.class).get();
+	}
+
+	@Override
+	public void saveAllElements(AllHl7Elements allHl7Elements) {
+	 datastoreProvider.getDefaultDb().save(allHl7Elements);
+
+	}
 }

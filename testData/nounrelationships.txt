@@ -26,3 +26,6 @@ token-token,neoplasm severity,qlco-neop,t,f,disease,f,t
 token-token,disease modifier,fusiform,f,f,dysnt,f,f
 token-token,finding site modifier,qlco,t,f,bpoc,t,f
 token-token,radiation dosage,cardinal number,t,f,cgy,f,f
+token-token,radiation fractions,cardinal number,t,f,fraction,f,f
+token-token,radiation fraction,cardinal number,t,f,fractions,f,f
+token-token,disease location,bpoc,t,f,neop-can,t,f

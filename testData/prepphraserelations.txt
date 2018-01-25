@@ -9,3 +9,43 @@ prep-to,range value,up,f,f,uom,t,f
 prep-of,existence,evidence,f,f,dysn,t,f
 prep-of,existence,evidence,f,f,neop-can,t,f,
 prep-without,existence-no,dysn,t,f,dysn,t,f
+prep-in,disease location,dysn,t,f,bpoc,t,f
+prep-within,disease location,dysn,t,f,bpoc,t,f
+prep-of,disease location,dysn,t,f,bpoc,t,f
+prep-in,gene location,*,f,f,gene,f,f
+prep-after,sequence of events,therapy,f,f,surgery,f,f
+prep-of,diagnosis,history,f,f,bpoc,t,f
+prep-with,diagnose,consistent,f,f,dysn,t,f
+prep-on,take,LV,f,t,drugpr,t,f
+prep-for,existence-maybe,suspicious,f,f,dysn,t,f
+prep-for,existence,concerning,f,f,dysn,t,f
+prep-with,existence,consistent,f,f,dysn,t,f
+prep-for,existence,positive,f,f,dysn,t,f
+prep-for,existence-no,negative,f,f,dysn,t,f
+prep-of,existence-maybe,suggestive,f,f,dysn,t,f
+prep-without,existence-no,dysn,t,f,sympto,t,f
+prep-here,existence,for,f,f,dysn,t,f
+prep-in,supp care,follow-up,f,f,tempor,t,f
+prep-without,existence-no,calcifications,f,f,dysn,t,f
+prep-with,history review,correlation,f,f,history,f,f
+prep-to,range value,up,f,f,uom,t,f
+prep-of,existence,evidence,f,f,dysn,t,f
+prep-of,existence,evidence,f,f,neop-can,t,f
+prep-without,existence-no,dysn,t,f,dysn,t,f
+prep-on,disease location,seen,f,f,bpoc,t,f
+prep-at,disease location,dysn,t,f,bpoc,t,f
+prep-with,disease location,associated,f,f,bpoc,t,f
+prep-in,disease location,present,f,f,bpoc,t,f
+prep-within,disease location,noted,f,f,bpoc,t,f
+prep-in,disease location,observed,f,f,bpoc,t,f
+prep-from,disease location,arising,f,f,bpoc,t,f
+prep-off,disease location,dysn,t,f,bpoc,t,f
+prep-on,disease location,dysn,t,f,bpoc,t,f
+prep-within,disease location,seen,f,f,bpoc,t,f
+prep-in,disease location,seen,f,f,bpoc,t,f
+prep-for,procedure,screening,f,f,dysn,t,f
+prep-of,disease-history,history,f,f,dysn,t,f
+prep-of,disease-history,history,f,f,neop-can,t,f
+prep-of,disease-history,redemonstration,f,f,dysn,t,f
+prep-for,disease-history,review,f,f,dysn,t,f
+prep-on,event date,*.*,f,f,date,t,f

@@ -10,7 +10,7 @@ import org.mongodb.morphia.utils.IndexType;
 
 import com.mst.model.sentenceProcessing.TokenRelationship;
 
-@Entity("recommendedTokenRelatationships")
+@Entity("recommendedTokenRelatationshipsTest")
 @Indexes({
     @Index(fields = {@Field(value = "key", type = IndexType.TEXT)})
 })

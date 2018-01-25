@@ -54,6 +54,13 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 		for(SentenceDiscovery sentenceDiscovery : sentences){
 			try{
 				String id = sentenceDiscovery.getId().toString();
+				
+				if(id.equals("5a661f2191775d0aaa69a391"))	{
+					int a =1;
+					int b = a;
+					System.out.println("");
+				}
+				
 				if(processedSentences.contains(id))continue;
 				List<TokenRelationship> relationships = RecommandedTokenRelationshipUtil.getTokenRelationshipsFromRecommendedTokenRelationships(sentenceDiscovery.getWordEmbeddings());
 				if(shouldByPassResult(relationships,edgeQuery,searchToken)) continue;

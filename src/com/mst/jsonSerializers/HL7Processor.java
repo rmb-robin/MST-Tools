@@ -6,7 +6,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -14,6 +16,7 @@ import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.HL7Details;
 import com.mst.model.HL7FreeText;
 import com.mst.model.discrete.DiscreteData;
+import com.mst.model.raw.AllHl7Elements;
 import com.mst.model.raw.HL7Element;
 
 import ca.uhn.hl7v2.model.Message;
@@ -66,6 +69,24 @@ public class HL7Processor {
 		}
 		
 		return request;
+	}
+	
+	
+	public Map<String, String> getAllAvailableHl7Fields(AllHl7Elements allelements){
+		Map<String,String> result = new HashMap<String,String>();
+		
+		for(String key: allelements.getElements()){
+			try{
+				String val = terser.get(key);
+				if(val!=null){
+					result.put(key.replace("/.",""), val);
+				}
+			}
+			catch(Exception ex){
+				
+			}
+		}
+		return result;
 	}
 	
 	private DiscreteData getHL7Discrete(List<HL7Element> discrete) {

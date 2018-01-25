@@ -20,6 +20,7 @@ import org.mongodb.morphia.converters.DateConverter;
 import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import com.mst.dao.DisceteDataComplianceDisplayFieldsDaoImpl;
+import com.mst.dao.Hl7DetailsDaoImpl;
 import com.mst.dao.RejectedReportDaoImpl;
 import com.mst.dao.SentenceDaoImpl;
 import com.mst.interfaces.dao.DisceteDataComplianceDisplayFieldsDao;
@@ -29,6 +30,7 @@ import com.mst.metadataProviders.DynamicRuleProvider;
 import com.mst.metadataProviders.TestHl7Provider;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
+import com.mst.model.raw.AllHl7Elements;
 import com.mst.model.raw.RawReportFile;
 import com.mst.model.requests.RejectedReport;
 import com.mst.model.requests.SentenceRequest;
@@ -155,6 +157,21 @@ public class LoadDataToMongo {
 		ds.delete(ds.createQuery(DynamicEdgeCreationRule.class));
 		ds.save(input);
 	}
+	
+	//@Test
+	public void loadAllHl7Elements(){
+		AllHl7Elements elements = new AllHl7Elements();
+		
+		List<String> data  = new TestHl7Provider().getAllValues();
+		for(String d: data){
+			elements.getElements().add("/." + d);
+		}
+		Hl7DetailsDaoImpl dao = new Hl7DetailsDaoImpl();
+		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+		dao.saveAllElements(elements);
+	
+	} 
+	
 	
 	//http://10.210.192.4
 	@Test

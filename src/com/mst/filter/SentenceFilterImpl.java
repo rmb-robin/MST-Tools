@@ -13,6 +13,7 @@ import com.mst.model.SentenceQuery.EdgeQuery;
 import com.mst.model.SentenceQuery.MatchInfo;
 import com.mst.model.SentenceQuery.ShouldMatchOnSentenceEdgesResult;
 import com.mst.model.metadataTypes.EdgeNames;
+import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.util.TokenRelationshipUtil;
 
@@ -39,6 +40,11 @@ public class SentenceFilterImpl implements SentenceFilter {
 		Map<String,List<TokenRelationship>> notNamedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingtokenRelationships,false);
 
 		for(EdgeQuery edgeQuery: edgeQueries){
+			
+			if(edgeQuery.getName().equals(WordEmbeddingTypes.defaultEdge) && edgeQuery.getValues().isEmpty()){
+				edgeQuery.getValues().add(searchToken);
+			}
+			
 			HashSet<String> edgeValues = edgeQuery.getValuesLower();
 			if(edgeQuery.getName().equals(EdgeNames.existence)){
 				//TO DO come back..
@@ -67,6 +73,7 @@ public class SentenceFilterImpl implements SentenceFilter {
 			
 			boolean isEdgeNumeric = edgeQuery.getIsNumeric();
 			boolean isEdgeInRange =false;
+			int matchCount = 0;
 			for(TokenRelationship relationship: tokenRelationships){
 				
 				if(isEdgeNumeric && !isEdgeInRange){
@@ -96,29 +103,31 @@ public class SentenceFilterImpl implements SentenceFilter {
 						{
 							info.setTokenType("from");
 							info.setValue(relationship.getFromToken().getToken());
+							matchCount+=1;
 						}
 						else 
 						{
 							info.setTokenType("to");
 							info.setValue(relationship.getToToken().getToken());
+							matchCount+=1;
 						}
 						result.getMatches().put(edgeQuery.getName(),info);
 					}
 				}
 			}
+			
+			if(matchCount==0){
+				result.setMatch(false);
+				return result;
+			}
+			
 			if(isEdgeNumeric && !isEdgeInRange){
 				result.setMatch(false); 
 				return result;
 			}
 		}
 		
-		if(result.getMatches().isEmpty())
-		{
-			result.setMatch(false);
-		}
-		else {
-			result.setMatch(true);
-		}
+		result.setMatch(true);
 		return result;
 	}
 	

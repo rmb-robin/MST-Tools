@@ -20,7 +20,7 @@ import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.Verb;
 import com.mst.model.sentenceProcessing.WordToken;
 
-@Entity("sentenceDiscoveries")
+@Entity("sentenceDiscoveriesTest")
 @Indexes({
     @Index(fields = {@Field(value = "origSentence", type = IndexType.TEXT)})
 })

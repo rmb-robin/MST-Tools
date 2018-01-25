@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
@@ -52,6 +53,8 @@ public class DiscreteData {
 	private Boolean isDuplicate;
 
 	private String rawFileId; 
+	
+	private Map<String,String> allAvailableFields; 
 	
 	public DiscreteData(){
 		customFields = new ArrayList<DiscreteDataCustomField>();
@@ -230,6 +233,14 @@ public class DiscreteData {
 
 	public void setRawFileId(String rawFileId) {
 		this.rawFileId = rawFileId;
+	}
+
+	public Map<String, String> getAllAvailableFields() {
+		return allAvailableFields;
+	}
+
+	public void setAllAvailableFields(Map<String, String> allAvailableFields) {
+		this.allAvailableFields = allAvailableFields;
 	} 
 	
 }

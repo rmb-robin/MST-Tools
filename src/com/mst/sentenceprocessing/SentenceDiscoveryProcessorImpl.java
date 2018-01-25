@@ -83,7 +83,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			discovery.getWordEmbeddings().addAll(nounPhraseProcesser.addEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
 			subjectAnnotator.annotate(discovery);
 			discovery.getWordEmbeddings().addAll(negativeRelationshipfactory.create(discovery.getModifiedWordList()));
-			discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
+		//	discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
 			discoveries.add(discovery);
 		}
 		return discoveries;
