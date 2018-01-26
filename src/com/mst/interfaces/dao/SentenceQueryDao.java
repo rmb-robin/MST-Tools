@@ -15,5 +15,4 @@ public interface SentenceQueryDao extends IDao {
 	List<String> getEdgeNamesByTokens(List<String> tokens);
 	List<SentenceDb> getSentencesForReprocess(SentenceReprocessingInput input);
 	List<SentenceDb> getSentencesByDiscreteDataIds(Set<String> ids);
-	List<SentenceQueryResult> getSentencesByText(SentenceQueryTextInput input);
 } 

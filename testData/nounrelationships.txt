@@ -1,31 +1,67 @@
-token-token,assay type,cancer,f,f,panel,f,f
-token-token,disease severity,cancer,f,f,stage,f,f
-token-token,parameters,current,f,f,criteria,f,f
-token-token,assay brand,genedx,f,f,panel,f,f
-token-token,disease appearance,appearing,f,f,dysn,t,f
-token-token,diagnostic parameters,testing,f,f,criteria,f,f
-token-token,disease severity,benign,f,f,dysn,t,f
-token-token,disease severity,malignant,f,f,dysn,t,f
-token-token,measure,mm,f,f,dysn,t,f
-token-token,measure,cm,f,f,dysn,t,f
-token-token,disease severity,invasive,f,f,neop,t,f
-token-token,disease severity,noninvasive,f,f,neop,t,f
-token-token,laterality,left,f,f,bpoc,t,f
-token-token,laterality,right,f,f,bpoc,t,f
-token-token,laterality,bilateral,f,f,bpoc,t,f
-token-token,unit of measure,cardinal number,t,f,cm,f,f
-token-token,unit of measure,cardinal number,t,f,mm,f,f
-token-token,measurement,cardinal number,t,f,cm,f,f
-token-token,measurement,cardinal number,t,f,mm,f,f
-token-token,disease location,bpoc,t,f,dysn,t,f
-token-token,simple cyst modifiers,qlco-simple,t,f,cyst,f,f
-token-token,simple cyst modifiers,qlco-simple,t,f,cysts,f,f
-token-token,complex cyst modifiers,qlco-com,t,f,cyst,f,f
-token-token,complex cyst modifiers,qlco-com,t,f,cysts,f,f
-token-token,neoplasm severity,qlco-neop,t,f,disease,f,t
-token-token,disease modifier,fusiform,f,f,dysnt,f,f
-token-token,finding site modifier,qlco,t,f,bpoc,t,f
-token-token,radiation dosage,cardinal number,t,f,cgy,f,f
-token-token,radiation fractions,cardinal number,t,f,fraction,f,f
-token-token,radiation fraction,cardinal number,t,f,fractions,f,f
-token-token,disease location,bpoc,t,f,neop-can,t,f
+cancer,f,panel,f,null,assay type
+cancer ,f,stage,f,null,disease severity
+current,f,criteria,f,null,parameters
+genedx,f,panel,f,null,assay brand
+appearing,f,dysn,t,null,disease appearance
+testing,f,criteria,f,null,diagnostic parameters
+benign,f,dysn,t,null,disease severity
+malignant,f,dysn,t,null,disease severity
+mm,f,dysn,t,null,measure
+cm,f,dysn,t,null,measure
+invasive,f,neop,t,null,disease severity
+noninvasive,f,neop,t,null,disease severity
+left,f,bpoc,t,null,laterality
+bilateral,f,bpoc,t,null,laterality
+right,f,bpoc,t,null,laterality
+diag,t,diagnosis,f,null,diagnosis
+cardinal number,t,cm,f,null,unit of measure
+cardinal number,t,mm,f,null,unit of measure
+bpoc,t,proc,t,null,procedure location
+stable,f,dysn,t,null,disease stability
+total,f,proc,t,null,degree of procedure
+partial,f,proc,t,null,degree of procedure
+mr.,f,*,f,0,pii
+mrs.,f,*,f,0,pii
+ms.,f,*,f,0,pii
+bpoc,t,dysn,t,null,disease location
+previous,f,dysn,t,null,general time
+prior,f,dysn,t,null,general time
+cardinal number,t,cm,f,null,measurement
+cardinal number,t,mm,f,null,measurement
+qlco,t,dysn,t,null,disease modifier
+qlco-cert,t,dysn,t,null,disease modifier
+qlco-degree,t,dysn,t,null,disease modifier
+qlco-depth,t,dysn,t,null,disease modifier
+qlco-fixed,t,dysn,t,null,disease modifier
+qlco-sev,t,dysn,t,null,disease modifier
+qlco-simple,t,cyst,f,null,simple cyst modifiers
+qlco-simple,t,cysts,f,null,simple cyst modifiers
+qlco-sizeref,t,dysn,t,null,disease modifier
+qlco-sym,t,dysn,t,null,disease modifier
+qlco-tempor,t,proc,t,null,procedure timing
+tempor,t,proc,t,null,procedure timing
+bpoc,t,proc,t,null,procedure location
+bpoc,t,title-med,t,null,physician speciality
+bpoc,t,ptconsul,t,null,consultation speciality
+proc,t,ptconsul,t,null,procedure evaluation
+qlco-neop,t,disease,f,null,neoplasm severity
+family,f,dysn,t,null,history
+drugpr,t,delivermeth,t,null,drug delivery
+follow-up,f,tempor,t,3,supp care
+cardinal number,t,tempor,t,null,time
+bpoc,t,ptconsul,t,null,consultation type
+ultrasound,f,follow-up,f,1,follow-up
+abdominal,f,aneurysm,f,1,disease location
+aortic,f,aneurysm,f,0,disease modifier
+recommend,f,proc,t,1,advise
+proc,t,recommended,f,2,advise
+clinically,f,abdominal,f,2,disease modifier
+evidence,f,seen,f,1,disease modifier
+incidental,f,dysn,t,null,new disease
+stable,f,dysn,t,null,disease stablity
+fusiform,f,dysn,t,null,disease modifier
+previous,f,dysn,t,null,disease history
+dysn,t,resection,f,null,procedure location
+sonographic,f,evidence,f,null,procedure
+qlco,t,bpoc,t,null,finding site modifier
+qlco-com,t,cyst,f,null,complex cyst modifiers

@@ -26,7 +26,6 @@ import com.mst.interfaces.filter.SentenceFilterController;
 import com.mst.model.SemanticType;
 import com.mst.model.SentenceQuery.DiscreteDataFilter;
 import com.mst.model.SentenceQuery.EdgeQuery;
-import com.mst.model.SentenceQuery.EdgeQueryMapResult;
 import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
@@ -38,10 +37,8 @@ import com.mst.model.discrete.DiscreteData;
 import com.mst.model.graph.Edge;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeResultTypes;
-import com.mst.model.metadataTypes.QueryAppenderTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
-import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -92,46 +89,23 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			
 			if(sentenceQueryInstance.getAppender()==null) continue;
 			String appender = sentenceQueryInstance.getAppender().toLowerCase();
-			if(appender.equals(QueryAppenderTypes.OR)){
+			if(appender.equals("or")){
 				sentenceFilterController.addSentencesToResult(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId(),discreteDataIds,filterOnDiscreteData));
 				continue;
 			}
 			
-			if(appender.equals(QueryAppenderTypes.AND)){
+			if(appender.equals("and")){
 				sentenceFilterController.filterForAnd(sentenceQueryInstance);
 			}
 			
-			if(appender.equals(QueryAppenderTypes.ANDNOT))
+			if(appender.equals("andnot"))
 				sentenceFilterController.filterForAndNot(sentenceQueryInstance);
 			
-			if(appender.equals(QueryAppenderTypes.ANDNOTALL))
+			if(appender.equals("andnotall"))
 				sentenceFilterController.filterForAndNotAll(sentenceQueryInstance);
 		}
 		return new ArrayList<SentenceQueryResult>(sentenceFilterController.getQueryResults().values());
 	}	
-	
-	@Override
-	public List<SentenceQueryResult> getSentencesByText(SentenceQueryTextInput input) {
-		sentenceDiscoveryFilter = new SentenceDiscoveryFilterImpl();
-		List<SentenceQueryResult> result = new ArrayList<SentenceQueryResult>();
-		Datastore datastore =  datastoreProvider.getDefaultDb();
-		Pattern pattern = Pattern.compile(input.getText(), Pattern.CASE_INSENSITIVE);
-		Query<SentenceDiscovery> query = datastore.createQuery(SentenceDiscovery.class);
-		query
-		.field("origSentence").equal(pattern);
-		 
-		List<SentenceDiscovery> sentences = query.asList();
-		sentences = sentenceDiscoveryFilter.filter(sentences, input.getText());
-		SentenceQueryResultFactory factory = new SentenceQueryResultFactory(); 
-		for(SentenceDiscovery db:sentences){
-			SentenceQueryResult queryResult = new SentenceQueryResult();
-			queryResult.setSentence(db.getOrigSentence());
-			queryResult.setSentenceId(db.getId().toString());
-			queryResult.getSentenceQueryEdgeResults().add(factory.createSentenceQueryResultForDiscovery(input.getText(), db));
-			result.add(queryResult);
-		}
-		return filterTextSentences(result);
-	}
 	
 	private List<SentenceQueryResult> filterTextSentences(List<SentenceQueryResult> sentences){
 		List<SentenceQueryResult> result = new ArrayList<>();
@@ -156,36 +130,24 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return false;
 	}
 
- 
-	
 	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete){
-		EdgeQueryMapResult   mapResult  = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
-
+		Map<String,EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
 		SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();
 
-		
-		
 		this.init();
 		for(String token: sentenceQueryInstance.getTokens()){
-			Query<SentenceDiscovery> query = datastore.createQuery(SentenceDiscovery.class);
+			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
 			 query
 			 .search(token)
+			 .field("tokenRelationships.edgeName").hasAllOf(edgeQueriesByName.keySet())
 			 .field("organizationId").equal(organizationId);
-			 
-			 
-			 if(!mapResult.getNonNamedEdges().isEmpty())
-				 query.field("wordEmbeddings.tokenRelationship.edgeName").hasAllOf(mapResult.getNonNamedEdges().keySet());
-				 
-			 if(!mapResult.getNamedEdges().isEmpty()){
-				 query.field("wordEmbeddings.tokenRelationship.namedEdge").hasAllOf(mapResult.getNamedEdges().keySet());
-			 }
 			 
 			 if(filterForDiscrete)
 				 query.field("discreteData").hasAnyOf(discreteDataIds);
 			 
 			 
-			 query.retrievedFields(true, "id", "wordEmbeddings", "normalizedSentence","origSentence", "discreteData");
-			 List<SentenceDiscovery> sentences = query.asList();
+			 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
+			 List<SentenceDb> sentences = query.asList();
 			 
 			 List<SentenceQueryResult> queryResults = sentenceFilterController.getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges(), token);
 			 result.getSentenceQueryResult().addAll(queryResults);
@@ -195,13 +157,13 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 
 	
-	private List<SentenceDiscovery> getMatchedSentences(List<SentenceQueryResult> queryResults, List<SentenceDiscovery> sentences){
+	private List<SentenceDb> getMatchedSentences(List<SentenceQueryResult> queryResults, List<SentenceDb> sentences){
 		HashSet<String> ids = new HashSet<>();
 		for(SentenceQueryResult q: queryResults){
 			ids.add(q.getSentenceId());
 		}
-		List<SentenceDiscovery> result = new ArrayList<>();
-		for(SentenceDiscovery s: sentences){
+		List<SentenceDb> result = new ArrayList<>();
+		for(SentenceDb s: sentences){
 			if(ids.contains(s.getId().toString()))
 				result.add(s);
 		}

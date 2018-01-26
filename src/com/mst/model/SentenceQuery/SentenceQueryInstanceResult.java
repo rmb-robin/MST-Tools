@@ -8,7 +8,7 @@ import com.mst.model.sentenceProcessing.SentenceDb;
 
 public class SentenceQueryInstanceResult {
 	private List<SentenceQueryResult> sentenceQueryResult;
-	private List<SentenceDiscovery> sentences;
+	private List<SentenceDb> sentences;
 	
 	public SentenceQueryInstanceResult(){
 		this.sentenceQueryResult  = new ArrayList<>();
@@ -21,10 +21,10 @@ public class SentenceQueryInstanceResult {
 	public void setSentenceQueryResult(List<SentenceQueryResult> sentenceQueryResult) {
 		this.sentenceQueryResult = sentenceQueryResult;
 	}
-	public List<SentenceDiscovery> getSentences() {
+	public List<SentenceDb> getSentences() {
 		return sentences;
 	}
-	public void setSentences(List<SentenceDiscovery> sentences) {
+	public void setSentences(List<SentenceDb> sentences) {
 		this.sentences = sentences;
 	}
 }
