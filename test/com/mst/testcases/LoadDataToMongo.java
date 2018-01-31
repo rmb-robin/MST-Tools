@@ -118,7 +118,7 @@ public class LoadDataToMongo {
 		dao.saveSentences(sentences, null,null);
 	}
 	
-	//@Test
+//	@Test
 	public void loadMetaData(){
     	SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
     	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();

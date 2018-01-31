@@ -7,5 +7,4 @@ import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 public interface SentenceQueryConverter {
 
 	SentenceQueryInstance getSTQueryInstance(SentenceQueryInput input);
-	SentenceQueryInput convertST(SentenceQueryInput sentenceQueryInput, SentenceQueryInstance stInstance, SentenceProcessingMetaDataInput metaData);
 }

@@ -82,14 +82,21 @@ public class SentenceFilterImpl implements SentenceFilter {
 						MatchInfo matchInfo = createMatchInfo(isEdgeInRange,"from",relationship.getFromToken().getToken());
 						if(matchInfo!=null) {
 							result.getMatches().put(edgeQuery.getName(),matchInfo);
+							matchCount +=1;
 							continue;
 						}
 					}
 					if(relationship.getToToken().isCardinal()) 
 						isEdgeInRange = isNumericInRange(edgeValuesList,relationship.getToToken().getToken());
 						MatchInfo matchInfo = createMatchInfo(isEdgeInRange,"to",relationship.getToToken().getToken());
-						if(matchInfo!=null) 
-							result.getMatches().put(edgeQuery.getName(),matchInfo);
+						if(matchInfo!=null) {
+							{
+								result.getMatches().put(edgeQuery.getName(),matchInfo);
+								matchCount +=1;
+							}
+							
+							
+							}
 				}
 				if(!isEdgeNumeric){
 					if(!edgeValues.contains(relationship.getFromToken().getToken()) && 

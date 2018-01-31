@@ -20,16 +20,4 @@ public class SentenceQueryConverterImpl  implements SentenceQueryConverter {
 		}
 		return null;
 	}
-
-	public SentenceQueryInput convertST(SentenceQueryInput sentenceQueryInput, SentenceQueryInstance stInstance, SentenceProcessingMetaDataInput metaData){
-		Map<String,List<String>> stTypes = metaData.getSemanticTypesByTypeName();
-		
-		List<String> tokens = new ArrayList<>();
-		for(String stToken: stInstance.getTokens()){
-			if(!stTypes.containsKey(stToken)) continue; 
-			tokens.addAll(stTypes.get(stToken));
-		}
-		stInstance.setTokens(tokens);
-		return sentenceQueryInput;
-	}	
 }

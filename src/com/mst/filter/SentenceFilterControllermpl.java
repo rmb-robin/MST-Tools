@@ -62,15 +62,19 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 			Map<String, List<TokenRelationship>> relationsByUniqueTofrom = TokenRelationshipUtil.getMapByDistinctToFrom(sentenceDb.getTokenRelationships());
 			for(TokenRelationship relationship: sentenceDb.getTokenRelationships()){
 			  if(relationship.getEdgeName()==null)continue;
-			  if(!edgeNameHash.contains(relationship.getEdgeName()))continue;
+			  boolean isEdgeInSearchQuery = edgeNameHash.contains(relationship.getEdgeName());
+
 			  ShouldMatchOnSentenceEdgesResult edgesResult  = sentenceFilter.shouldAddTokenFromRelationship(relationship,token);
 			  if(edgesResult.isMatch())
 				{	
 				    if(queryResult==null){
 				    	queryResult = SentenceQueryResultFactory.createSentenceQueryResult(sentenceDb);
 				    }
-					queryResult.getSentenceQueryEdgeResults()
-						.add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship,EdgeResultTypes.primaryEdge,matches));
+
+				    if(isEdgeInSearchQuery){
+				    	queryResult.getSentenceQueryEdgeResults()
+							.add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship,EdgeResultTypes.primaryEdge,matches));
+				    }
 					oppositeToken = relationship.getOppositeToken(token);
 					foundRelationship = relationship;
 										

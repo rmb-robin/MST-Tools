@@ -44,7 +44,7 @@ public class NegationTokenRelationshipProcessorTest {
 	
 	SemanticTypeSentenceAnnotatorImpl stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
 	SemanticTypeHardCodedProvider stprovider = new SemanticTypeHardCodedProvider();
-	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getRelationships("");
+//	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getRelationships("");
 	RelationshipProcessor nounrelationshipProcessor = new NounRelationshipProcessor();
 
 	PrepPhraseRelationshipProcessorImpl prepRelationshipProcessor = new PrepPhraseRelationshipProcessorImpl();
@@ -84,7 +84,7 @@ public class NegationTokenRelationshipProcessorTest {
 		List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(), stprovider.getSemanticTypes());
 		tokens = partOfSpeechAnnotator.annotate(tokens, entity);
 		tokens = verbProcessor.process(tokens, verbProcessingInput);
-		nounrelationshipProcessor.process(tokens, relationshipInput);
+		//nounrelationshipProcessor.process(tokens, relationshipInput);
 		tokens = prepPhraseProcessor.process(tokens, new PrepositionPhraseProcessingInputFactory().create());
 		tokens = verbPhraseProcessor.process(tokens, new VerbPhraseInputFactoryImpl().create());
 

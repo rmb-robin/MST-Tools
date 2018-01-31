@@ -46,7 +46,7 @@ public class ExistenceToExistenceNoConverterTest {
 	
 	SemanticTypeSentenceAnnotatorImpl stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
 	SemanticTypeHardCodedProvider stprovider = new SemanticTypeHardCodedProvider();
-	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getRelationships("");
+	//RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getRelationships("");
 	RelationshipProcessor nounrelationshipProcessor = new NounRelationshipProcessor();
 
 	PrepPhraseRelationshipProcessorImpl prepRelationshipProcessor = new PrepPhraseRelationshipProcessorImpl();

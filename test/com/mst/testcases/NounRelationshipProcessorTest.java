@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 
 public class NounRelationshipProcessorTest {
 
-	RelationshipInput input = new RelationshipInputProviderFileImpl().getRelationships("");
+	RelationshipInput input = new RelationshipInput();
 	Map<Integer, List<TokenRelationship>> expectedMap = new NounrRelationshipExpectedProvider().get();
 	
 	NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();

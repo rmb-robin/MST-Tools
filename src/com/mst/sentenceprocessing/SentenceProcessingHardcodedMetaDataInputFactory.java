@@ -12,18 +12,17 @@ import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 public class SentenceProcessingHardcodedMetaDataInputFactory implements SentenceProcessingMetaDataInputFactory {
 
 	public SentenceProcessingMetaDataInput create(){
-		RelationshipInputProviderFileImpl relationshipProvider = new RelationshipInputProviderFileImpl(); 
+		
 		SentenceProcessingMetaDataInput metaDataInput = new SentenceProcessingMetaDataInput();
 		metaDataInput.setNgramsInput(new NGramsHardCodedProvider().getNGrams());
-		metaDataInput.setNounRelationshipsInput(relationshipProvider.getRelationships("nounrelationships.txt"));
+		metaDataInput.setNounRelationshipsInput( new RelationshipInputProviderFileImpl().getNounRelationships(7));
 		metaDataInput.setPartOfSpeechAnnotatorEntity(new PartOfSpeechHardcodedAnnotatorEntityProvider().getPartOfSpeechAnnotatorEntity());
 		metaDataInput.setPhraseProcessingInput(new PrepositionPhraseProcessingInputFactory().create());
 		metaDataInput.setSemanticTypes(new SemanticTypeHardCodedProvider().getSemanticTypes());
 		metaDataInput.setVerbPhraseInput(new VerbPhraseInputFactoryImpl().create());
 		metaDataInput.setVerbProcessingInput(new VerbProcessingInputProvider().getInput());
-		metaDataInput.setPhraseRelationshipMappings(relationshipProvider.getRelationships("prepphraserelations.txt"));
+		metaDataInput.setPhraseRelationshipMappings(new RelationshipInputProviderFileImpl().getPrepPhraseRelationshipMapping());
 		metaDataInput.setDynamicEdgeCreationRules(new DynamicRuleProvider().getRules());
 		return metaDataInput;
 	}
-	
 }

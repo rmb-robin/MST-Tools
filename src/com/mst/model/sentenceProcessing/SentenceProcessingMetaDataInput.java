@@ -1,10 +1,7 @@
 package com.mst.model.sentenceProcessing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
@@ -18,17 +15,13 @@ public class SentenceProcessingMetaDataInput {
 	private ObjectId id;
 	private List<NGramsModifierEntity> ngramsInput;
 	private PartOfSpeechAnnotatorEntity partOfSpeechAnnotatorEntity;
-	private Map<String, String> semanticTypes;  
+	private Map<String, String> semanticTypes;
+	private RelationshipInput nounRelationshipsInput;
 	private VerbProcessingInput verbProcessingInput;
+	private PrepositionPhraseProcessingInput phraseProcessingInput;
 	private VerbPhraseInput verbPhraseInput;
+	private List<PrepPhraseRelationshipMapping> phraseRelationshipMappings;
 	private List<DynamicEdgeCreationRule> dynamicEdgeCreationRules;
-	private PrepositionPhraseProcessingInput phraseProcessingInput;	
-	
-	private RelationshipInput nounRelationshipsInput;   //THis should be the standard.. 
-	private RelationshipInput phraseRelationshipMappings;
-	
-	
-	
 	
 	public List<NGramsModifierEntity> getNgramsInput() {
 		return ngramsInput;
@@ -72,10 +65,10 @@ public class SentenceProcessingMetaDataInput {
 	public void setVerbPhraseInput(VerbPhraseInput verbPhraseInput) {
 		this.verbPhraseInput = verbPhraseInput;
 	}
-	public RelationshipInput getPhraseRelationshipMappings() {
+	public List<PrepPhraseRelationshipMapping> getPhraseRelationshipMappings() {
 		return phraseRelationshipMappings;
 	}
-	public void setPhraseRelationshipMappings(RelationshipInput phraseRelationshipMappings) {
+	public void setPhraseRelationshipMappings(List<PrepPhraseRelationshipMapping> phraseRelationshipMappings) {
 		this.phraseRelationshipMappings = phraseRelationshipMappings;
 	}
 	public ObjectId getId() {
@@ -89,19 +82,5 @@ public class SentenceProcessingMetaDataInput {
 	}
 	public void setDynamicEdgeCreationRules(List<DynamicEdgeCreationRule> dynamicEdgeCreationRules) {
 		this.dynamicEdgeCreationRules = dynamicEdgeCreationRules;
-	}
-	
-	public Map<String, List<String>> getSemanticTypesByTypeName(){
-		if(this.getSemanticTypes()==null) return new HashMap<String,List<String>>();
-		Map<String,List<String>> result = new HashMap<String,List<String>>();
-		
-		for(Entry<String,String> entry: this.getSemanticTypes().entrySet()){
-			if(!result.containsKey(entry.getValue()))
-					result.put(entry.getValue(),new ArrayList<String>());
-			
-			result.get(entry.getValue()).add(entry.getKey());
-		}
-		return result;
-		
 	}
 }

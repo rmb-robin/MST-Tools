@@ -97,7 +97,7 @@ public class RecommendedNounPhraseProcesserImpl  extends RelationshipProcessorBa
 			RelationshipMapping mapping = findMapping(newRelationship);
 			if(mapping==null) continue; 
 			if(edgesByKey.containsKey(newRelationship.getKey())) continue;
-			newRelationship.getTokenRelationship().setNamedEdge(mapping.getNamedEdgeName());
+			newRelationship.getTokenRelationship().setNamedEdge(mapping.getEdgeName());
 			result.add(newRelationship);
 		}
 		return result;
@@ -131,6 +131,6 @@ public class RecommendedNounPhraseProcesserImpl  extends RelationshipProcessorBa
 	private void processSingleEdge(RecommendedTokenRelationship recommandedTokenRelationship){
 		RelationshipMapping mapping = findMapping(recommandedTokenRelationship);
 		if(mapping==null) return;
-		recommandedTokenRelationship.getTokenRelationship().setNamedEdge(mapping.getNamedEdgeName());
+		recommandedTokenRelationship.getTokenRelationship().setNamedEdge(mapping.getEdgeName());
 	}
 }

@@ -46,7 +46,7 @@ public class VerbPhraseProcessorTest {
 	
 	SemanticTypeSentenceAnnotatorImpl stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
 	SemanticTypeHardCodedProvider stprovider = new SemanticTypeHardCodedProvider();
-	RelationshipInput relationshipInput = new RelationshipInputProviderFileImpl().getRelationships("");
+	RelationshipInput relationshipInput = new RelationshipInput();
 	RelationshipProcessor nounrelationshipProcessor = new NounRelationshipProcessor();
 
 	PrepPhraseRelationshipProcessorImpl prepRelationshipProcessor = new PrepPhraseRelationshipProcessorImpl();
