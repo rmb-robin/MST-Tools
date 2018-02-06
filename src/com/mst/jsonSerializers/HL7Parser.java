@@ -1,7 +1,7 @@
 package com.mst.jsonSerializers;
 
 import com.mst.model.HL7Details;
-
+import com.mst.model.raw.AllHl7Elements;
 import com.mst.model.raw.ParseHl7Result;
 import com.mst.model.requests.SentenceTextRequest;
 
