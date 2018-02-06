@@ -65,3 +65,38 @@ dysn,t,resection,f,null,procedure location
 sonographic,f,evidence,f,null,procedure
 qlco,t,bpoc,t,null,finding site modifier
 qlco-com,t,cyst,f,null,complex cyst modifiers
+bpoc,t,mets,f,null,metastatic finding site
+bpoc,t,metastatic,f,null,metastatic finding site
+bpoc,t,metastasis,f,null,metastatic finding site
+qlco-neop,t,neop-can,t,null,histologic type
+cardinal number,t,gy,f,null,radiation dosage
+cardinal number,t,cycle,f,null,treatment cycle
+cardinal number,t,treatment,f,null,treatment cycle
+bpoc,t,sympto,t,null,symptom location
+qlco-sev,t,dysn,t,null,disease modifier
+cardinal number,t,mci,f,null,mci values
+suv,f,cardinal number,t,null,suv
+cardinal number,t,hounsfield,f,null,hounsfield
+cardinal number,t,hu,f,null,hounsfield
+qlco,t,uptake,f,null,uptake
+qlco-simple,t,uptake,f,null,uptake
+bpoc,t,uptake,f,null,uptake location
+stereotactic,f,radiotherapy,t,null,radiotherapy type
+qlco-neop,t,dysn,t,null,neoplasm severity
+cardinal number,t,mgy,f,null,radiation dosage
+cardinal number,t,msv,f,null,radiation dosage
+cardinal number,t,mg,f,null,radiation dosage
+cardinal number,t,seconds,f,null,seconds
+cardinal number,t,second,f,null,seconds
+cardinal number,t,minute,f,null,minutes
+cardinal number,t,minutes,f,null,minutes
+cardinal number,t,hour,f,null,hours
+cardinal number,t,hours,f,null,hours
+probably,f,benign,f,null,probably benign
+bpoc,t,neop-can,t,null,disease location
+enlarged,f,bpoc,t,null,enlarged finding site
+enlargement,f,bpoc,t,null,enlarged finding site
+prominent,f,bpoc,t,null,enlarged finding site
+heterogeneous,f,bpoc,t,null,heterogeneous finding site
+multinodular,f,bpoc,t,null,heterogeneous finding site
+multi-nodular,f,bpoc,t,null,heterogeneous finding site
