@@ -105,3 +105,6 @@ milimetric,.9 cm
 millimetric,.9 cm
 sub-centimeter,.9 cm
 dominant follicles,dominant-follicles
+thoracic spine,thoracic-spine
+ground glass,ground-glass
+lumbar spine,lumbar-spine
