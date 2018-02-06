@@ -30,7 +30,6 @@ import com.mst.metadataProviders.DynamicRuleProvider;
 import com.mst.metadataProviders.TestHl7Provider;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
-import com.mst.model.raw.AllHl7Elements;
 import com.mst.model.raw.RawReportFile;
 import com.mst.model.requests.RejectedReport;
 import com.mst.model.requests.SentenceRequest;
@@ -118,7 +117,7 @@ public class LoadDataToMongo {
 		dao.saveSentences(sentences, null,null);
 	}
 	
-//	@Test
+	@Test
 	public void loadMetaData(){
     	SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
     	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
@@ -160,21 +159,21 @@ public class LoadDataToMongo {
 	
 	//@Test
 	public void loadAllHl7Elements(){
-		AllHl7Elements elements = new AllHl7Elements();
+		//AllHl7Elements elements = new AllHl7Elements();
 		
-		List<String> data  = new TestHl7Provider().getAllValues();
-		for(String d: data){
-			elements.getElements().add("/." + d);
-		}
-		Hl7DetailsDaoImpl dao = new Hl7DetailsDaoImpl();
-		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		dao.saveAllElements(elements);
+//		List<String> data  = new TestHl7Provider().getAllValues();
+//		for(String d: data){
+//			elements.getElements().add("/." + d);
+//		}
+//		Hl7DetailsDaoImpl dao = new Hl7DetailsDaoImpl();
+//		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+//		dao.saveAllElements(elements);
 	
 	} 
 	
 	
 	//http://10.210.192.4
-	@Test
+	//@Test
 	public void loadRawHl7IntoAPI(){
 		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save"; 
 				
