@@ -37,3 +37,13 @@ of,f,f,history,f,f,dysn,t,f,disease-history
 of,f,f,history,f,f,neop-can,t,f,disease-history
 of,f,f,redemonstration,f,f,dysn,t,f,disease-history
 for,f,f,review,f,f,dysn,t,f,disease-history
+in,f,f,neop-can,t,f,bpoc,t,f,disease location
+of,f,f,neop-can,t,f,bpoc,t,f,disease location
+to,f,f,gy,f,f,bpoc,t,f,radiation site
+to,f,f,cgy,f,f,bpoc,t,f,radiation site
+in,f,f,bpoc,t,f,proc,t,f,procedure location
+within,f,f,bpoc,t,f,proc,t,f,procedure location
+of,f,f,bpoc,t,f,proc,t,f,procedure location
+in,f,f,sympto,t,f,bpoc,t,f,symptom location
+within,f,f,sympto,t,f,bpoc,t,f,symptom location
+of,f,f,suv,f,f,cardinal number,t,f,suv
