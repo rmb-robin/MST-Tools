@@ -215,6 +215,12 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		 .field("discreteData").hasAnyOf(discreteData);
 		 return query.asList();
 	}
-
-
-  } 
+	
+	public List<SentenceDb> getSentencesForDiscreteDataId(String id){
+		Query<SentenceDb> query = datastoreProvider.getDefaultDb().createQuery(SentenceDb.class);
+		query.disableValidation();
+		query.field("discreteData.$id").equal(new ObjectId(id));
+		 query.retrievedFields(true, "origSentence");
+		return query.asList();
+	}
+  }  
