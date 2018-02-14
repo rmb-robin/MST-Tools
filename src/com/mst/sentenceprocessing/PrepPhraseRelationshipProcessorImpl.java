@@ -25,7 +25,7 @@ public class PrepPhraseRelationshipProcessorImpl extends RelationshipProcessorBa
 		
 	public List<TokenRelationship> process(List<WordToken> tokens, List<PrepPhraseRelationshipMapping> prepPhraseRelationshipMappings) {
 		this.wordTokens = tokens;
-		//setrelationshipMaps(prepPhraseRelationshipMappings);
+		setrelationshipMapsLegacy(prepPhraseRelationshipMappings);
 		return createRelationships();
 	}
 	
@@ -42,16 +42,16 @@ public class PrepPhraseRelationshipProcessorImpl extends RelationshipProcessorBa
 		return result;
 	}
 	
-//	private void setrelationshipMaps(List<PrepPhraseRelationshipMapping> relationshipMappings){
-//		relationshipMap  = new HashMap<>();
-//		semanticTypeRelationshipMap = new HashMap<>();
-//		for(PrepPhraseRelationshipMapping relationship : relationshipMappings){
-//			if(relationship.isTokenSemanticType())
-//				setRelationshipMap(semanticTypeRelationshipMap,relationship);
-//			else 
-//				setRelationshipMap(relationshipMap,relationship);
-//		}
-//	}
+	private void setrelationshipMapsLegacy(List<PrepPhraseRelationshipMapping> relationshipMappings){
+		relationshipMap  = new HashMap<>();
+		semanticTypeRelationshipMap = new HashMap<>();
+		for(PrepPhraseRelationshipMapping relationship : relationshipMappings){
+			if(relationship.isTokenSemanticType())
+				setRelationshipMap(semanticTypeRelationshipMap,relationship);
+			else 
+				setRelationshipMap(relationshipMap,relationship);
+		}
+	}
 
 	private void setRelationshipMap(Map<String, List<PrepPhraseRelationshipMapping>> map,PrepPhraseRelationshipMapping relationship){
 		if(!map.containsKey(relationship.getToken()))
@@ -99,7 +99,7 @@ public class PrepPhraseRelationshipProcessorImpl extends RelationshipProcessorBa
 	}
 		
 	private TokenRelationship createTokenRelationship(String edgeName,String frameName, WordToken fromToken, WordToken toToken){
-		return this.tokenRelationshipFactory.create(edgeName, frameName, fromToken, toToken);
+		return this.tokenRelationshipFactory.create(edgeName, frameName, fromToken, toToken,this.getClass().getName());
 	}
 }
 

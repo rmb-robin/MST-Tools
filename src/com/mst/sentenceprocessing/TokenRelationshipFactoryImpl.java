@@ -15,12 +15,14 @@ import com.mst.model.sentenceProcessing.WordToken;
 public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 
 	@Override
-	public TokenRelationship create(String edgeName, String frameName, WordToken fromToken,WordToken toToken) {
+	public TokenRelationship create(String edgeName, String frameName, WordToken fromToken,WordToken toToken, String source) {
 		TokenRelationship tokenRelationship = new TokenRelationship();
 		tokenRelationship.setUniqueIdentifier(UUID.randomUUID().toString());
 		tokenRelationship.setEdgeName(edgeName);
 		tokenRelationship.setFrameName(frameName);
-	
+		tokenRelationship.setSource(source);
+		
+		
 		if(fromToken.getPosition()<toToken.getPosition())
 		{
 			tokenRelationship.setFromToken(fromToken);
@@ -36,7 +38,7 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 	
 	public RecommendedTokenRelationship createRecommendedRelationship(String edgeName, String frameName, WordToken fromToken,WordToken toToken){
 		RecommendedTokenRelationship recommandedTokenRelationship = new RecommendedTokenRelationship();
-		recommandedTokenRelationship.setTokenRelationship(create(edgeName,frameName,fromToken,toToken));
+		recommandedTokenRelationship.setTokenRelationship(create(edgeName,frameName,fromToken,toToken,""));
 		String key = recommandedTokenRelationship.getTokenRelationship().getFromTokenToTokenString();
 		recommandedTokenRelationship.setKey(key);
 		return recommandedTokenRelationship;

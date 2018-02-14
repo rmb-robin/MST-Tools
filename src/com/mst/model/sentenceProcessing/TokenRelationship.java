@@ -23,7 +23,7 @@ public class TokenRelationship {
 	private String uniqueIdentifier;
 	private List<String> links;
 	private String namedEdge; 
-	
+	private String source; 
 	
 	
 	//should reference Ids maybe...
@@ -133,6 +133,12 @@ public class TokenRelationship {
 	}
 	public void setNamedEdge(String namedEdge) {
 		this.namedEdge = namedEdge;
+	}
+	public String getSource() {
+		return source;
+	}
+	public void setSource(String source) {
+		this.source = source;
 	}
 
 }

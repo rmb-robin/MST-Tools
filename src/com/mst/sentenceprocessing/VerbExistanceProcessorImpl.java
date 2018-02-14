@@ -4,26 +4,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.activemq.protobuf.compiler.parser.Token;
-
 import com.google.common.escape.Escaper;
-import com.mst.cache.implementation.RecommendedTokenRelationshipCacheManagerImpl;
-import com.mst.cache.interfaces.RecommendedTokenRelationshipCacheManager;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.interfaces.sentenceprocessing.VerbExistanceProcessor;
-import com.mst.model.graph.Edge;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.metadataTypes.VerbType;
-import com.mst.model.recommandation.RecommendedTokenRelationship;
-import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.Verb;
 import com.mst.model.sentenceProcessing.WordToken;
-import com.mst.util.RecommandedTokenRelationshipUtil;
-import com.mst.util.TokenRelationshipUtil;
 
 
 public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
@@ -33,21 +24,16 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private HashSet<WordToken> subjectComplements = null;
     private WordToken modalVerb = null;
 	private TokenRelationshipFactory tokenRelationshipFactory; 
-	private RecommendedTokenRelationshipCacheManager recommendedTokenRelationshipCacheManager;
-	private HashSet<String> filterExistingEdgeNames;    
-	
-	public VerbExistanceProcessorImpl(){
+ 
+    public VerbExistanceProcessorImpl(){
     	tokenRelationshipFactory = new TokenRelationshipFactoryImpl();
-    	recommendedTokenRelationshipCacheManager = new RecommendedTokenRelationshipCacheManagerImpl();
-    	filterExistingEdgeNames = new HashSet<>();
-    	filterExistingEdgeNames.add(EdgeNames.existence);
-	}
-  
+    }
+    
 	public List<TokenRelationship> process(Sentence sentence){
 		 
 		setVerbPhraseTokens(sentence.getModifiedWordList());
 		if(isVerbValid()){
-			String edgeName = getEdgeNameforNotHas(sentence.getTokenRelationships());
+			String edgeName = getEdgeNameforNotHas(sentence);
 			if(edgeName !=null) 
 				return createNonHasEdges(edgeName);
 		}
@@ -58,71 +44,7 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 		return relationships;
 	}
 	
-	public List<RecommendedTokenRelationship> processDiscovery(SentenceDiscovery discovery){
-		List<TokenRelationship> relationships = RecommandedTokenRelationshipUtil.getTokenRelationshipsFromRecommendedTokenRelationships(discovery.getWordEmbeddings());
-		List<WordToken> wordTokens = new ArrayList<WordToken>(TokenRelationshipUtil.getDistinctWordTokens(relationships));
-		setVerbPhraseTokens(wordTokens);
-		if(isVerbValid()){
-			
-			String edgeName = getEdgeNameforNotHas(relationships);
-			if(edgeName !=null) {
-				List<TokenRelationship> newRelationships =  createNonHasEdges(edgeName);
-				return tokenRelationshipFactory.createRecommendedRelationshipsFromTokenRelationships(newRelationships);
-			}
-		}
-		
-		TokenRelationship relationship = createHasEdge(discovery,relationships);
-		List<TokenRelationship> newRelationships = new ArrayList<>();
-		if(relationship!=null){
-			newRelationships.add(relationship);
-			return tokenRelationshipFactory.createRecommendedRelationshipsFromTokenRelationships(newRelationships);
-		}
-		return createEdgesFromDefault(discovery);
 	
-	}
-	
-	
-	private List<RecommendedTokenRelationship> createEdgesFromDefault(SentenceDiscovery discovery){
-		List<RecommendedTokenRelationship> result = new ArrayList<>();
-		if(RecommandedTokenRelationshipUtil.doRelationshipsContainVerb(discovery.getWordEmbeddings()))return result; 
-	
-		RecommendedTokenRelationship lastTokenToken = null;
-		for(int i=0;i<discovery.getWordEmbeddings().size();i++){
-			RecommendedTokenRelationship relationship = discovery.getWordEmbeddings().get(i);
-			if(!RecommandedTokenRelationshipUtil.isDefault(relationship))
-			{	
-				if(lastTokenToken!=null)
-					result.addAll(process(lastTokenToken));
-				lastTokenToken = null;
-				continue;
-			}
-			
-			lastTokenToken = relationship;
-			if(i+1== discovery.getWordEmbeddings().size()){
-				result.addAll(process(relationship));
-				return result;
-			}			
-		}
-		return result;
-	}
-
-	private List<RecommendedTokenRelationship> process(RecommendedTokenRelationship relationship){
-		List<RecommendedTokenRelationship> result = new ArrayList<>();
-		if(relationship.getTokenRelationship()==null)return result;
-		if(relationship.getTokenRelationship().getToToken()==null)return result;
-		List<RecommendedTokenRelationship> existing =  recommendedTokenRelationshipCacheManager.getListByKey(relationship.getTokenRelationship().getToToken().getToken());
-		List<RecommendedTokenRelationship> filtered = RecommandedTokenRelationshipUtil.filterByEdgeNames(filterExistingEdgeNames, existing);
-		if(filtered.isEmpty()) return result; 
-		
-		
-		for(RecommendedTokenRelationship existingRelationship: filtered){
-			if(existingRelationship.getTokenRelationship().getFromToken().getToken().equals(relationship.getTokenRelationship().getToToken().getToken()))
-				
-				result.add(this.tokenRelationshipFactory.createRecommendedRelationship(existingRelationship.getTokenRelationship().getEdgeName(),
-						EdgeTypes.related, relationship.getTokenRelationship().getFromToken(), existingRelationship.getTokenRelationship().getToToken()));
-		}
-		return result;
-	}
 
 	private boolean isVerbValid(){
 		if(verb==null) return false;
@@ -130,10 +52,11 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 		return true;
 	}
 	
-	private String getEdgeNameforNotHas(List<TokenRelationship> tokenRelationships){
-		if(tokenRelationships==null)return null;
+	private String getEdgeNameforNotHas(Sentence sentence){
+		List<TokenRelationship> existingRelationships = sentence.getTokenRelationships();
+		if(existingRelationships==null)return null;
 		if(subjects.isEmpty() && subjectComplements.isEmpty()) return null;
-		List<TokenRelationship> matchedRelationships = getTokenRelationsForTokens(tokenRelationships);
+		List<TokenRelationship> matchedRelationships = getTokenRelationsForTokens(existingRelationships);
 
 		if(isExistanceEdge(matchedRelationships)) return EdgeNames.existence;
 		if(isExistanceNoEdge(matchedRelationships)) return EdgeNames.existenceNo;
@@ -169,10 +92,9 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	
 	private boolean isExistanceEdge(List<TokenRelationship> tokenRelationships){
 		for(TokenRelationship tokenRelationship: tokenRelationships){
-			if(tokenRelationship.isNegationEdge()) return false;			
-//			if(tokenRelationship.getEdgeName()==null) continue;
-//			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation))return false;
-//			if(tokenRelationship.getEdgeName().equals(EdgeNames.possibility)) return false;
+			if(tokenRelationship.getEdgeName()==null) continue;
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation))return false;
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.possibility)) return false;
 		}
 		if(modalVerb!=null){
 			if(modalVerb.getVerb().getVerbState().equals(EdgeNames.possibility)) return false; 
@@ -185,7 +107,7 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	private boolean isExistanceNoEdge(List<TokenRelationship> tokenRelationships){
 		Verb verbObj = verb.getVerb();
 		for(TokenRelationship tokenRelationship: tokenRelationships){
-			if(tokenRelationship.isNegationEdge()){
+			if(tokenRelationship.getEdgeName().equals(EdgeNames.negation)){
 				if(verbObj.getVerbState().equals(EdgeNames.negation)) return true; 
 				if(verbObj.getVerbType()==VerbType.AV && verbObj.isExistance()) return true;
 			}
@@ -230,7 +152,7 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 					modalVerb = wordToken;
 				else 
 					verb = wordToken; 
-				//continue;
+				continue;
 			}
 			if(wordToken.getPropertyValueType()!=null && wordToken.getPropertyValueType().equals(PropertyValueTypes.Subject))
 			{
@@ -242,14 +164,14 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 				subjectComplements.add(wordToken);
 			}
 		}
-	}
-
+	}	
+		
 	private List<TokenRelationship> createRelationshipsForAll(String edgeName){
 		List<TokenRelationship> result = new ArrayList<>();
 		
 		for(WordToken subject: subjects){
 			for(WordToken  subjectComplement: subjectComplements){
-				result.add(tokenRelationshipFactory.create(edgeName, EdgeTypes.related, subject, subjectComplement));
+				result.add(tokenRelationshipFactory.create(edgeName, EdgeTypes.related, subject, subjectComplement, this.getClass().getName()));
 			}
 		}
 		return result;
@@ -303,29 +225,17 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 		
 		if(!sentence.doesSentenceContainVerb())	{
 			sentence.addHasVerb();
-			WordToken hasVerb =  sentence.getModifiedWordList().get(0);
-			return processEdgesForHasVerb(sentence.getTokenRelationships(),hasVerb,nounPhraseEnd);
+			return processEdgesForHasVerb(sentence,nounPhraseEnd);
 		}
 		return null;
 	}
 	
-	private TokenRelationship createHasEdge(SentenceDiscovery discovery, List<TokenRelationship> relationships){
-		WordToken nounPhraseEnd = getNounPhraseEnd(discovery.getModifiedWordList());
-		if(nounPhraseEnd==null) return null;
-		
-		if(!discovery.doesSentenceContainVerb()){
-			discovery.addHasVerb();
-			WordToken hasVerb =  discovery.getModifiedWordList().get(0);
-			return processEdgesForHasVerb(relationships,hasVerb,nounPhraseEnd);
-		}
-		return null;
-	}
-	
-	private TokenRelationship processEdgesForHasVerb(List<TokenRelationship> relationships,WordToken hasVerb, WordToken nounPhrase){
-		List<TokenRelationship> matchedTokenRelationship = getTokenRelationshipForSingleToken(relationships,nounPhrase);
+	private TokenRelationship processEdgesForHasVerb(Sentence sentence, WordToken nounPhrase){
+		List<TokenRelationship> matchedTokenRelationship = getTokenRelationshipForSingleToken(sentence.getTokenRelationships(),nounPhrase);
 		String edgeName = getEdgeNameforNHas(matchedTokenRelationship);
 		if(edgeName==null) return null;
-		return tokenRelationshipFactory.create(edgeName, EdgeTypes.related, hasVerb, nounPhrase);
+		WordToken hasVerb = sentence.getModifiedWordList().get(0);
+		return tokenRelationshipFactory.create(edgeName, EdgeTypes.related, hasVerb, nounPhrase,this.getClass().getName());
 	}
 	
 	private String getEdgeNameforNHas(List<TokenRelationship> matchedTokenRelationship){

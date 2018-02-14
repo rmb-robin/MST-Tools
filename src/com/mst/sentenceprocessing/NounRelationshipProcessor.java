@@ -181,7 +181,7 @@ public class NounRelationshipProcessor extends RelationshipProcessorBase impleme
 	private TokenRelationship createRelationshipAndAnnotateWordTokens(String edgeName,WordToken fromToken,WordToken toToken){
 		//fromToken.setPropertyValueType(PropertyValueTypes.NounPhraseBegin);
 		//toToken.setPropertyValueType(PropertyValueTypes.NounPhraseEnd);
-		return tokenRelationshipFactory.create(edgeName, EdgeTypes.related, fromToken,toToken);
+		return tokenRelationshipFactory.create(edgeName, EdgeTypes.related, fromToken,toToken,this.getClass().getName());
 	}
 	
 	

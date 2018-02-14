@@ -67,7 +67,7 @@ public class ExistenceToExistenceNoConverterImpl implements ExistenceToExistence
 			
 			if(!matchedRelationships.contains(entry.getKey()))
 			  cummaltiveRelationships.add(tokenRelationFactory.
-					  create(EdgeNames.existenceNo, EdgeTypes.related, entry.getValue().getFromToken(), entry.getValue().getToToken()));
+					  create(EdgeNames.existenceNo, EdgeTypes.related, entry.getValue().getFromToken(), entry.getValue().getToToken(),this.getClass().getName()));
 		}
 		return cummaltiveRelationships;
 	}

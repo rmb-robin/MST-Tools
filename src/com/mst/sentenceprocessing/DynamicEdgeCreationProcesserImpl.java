@@ -134,7 +134,7 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
 		if(from==null) return null;
 		if(to==null)return null;
 		
-		return tokenRelationshipFactory.create(rule.getEdgeName(),EdgeTypes.related, from,to);
+		return tokenRelationshipFactory.create(rule.getEdgeName(),EdgeTypes.related, from,to,this.getClass().getName());
 	}
 
 	private WordToken getFromTokenFromEdgesNames(List<String> edgeNames, Sentence sentence){

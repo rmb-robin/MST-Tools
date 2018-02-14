@@ -158,11 +158,4 @@ public class DiscreteDataDaoImpl extends BaseDocumentDaoImpl<DiscreteData> imple
 		datastoreProvider.getDefaultDb().save(discreteDatas);
 	}
 
-	@Override
-	public DiscreteData getbyid(String id) {
-		Query<DiscreteData> query = datastoreProvider.getDefaultDb().createQuery(DiscreteData.class);
-		 query
-		 .field("id").equal(id);
-		 return query.get();
-	}
 }

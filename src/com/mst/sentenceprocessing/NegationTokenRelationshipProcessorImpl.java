@@ -110,7 +110,7 @@ public class NegationTokenRelationshipProcessorImpl implements NegationTokenRela
 	//B2) If negation token precedes NounPhrase begin where NounPhraseFinal is not a subject or 
 	//subject complement, then create negation edge between the NounPhraseFinal token and the negation token.
 	private TokenRelationship createNegationEdge(WordToken from, WordToken to){
-		return tokenRelationshipFactory.create(EdgeNames.negation, EdgeTypes.related, from, to);
+		return tokenRelationshipFactory.create(EdgeNames.negation, EdgeTypes.related, from, to,this.getClass().getName());
 	}
 	
 	private SubjectSearchResult findSubjectInPhrase(int index, List<WordToken> wordTokens, WordToken verb, WordToken negation){

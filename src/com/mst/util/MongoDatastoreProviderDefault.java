@@ -7,8 +7,8 @@ public class MongoDatastoreProviderDefault extends MongoDatastoreProviderBase im
 	
 	public MongoDatastoreProviderDefault(){
 		connectionEntity = new MongoConnectionEntity();
-		connectionEntity.setDatabaseName("test_new");
-		connectionEntity.setIpAddress("10.210.192.4"); //
-	//	connectionEntity.setIpAddress("10.12.128.98");
+		connectionEntity.setDatabaseName("test");
+	//	connectionEntity.setIpAddress("10.210.192.4"); //
+		connectionEntity.setIpAddress("10.12.128.98");
 	}
 }

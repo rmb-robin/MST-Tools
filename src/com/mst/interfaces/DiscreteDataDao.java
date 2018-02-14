@@ -15,7 +15,7 @@ public interface DiscreteDataDao  extends IDao {
 	long getCountByNameAndDate(String orgName, LocalDate date);
 	List<DiscreteData> getDiscreteDatas(DiscreteDataFilter dataFilter, String orgId,boolean allvalues);
 	List<DiscreteData> getByIds(Set<String> ids);
-	DiscreteData getbyid(String id);
+	DiscreteData get(String id);
 	String save(DiscreteData discreteData, boolean isReprocess);
 	void saveCollection(List<DiscreteData> discreteDatas);
 }

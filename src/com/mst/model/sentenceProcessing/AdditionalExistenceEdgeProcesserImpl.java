@@ -38,7 +38,7 @@ public class AdditionalExistenceEdgeProcesserImpl implements AdditionalExistence
 			}
 		}
 		if(oppositeEdge!=null)
-			return tokenRelationshipFactory.create(EdgeNames.existence,EdgeTypes.related, dysnToken,oppositeEdge);
+			return tokenRelationshipFactory.create(EdgeNames.existence,EdgeTypes.related, dysnToken,oppositeEdge,this.getClass().getName());
 		return null;
 	}
 	
