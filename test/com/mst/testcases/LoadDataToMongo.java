@@ -117,7 +117,7 @@ public class LoadDataToMongo {
 		dao.saveSentences(sentences, null,null);
 	}
 	
-	@Test
+//	@Test
 	public void loadMetaData(){
     	SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
     	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
@@ -173,7 +173,7 @@ public class LoadDataToMongo {
 	
 	
 	//http://10.210.192.4
-	//@Test
+	@Test
 	public void loadRawHl7IntoAPI(){
 		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save"; 
 				
@@ -203,8 +203,8 @@ public class LoadDataToMongo {
 	    		file.setOrgId("5972aedebde4270bc53b23e3");
 	    		file.setOrgName("rad");
 	    		Gson gson = new Gson();
-	    	
-	    		streamWriter.write(	gson.toJson(file));
+	    		String input = gson.toJson(file);
+	    		streamWriter.write(input);
 	            streamWriter.flush();
 
 	            BufferedReader br = null;

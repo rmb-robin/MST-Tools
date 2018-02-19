@@ -20,12 +20,19 @@ public class SentenceQueryDaoIntergrationTest {
 
 	SentenceQueryDaoImpl dao =  new SentenceQueryDaoImpl();
 	
-	@Test
+	//@Test
 	public void getSentencesByDiscreteDataIds(){
 		Set<String> ids = new HashSet<>();
 		ids.add("598ccafdbde4270bc5381ea4");
 		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
 		List<SentenceDb> result = dao.getSentencesByDiscreteDataIds(ids);
+		int c = result.size();
+	}
+	
+	@Test
+	public void getSentencesByDiscreteDataId(){
+		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
+		List<SentenceDb> result = dao.getSentencesForDiscreteDataId("5a6e946e2cc553438626c0b5");
 		int c = result.size();
 	}
 	
@@ -150,5 +157,7 @@ public class SentenceQueryDaoIntergrationTest {
 		int size = sentences.size();
 		int t = size;
 	}	
+	
+ 
 
 }

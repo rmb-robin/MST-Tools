@@ -23,5 +23,14 @@ Query All Sentences by discreteData ObjectID
 
 db.sentences.find( { discreteData: DBRef("discreteData",ObjectID("598dba91bde4270bc5e89bdf") } ) 
     
-    
+
+GROUP BY : 
+
+db.hl7parsedRequest.aggregate(
+{
+$group : {_id : "$discreteData.reportFinalizedDate", processedCount : { $sum : 1 }}
+}
+);
+
+
     

@@ -11,7 +11,6 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
-import com.mongodb.util.Hash;
 import com.mst.dao.DiscreteDataDaoImpl;
 import com.mst.model.SentenceQuery.DiscreteDataFilter;
 import com.mst.model.discrete.DiscreteData;
