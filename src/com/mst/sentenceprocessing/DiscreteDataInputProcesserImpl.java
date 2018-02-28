@@ -38,7 +38,7 @@ public class DiscreteDataInputProcesserImpl implements DiscreteDataInputProcesse
 		if(result==null)return discreteData;
 		
 		discreteData.setBucketName(result.getBucketName());
-		if(result.equals(DiscreteDataBucketIdenticationType.compliance))
+		if(resultType.equals(DiscreteDataBucketIdenticationType.compliance))
 			discreteData.setIsCompliant(result.getIsCompliant());
 		else 
 			discreteData.setExpectedFollowup(result.getExpectedFollowup());

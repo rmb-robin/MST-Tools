@@ -53,6 +53,8 @@ public class DiscreteData {
 	private Boolean isDuplicate;
 
 	private String rawFileId; 
+	private String parseReportId; 
+	
 	
 	private Map<String,String> allAvailableFields; 
 	
@@ -241,6 +243,14 @@ public class DiscreteData {
 
 	public void setAllAvailableFields(Map<String, String> allAvailableFields) {
 		this.allAvailableFields = allAvailableFields;
+	}
+
+	public String getParseReportId() {
+		return parseReportId;
+	}
+
+	public void setParseReportId(String parseReportId) {
+		this.parseReportId = parseReportId;
 	} 
 	
 }

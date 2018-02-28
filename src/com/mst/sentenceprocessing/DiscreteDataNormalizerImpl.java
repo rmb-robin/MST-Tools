@@ -15,9 +15,9 @@ public class DiscreteDataNormalizerImpl implements DiscreteDataNormalizer {
 
 	private final int MENOPAUSE_LOW_CUTOFF = 45;
 	private final int MENOPAUSE_HIGH_CUTOFF = 57;
-	private final String MENOPAUSE_DEFAULT = "Menopausal";
-	private final String MENOPAUSE_PRE = "Pre-Menopausal";
-	private final String MENOPAUSE_POST = "Post-Menopausal";
+	private final String MENOPAUSE_DEFAULT = "menopausal";
+	private final String MENOPAUSE_PRE = "premenopausal";
+	private final String MENOPAUSE_POST = "postmenopausal";
 	
 	public DiscreteData process(DiscreteData discreteData) {
 		
