@@ -30,7 +30,7 @@ public class RawReportFile {
 	private boolean isProcessed;
 	private String orgId; 
 	private String orgName; 
-	
+	private boolean isProcessingtypeSentenceDiscovery;
 	
 	public ObjectId getId() {
 		return id;
@@ -70,6 +70,12 @@ public class RawReportFile {
 	}
 	public void setOrgName(String orgName) {
 		this.orgName = orgName;
+	}
+	public boolean getIsProcessingtypeSentenceDiscovery() {
+		return isProcessingtypeSentenceDiscovery;
+	}
+	public void setIsProcessingtypeSentenceDiscovery(boolean isProcessingtypeSentenceDiscovery) {
+		this.isProcessingtypeSentenceDiscovery = isProcessingtypeSentenceDiscovery;
 	} 
 	
 
