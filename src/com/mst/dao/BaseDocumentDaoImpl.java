@@ -66,6 +66,10 @@ public abstract class BaseDocumentDaoImpl<T> {
 		return query.asList();
 	}
 	
+	public void delete(String id){
+		getDatastore().delete(getQueryById(id));
+	}
+	
 	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
 		this.datastoreProvider = provider;
 		

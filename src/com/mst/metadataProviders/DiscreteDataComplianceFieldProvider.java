@@ -41,6 +41,8 @@ public class DiscreteDataComplianceFieldProvider {
 		return result;
 	}
 	
+	
+	
 	private void processLine(String[] values, String dieseName){
 
 		ComplianceDisplayFieldsBucketItem bucketItem = new ComplianceDisplayFieldsBucketItem();
@@ -49,7 +51,7 @@ public class DiscreteDataComplianceFieldProvider {
 			bucketItem.setAgeBegin(Integer.parseInt(values[2]));
 		
 		if(tryParseInt(values[3]))
-			bucketItem.setAgeBegin(Integer.parseInt(values[3]));
+			bucketItem.setAgeEnd(Integer.parseInt(values[3]));
 		
 		bucketItem.setMenopausalStatus(values[4]);
 		
