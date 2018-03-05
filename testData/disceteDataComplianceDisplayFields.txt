@@ -1,25 +1,30 @@
 t,Abdominal Aortic Aneurysm,Age Begin,Age End,Menopausal Status,Size min,Size max,Size Unit of Measure,Follow up time,Follow up procedure
-e,existence;aneurysm|disease location;abdominal
+e,existence;aneurysm-dilation-dilatation-distention-sac-aneurysms-dilations-dilatations-distentions-sacs|disease location;abdominal-infrarenal-diaphragm-celiac axis-sma-ima-suprarenal
 f,Bucket1,,,,2.6,2.9,cm,f,0,supp care;years|time;5
 f,Bucket2,,,,3,3.4,cm,f,0,supp care;years|time;3
 f,Bucket3,,,,3.5,3.9,cm,f,0,supp care;months|time;12|supp care;year|time;1
 f,Bucket4,,,,4,4.4,cm,f,0,supp care;months|time;12|supp care;year|time;1
-f,Bucket5,,,,4,4.4,cm,f,0,advise; consultation|consultation type;vascular
+f,Bucket5,,,,4,4.4,cm,f,0,advise;consultation|consultation type;vascular
 f,Bucket6,,,,4.5,5.4,cm,f,0,supp care;months|time;6 
 f,Bucket7,,,,4.5,5.4,cm,f,0,advise;consultation|consultation type;vascular 
 f,Bucket8,,,,5.5,100,cm,f,0,advise;surgeon|physician specialty;vascular
 t,Incidental Thyroid Nodule,,,,,,,,
-e,existence;nodule|disease location;thyroid
-f,Bucket1,0,18,,(all),(all),,f,0,advise;ultrasound
-f,Bucket2,19,34,,1,100,cm,f,0,advise;ultrasound
-f,Bucket3,35,100,,1.5,100,cm,f,0,advise;ultrasound
+e,existence;nodule-nodules-mass-masses-lesion-lesions-cyst-cysts-hypodensity-hypodensities-attenuation-attenuations|disease location;thyroid-isthmus
+f,Bucket1,0,18,,0,120,,f,0,advise;ultrasound|advise;sonography
+f,Bucket2,19,34,,1,100,cm,f,0,advise;ultrasound|advise;sonography
+f,Bucket3,35,100,,1.5,100,cm,f,0,advise;ultrasound|advise;sonography
+f,Bucket4,19,34,,0,.9,cm,f,0,negation;follow-up
+f,Bucket5,35,100,,0,1.4,cm,f,0,negation;follow-up
+t,Enlarged Thyroid,,,,,,,,
+e,existence;thyroid-isthmus|finding site modifiers;enlarged-enlargement-goiter-prominent-thyromegaly-heterogeneous-multinodular
+f,Bucket6,0,100,,,,,f,0,advise;ultrasound|advise;sonography
 t,Ovarian Simple Cyst,,,,,,,,
-e,existence;cyst|disease location;ovarian-ovary-ovaries|simple cyst modifiers;unilocular-sonolucent-small-simple-rupture-functional-dominant-physiologic-hyperechoic-follicular-dominant follicle-decompressed-anechoic
+e,existence;cyst-cysts-lesion-lesions-transmission-transmissions-attenuation-attenuations|disease location;ovarian-ovary-ovaries-paraovarian-adnexa-adnexum-adnexal
 f,Bucket1,,,premenopausal,0,3,cm,f,0,advise-no;imaging|negation;imaging|negation;follow-up
 f,Bucket2,,,premenopausal,3.1,5,cm,f,0,advise-no;imaging|negation;imaging|negation;follow-up
-f,Bucket3,,,premenopausal,5.1,7,cm,f,0,advise;ultrasound|procedure time;annual
-f,Bucket4,,,premenopausal,7.1,100,cm,f,0,advise;MR
+f,Bucket3,,,premenopausal,5.1,7,cm,f,0,advise;ultrasound|procedure time;annual|procedure time;annually
+f,Bucket4,,,premenopausal,7.1,100,cm,f,0,advise;MR|procedure evaluation;surgical
 f,Bucket5,,,postmenopausal,0,1,cm,f,0,advise-no;imaging|negation;imaging|negation;follow-up
 f,Bucket6,,,postmenopausal,1.1,3,cm,f,0,advise-no;imaging|negation;imaging|negation;follow-up
-f,Bucket7,,,postmenopausal,3.1,7,cm,f,0,advise;ultrasound|procedure time;annual
-f,Bucket8,,,postmenopausal,7.1,100,cm,f,0,advise;MR
+f,Bucket7,,,postmenopausal,3.1,7,cm,f,0,advise;ultrasound|procedure time;annual|procedure time;annually
+f,Bucket8,,,postmenopausal,7.1,100,cm,f,0,advise;MR|procedure evaluation;surgical

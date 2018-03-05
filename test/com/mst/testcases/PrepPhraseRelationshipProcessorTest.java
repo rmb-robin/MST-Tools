@@ -77,9 +77,13 @@ public class PrepPhraseRelationshipProcessorTest {
 	
 	@Test
 	public void passing()throws Exception{
-		TokenRelationship tokenRelationship = getExpectedTokenRelationship("disease location", "cyst", "spine");
+		TokenRelationship tokenRelationship = getExpectedTokenRelationship("disease location", "cyst", "ovaries");
 		addToMap(tokenRelationship);
-		runAssert(false,"She has a cyst in the lumbar spine.", relationships);
+		runAssert(false,"There is presence of a 1.4x1.3x1.0 cm simple cyst.", relationships); 
+		
+		//runAssert(false,"She has a cyst in the ovaries.", relationships);
+		
+		//runAssert(false,"She has a cyst in the lumbar spine.", relationships);
 		
 		relationships.clear();
 		tokenRelationship = getExpectedTokenRelationship("disease location", "cyst", "spine");
