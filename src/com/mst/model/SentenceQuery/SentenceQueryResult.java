@@ -7,47 +7,55 @@ import com.mst.model.discrete.DiscreteData;
 
 public class SentenceQueryResult {
 
-	private String sentence; 
+	private String sentence;
 	private String sentenceId;
-	private DiscreteData discreteData; 
-	
-	
+	private DiscreteData discreteData;
+	private String reportText;
+
 	private List<SentenceQueryEdgeResult> sentenceQueryEdgeResults;
-	
-	public SentenceQueryResult(){
+
+	public SentenceQueryResult() {
 		sentenceQueryEdgeResults = new ArrayList<>();
-	}
-
-	public String getSentence() {
-		return sentence;
-	}
-
-	public void setSentence(String sentence) {
-		this.sentence = sentence;
-	}
-
-	public List<SentenceQueryEdgeResult> getSentenceQueryEdgeResults() {
-		return sentenceQueryEdgeResults;
-	}
-
-	public void setSentenceQueryEdgeResults(List<SentenceQueryEdgeResult> sentenceQueryEdgeResults) {
-		this.sentenceQueryEdgeResults = sentenceQueryEdgeResults;
-	}
-
-	public String getSentenceId() {
-		return sentenceId;
-	}
-
-	public void setSentenceId(String sentenceId) {
-		this.sentenceId = sentenceId;
 	}
 
 	public DiscreteData getDiscreteData() {
 		return discreteData;
 	}
 
+	public String getReportText() {
+		return reportText;
+	}
+
+	public String getSentence() {
+		return sentence;
+	}
+
+	public String getSentenceId() {
+		return sentenceId;
+	}
+
+	public List<SentenceQueryEdgeResult> getSentenceQueryEdgeResults() {
+		return sentenceQueryEdgeResults;
+	}
+
 	public void setDiscreteData(DiscreteData discreteData) {
 		this.discreteData = discreteData;
 	}
-	
+
+	public void setReportText(String reportText) {
+		this.reportText = reportText;
+	}
+
+	public void setSentence(String sentence) {
+		this.sentence = sentence;
+	}
+
+	public void setSentenceId(String sentenceId) {
+		this.sentenceId = sentenceId;
+	}
+
+	public void setSentenceQueryEdgeResults(List<SentenceQueryEdgeResult> sentenceQueryEdgeResults) {
+		this.sentenceQueryEdgeResults = sentenceQueryEdgeResults;
+	}
+
 }

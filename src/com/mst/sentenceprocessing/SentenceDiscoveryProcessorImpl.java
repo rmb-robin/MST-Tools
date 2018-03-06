@@ -65,7 +65,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		List<Sentence> sentences = sentenceFactory.getSentences(request.getText(),"","",request.getSource());
 		List<SentenceDiscovery> discoveries = new ArrayList<>();
 		for(Sentence sentence: sentences){
-			sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
+	/*		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
 			List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(),this.sentenceProcessingMetaDataInput.getSemanticTypes());
 			
 			sentence.setTokenRelationships(new ArrayList<TokenRelationship>());
@@ -75,11 +75,11 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	
 			tokens = filterTokens(tokens);
 			List<RecommendedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens); 			sentence.setModifiedWordList(tokens);
-			//SentenceDiscovery discovery =  convert(sentence, nounPhraseResult);		
-		//	subjectAnnotator.annotate(discovery);
-		//	discovery.getWordEmbeddings().addAll(negativeRelationshipfactory.create(discovery.getModifiedWordList()));
+			SentenceDiscovery discovery =  convert(sentence, nounPhraseResult);		
+			subjectAnnotator.annotate(discovery);
+			discovery.getWordEmbeddings().addAll(negativeRelationshipfactory.create(discovery.getModifiedWordList()));
 			discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
-			discoveries.add(discovery);
+			discoveries.add(discovery);*/
 		}
 		return discoveries;
 	}
