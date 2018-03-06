@@ -100,3 +100,17 @@ prominent,f,bpoc,t,null,enlarged finding site
 heterogeneous,f,bpoc,t,null,heterogeneous finding site
 multinodular,f,bpoc,t,null,heterogeneous finding site
 multi-nodular,f,bpoc,t,null,heterogeneous finding site
+proc,t,qlco,t,null,procedure modifier
+proc,t,qlco-simple,t,null,procedure modifier
+proc,t,qlco-degree,t,null,procedure modifier
+sympto,t,qlco,t,null,symptom modifier
+sympto,t,qlco-simple,t,null,symptom modifier
+sympto,t,qlco-degree,t,null,symptom modifier
+dysntype,t,dysn,t,null,disease type
+qlco-degree,t,proc,t,null,procedure modifier
+qlco,t,proc,t,null,procedure modifier
+qlco-simple,t,proc,t,null,procedure modifier
+dysn,t,proc,t,null,procedure type
+qlco,t,neop-can,t,null,disease modifier
+qlco-simple,t,neop-can,t,null,disease modifier
+qlco-degree,t,neop-can,t,null,disease modifier

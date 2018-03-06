@@ -117,23 +117,6 @@ public class LoadDataToMongo {
 		dao.saveSentences(sentences, null,null);
 	}
 	
-//	@Test
-	public void loadMetaData(){
-    	SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
-    	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
-    	ds.delete(ds.createQuery(SentenceProcessingMetaDataInput.class));
-    	ds.save(input); 
-	}
-	
-	
-	//@Test
-	public void loadDiscreteDataComplianceFields(){
-		DiscreteDataComplianceFieldProvider provider = new DiscreteDataComplianceFieldProvider();
-		DisceteDataComplianceDisplayFields fields =  provider.get("rad","rad");
-		DisceteDataComplianceDisplayFieldsDaoImpl dao = new DisceteDataComplianceDisplayFieldsDaoImpl();
-		dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault());
-		dao.save(fields);
-	}
 	
 	private Sentence getSentence(String text) throws Exception{
 		SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
@@ -200,7 +183,7 @@ public class LoadDataToMongo {
 	            
 	    		RawReportFile file = new RawReportFile();
 	    		file.setContent(body);
-	    		file.setOrgId("5972aedebde4270bc53b23e3");
+	    		file.setOrgId("58c6f3ceaf3c420b90160803");
 	    		file.setOrgName("rad");
 	    		Gson gson = new Gson();
 	    		String input = gson.toJson(file);
