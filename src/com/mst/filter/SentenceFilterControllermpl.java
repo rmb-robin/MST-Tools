@@ -133,42 +133,34 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 	}
 
 
-	public void filterForAndNot(SentenceQueryInstance sentenceQueryInstance){
-		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
+	public void filterForAndNot(SentenceQueryInstance sentenceQueryInstance) {
 		HashSet<String> matchedIds = new HashSet<>();
-		List<String> unmatchedTokens = new ArrayList<String>();
 		for (Map.Entry<String, SentenceDb> entry : cumalativeSentenceResults.entrySet()) {
-			 boolean tokenMatch = false;
-			 for(String token: sentenceQueryInstance.getTokens()){
-				if(entry.getValue().getOrigSentence().contains(token)){
-					tokenMatch = true;
-				}
-				else
-				{
-					unmatchedTokens.add(token);
-				}
-			}
-			 
-			if(tokenMatch) continue;
 
-			HashSet<String> sentenceUniqueEdgeNames = new HashSet<>();
-			entry.getValue().getTokenRelationships().stream().forEach(a-> sentenceUniqueEdgeNames.add(a.getEdgeName()));
-			for(String edgeName: edgeQueriesByName.keySet()){
-				if(sentenceUniqueEdgeNames.contains(edgeName)){
-					tokenMatch = true;
+			// do all tokens as this is not a db query impact
+			for (String token : sentenceQueryInstance.getTokens()) {
+				if (!entry.getValue().getOrigSentence().contains(token)) {
+					continue;
+				}
+ 				boolean match = shouldByPassResultExclude(entry.getValue().getTokenRelationships(),
+						sentenceQueryInstance.getEdges(), token);
+
+				if (match) {
+					matchedIds.add(entry.getKey());
+					break;
 				}
 			}
-				
-			if(tokenMatch) continue;
-			
-			for(String token: unmatchedTokens){
-				if(shouldByPassResultExclude(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges(), token)) continue;
-			}
-			matchedIds.add(entry.getKey());
-		 }
-		updateExistingResults(matchedIds);
+			// matchedIds.add(entry.getKey());
+		}
+		// changing since update existing does the oppisite of what we want here.
+		for(String id: matchedIds){
+			queryResults.remove(id);
+			if(this.cumalativeSentenceResults.containsKey(id))
+				this.cumalativeSentenceResults.remove(id);
+		}
+		//updateExistingResults(matchedIds);
 	}
-	
+
 	public void filterForAndNotAll(SentenceQueryInstance sentenceQueryInstance){
 		Map<String,EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
 		HashSet<String> matchedIds = new HashSet<>();
