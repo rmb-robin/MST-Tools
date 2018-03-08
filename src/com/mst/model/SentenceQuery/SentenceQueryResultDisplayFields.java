@@ -4,10 +4,14 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mst.jsonSerializers.ObjectIdJsonSerializer;
+
 @Entity("sentencequeryresultdisplayfields")
 public class SentenceQueryResultDisplayFields {
 
 	@Id
+	@JsonSerialize(using=ObjectIdJsonSerializer.class)
 	private ObjectId id;
 	
 	private String organizationId; 
