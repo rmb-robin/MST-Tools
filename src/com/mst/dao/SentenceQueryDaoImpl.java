@@ -98,7 +98,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 				sentenceFilterController.filterForAnd(sentenceQueryInstance);
 			}
 			
-			if(appender.equals("andnot"))
+			if(appender.equals("andnot") || appender.equals("and not"))
 				sentenceFilterController.filterForAndNot(sentenceQueryInstance);
 			
 			if(appender.equals("andnotall"))
