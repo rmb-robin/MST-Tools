@@ -144,7 +144,6 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 				}
 				EdgeMatchOnQueryResult result = sentenceFilter.AreEdgesMatchOnQuery(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges(),token);
  				
- 				System.out.println("Checking: "+ entry.getValue().getNormalizedSentence() + " : " + result.isMatch());
 				if (result.isMatch()) {
 					matchedIds.add(entry.getKey());
 					break;
