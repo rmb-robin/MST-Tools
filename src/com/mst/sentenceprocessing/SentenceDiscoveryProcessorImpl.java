@@ -16,6 +16,7 @@ import com.mst.interfaces.sentenceprocessing.VerbExistanceProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.interfaces.sentenceprocessing.WordEmbeddingProcessor;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
+import com.mst.model.metadataTypes.TokenBypassTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.RecommandationRequest;
@@ -38,6 +39,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private SentenceMeasureNormalizer sentenceMeasureNormalizer;
 	private WordEmbeddingProcessor wordEmbeddingProcessor; 
 	private VerbProcessor verbProcessor; 
+	private RecommendedNounPhraseProcesserImpl nounPhraseProcesser;
 	private RecommandedSubjectAnnotator subjectAnnotator; 
 	private RecommendedNegativeRelationshipFactoryImpl negativeRelationshipfactory;
 	private VerbExistanceProcessor verbExistanceProcessor; 
@@ -50,6 +52,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
 		wordEmbeddingProcessor = new WordEmbeddingProcesseorImpl();
 		verbProcessor = new VerbProcessorImpl();
+		nounPhraseProcesser = new RecommendedNounPhraseProcesserImpl();
 		subjectAnnotator = new RecommandedSubjectAnnotatorImpl();
 		negativeRelationshipfactory = new RecommendedNegativeRelationshipFactoryImpl();
 		verbExistanceProcessor = new VerbExistanceProcessorImpl();
@@ -65,7 +68,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		List<Sentence> sentences = sentenceFactory.getSentences(request.getText(),"","",request.getSource());
 		List<SentenceDiscovery> discoveries = new ArrayList<>();
 		for(Sentence sentence: sentences){
-	/*		sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
+			sentence = ngramProcessor.process(sentence,this.sentenceProcessingMetaDataInput.getNgramsInput());
 			List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(),this.sentenceProcessingMetaDataInput.getSemanticTypes());
 			
 			sentence.setTokenRelationships(new ArrayList<TokenRelationship>());
@@ -74,12 +77,15 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
 	
 			tokens = filterTokens(tokens);
-			List<RecommendedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens); 			sentence.setModifiedWordList(tokens);
+			List<RecommendedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
+			RecommandedNounPhraseResult nounPhraseResult = nounPhraseProcesser.process(wordEmbeddings);
+			sentence.setModifiedWordList(tokens);
 			SentenceDiscovery discovery =  convert(sentence, nounPhraseResult);		
+			discovery.getWordEmbeddings().addAll(nounPhraseProcesser.addEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
 			subjectAnnotator.annotate(discovery);
 			discovery.getWordEmbeddings().addAll(negativeRelationshipfactory.create(discovery.getModifiedWordList()));
 			discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
-			discoveries.add(discovery);*/
+			discoveries.add(discovery);
 		}
 		return discoveries;
 	}
@@ -89,10 +95,11 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		HashSet<String> byPassPOS = new HashSet<>();
 		byPassPOS.add(PartOfSpeachTypes.DET);
 		byPassPOS.add(PartOfSpeachTypes.PUNCTUATION);
-	
+		HashSet<String> specialCharactersBypass = TokenBypassTypes.values;
 		for(WordToken token: tokens){
 			if(token.getPos()!=null && byPassPOS.contains(token.getPos())) continue;
-			
+			if(specialCharactersBypass.contains(token.getToken())) continue;
+
 			result.add(token);	
 		}
 		return result;
