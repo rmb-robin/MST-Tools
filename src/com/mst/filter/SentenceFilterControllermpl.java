@@ -142,10 +142,10 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 				if (!entry.getValue().getOrigSentence().contains(token)) {
 					continue;
 				}
- 				boolean match = shouldByPassResultExclude(entry.getValue().getTokenRelationships(),
-						sentenceQueryInstance.getEdges(), token);
-
-				if (match) {
+				EdgeMatchOnQueryResult result = sentenceFilter.AreEdgesMatchOnQuery(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges(),token);
+ 				
+ 				System.out.println("Checking: "+ entry.getValue().getNormalizedSentence() + " : " + result.isMatch());
+				if (result.isMatch()) {
 					matchedIds.add(entry.getKey());
 					break;
 				}
