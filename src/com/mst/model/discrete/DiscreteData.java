@@ -56,6 +56,20 @@ public class DiscreteData {
 	private String parseReportId; 
 	
 	
+	private String patientLastName; 
+	private String patientFirstName;
+	private String PatientClass; 
+	private String principalResultInterpreterID;
+	private String principalResultInterpreterLastName;
+	private String principalResultInterpreterfirstName;
+	private String assignedPatientLocation; 
+	private String orderingProviderId; 
+	private String orderingProviderFirstName;
+	private String orderingProviderLastName;
+	
+	
+	
+	
 	private Map<String,String> allAvailableFields; 
 	
 	public DiscreteData(){
@@ -251,6 +265,90 @@ public class DiscreteData {
 
 	public void setParseReportId(String parseReportId) {
 		this.parseReportId = parseReportId;
+	}
+
+	public String getPatientLastName() {
+		return patientLastName;
+	}
+
+	public void setPatientLastName(String patientLastName) {
+		this.patientLastName = patientLastName;
+	}
+
+	public String getPatientFirstName() {
+		return patientFirstName;
+	}
+
+	public void setPatientFirstName(String patientFirstName) {
+		this.patientFirstName = patientFirstName;
+	}
+
+	public String getPatientClass() {
+		return PatientClass;
+	}
+
+	public void setPatientClass(String patientClass) {
+		PatientClass = patientClass;
+	}
+
+	public String getPrincipalResultInterpreterID() {
+		return principalResultInterpreterID;
+	}
+
+	public void setPrincipalResultInterpreterID(String principalResultInterpreterID) {
+		this.principalResultInterpreterID = principalResultInterpreterID;
+	}
+
+	public String getPrincipalResultInterpreterLastName() {
+		return principalResultInterpreterLastName;
+	}
+
+	public void setPrincipalResultInterpreterLastName(String principalResultInterpreterLastName) {
+		this.principalResultInterpreterLastName = principalResultInterpreterLastName;
+	}
+
+	public String getPrincipalResultInterpreterfirstName() {
+		return principalResultInterpreterfirstName;
+	}
+
+	public void setPrincipalResultInterpreterfirstName(String principalResultInterpreterfirstName) {
+		this.principalResultInterpreterfirstName = principalResultInterpreterfirstName;
+	}
+
+	public String getAssignedPatientLocation() {
+		return assignedPatientLocation;
+	}
+
+	public void setAssignedPatientLocation(String assignedPatientLocation) {
+		this.assignedPatientLocation = assignedPatientLocation;
+	}
+
+	public String getOrderingProviderId() {
+		return orderingProviderId;
+	}
+
+	public void setOrderingProviderId(String orderingProviderId) {
+		this.orderingProviderId = orderingProviderId;
+	}
+
+	public String getOrderingProviderFirstName() {
+		return orderingProviderFirstName;
+	}
+
+	public void setOrderingProviderFirstName(String orderingProviderFirstName) {
+		this.orderingProviderFirstName = orderingProviderFirstName;
+	}
+
+	public String getOrderingProviderLastName() {
+		return orderingProviderLastName;
+	}
+
+	public void setOrderingProviderLastName(String orderingProviderLastName) {
+		this.orderingProviderLastName = orderingProviderLastName;
+	}
+
+	public void setCompliant(boolean isCompliant) {
+		this.isCompliant = isCompliant;
 	} 
 	
 }

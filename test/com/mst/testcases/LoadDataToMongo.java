@@ -156,6 +156,7 @@ public class LoadDataToMongo {
 	
 	
 	//http://10.210.192.4
+	
 	@Test
 	public void loadRawHl7IntoAPI(){
 		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save"; 

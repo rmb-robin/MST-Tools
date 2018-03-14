@@ -147,6 +147,51 @@ public class HL7Processor {
 				} else if(element.getName().equalsIgnoreCase("OrderControl")) {
 					data.setOrderControl(value);
 				}
+			   
+				else if(element.getName().equalsIgnoreCase("PatientLastName")) {
+				data.setPatientLastName(value);
+			}
+			
+				
+			   else if(element.getName().equalsIgnoreCase("PatientFirstName")) {
+					data.setPatientFirstName(value);
+				}
+	
+				else if(element.getName().equalsIgnoreCase("PatientClass")) {
+					data.setPatientClass(value);
+				}
+				
+					
+				   else if(element.getName().equalsIgnoreCase("PrincipalResultInterpreterID")) {
+						data.setPrincipalResultInterpreterID(value);
+					}
+					
+						
+				  else if(element.getName().equalsIgnoreCase("PrincipalResultInterpreterLastName")) {
+							data.setPrincipalResultInterpreterLastName(value);
+				  }
+				
+				  else if(element.getName().equalsIgnoreCase("PrincipalResultInterpreterFirstName")) {
+						data.setPrincipalResultInterpreterfirstName(value);
+				  }
+			
+		
+				  else if(element.getName().equalsIgnoreCase("AssignedPatientLocation")) {
+						data.setAssignedPatientLocation(value);
+				  }
+			
+				  else if(element.getName().equalsIgnoreCase("OrderingProviderId")) {
+					data.setOrderingProviderId(value);
+				  }
+				
+				  else if(element.getName().equalsIgnoreCase("OrderingProviderFirstName")) {
+						data.setOrderingProviderFirstName(value);
+					  }
+				
+				  else if(element.getName().equalsIgnoreCase("OrderingProviderLastName")) {
+						data.setOrderControl(value);
+					  }
+				
 			} catch(Exception e) {
 				e.printStackTrace();
 			}

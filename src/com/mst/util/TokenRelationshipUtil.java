@@ -64,8 +64,8 @@ public class TokenRelationshipUtil {
 		result.get(key).add(relationship);
     }
     
-    public static HashSet<WordToken> getDistinctWordTokens(List<TokenRelationship> relationships){
-    	HashSet<WordToken> result = new HashSet<>();
+    public static List<WordToken> getDistinctWordTokens(List<TokenRelationship> relationships){
+    	List<WordToken> result = new ArrayList<>();
 		for(TokenRelationship relationship: relationships){
 			if(!result.contains(relationship.getFromToken()))
 					result.add(relationship.getFromToken());
