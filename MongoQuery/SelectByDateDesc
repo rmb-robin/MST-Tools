@@ -1,0 +1,7 @@
+mb.runSQLQuery(`
+
+SELECT 
+ *
+from hl7parsedRequest
+order by processedDate desc
+`)

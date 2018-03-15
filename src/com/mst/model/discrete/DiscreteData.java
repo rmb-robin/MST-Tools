@@ -56,20 +56,14 @@ public class DiscreteData {
 	private String parseReportId; 
 	
 	
-	private String patientLastName; 
-	private String patientFirstName;
+	private String patientName; 
 	private String PatientClass; 
 	private String principalResultInterpreterID;
-	private String principalResultInterpreterLastName;
-	private String principalResultInterpreterfirstName;
+	private String principalResultInterpreterName;
 	private String assignedPatientLocation; 
 	private String orderingProviderId; 
-	private String orderingProviderFirstName;
-	private String orderingProviderLastName;
-	
-	
-	
-	
+	private String orderingProviderName;
+
 	private Map<String,String> allAvailableFields; 
 	
 	public DiscreteData(){
@@ -267,21 +261,6 @@ public class DiscreteData {
 		this.parseReportId = parseReportId;
 	}
 
-	public String getPatientLastName() {
-		return patientLastName;
-	}
-
-	public void setPatientLastName(String patientLastName) {
-		this.patientLastName = patientLastName;
-	}
-
-	public String getPatientFirstName() {
-		return patientFirstName;
-	}
-
-	public void setPatientFirstName(String patientFirstName) {
-		this.patientFirstName = patientFirstName;
-	}
 
 	public String getPatientClass() {
 		return PatientClass;
@@ -299,21 +278,6 @@ public class DiscreteData {
 		this.principalResultInterpreterID = principalResultInterpreterID;
 	}
 
-	public String getPrincipalResultInterpreterLastName() {
-		return principalResultInterpreterLastName;
-	}
-
-	public void setPrincipalResultInterpreterLastName(String principalResultInterpreterLastName) {
-		this.principalResultInterpreterLastName = principalResultInterpreterLastName;
-	}
-
-	public String getPrincipalResultInterpreterfirstName() {
-		return principalResultInterpreterfirstName;
-	}
-
-	public void setPrincipalResultInterpreterfirstName(String principalResultInterpreterfirstName) {
-		this.principalResultInterpreterfirstName = principalResultInterpreterfirstName;
-	}
 
 	public String getAssignedPatientLocation() {
 		return assignedPatientLocation;
@@ -331,24 +295,34 @@ public class DiscreteData {
 		this.orderingProviderId = orderingProviderId;
 	}
 
-	public String getOrderingProviderFirstName() {
-		return orderingProviderFirstName;
-	}
-
-	public void setOrderingProviderFirstName(String orderingProviderFirstName) {
-		this.orderingProviderFirstName = orderingProviderFirstName;
-	}
-
-	public String getOrderingProviderLastName() {
-		return orderingProviderLastName;
-	}
-
-	public void setOrderingProviderLastName(String orderingProviderLastName) {
-		this.orderingProviderLastName = orderingProviderLastName;
-	}
+	
 
 	public void setCompliant(boolean isCompliant) {
 		this.isCompliant = isCompliant;
+	}
+
+	public String getPrincipalResultInterpreterName() {
+		return principalResultInterpreterName;
+	}
+
+	public void setPrincipalResultInterpreterName(String principalResultInterpreterName) {
+		this.principalResultInterpreterName = principalResultInterpreterName;
+	}
+
+	public String getPatientName() {
+		return patientName;
+	}
+
+	public void setPatientName(String patientName) {
+		this.patientName = patientName;
+	}
+
+	public String getOrderingProviderName() {
+		return orderingProviderName;
+	}
+
+	public void setOrderingProviderName(String orderingProviderName) {
+		this.orderingProviderName = orderingProviderName;
 	} 
 	
 }

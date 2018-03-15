@@ -6,3 +6,4 @@ public interface SentenceProcessingMetaDataInputFactory {
 
 	 SentenceProcessingMetaDataInput create();
 }
+

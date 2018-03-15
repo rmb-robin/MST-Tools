@@ -131,6 +131,6 @@ public class RecommendedNounPhraseProcesserImpl  extends RelationshipProcessorBa
 	private void processSingleEdge(RecommendedTokenRelationship recommandedTokenRelationship){
 		RelationshipMapping mapping = findMapping(recommandedTokenRelationship);
 		if(mapping==null) return;
-		recommandedTokenRelationship.getTokenRelationship().setNamedEdge(mapping.getEdgeName());
+		recommandedTokenRelationship.getTokenRelationship().setNamedEdge(mapping.getNamedEdgeName());
 	}
 }

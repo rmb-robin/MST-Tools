@@ -4,9 +4,10 @@ public class RelationshipMapping {
 	
 	private String fromToken;
 	private String toToken;
-	private int maxDistance;
 	private String edgeName;
-
+	private String namedEdgeName;
+	private int maxDistance;
+	
 	private boolean isFromSemanticType;
 	private boolean isToSemanticType;
 	private boolean isFromWildcard;
@@ -25,12 +26,7 @@ public class RelationshipMapping {
 	public void setToToken(String toToken) {
 		this.toToken = toToken;
 	}
-	public int getMaxDistance() {
-		return maxDistance;
-	}
-	public void setMaxDistance(int maxDistance) {
-		this.maxDistance = maxDistance;
-	}
+
 	public String getEdgeName() {
 		return edgeName;
 	}
@@ -60,5 +56,17 @@ public class RelationshipMapping {
 	}
 	public void setToWildcard(boolean isToWildcard) {
 		this.isToWildcard = isToWildcard;
+	}
+	public String getNamedEdgeName() {
+		return namedEdgeName;
+	}
+	public void setNamedEdgeName(String namedEdgeName) {
+		this.namedEdgeName = namedEdgeName;
+	}
+	public int getMaxDistance() {
+		return maxDistance;
+	}
+	public void setMaxDistance(int maxDistance) {
+		this.maxDistance = maxDistance;
 	}
 }

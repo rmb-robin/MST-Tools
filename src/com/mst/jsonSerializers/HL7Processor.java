@@ -148,15 +148,10 @@ public class HL7Processor {
 					data.setOrderControl(value);
 				}
 			   
-				else if(element.getName().equalsIgnoreCase("PatientLastName")) {
-				data.setPatientLastName(value);
+				else if(element.getName().equalsIgnoreCase("PatientName")) {
+				data.setPatientName(value);
 			}
 			
-				
-			   else if(element.getName().equalsIgnoreCase("PatientFirstName")) {
-					data.setPatientFirstName(value);
-				}
-	
 				else if(element.getName().equalsIgnoreCase("PatientClass")) {
 					data.setPatientClass(value);
 				}
@@ -167,15 +162,10 @@ public class HL7Processor {
 					}
 					
 						
-				  else if(element.getName().equalsIgnoreCase("PrincipalResultInterpreterLastName")) {
-							data.setPrincipalResultInterpreterLastName(value);
+				  else if(element.getName().equalsIgnoreCase("PrincipalResultInterpreterName")) {
+							data.setPrincipalResultInterpreterName(value);
 				  }
 				
-				  else if(element.getName().equalsIgnoreCase("PrincipalResultInterpreterFirstName")) {
-						data.setPrincipalResultInterpreterfirstName(value);
-				  }
-			
-		
 				  else if(element.getName().equalsIgnoreCase("AssignedPatientLocation")) {
 						data.setAssignedPatientLocation(value);
 				  }
@@ -184,12 +174,8 @@ public class HL7Processor {
 					data.setOrderingProviderId(value);
 				  }
 				
-				  else if(element.getName().equalsIgnoreCase("OrderingProviderFirstName")) {
-						data.setOrderingProviderFirstName(value);
-					  }
-				
-				  else if(element.getName().equalsIgnoreCase("OrderingProviderLastName")) {
-						data.setOrderControl(value);
+				  else if(element.getName().equalsIgnoreCase("OrderingProviderName")) {
+						data.setOrderingProviderName(value);
 					  }
 				
 			} catch(Exception e) {
@@ -268,7 +254,33 @@ public class HL7Processor {
 				String lName = terser.get("/.OBR-33-2");
 				String fName = terser.get("/.OBR-33-3");
 				value = processName(lName) + ", " + processName(fName);
-			} else {
+			} 
+			
+			
+		 else if(element.getLocation().equalsIgnoreCase("/.OBR-32")) {
+			// report finalized by first and last names
+			// OBR-33-1 is handled elsewhere and written to ReportFinalizedById
+			String lName = terser.get("/.OBR-32-2");
+			String fName = terser.get("/.OBR-32-3");
+			value = processName(lName) + ", " + processName(fName);
+		}
+		
+		 else if(element.getLocation().equalsIgnoreCase("/.PID-5")) {
+				// report finalized by first and last names
+				// OBR-33-1 is handled elsewhere and written to ReportFinalizedById
+				String lName = terser.get("/.PID-5-1");
+				String fName = terser.get("/.PID-5-2");
+				value = processName(lName) + ", " + processName(fName);
+			}
+			
+		 else if(element.getLocation().equalsIgnoreCase("/.OBR-16")) {
+				// report finalized by first and last names
+				// OBR-33-1 is handled elsewhere and written to ReportFinalizedById
+				String lName = terser.get("/.OBR-16-2");
+				String fName = terser.get("/.OBR-16-3");
+				value = processName(lName) + ", " + processName(fName);
+			}	
+		else {
 				value = terser.get(element.getLocation());
 			}
 		} catch(Exception e) {
