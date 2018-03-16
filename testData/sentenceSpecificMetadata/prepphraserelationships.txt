@@ -1,0 +1,49 @@
+in,f,f,dysn,t,f,bpoc,t,f,disease location
+within,f,f,dysn,t,f,bpoc,t,f,disease location
+of,f,f,dysn,t,f,bpoc,t,f,disease location
+in,f,f,*,f,f,gene,f,f,gene location
+after,f,f,therapy,f,f,surgery,f,f,sequence of events
+of,f,f,history,f,f,bpoc,t,f,diagnosis
+with,f,f,consistent,f,f,dysn,t,f,diagnose
+on,f,f,LV,f,t,drugpr,t,f,take
+for,f,f,suspicious,f,f,dysn,t,f,existence-maybe
+for,f,f,concerning,f,f,dysn,t,f,existence
+with,f,f,consistent,f,f,dysn,t,f,existence
+for,f,f,positive,f,f,dysn,t,f,existence
+for,f,f,negative,f,f,dysn,t,f,existence-no
+of,f,f,suggestive,f,f,dysn,t,f,existence-maybe
+without,f,f,dysn,t,f,sympto,t,f,existence-no
+here,f,f,for,f,f,dysn,t,f,existence
+in,f,f,follow-up,f,f,tempor,t,f,supp care
+without,f,f,calcifications,f,f,dysn,t,f,existence-no
+with,f,f,correlation,f,f,history,f,f,history review
+to,f,f,up,f,f,uom,t,f,range value
+of,f,f,evidence,f,f,dysn,t,f,existence
+of,f,f,evidence,f,f,neop-can,t,f,existence
+without,f,f,dysn,t,f,dysn,t,f,existence-no
+on,f,f,seen,f,f,bpoc,t,f,disease location
+at,f,f,dysn,t,f,bpoc,t,f,disease location
+with,f,f,associated,f,f,bpoc,t,f,disease location
+in,f,f,present,f,f,bpoc,t,f,disease location
+within,f,f,noted,f,f,bpoc,t,f,disease location
+in,f,f,observed,f,f,bpoc,t,f,disease location
+from,f,f,arising,f,f,bpoc,t,f,disease location
+off,f,f,dysn,t,f,bpoc,t,f,disease location
+on,f,f,dysn,t,f,bpoc,t,f,disease location
+within,f,f,seen,f,f,bpoc,t,f,disease location
+in,f,f,seen,f,f,bpoc,t,f,disease location
+for,f,f,screening,f,f,dysn,t,f,procedure
+of,f,f,history,f,f,dysn,t,f,disease-history
+of,f,f,history,f,f,neop-can,t,f,disease-history
+of,f,f,redemonstration,f,f,dysn,t,f,disease-history
+for,f,f,review,f,f,dysn,t,f,disease-history
+in,f,f,neop-can,t,f,bpoc,t,f,disease location
+of,f,f,neop-can,t,f,bpoc,t,f,disease location
+to,f,f,gy,f,f,bpoc,t,f,radiation site
+to,f,f,cgy,f,f,bpoc,t,f,radiation site
+in,f,f,bpoc,t,f,proc,t,f,procedure location
+within,f,f,bpoc,t,f,proc,t,f,procedure location
+of,f,f,bpoc,t,f,proc,t,f,procedure location
+in,f,f,sympto,t,f,bpoc,t,f,symptom location
+within,f,f,sympto,t,f,bpoc,t,f,symptom location
+of,f,f,suv,f,f,cardinal number,t,f,suv

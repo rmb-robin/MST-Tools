@@ -9,76 +9,43 @@ import com.mst.model.sentenceProcessing.PrepPhraseRelationshipMapping;
 import com.mst.model.sentenceProcessing.RelationshipInput;
 import com.mst.model.sentenceProcessing.RelationshipMapping;
 
-public class RelationshipInputProviderFileImpl extends BaseProvider {
+public class RelationshipInputProviderFileImpl implements NounRelationshipInputProvider {
 
 	private String getFullFilePath(String filePath){
-		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + filePath;
+		return System.getProperty("user.dir") + File.separator + "testData" +  
+				File.separator + "sentenceDiscoverySpecificMetadata"  + File.separator  + filePath;
 	}
 	
-	private int maxDistance;
-	public RelationshipInput getNounRelationships(int maxDistance) {
-		this.maxDistance = maxDistance;
+	public RelationshipInput getRelationships(String fileName) {
+	
 		RelationshipInput nounRelationshipInput = new RelationshipInput();
-		List<String> lines = TestDataProvider.readLines(getFullFilePath("nounrelationships.txt"));
+		List<String> lines = TestDataProvider.readLines(getFullFilePath(fileName));
 		for(String line: lines){
-			nounRelationshipInput.getRelationshipMappings().add(getNounRelationship(line));
+			nounRelationshipInput.getRelationshipMappings().add(createRelationshipMapping(line));
 		}
 		return nounRelationshipInput;
 	}
-	
-	public List<PrepPhraseRelationshipMapping> getPrepPhraseRelationshipMapping(){	
-		List<String> lines = TestDataProvider.readLines(getFullFilePath("prepphraserelationships.txt"));
-		List<PrepPhraseRelationshipMapping> mappings = new ArrayList<PrepPhraseRelationshipMapping>();
-		
-		for(String line: lines){
-			mappings.add(getPrepPhraseRelationship(line));
-		}
-		return mappings;
-	}
-	
-	private PrepPhraseRelationshipMapping getPrepPhraseRelationship(String line){
-	//	on,f,f,LV,f,t,drugpr,t,f,take
+
+
+	private RelationshipMapping createRelationshipMapping(String line)
+	{
+		//token-token,laterality,left,f,f,bpoc,t,f
 		String[] values = line.split(",");
-		PrepPhraseRelationshipMapping mapping = new PrepPhraseRelationshipMapping();
+		RelationshipMapping relationshipMapping = new RelationshipMapping();
 		
-		mapping.setToken(values[0]);
-		mapping.setTokenSemanticType(getBoolType(values[1]));
-		mapping.setTokenPOSType(getBoolType(values[3]));
+		relationshipMapping.setEdgeName(values[0]);
+		relationshipMapping.setNamedEdgeName(values[1]);
 		
-		mapping.setPreviousToken(values[3]);
-		mapping.setPreviousTokenSemanticType(getBoolType(values[4]));
-		mapping.setPreviousTokenPOSType(getBoolType(values[5]));
+		relationshipMapping.setFromToken(values[2]);
+		relationshipMapping.setFromSemanticType(getBoolType(values[3]));
+		relationshipMapping.setFromWildcard(getBoolType(values[4]));
 		
-	
-		mapping.setPrepObjectToken(values[6]);
-		mapping.setPrepObjectTokenSemanticType(getBoolType(values[7]));
-		mapping.setPrepObjectTokenPOSType(getBoolType(values[8]));
-		mapping.setEdgeName(values[9]);
-		return mapping;
-		
+		relationshipMapping.setToToken(values[5]);
+		relationshipMapping.setToSemanticType(getBoolType(values[6]));
+		relationshipMapping.setToWildcard(getBoolType(values[7]));
+		return relationshipMapping;
 	}
 
-	private RelationshipMapping getNounRelationship(String line)
-	{
-		String[] values = line.split(",");
-		RelationshipMapping nounRelationship = new RelationshipMapping();
-		nounRelationship.setFromToken(values[0]);
-		nounRelationship.setFromSemanticType(getBoolType(values[1]));
-		
-		nounRelationship.setToToken(values[2]);
-		nounRelationship.setToSemanticType(getBoolType(values[3]));
-		
-		nounRelationship.setMaxDistance(getDistance(values[4]));
-		nounRelationship.setEdgeName(values[5]);
-		nounRelationship.setMaxDistance(this.maxDistance);
-		return nounRelationship;
-		
-	}
-	
-	private int getDistance(String val){
-		if(val.equals("null")) return this.maxDistance;
-		return Integer.parseInt(val);
-	}
 	
 	private boolean getBoolType(String val){
 		if(val.toLowerCase().equals("f")) return false;

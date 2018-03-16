@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mst.model.SentenceToken;
+import com.mst.model.discrete.DiscreteData;
+import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.sentenceprocessing.SentenceCleaner;
 import com.mst.sentenceprocessing.Tokenizer;
@@ -57,4 +59,18 @@ public class TestDataProvider {
 		return sentences;
 	}
 	
+	public static SentenceTextRequest getSentenceTextRequest(String path){
+	  String text = getFileText(path);
+	  SentenceTextRequest request = new SentenceTextRequest();
+	  request.setText(text);
+	  DiscreteData dd = new DiscreteData();
+	  dd.setAccessionNumber("111");
+	  dd.setAssignedPatientLocation("Localtion");
+	  dd.setExamDescription("desc");
+	  dd.setModality("modality");
+	  dd.setOrderControl("DD");
+	  dd.setOrderingProviderId("1");
+	  request.setDiscreteData(dd);
+	  return request;
+	}
 }

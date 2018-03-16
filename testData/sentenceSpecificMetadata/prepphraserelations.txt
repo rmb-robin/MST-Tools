@@ -49,13 +49,3 @@ prep-of,disease-history,history,f,f,neop-can,t,f
 prep-of,disease-history,redemonstration,f,f,dysn,t,f
 prep-for,disease-history,review,f,f,dysn,t,f
 prep-on,event date,*.*,f,f,date,t,f
-prep-in,disease location,neop-can,t,f,bpoc,t,f
-prep-of,disease location,neop-can,t,f,bpoc,t,f
-prep-to,radiation site,gy,f,f,bpoc,t,f
-prep-to,radiation site,cgy,f,f,bpoc,t,f
-prep-in,procedure location,bpoc,t,f,proc,t,f
-prep-within,procedure location,bpoc,t,f,proc,t,f
-prep-of,procedure location,bpoc,t,f,proc,t,f
-prep-in,symptom location,sympto,t,f,bpoc,t,f
-prep-within,symptom location,sympto,t,f,bpoc,t,f
-prep-of,suv,suv,f,f,cardinal number,t,f

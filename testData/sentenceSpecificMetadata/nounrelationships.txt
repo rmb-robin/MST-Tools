@@ -1,0 +1,102 @@
+cancer,f,panel,f,null,assay type
+cancer ,f,stage,f,null,disease severity
+current,f,criteria,f,null,parameters
+genedx,f,panel,f,null,assay brand
+appearing,f,dysn,t,null,disease appearance
+testing,f,criteria,f,null,diagnostic parameters
+benign,f,dysn,t,null,disease severity
+malignant,f,dysn,t,null,disease severity
+mm,f,dysn,t,null,measure
+cm,f,dysn,t,null,measure
+invasive,f,neop,t,null,disease severity
+noninvasive,f,neop,t,null,disease severity
+left,f,bpoc,t,null,laterality
+bilateral,f,bpoc,t,null,laterality
+right,f,bpoc,t,null,laterality
+diag,t,diagnosis,f,null,diagnosis
+cardinal number,t,cm,f,null,unit of measure
+cardinal number,t,mm,f,null,unit of measure
+bpoc,t,proc,t,null,procedure location
+stable,f,dysn,t,null,disease stability
+total,f,proc,t,null,degree of procedure
+partial,f,proc,t,null,degree of procedure
+mr.,f,*,f,0,pii
+mrs.,f,*,f,0,pii
+ms.,f,*,f,0,pii
+bpoc,t,dysn,t,null,disease location
+previous,f,dysn,t,null,general time
+prior,f,dysn,t,null,general time
+cardinal number,t,cm,f,null,measurement
+cardinal number,t,mm,f,null,measurement
+qlco,t,dysn,t,null,disease modifier
+qlco-cert,t,dysn,t,null,disease modifier
+qlco-degree,t,dysn,t,null,disease modifier
+qlco-depth,t,dysn,t,null,disease modifier
+qlco-fixed,t,dysn,t,null,disease modifier
+qlco-sev,t,dysn,t,null,disease modifier
+qlco-simple,t,cyst,f,null,simple cyst modifiers
+qlco-simple,t,cysts,f,null,simple cyst modifiers
+qlco-sizeref,t,dysn,t,null,disease modifier
+qlco-sym,t,dysn,t,null,disease modifier
+qlco-tempor,t,proc,t,null,procedure timing
+tempor,t,proc,t,null,procedure timing
+bpoc,t,proc,t,null,procedure location
+bpoc,t,title-med,t,null,physician speciality
+bpoc,t,ptconsul,t,null,consultation speciality
+proc,t,ptconsul,t,null,procedure evaluation
+qlco-neop,t,disease,f,null,neoplasm severity
+family,f,dysn,t,null,history
+drugpr,t,delivermeth,t,null,drug delivery
+follow-up,f,tempor,t,3,supp care
+cardinal number,t,tempor,t,null,time
+bpoc,t,ptconsul,t,null,consultation type
+ultrasound,f,follow-up,f,1,follow-up
+abdominal,f,aneurysm,f,1,disease location
+aortic,f,aneurysm,f,0,disease modifier
+recommend,f,proc,t,1,advise
+proc,t,recommended,f,2,advise
+clinically,f,abdominal,f,2,disease modifier
+evidence,f,seen,f,1,disease modifier
+incidental,f,dysn,t,null,new disease
+stable,f,dysn,t,null,disease stablity
+fusiform,f,dysn,t,null,disease modifier
+previous,f,dysn,t,null,disease history
+dysn,t,resection,f,null,procedure location
+sonographic,f,evidence,f,null,procedure
+qlco,t,bpoc,t,null,finding site modifier
+qlco-com,t,cyst,f,null,complex cyst modifiers
+bpoc,t,mets,f,null,metastatic finding site
+bpoc,t,metastatic,f,null,metastatic finding site
+bpoc,t,metastasis,f,null,metastatic finding site
+qlco-neop,t,neop-can,t,null,histologic type
+cardinal number,t,gy,f,null,radiation dosage
+cardinal number,t,cycle,f,null,treatment cycle
+cardinal number,t,treatment,f,null,treatment cycle
+bpoc,t,sympto,t,null,symptom location
+qlco-sev,t,dysn,t,null,disease modifier
+cardinal number,t,mci,f,null,mci values
+suv,f,cardinal number,t,null,suv
+cardinal number,t,hounsfield,f,null,hounsfield
+cardinal number,t,hu,f,null,hounsfield
+qlco,t,uptake,f,null,uptake
+qlco-simple,t,uptake,f,null,uptake
+bpoc,t,uptake,f,null,uptake location
+stereotactic,f,radiotherapy,t,null,radiotherapy type
+qlco-neop,t,dysn,t,null,neoplasm severity
+cardinal number,t,mgy,f,null,radiation dosage
+cardinal number,t,msv,f,null,radiation dosage
+cardinal number,t,mg,f,null,radiation dosage
+cardinal number,t,seconds,f,null,seconds
+cardinal number,t,second,f,null,seconds
+cardinal number,t,minute,f,null,minutes
+cardinal number,t,minutes,f,null,minutes
+cardinal number,t,hour,f,null,hours
+cardinal number,t,hours,f,null,hours
+probably,f,benign,f,null,probably benign
+bpoc,t,neop-can,t,null,disease location
+enlarged,f,bpoc,t,null,enlarged finding site
+enlargement,f,bpoc,t,null,enlarged finding site
+prominent,f,bpoc,t,null,enlarged finding site
+heterogeneous,f,bpoc,t,null,heterogeneous finding site
+multinodular,f,bpoc,t,null,heterogeneous finding site
+multi-nodular,f,bpoc,t,null,heterogeneous finding site
