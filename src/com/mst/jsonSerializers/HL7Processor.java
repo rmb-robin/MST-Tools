@@ -111,7 +111,7 @@ public class HL7Processor {
 					try {
 						data.setPatientDob(LocalDate.parse(value, format));
 					} catch(DateTimeParseException e) {
-						LOG.error(e.toString());
+					//	LOG.error(e.toString());
 						missingFields.add(element.getName());
 						//data.setPatientDob(LocalDate.parse(element.getDefaultValue(), format));
 					}
@@ -132,7 +132,7 @@ public class HL7Processor {
 						}
 						data.setReportFinalizedDate(LocalDate.parse(value, format));
 					} catch(Exception e) {
-						LOG.error(e.toString());
+						//LOG.error(e.toString());
 						missingFields.add(element.getName());
 						//data.setReportFinalizedDate(LocalDate.parse(element.getDefaultValue(), format));
 					}
