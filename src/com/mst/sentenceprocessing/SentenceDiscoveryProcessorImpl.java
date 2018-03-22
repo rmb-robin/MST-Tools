@@ -73,7 +73,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			
 			sentence.setTokenRelationships(new ArrayList<TokenRelationship>());
 			tokens = partOfSpeechAnnotator.annotate(tokens, this.sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
-			tokens = sentenceMeasureNormalizer.Normalize(tokens, true,true);
+			
+			tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements(),request.isConvertLargest());
 			tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
 	
 			tokens = filterTokens(tokens);
@@ -85,6 +86,11 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			subjectAnnotator.annotate(discovery);
 			discovery.getWordEmbeddings().addAll(negativeRelationshipfactory.create(discovery.getModifiedWordList()));
 			discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
+			
+			List<RecommendedTokenRelationship> edges = nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(), this.sentenceProcessingMetaDataInput.getNounRelationshipsInput());
+			discovery.setWordEmbeddings(edges);
+			
+			
 			discoveries.add(discovery);
 		}
 		return discoveries;

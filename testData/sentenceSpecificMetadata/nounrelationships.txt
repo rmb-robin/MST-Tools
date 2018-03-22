@@ -13,16 +13,12 @@ noninvasive,f,neop,t,null,disease severity
 left,f,bpoc,t,null,laterality
 bilateral,f,bpoc,t,null,laterality
 right,f,bpoc,t,null,laterality
-diag,t,diagnosis,f,null,diagnosis
 cardinal number,t,cm,f,null,unit of measure
 cardinal number,t,mm,f,null,unit of measure
 bpoc,t,proc,t,null,procedure location
 stable,f,dysn,t,null,disease stability
 total,f,proc,t,null,degree of procedure
 partial,f,proc,t,null,degree of procedure
-mr.,f,*,f,0,pii
-mrs.,f,*,f,0,pii
-ms.,f,*,f,0,pii
 bpoc,t,dysn,t,null,disease location
 previous,f,dysn,t,null,general time
 prior,f,dysn,t,null,general time
@@ -56,13 +52,10 @@ aortic,f,aneurysm,f,0,disease modifier
 recommend,f,proc,t,1,advise
 proc,t,recommended,f,2,advise
 clinically,f,abdominal,f,2,disease modifier
-evidence,f,seen,f,1,disease modifier
 incidental,f,dysn,t,null,new disease
 stable,f,dysn,t,null,disease stablity
 fusiform,f,dysn,t,null,disease modifier
 previous,f,dysn,t,null,disease history
-dysn,t,resection,f,null,procedure location
-sonographic,f,evidence,f,null,procedure
 qlco,t,bpoc,t,null,finding site modifier
 qlco-com,t,cyst,f,null,complex cyst modifiers
 bpoc,t,mets,f,null,metastatic finding site
@@ -100,3 +93,6 @@ prominent,f,bpoc,t,null,enlarged finding site
 heterogeneous,f,bpoc,t,null,heterogeneous finding site
 multinodular,f,bpoc,t,null,heterogeneous finding site
 multi-nodular,f,bpoc,t,null,heterogeneous finding site
+cardinal number,t,cgy,f,null,radiation dosage
+cardinal number,t,fraction,f,null,radiation fractions
+cardinal number,t,fractions,f,null,radiation fractions

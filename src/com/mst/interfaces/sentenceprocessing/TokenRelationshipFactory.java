@@ -12,4 +12,5 @@ public interface TokenRelationshipFactory {
 	RecommendedTokenRelationship createRecommendedRelationship(String edgeName, String frameName, WordToken fromToken,WordToken toToken);
 	RecommendedTokenRelationship createRecommendedRelationshipFromTokenRelationship(TokenRelationship tokenRelationship);
 	List<RecommendedTokenRelationship> createRecommendedRelationshipsFromTokenRelationships(List<TokenRelationship> tokenRelationships);
+	RecommendedTokenRelationship deepCopy(RecommendedTokenRelationship original);
 }

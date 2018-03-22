@@ -8,7 +8,7 @@ import com.mst.model.sentenceProcessing.RelationshipInput;
 
 public interface RecommendedNounPhraseProcesser {
 
-	void setNamedEdges(List<RecommendedTokenRelationship> edges, RelationshipInput input);
+	List<RecommendedTokenRelationship> setNamedEdges(List<RecommendedTokenRelationship> edges, RelationshipInput input);
 	RecommandedNounPhraseResult process(List<RecommendedTokenRelationship> embeddedwords);
 	List<RecommendedTokenRelationship> addEdges(List<RecommendedTokenRelationship> edges, RelationshipInput input);  
 }

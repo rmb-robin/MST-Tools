@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
@@ -15,8 +16,8 @@ public class TokenRelationshipUtil {
 		Map<String,List<TokenRelationship>> result = new HashMap<>();
 		for(TokenRelationship tokenRelationship: relationships){
 		
-			if(!isNamed){
-			
+			if(!isNamed  || tokenRelationship.getEdgeName().equals(EdgeNames.existence) ){
+
 				if(!result.containsKey(tokenRelationship.getEdgeName()))
 					result.put(tokenRelationship.getEdgeName(), new ArrayList<TokenRelationship>());
 		 

@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import com.mst.interfaces.sentenceprocessing.RecommendedNounPhraseProcesser;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
+import com.mst.jsonSerializers.DeepCloner;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
@@ -28,12 +29,15 @@ public class RecommendedNounPhraseProcesserImpl  extends RelationshipProcessorBa
 		factory = new TokenRelationshipFactoryImpl();
 	}
 
-	public void setNamedEdges(List<RecommendedTokenRelationship> edges, RelationshipInput input) {
+	public List<RecommendedTokenRelationship> setNamedEdges(List<RecommendedTokenRelationship> edges, RelationshipInput input) {
 		setrelationshipMaps(input.getRelationshipMappings());
 		this.input = input;
+		List<RecommendedTokenRelationship> additionalEdges = new ArrayList<>();
 		for(RecommendedTokenRelationship recommandedTokenRelationship: edges){
-			processSingleEdge(recommandedTokenRelationship);
+			additionalEdges.addAll(processSingleEdge(recommandedTokenRelationship));
 		}
+		edges.addAll(additionalEdges);
+		return edges;
 	}
 
 	public RecommandedNounPhraseResult process(List<RecommendedTokenRelationship> embeddedwords){
@@ -127,10 +131,46 @@ public class RecommendedNounPhraseProcesserImpl  extends RelationshipProcessorBa
 		return null;
 	}
 	
-	
-	private void processSingleEdge(RecommendedTokenRelationship recommandedTokenRelationship){
-		RelationshipMapping mapping = findMapping(recommandedTokenRelationship);
-		if(mapping==null) return;
-		recommandedTokenRelationship.getTokenRelationship().setNamedEdge(mapping.getNamedEdgeName());
+	private List<RelationshipMapping> findMappings(RecommendedTokenRelationship recommandedTokenRelationship){
+		List<RelationshipMapping> mappings = new ArrayList<>();
+		for(RelationshipMapping mapping :input.getRelationshipMappings()){
+			if(!isWordTokenMatchToRelationship(mapping.getIsFromSemanticType(),false,mapping.getFromToken(), recommandedTokenRelationship.getTokenRelationship().getFromToken())) continue; 
+			if(isWordTokenMatchToRelationship(mapping.getIsToSemanticType(),false,mapping.getToToken(), recommandedTokenRelationship.getTokenRelationship().getToToken())) {
+				mappings.add(mapping);
+			 
+			}
+		}
+		return mappings;
 	}
+	
+	private List<RecommendedTokenRelationship> processSingleEdge(RecommendedTokenRelationship recommandedTokenRelationship){
+		List<RelationshipMapping> mappings = findMappings(recommandedTokenRelationship);
+		if(mappings.isEmpty())return new ArrayList<>();
+		if(mappings.size()==1)
+		{
+			RelationshipMapping mapping = mappings.get(0); 
+			recommandedTokenRelationship.getTokenRelationship().setNamedEdge(mapping.getNamedEdgeName());
+			return new ArrayList<>();
+		}
+		
+		List<RecommendedTokenRelationship> additionalEdges =  addEdgesForMatchedNames(mappings.size()-1, recommandedTokenRelationship);
+		recommandedTokenRelationship.getTokenRelationship().setNamedEdge(mappings.get(0).getNamedEdgeName());
+	
+		for(int i =1;i<mappings.size();i++){
+			additionalEdges.get(i-1).getTokenRelationship().setNamedEdge(mappings.get(i).getNamedEdgeName());
+		}
+		
+		return additionalEdges;
+	}
+	
+	private List<RecommendedTokenRelationship> addEdgesForMatchedNames(int numberOfAdd, RecommendedTokenRelationship originalRelationship){
+		List<RecommendedTokenRelationship> result = new ArrayList<>();
+		
+		for(int i =0;i<numberOfAdd;i++){
+			result.add(factory.deepCopy(originalRelationship));
+		}
+		return result;
+		
+	}
+	
 }

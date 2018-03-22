@@ -6,10 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import com.mst.jsonSerializers.DeepCloner;
+import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.model.sentenceProcessing.WordToken;
 
 public class RecommandedTokenRelationshipUtil {
 
@@ -92,4 +95,6 @@ public class RecommandedTokenRelationshipUtil {
     public static boolean isDefault(RecommendedTokenRelationship edge){
 		return edge.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge);
 	}
+    
+
 }

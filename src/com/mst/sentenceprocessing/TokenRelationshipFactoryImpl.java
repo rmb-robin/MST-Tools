@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.joda.time.DateTime;
 
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
+import com.mst.jsonSerializers.DeepCloner;
+import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -61,6 +63,9 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 		return result;
 	}
 	
-	
-
+    public  RecommendedTokenRelationship deepCopy(RecommendedTokenRelationship original){
+    	WordToken firstCloned = (WordToken) DeepCloner.deepClone(original.getTokenRelationship().getFromToken());
+		WordToken secondCloned = (WordToken) DeepCloner.deepClone(original.getTokenRelationship().getToToken());
+		return this.createRecommendedRelationship(original.getTokenRelationship().getEdgeName(), EdgeTypes.related, firstCloned, secondCloned);
+    }
 }

@@ -26,7 +26,7 @@ token-token,neoplasm severity,qlco-neop,t,f,disease,f,t
 token-token,finding site modifier,qlco,t,f,bpoc,t,f
 token-token,radiation dosage,cardinal number,t,f,cgy,f,f
 token-token,radiation fractions,cardinal number,t,f,fraction,f,f
-token-token,radiation fraction,cardinal number,t,f,fractions,f,f
+token-token,radiation fractions,cardinal number,t,f,fractions,f,f
 token-token,disease location,bpoc,t,f,neop-can,t,f
 token-token,metastatic finding site,bpoc,t,f,mets,f,f
 token-token,metastatic finding site,bpoc,t,f,metastatic,f,f
@@ -65,3 +65,34 @@ token-token,enlarged finding site,prominent,f,f,bpoc,t,f
 token-token,heterogeneous finding site,heterogeneous,f,f,bpoc,t,f
 token-token,heterogeneous finding site,multinodular,f,f,bpoc,t,f
 token-token,heterogeneous finding site,multi-nodular,f,f,bpoc,t,f
+token-token,complex cyst modifiers,qlco-com,t,f,cysts,f,f
+token-token,disease stability,stable,f,f,dysn,t,f
+token-token,degree of procedure,total,f,f,proc,t,f
+token-token,degree of procedure,partial,f,f,proc,t,f
+token-token,general time,previous,f,f,dysn,t,f
+token-token,general time,prior,f,f,dysn,t,f
+token-token,disease modifier,qlco-cert,t,f,dysn,t,f
+token-token,disease modifier,qlco-degree,t,f,dysn,t,f
+token-token,disease modifier,qlco-depth,t,f,dysn,t,f
+token-token,disease modifier,qlco-fixed,t,f,dysn,t,f
+token-token,disease modifier,qlco-sev,t,f,dysn,t,f
+token-token,disease modifier,qlco-sizeref,t,f,dysn,t,f
+token-token,disease modifier,qlco-sym,t,f,dysn,t,f
+token-token,procedure timing,qlco-tempor,t,f,proc,t,f
+token-token,procedure timing,tempor,t,f,proc,t,f
+token-token,physician speciality,bpoc,t,f,title-med,t,f
+token-token,consultation speciality,bpoc,t,f,ptconsul,t,f
+token-token,procedure evaluation,proc,t,f,ptconsul,t,f
+token-token,history,family,f,f,dysn,t,f
+token-token,drug delivery,drugpr,t,f,delivermeth,t,f
+token-token,supp care,follow-up,f,f,tempor,t,f
+token-token,time,cardinal number,t,f,tempor,t,f
+token-token,consultation type,bpoc,t,f,ptconsul,t,f
+token-token,follow-up,ultrasound,f,f,follow-up,f,f
+token-token,disease location,abdominal,f,f,aneurysm,f,f
+token-token,disease modifier,aortic,f,f,aneurysm,f,f
+token-token,advise,recommend,f,f,proc,t,f
+token-token,advise,proc,t,f,recommended,f,f
+token-token,disease modifier,clinically,f,f,abdominal,f,f
+token-token,new disease,incidental,f,f,dysn,t,f
+token-token,disease history,previous,f,f,dysn,t,f
