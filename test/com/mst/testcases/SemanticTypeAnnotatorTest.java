@@ -34,20 +34,20 @@ public class SemanticTypeAnnotatorTest {
 	
 	//@Test
 	public void annotate(){
-		SemanticTypeSentenceAnnotatorImpl annotator = new SemanticTypeSentenceAnnotatorImpl();
-		SemanticTypeHardCodedProvider provider = new SemanticTypeHardCodedProvider();
-		NGramsSentenceProcessorImpl processor = new NGramsSentenceProcessorImpl();
-		
-		String fileText = TestDataProvider.getFileText(getTestDataPath());
-		List<Sentence> originalSentences = TestDataProvider.getSentences(fileText);
-		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
-		int i = 1;
-		for(Sentence s: originalSentences){
-			s = processor.process(s, ngramsProvider.getNGrams());
-			List<WordToken> modifiedTokens = annotator.annotate(s.getModifiedWordList(), provider.getSemanticTypes());
-			assertTokens(modifiedTokens, i);
-			i+=1;
-		}
+//		SemanticTypeSentenceAnnotatorImpl annotator = new SemanticTypeSentenceAnnotatorImpl();
+//		SemanticTypeHardCodedProvider provider = new SemanticTypeHardCodedProvider();
+//		NGramsSentenceProcessorImpl processor = new NGramsSentenceProcessorImpl();
+//		
+//		String fileText = TestDataProvider.getFileText(getTestDataPath());
+//		List<Sentence> originalSentences = TestDataProvider.getSentences(fileText);
+//		NGramsHardCodedProvider ngramsProvider = new NGramsHardCodedProvider();
+//		int i = 1;
+//		for(Sentence s: originalSentences){
+//			s = processor.process(s, ngramsProvider.getNGrams());
+//			List<WordToken> modifiedTokens = annotator.annotate(s.getModifiedWordList(), provider.getSemanticTypes());
+//			assertTokens(modifiedTokens, i);
+//			i+=1;
+//		}
 	}
 	
 	private void assertTokens(List<WordToken> modifiedTokens, int i){	
@@ -68,20 +68,20 @@ public class SemanticTypeAnnotatorTest {
 	
 	@Test
 	public void createFile() throws Exception{
-		String file =  System.getProperty("user.dir") + File.separator + "testData" + File.separator + "semanticTypes.txt";
-		Path path = Paths.get(file);
-		Map<String,String> stTypes =  new SemanticTypeHardCodedProvider().getSemanticTypes();
-		
-		StringBuilder sb = new StringBuilder();
-		for (Map.Entry<String, String> entry : stTypes.entrySet()) {
-
-			sb.append(entry.getKey() + "," + entry.getValue() + System.lineSeparator());
-		}
-		//Use try-with-resource to get auto-closeable writer instance
-		try (BufferedWriter writer = Files.newBufferedWriter(path)) 
-		{
-		    writer.write(sb.toString());
-		}
+//		String file =  System.getProperty("user.dir") + File.separator + "testData" + File.separator + "semanticTypes.txt";
+//		Path path = Paths.get(file);
+//		Map<String,String> stTypes =  new SemanticTypeHardCodedProvider().getSemanticTypes();
+//		
+//		StringBuilder sb = new StringBuilder();
+//		for (Map.Entry<String, String> entry : stTypes.entrySet()) {
+//
+//			sb.append(entry.getKey() + "," + entry.getValue() + System.lineSeparator());
+//		}
+//		//Use try-with-resource to get auto-closeable writer instance
+//		try (BufferedWriter writer = Files.newBufferedWriter(path)) 
+//		{
+//		    writer.write(sb.toString());
+//		}
 	}
 	
 	private Map<String,String> getExpectedResults(){

@@ -11,7 +11,7 @@ public class LoadSentenceMetadata {
 	
 	@Test
 	public void loadMetaData(){
-    	SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create(true);
+    	SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
     	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
     	ds.delete(ds.createQuery(SentenceProcessingMetaDataInput.class));
     	ds.save(input); 

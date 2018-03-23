@@ -28,7 +28,7 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 	private HashSet<String> processedSentences; 
 	private SentenceFilter sentenceFilter;
 	private Map<String,SentenceQueryResult> queryResults;
-	private Map<String,SentenceDb> cumalativeSentenceResults;
+	public Map<String,SentenceDb> cumalativeSentenceResults;
 	private FriendOfFriendService friendOfFriendService; 
 	
 	public SentenceFilterControllermpl(){
