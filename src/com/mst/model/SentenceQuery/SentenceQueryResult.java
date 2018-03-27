@@ -57,5 +57,31 @@ public class SentenceQueryResult {
 	public void setSentenceQueryEdgeResults(List<SentenceQueryEdgeResult> sentenceQueryEdgeResults) {
 		this.sentenceQueryEdgeResults = sentenceQueryEdgeResults;
 	}
+	// Only using the sentenceId for array handling.
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((sentenceQueryEdgeResults == null) ? 0 : sentenceQueryEdgeResults.hashCode());
+		return result;
+	}
+
+	// Only using the sentenceId for array handling.
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SentenceQueryResult other = (SentenceQueryResult) obj;
+		if (getSentenceId() == null) {
+			if (other.getSentenceId() != null)
+				return false;
+		} else if (!getSentenceId().equals(other.getSentenceId()))
+			return false;
+		return true;
+	}
 
 }

@@ -10,7 +10,9 @@ public class SentenceQueryInput {
 	private List<SentenceQueryInstance> sentenceQueryInstances; 
 	private String organizationId; 
 	private DiscreteDataFilter discreteDataFilter;
-	
+	private String debug = "false";
+	private boolean filterByReport = false;
+
 	public SentenceQueryInput(){
 		sentenceQueryInstances = new ArrayList<>();
 	}
@@ -24,6 +26,22 @@ public class SentenceQueryInput {
 
 	public String getOrganizationId() {
 		return organizationId;
+	}
+
+	public String getDebug() {
+		return debug;
+	}
+
+	public void setDebug(String debug) {
+		this.debug = debug;
+	}
+
+	public boolean isFilterByReport() {
+		return filterByReport;
+	}
+
+	public void setFilterByReport(boolean filterByReport) {
+		this.filterByReport = filterByReport;
 	}
 
 	public void setOrganizationId(String organizationId) {
@@ -44,5 +62,15 @@ public class SentenceQueryInput {
 
 	public void setNotAndAll(boolean isNotAndAll) {
 		this.isNotAndAll = isNotAndAll;
+	}
+
+	public boolean isDebug() {
+		if ( debug == null ) 
+			return false;
+		try {
+			return Boolean.parseBoolean(debug);
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

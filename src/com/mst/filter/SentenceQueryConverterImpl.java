@@ -20,4 +20,6 @@ public class SentenceQueryConverterImpl  implements SentenceQueryConverter {
 		}
 		return null;
 	}
+
+
 }

@@ -50,7 +50,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	private MongoDatastoreProvider datastoreProvider;
 
-	private SentenceFilterController sentenceFilterController; 
+	public SentenceFilterControllermpl sentenceFilterController; 
 	private DiscreteDataDao discreteDataDao; 
 	private SentenceDiscoveryFilter sentenceDiscoveryFilter; 
 			
@@ -69,6 +69,11 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
+		return getSentences(input, null);
+	}
+	
+	public List<SentenceQueryResult> getSentences(SentenceQueryInput input, List<SentenceDb> sentences) {
+
 		sentenceFilterController = new SentenceFilterControllermpl();
 		Datastore datastore =  datastoreProvider.getDefaultDb();
 
@@ -83,14 +88,14 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		for(int i =0;i< input.getSentenceQueryInstances().size();i++){
 			SentenceQueryInstance sentenceQueryInstance = input.getSentenceQueryInstances().get(i);
 			if(i==0){
-				sentenceFilterController.addSentencesToResult(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId(),discreteDataIds,filterOnDiscreteData));
+				sentenceFilterController.addSentencesToResult(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId(),discreteDataIds,filterOnDiscreteData, sentences));
 				continue;
 			}
 			
 			if(sentenceQueryInstance.getAppender()==null) continue;
 			String appender = sentenceQueryInstance.getAppender().toLowerCase();
 			if(appender.equals("or")){
-				sentenceFilterController.addSentencesToResult(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId(),discreteDataIds,filterOnDiscreteData));
+				sentenceFilterController.addSentencesToResult(processQueryInstance(sentenceQueryInstance, datastore,input.getOrganizationId(),discreteDataIds,filterOnDiscreteData, sentences));
 				continue;
 			}
 			
@@ -104,6 +109,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			if(appender.equals("andnotall"))
 				sentenceFilterController.filterForAndNotAll(sentenceQueryInstance);
 		}
+		
 		return new ArrayList<SentenceQueryResult>(sentenceFilterController.getQueryResults().values());
 	}	
 	
@@ -130,28 +136,34 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return false;
 	}
 
-	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,Datastore datastore,String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete){
-		Map<String,EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
+	private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance,
+			Datastore datastore, String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete,
+			List<SentenceDb> passedSentences) {
+		Map<String, EdgeQuery> edgeQueriesByName = sentenceFilterController
+				.convertEdgeQueryToDictionary(sentenceQueryInstance);
 		SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();
-
 		this.init();
-		for(String token: sentenceQueryInstance.getTokens()){
-			Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
-			 query
-			 .search(token)
-			 .field("tokenRelationships.edgeName").hasAllOf(edgeQueriesByName.keySet())
-			 .field("organizationId").equal(organizationId);
-			 
-			 if(filterForDiscrete)
-				 query.field("discreteData").hasAnyOf(discreteDataIds);
-			 
-			 
-			 query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence","origSentence", "discreteData");
-			 List<SentenceDb> sentences = query.asList();
-			 
-			 List<SentenceQueryResult> queryResults = sentenceFilterController.getSentenceQueryResults(sentences, token,sentenceQueryInstance.getEdges(), token);
-			 result.getSentenceQueryResult().addAll(queryResults);
-			 result.getSentences().addAll(getMatchedSentences(queryResults, sentences));
+		for (String token : sentenceQueryInstance.getTokens()) {
+			List<SentenceDb> sentences = new ArrayList<SentenceDb>();
+			if (passedSentences == null) {
+				Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
+				query.search(token)
+					.field("tokenRelationships.edgeName").hasAllOf(edgeQueriesByName.keySet())
+					.field("organizationId").equal(organizationId);
+
+				if (filterForDiscrete)
+					query.field("discreteData").hasAnyOf(discreteDataIds);
+
+				query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence", "origSentence",
+						"discreteData");
+				sentences = query.asList();
+			} else {
+				sentences.addAll(passedSentences);
+			}
+			List<SentenceQueryResult> queryResults = sentenceFilterController.getSentenceQueryResults(sentences, token,
+					sentenceQueryInstance.getEdges(), token);
+			result.getSentenceQueryResult().addAll(queryResults);
+			result.getSentences().addAll(getMatchedSentences(queryResults, sentences));
 		}
 		return result;
 	}

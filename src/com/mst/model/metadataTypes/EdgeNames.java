@@ -4,6 +4,7 @@ import java.util.HashSet;
 
 public class EdgeNames {
 	public final static String unitOfMeasure = "unit of measure";
+	public final static String measurement = "measurement";
 	public final static String existence = "existence";
 	public final static String negation = "negation";
 	public final static String possibility = "possibility";
@@ -18,6 +19,8 @@ public class EdgeNames {
 	public final static String diseaseModifier = "disease modifier";
 	public final static String diseaseLocation = "disease location";
 
+	public static final String hetrogeneous_finding_sites = "heterogeneous finding site";
+	public static final String enlarged_finding_sites = "enlarged finding site";
 
 	public static HashSet<String> getExistenceSet(){
 		HashSet<String> result = new HashSet<String>();

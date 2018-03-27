@@ -79,22 +79,23 @@ public class NounRelationshipProcessorTest {
 	}
 	
 	private List<TokenRelationship> getTokenRelationships(Sentence sentence,int index){
-		Sentence ngramsProcessedSentence = ngramsProcessor.process(sentence,ngramsProvider.getNGrams());
-		List<WordToken> modifiedTokens = annotator.annotate(ngramsProcessedSentence.getModifiedWordList(), provider.getSemanticTypes());
-		if(index==0){
-			System.out.println("STOP");
-		}
-		List<TokenRelationship> relationships =  processor.process(modifiedTokens, input);
-		
-		System.out.println(sentence.getNormalizedSentence());
-		for(TokenRelationship tr :  relationships){
-			System.out.println("From " + tr.getFromToken().getToken());
-			System.out.println("To " + tr.getToToken().getToken());
-			
-			System.out.println(tr.getEdgeName());
-			System.out.println("**********************************************");
-		}
-		return relationships;
+//		Sentence ngramsProcessedSentence = ngramsProcessor.process(sentence,ngramsProvider.getNGrams());
+//		List<WordToken> modifiedTokens = annotator.annotate(ngramsProcessedSentence.getModifiedWordList(), provider.getSemanticTypes());
+//		if(index==0){
+//			System.out.println("STOP");
+//		}
+//		List<TokenRelationship> relationships =  processor.process(modifiedTokens, input);
+//		
+//		System.out.println(sentence.getNormalizedSentence());
+//		for(TokenRelationship tr :  relationships){
+//			System.out.println("From " + tr.getFromToken().getToken());
+//			System.out.println("To " + tr.getToToken().getToken());
+//			
+//			System.out.println(tr.getEdgeName());
+//			System.out.println("**********************************************");
+//		}
+//		return relationships;
+		return null;
 	}
 	
 	private void assertRelations(int index,List<TokenRelationship> actual, List<TokenRelationship> expected){
