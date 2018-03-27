@@ -17,4 +17,8 @@ public abstract class MongoDatastoreProviderBase {
 	public Datastore getRawDb() {
 		return RawDBProvider.INSTANCE.getDatastore(connectionEntity);
 	}
+	
+	public void set(MongoConnectionEntity connection){
+		this.connectionEntity = connection;
+	}
 }

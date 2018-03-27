@@ -82,4 +82,11 @@ public class SentenceDaoImpl extends BaseDocumentDaoImpl<SentenceDb> implements 
 		super.setMongoDatastoreProvider(provider);
 		discreteDataDao.setMongoDatastoreProvider(provider);
 	}
+
+	@Override
+	public List<SentenceDb> getByOrgId(String orgId) {
+		Query<SentenceDb> query = datastoreProvider.getDefaultDb().createQuery(SentenceDb.class);
+		query.field("organizationId").equal(orgId);
+		return query.asList();		
+	}
 }

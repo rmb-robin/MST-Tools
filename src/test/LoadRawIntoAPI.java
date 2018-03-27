@@ -7,7 +7,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.junit.Test;
+//import org.junit.Test;
 
 import com.google.gson.Gson;
 import com.mst.metadataProviders.TestHl7Provider;
@@ -15,7 +15,7 @@ import com.mst.model.raw.RawReportFile;
 
 public class LoadRawIntoAPI {
 
-	@Test
+//	@Test
 	public void loadRawHl7IntoAPI(){
 		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save"; 
 				
