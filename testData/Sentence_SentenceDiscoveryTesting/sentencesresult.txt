@@ -1,0 +1,84 @@
+Sentence : she has a 4 cm simple ovarian cyst.
+Sentence (New) : she has a 4 cm simple ovarian cyst.
+Edges Match
+*************************************************
+Sentence : bilateral thyroid goiter is demonstrated.
+Sentence (New) : bilateral thyroid goiter is demonstrated.
+Edges Match
+*************************************************
+Sentence : punctate calcifications are seen within the left thyroid lobe, nonspecific.
+Sentence (New) : punctate calcifications are seen within the left thyroid lobe, nonspecific.
+Edges Match
+*************************************************
+Sentence : large distal abdominal aortic aneurysm measuring up to 5x5.7 cm.
+Sentence (New) : large distal abdominal aortic aneurysm measuring up to 5x5.7 cm.
+Edges Match
+*************************************************
+Sentence : the infrarenal aorta is aneurysmally dilated to 2.7 cm.
+Sentence (New) : the infrarenal aorta is aneurysmally dilated to 2.7 cm.
+Edges Match
+*************************************************
+Sentence : borderline aneurysmal dilation of the infrarenal aorta measures 2.8 cm.
+Sentence (New) : borderline aneurysmal dilation of the infrarenal aorta measures 2.8 cm.
+Edges Match
+*************************************************
+Sentence : there is nabothian cysts.
+Sentence (New) : there is nabothian cysts.
+Edges Match
+*************************************************
+Sentence : the right ovary measures 2.3x1.6x2.2  cm in size.
+Sentence (New) : the right ovary measures 2.3x1.6x2.2  cm in size.
+Edges Match
+*************************************************
+Sentence : the left ovary measure 4.7x2.4x2.7  cm in size.
+Sentence (New) : the left ovary measure 4.7x2.4x2.7  cm in size.
+Edges Match
+*************************************************
+Sentence : there is dominant-follicle seen which measure 1.8x1.5x1.4  cm in size.
+Sentence (New) : there is dominant-follicle seen which measure 1.8x1.5x1.4  cm in size.
+Edges Match
+*************************************************
+Sentence : there is a dominant-follicle within the right ovary measuring 2.1x1.7 cm and no further follow-up is recommended.
+Sentence (New) : there is a dominant-follicle within the right ovary measuring 2.1x1.7 cm and no further follow-up is recommended.
+Edges Match
+*************************************************
+Sentence : 2.1 cm greatest length dominant-follicle within the right ovary with no associated finding.
+Sentence (New) : 2.1 cm greatest length dominant-follicle within the right ovary with no associated finding.
+Edges Match
+*************************************************
+Sentence : within the right adnexa, there is an anechoic cyst that measures up to 2 cm.
+Sentence (New) : within the right adnexa, there is an anechoic cyst that measures up to 2 cm.
+Edges Match
+*************************************************
+Sentence : right ovarian cyst versus prominent focal fluid-filled fallopian tube.
+Sentence (New) : right ovarian cyst versus prominent focal fluid-filled fallopian tube.
+Edges Match
+*************************************************
+Sentence : the right ovary measures approximately 3.5x1.7x2.9  cm.
+Sentence (New) : the right ovary measures approximately 3.5x1.7x2.9  cm.
+Edges Match
+*************************************************
+Sentence : within the right ovary there is a small 2.1x1.6x1.4  cm simple appearing dominant-follicle.
+Sentence (New) : within the right ovary there is a small 2.1x1.6x1.4  cm simple appearing dominant-follicle.
+Edges Match
+*************************************************
+Sentence : this should-be considered benign with no follow-up recommended.
+Sentence (New) : this should-be considered benign with no follow-up recommended.
+Edges Match
+*************************************************
+Sentence : left ovary measures approximately 3.2x2.3x3.5  cm.
+Sentence (New) : left ovary measures approximately 3.2x2.3x3.5  cm.
+Edges Match
+*************************************************
+Sentence : within the left ovary there is a 1.6x1.6x0.9  cm simple appearing   dominant-follicle.
+Sentence (New) : within the left ovary there is a 1.6x1.6x0.9  cm simple appearing   dominant-follicle.
+Edges Match
+*************************************************
+Sentence : this also should-be considered benign with no follow-up recommended.
+Sentence (New) : this also should-be considered benign with no follow-up recommended.
+Edges Match
+*************************************************
+Sentence : 1.6 cm left adrenal lesion is stable compared to 01/01/2012  consistent with benign etiology, likely an adenoma.
+Sentence (New) : 1.6 cm left adrenal lesion is stable compared to 01/01/2012  consistent with benign etiology, likely an adenoma.
+Edges Match
+*************************************************
