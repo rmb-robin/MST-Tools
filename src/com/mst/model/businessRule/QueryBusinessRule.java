@@ -9,25 +9,22 @@ import org.mongodb.morphia.annotations.Id;
 
 import java.util.List;
 
-
-enum RuleType {
-    CREATE_SYNONYM { public String toString() { return "createSynonym"; } }     //Implies using an OR in the query
-}
-
-@Entity("businessRule")
-public class businessRule {
+@Entity("queryBusinessRule")
+public class QueryBusinessRule {
     @Id
     @JsonSerialize(using=ObjectIdJsonSerializer.class)
     private ObjectId id;
     private String organizationId;
     private String ruleName;
-    private RuleType ruleType;
+    private String ruleType;
     private String edgeName;                                        //e.g., measurement
     private List<String> edgeValues;                                //e.g., ["0", "3"]
     private String synonymousEdge;                                  //e.g., disease modifier
     private String synonymousValue;                                 //e.g., small
     private List<Pair<String, List<String>>> edgeValuesToMatch;     //e.g., existence, disease location["ovary", "ovarian"]
 
+    private List<String> tokenSequenceToExlude; 
+   
     public ObjectId getId() {
         return id;
     }
@@ -52,11 +49,11 @@ public class businessRule {
         this.ruleName = ruleName;
     }
 
-    public RuleType getRuleType() {
+    public String getRuleType() {
         return ruleType;
     }
 
-    public void setRuleType(RuleType ruleType) {
+    public void setRuleType(String ruleType) {
         this.ruleType = ruleType;
     }
 
@@ -99,4 +96,12 @@ public class businessRule {
     public void setEdgeValuesToMatch(List<Pair<String, List<String>>> edgeValuesToMatch) {
         this.edgeValuesToMatch = edgeValuesToMatch;
     }
+
+	public List<String> getTokenSequenceToExlude() {
+		return tokenSequenceToExlude;
+	}
+
+	public void setTokenSequenceToExlude(List<String> tokenSequenceToExlude) {
+		this.tokenSequenceToExlude = tokenSequenceToExlude;
+	}
 }
