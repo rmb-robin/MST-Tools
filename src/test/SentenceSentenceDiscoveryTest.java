@@ -12,7 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+//import org.junit.Test;
 //import org.junit.Test;
 import org.omg.CORBA.Environment;
 
@@ -59,7 +59,7 @@ public class SentenceSentenceDiscoveryTest {
 	}
 	
 
-	@Test
+	//@Test
 	public void runOldEnvVsNew() throws Exception {
 		SentenceTextRequest request = TestDataProvider.getSentenceTextRequest(createFullPath());
 		request.getDiscreteData().setOrganizationId("58ab6f9f96c2958294a1fdf0");
