@@ -16,15 +16,15 @@ public class QueryBusinessRule {
     private ObjectId id;
     private String organizationId;
     private String ruleName;
-    private String ruleType;
+    private String ruleType;                                        //See QueryBusinessRuleTypes
+    private List<String> queryTokens;                               //e.g., cyst, cysts, lesion
     private String edgeName;                                        //e.g., measurement
-    private List<String> edgeValues;                                //e.g., ["0", "3"]
+    private List<String> edgeValues;                                //e.g., ["0", ".3"]
     private String synonymousEdge;                                  //e.g., disease modifier
     private String synonymousValue;                                 //e.g., small
     private List<Pair<String, List<String>>> edgeValuesToMatch;     //e.g., existence, disease location["ovary", "ovarian"]
-
     private List<String> tokenSequenceToExlude; 
-   
+
     public ObjectId getId() {
         return id;
     }
@@ -55,6 +55,14 @@ public class QueryBusinessRule {
 
     public void setRuleType(String ruleType) {
         this.ruleType = ruleType;
+    }
+
+    public List<String> getQueryTokens() {
+        return queryTokens;
+    }
+
+    public void setQueryTokens(List<String> queryTokens) {
+        this.queryTokens = queryTokens;
     }
 
     public String getEdgeName() {
