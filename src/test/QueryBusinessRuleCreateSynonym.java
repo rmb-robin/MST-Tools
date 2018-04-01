@@ -4,13 +4,9 @@ import com.mst.dao.QueryBusinessRuleDaoImpl;
 import com.mst.model.businessRule.QueryBusinessRule;
 import com.mst.model.metadataTypes.QueryBusinessRuleTypes;
 import com.mst.util.MongoDatastoreProviderDefault;
-import javafx.util.Pair;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import static org.junit.Assert.*;
 
 public class QueryBusinessRuleCreateSynonym {
     @Test
@@ -19,37 +15,106 @@ public class QueryBusinessRuleCreateSynonym {
         QueryBusinessRuleDaoImpl dao = new QueryBusinessRuleDaoImpl();
         dao.setMongoDatastoreProvider(provider);
 
-        // business rule for small ovarian cyst
-        QueryBusinessRule rule = new QueryBusinessRule();
-        rule.setOrganizationId("58c6f3ceaf3c420b90160803");
-        rule.setRuleName("Small Measurement Modifier - Ovarian Cyst");
-        rule.setRuleType(QueryBusinessRuleTypes.CREATE_SYNONYM);
+        QueryBusinessRule queryRule = new QueryBusinessRule();
+        queryRule.setOrganizationId("58c6f3ceaf3c420b90160803");
+        queryRule.setRuleType(QueryBusinessRuleTypes.CREATE_SYNONYM);
+        List<QueryBusinessRule.Rule> rules = new ArrayList<>();
+
+        // rule for small ovarian cyst
+        QueryBusinessRule.Rule rule = new QueryBusinessRule.Rule();
+        rule.setRuleName("Small Measurement Modifier; Ovarian Cyst");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","structure","structures")));
         rule.setEdgeName("measurement");
-        rule.setEdgeValues(new ArrayList<>(Collections.singletonList(".1")));
+        rule.setEdgeValues(new ArrayList<>(Collections.singletonList(".1cm")));
         rule.setSynonymousEdge("disease modifier");
-        rule.setSynonymousValue("small");
-        List<Pair<String, List<String>>> edges = new ArrayList<>();
-        edges.add(new Pair<>("existence", new ArrayList<>()));
-        edges.add(new Pair<>("disease location", new ArrayList<>(Arrays.asList("adnexa","adnexal","adnexum","ovarian","ovaries","ovary","paraovarian"))));
+        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList("small")));
+        rule.setDiscreteDataToMatch(new HashMap<>());
+        Map<String, List<String>> edges = new HashMap<>();
+        edges.put("existence", new ArrayList<>());
+        edges.put("disease location", new ArrayList<>(Arrays.asList("adnexa","adnexal","adnexum","ovarian","ovaries","ovary","paraovarian")));
         rule.setEdgeValuesToMatch(edges);
-        dao.save(rule);
+        rules.add(rule);
 
-        // business rule for small thyroid nodule
-        rule = new QueryBusinessRule();
-        rule.setOrganizationId("58c6f3ceaf3c420b90160803");
-        rule.setRuleName("Small Measurement Modifier - Thyroid Nodule");
-        rule.setRuleType(QueryBusinessRuleTypes.CREATE_SYNONYM);
-        rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","masses","masses", "nodule", "nodules", "hypodensity", "attenuation")));
+        // rule for small thyroid nodule
+        rule = new QueryBusinessRule.Rule();
+        rule.setRuleName("Small Measurement Modifier; Thyroid Nodule");
+        rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
         rule.setEdgeName("measurement");
-        rule.setEdgeValues(new ArrayList<>(Collections.singletonList(".1")));
+        rule.setEdgeValues(new ArrayList<>(Collections.singletonList(".1cm")));
         rule.setSynonymousEdge("disease modifier");
-        rule.setSynonymousValue("small");
-        edges = new ArrayList<>();
-        edges.add(new Pair<>("existence", new ArrayList<>()));
-        edges.add(new Pair<>("disease location", new ArrayList<>(Arrays.asList("isthmus", "thyroid"))));
+        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList("small")));
+        rule.setDiscreteDataToMatch(new HashMap<>());
+        edges = new HashMap<>();
+        edges.put("existence", new ArrayList<>());
+        edges.put("disease location", new ArrayList<>(Arrays.asList("isthmus","thyroid")));
         rule.setEdgeValuesToMatch(edges);
-        dao.save(rule);
+        rules.add(rule);
+
+        // rule for large thyroid nodule age 0-18
+        rule = new QueryBusinessRule.Rule();
+        rule.setRuleName("Large Measurement Modifier; Thyroid Nodule; Age 0-18");
+        rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
+        rule.setEdgeName("measurement");
+        rule.setEdgeValues(new ArrayList<>(Collections.singletonList(".1cm")));
+        rule.setSynonymousEdge("disease modifier");
+        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList("large")));
+        Map<String, List<String>> discreteData = new HashMap<>();
+        discreteData.put("patientAge", new ArrayList<>(Arrays.asList("0","18")));
+        rule.setDiscreteDataToMatch(discreteData);
+        edges = new HashMap<>();
+        edges.put("existence", new ArrayList<>());
+        edges.put("disease location", new ArrayList<>(Arrays.asList("isthmus","thyroid")));
+        rule.setEdgeValuesToMatch(edges);
+        rules.add(rule);
+
+        // rule for large thyroid nodule age > 18
+        rule = new QueryBusinessRule.Rule();
+        rule.setRuleName("Large Measurement Modifier; Thyroid Nodule; Age > 18");
+        rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
+        rule.setEdgeName("measurement");
+        rule.setEdgeValues(new ArrayList<>(Collections.singletonList("1.5cm")));
+        rule.setSynonymousEdge("disease modifier");
+        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList("large")));
+        discreteData = new HashMap<>();
+        discreteData.put("patientAge", new ArrayList<>(Arrays.asList("19","100")));
+        rule.setDiscreteDataToMatch(discreteData);
+        edges = new HashMap<>();
+        edges.put("existence", new ArrayList<>());
+        edges.put("disease location", new ArrayList<>(Arrays.asList("isthmus","thyroid")));
+        rule.setEdgeValuesToMatch(edges);
+        rules.add(rule);
+
+        // rule for too small to characterize
+        rule = new QueryBusinessRule.Rule();
+        rule.setRuleName("Too Small To Characterize");
+        rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation","structure","structures")));
+        rule.setEdgeName("measurement");
+        rule.setEdgeValues(new ArrayList<>(Collections.singletonList(".4mm")));
+        rule.setSynonymousEdge("disease modifier");
+        rule.setSynonymousValues(new ArrayList<>(Arrays.asList("Too small to characterize","TSTC")));
+        rule.setDiscreteDataToMatch(new HashMap<>());
+        edges = new HashMap<>();
+        edges.put("existence", new ArrayList<>());
+        rule.setEdgeValuesToMatch(edges);
+        rules.add(rule);
+
+        // rule for thyroid nodule no measurement
+        rule = new QueryBusinessRule.Rule();
+        rule.setRuleName("No Measurement Modifier; Thyroid Nodule");
+        rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation","structure","structures")));
+        rule.setEdgeName("measurement");
+        rule.setEdgeValues(new ArrayList<>(Collections.singletonList(".9cm")));
+        rule.setSynonymousEdge("");
+        rule.setSynonymousValues(new ArrayList<>());
+        rule.setDiscreteDataToMatch(new HashMap<>());
+        edges = new HashMap<>();
+        edges.put("existence", new ArrayList<>());
+        edges.put("disease location", new ArrayList<>(Arrays.asList("isthmus","thyroid")));
+        rule.setEdgeValuesToMatch(edges);
+        rules.add(rule);
+
+        queryRule.setRules(rules);
+        dao.save(queryRule); //NOTE: if updating an existing record, the dao will create and save a duplicate record
     }
 
     @Test
@@ -58,7 +123,117 @@ public class QueryBusinessRuleCreateSynonym {
         QueryBusinessRuleDaoImpl dao = new QueryBusinessRuleDaoImpl();
         dao.setMongoDatastoreProvider(provider);
 
-        //TODO needs to return multiple rules
-        //QueryBusinessRule rule = dao.get("58c6f3ceaf3c420b90160803", QueryBusinessRuleTypes.CREATE_SYNONYM);
+        QueryBusinessRule queryRule = dao.get("58c6f3ceaf3c420b90160803", QueryBusinessRuleTypes.CREATE_SYNONYM);
+        assertEquals(queryRule.getOrganizationId(), "58c6f3ceaf3c420b90160803");
+        assertEquals(queryRule.getRuleType(), QueryBusinessRuleTypes.CREATE_SYNONYM);
+
+        List<QueryBusinessRule.Rule> rules = queryRule.getRules();
+        assertNotNull("Rule list is null;", rules);
+        assertTrue(rules.size() == 6);
+
+        for (int i = 0; i < rules.size(); ++i) {
+            QueryBusinessRule.Rule rule = rules.get(i);
+            List<String> tokens = rule.getQueryTokens();
+            List<String> synonymousValues = rule.getSynonymousValues();
+            Map<String, List<String>> discreteData = rule.getDiscreteDataToMatch();
+            Map<String, List<String>> edges = rule.getEdgeValuesToMatch();
+
+            assertNotNull(tokens);
+            if (i != 5) {
+                assertEquals(rule.getEdgeName(), "measurement");
+                assertEquals(rule.getSynonymousEdge(), "disease modifier");
+                assertNotNull(synonymousValues);
+                assertTrue(synonymousValues.size() > 0);
+            }
+            assertNotNull(edges);
+            assertTrue(edges.size() >= 1);
+
+            switch(i)
+            {
+                case 0:
+                    assertEquals(rule.getRuleName(), "Small Measurement Modifier; Ovarian Cyst");
+                    assertEquals(tokens.size(), 6);
+                    assertEquals(tokens.get(0), "cyst");
+                    assertEquals(tokens.get(5), "structures");
+                    assertEquals(rule.getEdgeValues().get(0), ".1cm");
+                    assertEquals(synonymousValues.get(0), "small");
+                    for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
+                            assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
+                            if (entry.getKey().equals("disease location")) {
+                                assertEquals(entry.getKey(), "disease location");
+                                assertTrue(entry.getValue().size() == 7);
+                                assertEquals(entry.getValue().get(0), "adnexa");
+                                assertEquals(entry.getValue().get(6), "paraovarian");
+                            }
+                    }
+                    break;
+                case 1:
+                    assertEquals(rule.getRuleName(), "Small Measurement Modifier; Thyroid Nodule");
+                    assertEquals(tokens.size(), 10);
+                    assertEquals(tokens.get(0), "cyst");
+                    assertEquals(tokens.get(9), "attenuation");
+                    assertEquals(rule.getEdgeValues().get(0), ".1cm");
+                    assertEquals(synonymousValues.get(0), "small");
+                    for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
+                        assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
+                        if (entry.getKey().equals("disease location")) {
+                            assertEquals(entry.getKey(), "disease location");
+                            assertTrue(entry.getValue().size() == 2);
+                            assertEquals(entry.getValue().get(0), "isthmus");
+                            assertEquals(entry.getValue().get(1), "thyroid");
+                        }
+                    }
+                    break;
+                case 2:
+                    assertEquals(rule.getRuleName(), "Large Measurement Modifier; Thyroid Nodule; Age 0-18");
+                    assertEquals(tokens.size(), 10);
+                    assertEquals(tokens.get(0), "cyst");
+                    assertEquals(tokens.get(9), "attenuation");
+                    assertEquals(rule.getEdgeValues().get(0), ".1cm");
+                    assertEquals(synonymousValues.get(0), "large");
+                    assertNotNull(discreteData);
+                    assertTrue(discreteData.size() == 1);
+                    for (Map.Entry<String, List<String>> entry : discreteData.entrySet()) {
+                        assertEquals(entry.getKey(), "patientAge");
+                        assertNotNull(entry.getValue());
+                        assertTrue(entry.getValue().size() == 2);
+                        assertEquals(entry.getValue().get(0), "0");
+                        assertEquals(entry.getValue().get(1), "18");
+                    }
+                    for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
+                        assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
+                        if (entry.getKey().equals("disease location")) {
+                            assertEquals(entry.getKey(), "disease location");
+                            assertTrue(entry.getValue().size() == 2);
+                            assertEquals(entry.getValue().get(0), "isthmus");
+                        }
+                    }
+                    break;
+                case 3:
+                    assertEquals(rule.getRuleName(), "Large Measurement Modifier; Thyroid Nodule; Age > 18");
+                    assertEquals(tokens.size(), 10);
+                    assertEquals(tokens.get(0), "cyst");
+                    assertEquals(tokens.get(9), "attenuation");
+                    assertEquals(rule.getEdgeValues().get(0), "1.5cm");
+                    assertEquals(synonymousValues.get(0), "large");
+                    assertNotNull(discreteData);
+                    assertTrue(discreteData.size() == 1);
+                    for (Map.Entry<String, List<String>> entry : discreteData.entrySet()) {
+                        assertEquals(entry.getKey(), "patientAge");
+                        assertNotNull(entry.getValue());
+                        assertTrue(entry.getValue().size() == 2);
+                        assertEquals(entry.getValue().get(0), "19");
+                        assertEquals(entry.getValue().get(1), "100");
+                    }
+                    for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
+                        assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
+                        if (entry.getKey().equals("disease location")) {
+                            assertEquals(entry.getKey(), "disease location");
+                            assertTrue(entry.getValue().size() == 2);
+                            assertEquals(entry.getValue().get(1), "thyroid");
+                        }
+                    }
+            }
+        }
     }
 }
