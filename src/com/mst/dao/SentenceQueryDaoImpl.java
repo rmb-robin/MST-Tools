@@ -15,6 +15,11 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.QueryResults;
 
+import com.mst.filter.ITNReportFilterImpl;
+import com.mst.filter.ImpressionReportFilterImpl;
+import com.mst.filter.ReportFilterByQueryImpl;
+import com.mst.filter.ReportFilterException;
+import com.mst.filter.ReportQueryFilter;
 import com.mst.filter.SentenceDiscoveryFilterImpl;
 import com.mst.filter.SentenceFilterControllermpl;
 import com.mst.filter.SentenceQueryResultFactory;
@@ -69,7 +74,10 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	}
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
-		return getSentences(input, null);
+		List<SentenceQueryResult> result = getSentences(input, null);
+		if(input.isFilterByReport())
+			filterResultsByDistinctReport(result,input, this.sentenceFilterController.cumalativeSentenceResults);
+		return result;
 	}
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input, List<SentenceDb> sentences) {
@@ -235,4 +243,56 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		 query.retrievedFields(true, "origSentence");
 		return query.asList();
 	}
+	
+	
+	private List<SentenceQueryResult> getMatchesByDiscreateId(List<SentenceQueryResult> results, String id) {
+		return results.parallelStream().filter((result) -> result.getDiscreteData().getId().toString().equals(id))
+				.collect(Collectors.toList());
+	}
+	
+	private void filterResultsByDistinctReport(List<SentenceQueryResult> results, SentenceQueryInput input,
+			Map<String, SentenceDb> sentenceCache) {
+
+		List<String> ids = results.stream().map((result) -> result.getDiscreteData().getId().toString()).distinct()
+				.collect(Collectors.toList());
+
+		for (String id : ids) {
+
+			List<SentenceQueryResult> idResults = getMatchesByDiscreateId(results, id);
+			if ( idResults.size() <= 1 ) {
+				continue;
+			}
+
+			List<SentenceDb> sentences = idResults.parallelStream()
+					.map(idResult -> sentenceCache.get(idResult.getSentenceId())).filter(s -> s != null).distinct()
+					.collect(Collectors.toList());
+
+		
+			List<ReportQueryFilter> filters = new ArrayList<ReportQueryFilter>();
+			filters.add(new ITNReportFilterImpl(input, sentenceCache));
+			filters.add(new ImpressionReportFilterImpl(input, sentenceCache));
+			filters.add(new ReportFilterByQueryImpl(input, sentenceCache));
+
+			for (ReportQueryFilter filter : filters) {
+				filter.build(this, results, sentences, input);
+				if (filter.qualifingFilter()) {
+					int rowsFiltered;
+					try {
+						rowsFiltered = filter.process(results);
+
+					} catch (ReportFilterException e) {
+						e.printStackTrace();
+					}
+					break;
+				} else {
+						System.out.println("  Filter does not qualify: " + filter.getClass().getName());
+				}
+			}
+
+		}
+	}
+	
+	
+	
+	
   }  

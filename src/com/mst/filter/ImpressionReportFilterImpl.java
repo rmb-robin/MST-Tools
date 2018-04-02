@@ -21,12 +21,9 @@ public class ImpressionReportFilterImpl extends ReportFilterByQueryImpl {
 
 		if (sentence != null) {
 			for (String token : tokens) {
-				for ( WordToken word : sentence.getModifiedWordList() ) {
-					if ( word.getToken().equalsIgnoreCase(token) ) {
+					if(sentence.getOrigSentence().toLowerCase().contains(token.toLowerCase()))
 						return true;
 					}
-				}
-			}
 		}
 		return false;
 	}

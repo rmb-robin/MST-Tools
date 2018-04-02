@@ -12,7 +12,9 @@ public class SentenceQueryInput {
 	private DiscreteDataFilter discreteDataFilter;
 	private String debug = "false";
 	private boolean filterByReport = false;
-
+	private boolean filterByTokenSequence; 
+	
+	
 	public SentenceQueryInput(){
 		sentenceQueryInstances = new ArrayList<>();
 	}
@@ -72,5 +74,13 @@ public class SentenceQueryInput {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	public boolean isFilterByTokenSequence() {
+		return filterByTokenSequence;
+	}
+
+	public void setFilterByTokenSequence(boolean filterByTokenSequence) {
+		this.filterByTokenSequence = filterByTokenSequence;
 	}
 }

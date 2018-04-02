@@ -9,7 +9,7 @@ public class SentenceQueryInstance {
 //	private List<EdgeQuery> exclusiveEdges; 
 	private String appender; 
 	private boolean isSt; 
-	
+	private boolean excludeTokenSequence; 
 
 	public SentenceQueryInstance(){
 		tokens = new ArrayList<>();
@@ -46,6 +46,14 @@ public class SentenceQueryInstance {
 
 	public void setIsSt(boolean isSt) {
 		this.isSt = isSt;
+	}
+
+	public boolean isExcludeTokenSequence() {
+		return excludeTokenSequence;
+	}
+
+	public void setExcludeTokenSequence(boolean excludeTokenSequence) {
+		this.excludeTokenSequence = excludeTokenSequence;
 	}
 
 
