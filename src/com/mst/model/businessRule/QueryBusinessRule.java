@@ -2,7 +2,6 @@ package com.mst.model.businessRule;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mst.jsonSerializers.ObjectIdJsonSerializer;
-import javafx.util.Pair;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
@@ -34,7 +33,6 @@ public class QueryBusinessRule {
         public void setRuleName(String ruleName) {
             this.ruleName = ruleName;
         }
-
 
         public List<String> getQueryTokens() {
             return queryTokens;
