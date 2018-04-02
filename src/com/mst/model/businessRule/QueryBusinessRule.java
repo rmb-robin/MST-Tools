@@ -16,6 +16,10 @@ public class QueryBusinessRule {
     private ObjectId id;
     private String organizationId;
     private String ruleType;    //See QueryBusinessRuleTypes
+
+    private List<Rule> rules;
+    private List<String> tokenSequenceToExlude;
+    
     public static class Rule {
         private String ruleName;
         private List<String> queryTokens;                               //e.g., cyst, cysts, lesion
@@ -91,8 +95,7 @@ public class QueryBusinessRule {
         }
     }
 
-    private List<Rule> rules;
-    private List<String> tokenSequenceToExlude;
+
 
     public ObjectId getId() {
         return id;
@@ -127,7 +130,7 @@ public class QueryBusinessRule {
     }
 
     public List<String> getTokenSequenceToExlude() {
-		return tokenSequenceToExlude;
+		return this.tokenSequenceToExlude;
 	}
 
 	public void setTokenSequenceToExlude(List<String> tokenSequenceToExlude) {
