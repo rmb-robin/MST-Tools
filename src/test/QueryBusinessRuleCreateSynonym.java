@@ -9,6 +9,8 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class QueryBusinessRuleCreateSynonym {
+    private String orgId = "58c6f3ceaf3c420b90160803";
+
     @Test
     public void insert(){
         MongoDatastoreProviderDefault provider = new MongoDatastoreProviderDefault();
@@ -16,7 +18,7 @@ public class QueryBusinessRuleCreateSynonym {
         dao.setMongoDatastoreProvider(provider);
 
         QueryBusinessRule queryRule = new QueryBusinessRule();
-        queryRule.setOrganizationId("58c6f3ceaf3c420b90160803");
+        queryRule.setOrganizationId(orgId);
         queryRule.setRuleType(QueryBusinessRuleTypes.CREATE_SYNONYM);
         List<QueryBusinessRule.Rule> rules = new ArrayList<>();
 
@@ -130,7 +132,8 @@ public class QueryBusinessRuleCreateSynonym {
         rules.add(rule);
 
         queryRule.setRules(rules);
-        dao.save(queryRule); //NOTE: if updating an existing record, the dao will create and save a duplicate record
+        dao.delete(orgId, QueryBusinessRuleTypes.CREATE_SYNONYM); //if updating an existing record, the dao would create and save a duplicate
+        dao.save(queryRule);
     }
 
     @Test
@@ -139,8 +142,9 @@ public class QueryBusinessRuleCreateSynonym {
         QueryBusinessRuleDaoImpl dao = new QueryBusinessRuleDaoImpl();
         dao.setMongoDatastoreProvider(provider);
 
-        QueryBusinessRule queryRule = dao.get("58c6f3ceaf3c420b90160803", QueryBusinessRuleTypes.CREATE_SYNONYM);
-        assertEquals(queryRule.getOrganizationId(), "58c6f3ceaf3c420b90160803");
+        QueryBusinessRule queryRule = dao.get(orgId, QueryBusinessRuleTypes.CREATE_SYNONYM);
+        assertNotNull(queryRule);
+        assertEquals(queryRule.getOrganizationId(), orgId);
         assertEquals(queryRule.getRuleType(), QueryBusinessRuleTypes.CREATE_SYNONYM);
 
         List<QueryBusinessRule.Rule> rules = queryRule.getRules();
