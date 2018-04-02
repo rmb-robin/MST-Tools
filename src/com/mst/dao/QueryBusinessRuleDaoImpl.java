@@ -19,6 +19,18 @@ public class QueryBusinessRuleDaoImpl extends BaseDocumentDaoImpl<QueryBusinessR
 		query.field("ruleType").equal(ruleType);
 		return query.get();
 	}
+
+	public void delete(String orgId, String ruleType) {
+		Query<QueryBusinessRule> query = this.getDatastore().createQuery(QueryBusinessRule.class);
+		query.field("organizationId").equal(orgId);
+		query.field("ruleType").equal(ruleType);
+		QueryBusinessRule rule = query.get();
+
+		if (rule != null) {
+			String id = rule.getId().toString();
+			delete(id);
+		}
+	}
 }
 
 
