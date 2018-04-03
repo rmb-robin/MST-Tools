@@ -23,10 +23,15 @@ public class TokenSequenceQueryBusinessRuleFilterImpl implements QueryBusinessRu
 		List<SentenceQueryResult> results = new ArrayList<>();
 		
 		for(SentenceQueryResult  result: resultsToFilter){
-			
+			boolean shouldExclude = false;
 			for(String sequenceTokExclude: tokenSequence){
-				if(result.getSentence().contains(sequenceTokExclude))continue;
+				if(result.getSentence().contains(sequenceTokExclude)){
+					shouldExclude = true; 
+					break;
+				}
 			}
+			
+			if(shouldExclude) continue;
 			results.add(result);	
 		}
 		return results;
