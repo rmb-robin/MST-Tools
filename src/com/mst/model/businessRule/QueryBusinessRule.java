@@ -9,6 +9,14 @@ import org.mongodb.morphia.annotations.Id;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Provides the data model for serializing business rule objects to the DB.
+ * This class applies to business rules that are applicable to the input and/or
+ * output of a user query.
+ *
+ * @author Brian Sheely
+ * @version %I%, %G%
+ */
 @Entity("queryBusinessRule")
 public class QueryBusinessRule {
     @Id
@@ -23,17 +31,26 @@ public class QueryBusinessRule {
     public static class Rule {
         private String ruleName;
         private List<String> queryTokens;                               //e.g., cyst, cysts, lesion
-        private String edgeName;                                        //e.g., measurement
-        private List<String> edgeValues;                                //e.g., ["0", ".3"]
-        private String synonymousEdge;                                  //e.g., disease modifier
-        private List<String> synonymousValues;                          //e.g., small
-        private Map<String, List<String>> discreteDataToMatch;          //e.g., sex["F"], patientAge["0", "18"] NOTE: 0, 18 designates a range
+        private boolean edgeNameExists;                                 // if false, create synonym if edgeName does not exist
+        private String edgeName;                                        //e.g., disease modifier
+        private List<String> edgeValues;                                //e.g., small
+        private String synonymousEdge;                                  //e.g., measurement
+        private List<String> synonymousValues;                          //e.g., [".1cm"]
+        private List<DiscreteDataType> discreteDataToMatch;
         private Map<String, List<String>> edgeValuesToMatch;            //e.g., existence, disease location["ovary", "ovarian"]
 
+        /**
+         * Gets the name of the business rule.
+         * @return description of the business rule
+         */
         public String getRuleName() {
             return ruleName;
         }
 
+        /**
+         * Sets the name of the business rule.
+         * @param ruleName user friendly description of the business rule
+         */
         public void setRuleName(String ruleName) {
             this.ruleName = ruleName;
         }
@@ -44,6 +61,14 @@ public class QueryBusinessRule {
 
         public void setQueryTokens(List<String> queryTokens) {
             this.queryTokens = queryTokens;
+        }
+
+        public boolean isEdgeNameExists() {
+            return edgeNameExists;
+        }
+
+        public void setEdgeNameExists(boolean edgeNameExists) {
+            this.edgeNameExists = edgeNameExists;
         }
 
         public String getEdgeName() {
@@ -78,11 +103,11 @@ public class QueryBusinessRule {
             this.synonymousValues = synonymousValues;
         }
 
-        public Map<String, List<String>> getDiscreteDataToMatch() {
+        public List<DiscreteDataType> getDiscreteDataToMatch() {
             return discreteDataToMatch;
         }
 
-        public void setDiscreteDataToMatch(Map<String, List<String>> discreteDataToMatch) {
+        public void setDiscreteDataToMatch(List<DiscreteDataType> discreteDataToMatch) {
             this.discreteDataToMatch = discreteDataToMatch;
         }
 
@@ -94,8 +119,6 @@ public class QueryBusinessRule {
             this.edgeValuesToMatch = edgeValuesToMatch;
         }
     }
-
-
 
     public ObjectId getId() {
         return id;
@@ -113,10 +136,19 @@ public class QueryBusinessRule {
         this.organizationId = organizationId;
     }
 
+    /**
+     * Gets the name used to further categorize this class of business rules.
+     * @return String to be used in the business rule DB query
+     */
     public String getRuleType() {
         return ruleType;
     }
 
+    /**
+     * Sets the unique name to further categorize this class of business rules.
+     * @param ruleType String used to categorize this business rule
+     * @see com.mst.model.metadataTypes.QueryBusinessRuleTypes
+     */
     public void setRuleType(String ruleType) {
         this.ruleType = ruleType;
     }
