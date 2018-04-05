@@ -23,6 +23,7 @@ import com.mst.filter.ReportQueryFilter;
 import com.mst.filter.SentenceDiscoveryFilterImpl;
 import com.mst.filter.SentenceFilterControllermpl;
 import com.mst.filter.SentenceQueryResultFactory;
+import com.mst.filter.TokenSequenceQueryBusinessRuleFilterImpl;
 import com.mst.interfaces.DiscreteDataDao;
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceQueryDao;
@@ -38,10 +39,12 @@ import com.mst.model.SentenceQuery.SentenceQueryInstanceResult;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
 import com.mst.model.SentenceQuery.SentenceQueryTextInput;
 import com.mst.model.SentenceQuery.SentenceReprocessingInput;
+import com.mst.model.businessRule.QueryBusinessRule;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.graph.Edge;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeResultTypes;
+import com.mst.model.metadataTypes.QueryBusinessRuleTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.SentenceDiscovery;
@@ -75,6 +78,15 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
 		List<SentenceQueryResult> result = getSentences(input, null);
+		
+		if(input.isFilterByTokenSequence()){
+			QueryBusinessRuleDaoImpl queryBusinessRuleDao = new QueryBusinessRuleDaoImpl();
+			queryBusinessRuleDao.setMongoDatastoreProvider(this.datastoreProvider);
+			QueryBusinessRule rule = queryBusinessRuleDao.get(input.getOrganizationId(),QueryBusinessRuleTypes.tokensequenceexlcude);
+			TokenSequenceQueryBusinessRuleFilterImpl queryBusinessRuleFilterImpl = new TokenSequenceQueryBusinessRuleFilterImpl();
+			result = queryBusinessRuleFilterImpl.filterByBusinessRule(result, rule);
+		}
+
 		if(input.isFilterByReport())
 			filterResultsByDistinctReport(result,input, this.sentenceFilterController.cumalativeSentenceResults);
 		return result;
