@@ -30,11 +30,13 @@ import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.SentenceRequestBase;
 import com.mst.model.requests.SentenceTextRequest;
+import com.mst.model.sentenceProcessing.IterationDataRule;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.util.MongoConnectionEntity;
+import com.mst.sentenceprocessing.IterationRuleProcesser;
 import com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl;
 import com.mst.sentenceprocessing.SentenceDiscoveryProcessingHardcodedMetaDataInputFactory;
 import com.mst.sentenceprocessing.SentenceDiscoveryProcessorImpl;
@@ -58,6 +60,24 @@ public class SentenceSentenceDiscoveryTest {
 		this.assertProcess(sentences, discoveries);
 	}
 	
+	//Test
+	public void RunIterationRule() throws Exception {
+		SentenceTextRequest request = TestDataProvider.getSentenceTextRequest(createFullPath());
+		//request.getDiscreteData().setOrganizationId("58ab6f9f96c2958294a1fdf0");
+		List<SentenceDiscovery> discoveries = getSentenceDiscovery(request);
+
+		IterationRuleProcesser ruleProcesser = new IterationRuleProcesser();
+		IterationDataRule rule = getIterationDataRule();
+		
+		List<RecommendedTokenRelationship> newEdges = ruleProcesser.process(discoveries.get(0).getWordEmbeddings(), rule);
+	}
+	
+	private IterationDataRule getIterationDataRule(){
+		IterationDataRule rule = new IterationDataRule();
+		return rule; 
+	}
+	
+
 
 	//@Test
 	public void runOldEnvVsNew() throws Exception {
