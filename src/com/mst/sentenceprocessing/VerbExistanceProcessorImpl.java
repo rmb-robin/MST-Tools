@@ -119,7 +119,7 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 			if(existingRelationship.getTokenRelationship().getFromToken().getToken().equals(relationship.getTokenRelationship().getToToken().getToken()))
 				
 				result.add(this.tokenRelationshipFactory.createRecommendedRelationship(existingRelationship.getTokenRelationship().getEdgeName(),
-						EdgeTypes.related, relationship.getTokenRelationship().getFromToken(), existingRelationship.getTokenRelationship().getToToken()));
+						EdgeTypes.related, relationship.getTokenRelationship().getFromToken(), existingRelationship.getTokenRelationship().getToToken(),this.getClass().getName()));
 		}
 		return result;
 	}

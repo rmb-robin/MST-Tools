@@ -73,7 +73,7 @@ public class RecommendedNounPhraseProcesserImpl  extends RelationshipProcessorBa
 	}
 	
 	private RecommendedTokenRelationship create(RecommendedTokenRelationship from, RecommendedTokenRelationship to){
-		return factory.createRecommendedRelationship(WordEmbeddingTypes.defaultEdge, EdgeTypes.related, from.getTokenRelationship().getFromToken(),to.getTokenRelationship().getToToken());
+		return factory.createRecommendedRelationship(WordEmbeddingTypes.defaultEdge, EdgeTypes.related, from.getTokenRelationship().getFromToken(),to.getTokenRelationship().getToToken(),this.getClass().getName());
 	}
 	
 	

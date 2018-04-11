@@ -30,18 +30,25 @@ public class ReportFilterByQueryImpl implements ReportQueryFilter {
 		this.sentenceCache = sentenceCache;
 	}
 
+	
+	protected List<SentenceDb> processingSentencs; 
+	
 	@Override
-	public void build(SentenceQueryDaoImpl daoImpl, List<SentenceQueryResult> results,
+	public List<SentenceQueryResult> build(SentenceQueryDaoImpl daoImpl, List<SentenceQueryResult> results,
 			List<SentenceDb> sentences, SentenceQueryInput filter) {
 		this.filter = filter;
+		this.processingSentencs = sentences;
 		SentenceQueryInput myFilter = getResultsFilter(filter);
 		
 		List<SentenceQueryResult> myResults = daoImpl.getSentences(myFilter, sentences);
-				
+			
+		if(myResults.isEmpty()) return myResults;
+		
 				//controller.getSentenceQueryResults(sentences, "cyst", edgeQuery, "cyst")
 				//controller.getSentenceQueryResults(myFilter, sentences);
 
 		processedMatches = sortBestMatches(filter, myResults, sentenceCache);
+		return processedMatches; 
 	}
 
 	private double doubleValue(String value) {
@@ -147,6 +154,9 @@ public class ReportFilterByQueryImpl implements ReportQueryFilter {
 
 	@Override
 	public boolean qualifingFilter() {
+		if(this.getProcessedMatches().isEmpty()) return false; 
+		if(this.getProcessedMatches().size()==1) return true;
+		
 		hasNumericEdges = false;
 		if (filter != null)
 			filter.getSentenceQueryInstances().stream()

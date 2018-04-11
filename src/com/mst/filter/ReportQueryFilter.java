@@ -9,7 +9,7 @@ import com.mst.model.sentenceProcessing.SentenceDb;
 
 public interface ReportQueryFilter {
 
-	void build(SentenceQueryDaoImpl daoImp, List<SentenceQueryResult> results, List<SentenceDb> sentences, SentenceQueryInput filter);
+	List<SentenceQueryResult> build(SentenceQueryDaoImpl daoImp, List<SentenceQueryResult> results, List<SentenceDb> sentences, SentenceQueryInput filter);
 
 	int process(List<SentenceQueryResult> results) throws ReportFilterException;
 

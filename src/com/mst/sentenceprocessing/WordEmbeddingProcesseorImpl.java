@@ -35,7 +35,7 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 	private RecommendedTokenRelationship getWordEmbedding(WordToken first, WordToken second){
 		WordToken firstCloned = (WordToken) DeepCloner.deepClone(first);
 		WordToken secondCloned = (WordToken) DeepCloner.deepClone(second);
-		return factory.createRecommendedRelationship(getEdgeName(first, second), EdgeTypes.related, firstCloned, secondCloned);
+		return factory.createRecommendedRelationship(getEdgeName(first, second), EdgeTypes.related, firstCloned, secondCloned,this.getClass().getName());
 	}
 
 	private String getEdgeName(WordToken first, WordToken second){

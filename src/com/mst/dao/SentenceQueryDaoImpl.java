@@ -15,6 +15,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 import org.mongodb.morphia.query.QueryResults;
 
+import com.mst.filter.CystAndAAAReportFilterImpl;
 import com.mst.filter.ITNReportFilterImpl;
 import com.mst.filter.ImpressionReportFilterImpl;
 import com.mst.filter.ReportFilterByQueryImpl;
@@ -52,6 +53,7 @@ import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.util.Constants;
+import com.mst.util.TokenRelationshipUtil;
 
 
 public class SentenceQueryDaoImpl implements SentenceQueryDao  {
@@ -88,7 +90,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		}
 
 		if(input.isFilterByReport())
-			filterResultsByDistinctReport(result,input, this.sentenceFilterController.cumalativeSentenceResults);
+			result = filterResultsByDistinctReport(result,input, this.sentenceFilterController.cumalativeSentenceResults);
 		return result;
 	}
 	
@@ -178,7 +180,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 						"discreteData");
 				sentences = query.asList();
 			} else {
-				sentences.addAll(passedSentences);
+				sentences.addAll(filterForEdges(passedSentences, edgeQueriesByName));
 			}
 			List<SentenceQueryResult> queryResults = sentenceFilterController.getSentenceQueryResults(sentences, token,
 					sentenceQueryInstance.getEdges(), token);
@@ -188,6 +190,25 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		return result;
 	}
 
+	private List<SentenceDb> filterForEdges(List<SentenceDb> sentences, Map<String, EdgeQuery> edgeQueriesByName){
+		List<SentenceDb> result = new ArrayList<>();
+		Set<String> keys = edgeQueriesByName.keySet();
+		for(SentenceDb sentence: sentences){
+			boolean isMatch = true;
+			Map<String, List<TokenRelationship>> edgesByName = TokenRelationshipUtil.getMapByEdgeName(sentence.getTokenRelationships(),false);
+			for(String edgeName: keys){
+				if(!edgesByName.containsKey(edgeName)){
+					isMatch = false; 
+					break;
+					
+				}	
+			}
+			
+			if(isMatch)result.add(sentence);	
+		}
+		return result;
+
+	}
 	
 	private List<SentenceDb> getMatchedSentences(List<SentenceQueryResult> queryResults, List<SentenceDb> sentences){
 		HashSet<String> ids = new HashSet<>();
@@ -221,7 +242,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	private HashSet<String> getEdgeNamesForSentences(List<SentenceDb> sentences){
 		HashSet<String> result = new HashSet<>();
 		for(SentenceDb sentence : sentences){
-			if(sentence.getTokenRelationships()==null)continue;
+ 			if(sentence.getTokenRelationships()==null)continue;
 			  sentence.getTokenRelationships().forEach(a-> result.add(a.getEdgeName()));
 		}
 		return result;
@@ -262,16 +283,20 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 				.collect(Collectors.toList());
 	}
 	
-	private void filterResultsByDistinctReport(List<SentenceQueryResult> results, SentenceQueryInput input,
+	private List<SentenceQueryResult> filterResultsByDistinctReport(List<SentenceQueryResult> results, SentenceQueryInput input,
 			Map<String, SentenceDb> sentenceCache) {
 
 		List<String> ids = results.stream().map((result) -> result.getDiscreteData().getId().toString()).distinct()
 				.collect(Collectors.toList());
 
+		List<SentenceQueryResult> result = new ArrayList<>();
 		for (String id : ids) {
 
 			List<SentenceQueryResult> idResults = getMatchesByDiscreateId(results, id);
 			if ( idResults.size() <= 1 ) {
+				
+				if(idResults.size()==1)
+					result.add(idResults.get(0));
 				continue;
 			}
 
@@ -283,25 +308,34 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 			List<ReportQueryFilter> filters = new ArrayList<ReportQueryFilter>();
 			filters.add(new ITNReportFilterImpl(input, sentenceCache));
 			filters.add(new ImpressionReportFilterImpl(input, sentenceCache));
+			filters.add(new CystAndAAAReportFilterImpl(input, sentenceCache));
 			filters.add(new ReportFilterByQueryImpl(input, sentenceCache));
-
+						
 			for (ReportQueryFilter filter : filters) {
-				filter.build(this, results, sentences, input);
-				if (filter.qualifingFilter()) {
-					int rowsFiltered;
-					try {
-						rowsFiltered = filter.process(results);
-
-					} catch (ReportFilterException e) {
-						e.printStackTrace();
-					}
+				List<SentenceQueryResult> filterResult = filter.build(this, results, sentences, input);
+				if(filterResult.size()!= 0){
+					result.add(filterResult.get(0));
 					break;
-				} else {
-						System.out.println("  Filter does not qualify: " + filter.getClass().getName());
 				}
+
+//				if (filter.qualifingFilter()) {
+//					int rowsFiltered;
+//					try {
+//						rowsFiltered = filter.process(results);
+//
+//					} catch (ReportFilterException e) {
+//						e.printStackTrace();
+//					}
+//				
+//				} else {
+//						System.out.println("  Filter does not qualify: " + filter.getClass().getName());
+//				}
 			}
 
 		}
+	
+		return result;
+		
 	}
 	
 	

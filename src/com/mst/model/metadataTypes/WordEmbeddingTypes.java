@@ -15,4 +15,8 @@ public class WordEmbeddingTypes {
 	public static String negativeToken = "neg-token";
 	public static String verbMinusNeg = " verb-neg";
 	public static String verbPlusNeg = "verb+neg";
+
+	public static String subjectVerb = "subj-verb";
+	public static String subjectComplementVerb = "subjComp-Verb";
+
 }

@@ -16,7 +16,7 @@ import com.mst.model.sentenceProcessing.SentenceDb;
 public class CystAndAAAReportFilterImpl extends ReportFilterByQueryImpl {
 	private static List<String> cystTokenList = Arrays.asList("cyst", "cysts", "lesion", "lesions", "structure", "structures");
 	private static List<String> cystLocationList = Arrays.asList("adnexal", "adnexa", "adnexum", "ovarian", "ovaries", "ovary", "paraovarian");
-	private static List<String> aaaTokenList = Arrays.asList("aneurysm","aneurysms","dilation","dilations","dilatation","dilatations","distention","distention","sacs","sac");
+	private static List<String> aaaTokenList = Arrays.asList("aaa","aneurysm","aneurysms","dilation","dilations","dilatation","dilatations","distention","distention","sacs","sac");
 	private static List<String> aaaLocationList = Arrays.asList("abdominal","abdominals","diaphragm","infrarenal","celiac axis","ima","sma","suprarenal");
 
 	public CystAndAAAReportFilterImpl(SentenceQueryInput query, Map<String, SentenceDb> sentenceCache) {
@@ -25,7 +25,10 @@ public class CystAndAAAReportFilterImpl extends ReportFilterByQueryImpl {
 
 	@Override
 	public boolean qualifingFilter() {
-	    if ( isOvarianCystFilter() || isAAAFilter() ) 
+		if(this.getProcessedMatches().isEmpty()) return false; 
+		if(this.getProcessedMatches().size()==1) return true;
+		
+		if ( isOvarianCystFilter() || isAAAFilter() ) 
 	    	return true;
 	    
 	

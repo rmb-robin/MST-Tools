@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
 //import org.junit.Test;
 //import org.junit.Test;
 import org.omg.CORBA.Environment;
@@ -25,12 +26,14 @@ import com.mst.interfaces.sentenceprocessing.NounRelationshipProcesserSentenceDi
 import com.mst.metadataProviders.TestDataProvider;
 import com.mst.metadataProviders.TestHl7Provider;
 import com.mst.model.metadataTypes.EdgeNames;
+import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.raw.RawReportFile;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.SentenceRequestBase;
 import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.IterationDataRule;
+import com.mst.model.sentenceProcessing.IterationRuleProcesserInput;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
@@ -60,21 +63,59 @@ public class SentenceSentenceDiscoveryTest {
 		this.assertProcess(sentences, discoveries);
 	}
 	
-	//Test
+	@Test
 	public void RunIterationRule() throws Exception {
-		SentenceTextRequest request = TestDataProvider.getSentenceTextRequest(createFullPath());
+		 SentenceTextRequest request = getRequest("Borderline aneurysmal dilation of the infrarenal aorta measures 2.8 cm.");
 		//request.getDiscreteData().setOrganizationId("58ab6f9f96c2958294a1fdf0");
 		List<SentenceDiscovery> discoveries = getSentenceDiscovery(request);
 
 		IterationRuleProcesser ruleProcesser = new IterationRuleProcesser();
-		IterationDataRule rule = getIterationDataRule();
 		
-		List<RecommendedTokenRelationship> newEdges = ruleProcesser.process(discoveries.get(0).getWordEmbeddings(), rule);
+		IterationRuleProcesserInput input =getIterationInput();
+		
+		List<RecommendedTokenRelationship> newEdges = ruleProcesser.process(discoveries.get(0).getWordEmbeddings(), input);
+		
+		
+		
+		request.setText("There is a dominant follicle within the right ovary measuring 2.1 x 1.7 cm");
+		discoveries = getSentenceDiscovery(request);
+		newEdges = ruleProcesser.process(discoveries.get(0).getWordEmbeddings(), input);
+	
+
 	}
 	
-	private IterationDataRule getIterationDataRule(){
+	private IterationRuleProcesserInput getIterationInput(){
+		IterationRuleProcesserInput input = new IterationRuleProcesserInput();
+		
+		ArrayList<IterationDataRule> leftRules = new ArrayList<>();
+		
+		
+		IterationDataRule rule = getIterationDataRule(WordEmbeddingTypes.firstVerb,20);
+		leftRules.add(rule);
+		
+		rule = getIterationDataRule(WordEmbeddingTypes.secondPrep,30);
+		leftRules.add(rule);
+		
+		rule = getIterationDataRule(WordEmbeddingTypes.secondVerb,10);
+		leftRules.add(rule);
+		
+		
+		input.setLeftRules(leftRules);
+		return input; 
+		
+	}
+	
+	private SentenceTextRequest getRequest(String text){
+		SentenceTextRequest request = TestDataProvider.getSentenceTextRequest(createFullPath());
+		request.setText(text);
+		return request;
+	}
+	
+	private IterationDataRule getIterationDataRule(String endRelationship, int points){
 		IterationDataRule rule = new IterationDataRule();
-		return rule; 
+		rule.setPointValue(points);
+		rule.setEdgeNameTolookfor(endRelationship);
+		return rule;
 	}
 	
 

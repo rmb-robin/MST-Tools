@@ -29,21 +29,23 @@ public class RecommendedNegativeRelationshipFactoryImpl {
 
 	private RecommendedTokenRelationship createEdge(int index, List<WordToken> wordTokens){
 		
+		String sourceName = this.getClass().getName();
+		
 		if(index>0){
 			WordToken prevWordToken = wordTokens.get(index-1);
 			if(prevWordToken.isVerb())
 			{
-				return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.verbPlusNeg, EdgeTypes.related, prevWordToken, wordTokens.get(index));
+				return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.verbPlusNeg, EdgeTypes.related, prevWordToken, wordTokens.get(index),sourceName);
 			}
 		}
 		
 		if(index<wordTokens.size()){
 			WordToken nextWordToken = wordTokens.get(index+1);
 			if(nextWordToken.isVerb()){
-				return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.verbMinusNeg, EdgeTypes.related, wordTokens.get(index),nextWordToken);
+				return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.verbMinusNeg, EdgeTypes.related, wordTokens.get(index),nextWordToken,sourceName);
 			}
 			
-			return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.negativeToken, EdgeTypes.related, wordTokens.get(index),nextWordToken);
+			return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.negativeToken, EdgeTypes.related, wordTokens.get(index),nextWordToken,sourceName);
 		}
 		return null;
 			

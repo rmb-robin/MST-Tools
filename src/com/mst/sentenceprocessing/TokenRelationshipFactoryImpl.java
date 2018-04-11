@@ -38,9 +38,9 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
 		return tokenRelationship;
 	}
 	
-	public RecommendedTokenRelationship createRecommendedRelationship(String edgeName, String frameName, WordToken fromToken,WordToken toToken){
+	public RecommendedTokenRelationship createRecommendedRelationship(String edgeName, String frameName, WordToken fromToken,WordToken toToken, String source){
 		RecommendedTokenRelationship recommandedTokenRelationship = new RecommendedTokenRelationship();
-		recommandedTokenRelationship.setTokenRelationship(create(edgeName,frameName,fromToken,toToken,""));
+		recommandedTokenRelationship.setTokenRelationship(create(edgeName,frameName,fromToken,toToken,source));
 		String key = recommandedTokenRelationship.getTokenRelationship().getFromTokenToTokenString();
 		recommandedTokenRelationship.setKey(key);
 		return recommandedTokenRelationship;
@@ -66,6 +66,6 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
     public  RecommendedTokenRelationship deepCopy(RecommendedTokenRelationship original){
     	WordToken firstCloned = (WordToken) DeepCloner.deepClone(original.getTokenRelationship().getFromToken());
 		WordToken secondCloned = (WordToken) DeepCloner.deepClone(original.getTokenRelationship().getToToken());
-		return this.createRecommendedRelationship(original.getTokenRelationship().getEdgeName(), EdgeTypes.related, firstCloned, secondCloned);
+		return this.createRecommendedRelationship(original.getTokenRelationship().getEdgeName(), EdgeTypes.related, firstCloned, secondCloned, original.getTokenRelationship().getSource());
     }
 }

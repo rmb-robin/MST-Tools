@@ -36,6 +36,9 @@ public class ImpressionReportFilterImpl extends ReportFilterByQueryImpl {
 	
 	@Override
 	public boolean qualifingFilter() {
+		if(this.getProcessedMatches().isEmpty()) return false; 
+		if(this.getProcessedMatches().size()==1) return true;
+		
 		if ( ! sentencesContainsImpression() ) {
 			return false; 
 		}

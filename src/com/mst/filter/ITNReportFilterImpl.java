@@ -14,6 +14,7 @@ import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.sentenceProcessing.SentenceDb;
+import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
 public class ITNReportFilterImpl extends ReportFilterByQueryImpl {
@@ -43,6 +44,17 @@ public class ITNReportFilterImpl extends ReportFilterByQueryImpl {
 		}
 		return false;
 	}
+	
+	
+	private boolean containsEnlarged(){
+		
+		for(SentenceDb sentence :this.processingSentencs){
+			for(TokenRelationship relationship: sentence.getTokenRelationships()){
+				if(relationship.getEdgeName().equals(EdgeNames.enlarged_finding_sites)) return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	protected SentenceQueryInput getResultsFilter(SentenceQueryInput original) {
@@ -51,26 +63,37 @@ public class ITNReportFilterImpl extends ReportFilterByQueryImpl {
 
 		SentenceQueryInstance instance = new SentenceQueryInstance();
 
-		instance.setTokens(original.getSentenceQueryInstances().get(0).getTokens());
+		
+		boolean isEnlarged = containsEnlarged();
+	
+		if(!isEnlarged){
+			instance.setTokens(original.getSentenceQueryInstances().get(0).getTokens());
+			EdgeQuery query;
+			
+
+			query = new EdgeQuery();
+			query.setName(EdgeNames.measurement);
+			query.setValues(new HashSet<>(Arrays.asList("0", "1000000")));
+			instance.getEdges().add(query);
+		
+		
+			query = new EdgeQuery();
+			query.setName(EdgeNames.diseaseLocation);
+			query.setValues(new HashSet<>(ITNReportFilterImpl.diseaseLocationList));
+			instance.getEdges().add(query);
+			filter.getSentenceQueryInstances().add(instance);
+		}
+		
+		
+		//this second instance.
+		instance = new SentenceQueryInstance();
+		instance.setTokens(ITNReportFilterImpl.instance2TokenList);
+		
+		if(!isEnlarged)
+			instance.setAppender("or");
+		
 
 		EdgeQuery query = new EdgeQuery();
-		query.setName(EdgeNames.measurement);
-		query.setValues(new HashSet<>(Arrays.asList("0", "1000000")));
-		instance.getEdges().add(query);
-
-		query = new EdgeQuery();
-		query.setName(EdgeNames.diseaseLocation);
-		query.setValues(new HashSet<>(ITNReportFilterImpl.diseaseLocationList));
-		instance.getEdges().add(query);
-
-		filter.getSentenceQueryInstances().add(instance);
-
-		instance = new SentenceQueryInstance();
-
-		instance.setTokens(ITNReportFilterImpl.instance2TokenList);
-		instance.setAppender("or");
-
-		query = new EdgeQuery();
 		query.setName(EdgeNames.hetrogeneous_finding_sites);
 		query.setValues(new HashSet<>(ITNReportFilterImpl.heterogeneousFindingSiteList));
 		instance.getEdges().add(query);
@@ -80,11 +103,13 @@ public class ITNReportFilterImpl extends ReportFilterByQueryImpl {
 		query.setValues(new HashSet<>(ITNReportFilterImpl.enlargedFindingSiteList));
 		instance.getEdges().add(query);
 
-		query = new EdgeQuery();
-		query.setName(EdgeNames.existence);
-		query.setValues(new HashSet<>(Arrays.asList()));
-		instance.getEdges().add(query);
-
+		if(!isEnlarged){
+			query = new EdgeQuery();
+			query.setName(EdgeNames.existence);
+			query.setValues(new HashSet<>(Arrays.asList()));
+			instance.getEdges().add(query);
+		}
+		
 		filter.getSentenceQueryInstances().add(instance);
 		return filter;
 	}
@@ -111,6 +136,10 @@ public class ITNReportFilterImpl extends ReportFilterByQueryImpl {
 
 	@Override
 	public boolean qualifingFilter() {
+		if(this.getProcessedMatches().isEmpty()) return false; 
+		if(this.getProcessedMatches().size()==1) return true;
+		
+		
 		if (getOriginalQuery() == null || getOriginalQuery().getSentenceQueryInstances().size() != 2) {
 			return false;
 		}
@@ -137,8 +166,7 @@ public class ITNReportFilterImpl extends ReportFilterByQueryImpl {
 				existenceFound = true;
 			}
 		}
-		if (!(locationFound && existenceFound && measurementFound)) {
-
+		if (!(locationFound && existenceFound && measurementFound) && !containsEnlarged()) {
 			return false;
 		}
 
