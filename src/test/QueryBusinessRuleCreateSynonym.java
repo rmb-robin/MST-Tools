@@ -13,7 +13,8 @@ import static com.mst.model.businessRule.DiscreteDataType.DataType.NUMERIC_RANGE
 import static org.junit.Assert.*;
 
 public class QueryBusinessRuleCreateSynonym {
-    private String orgId = "58c6f3ceaf3c420b90160803";
+    //private String orgId = "58c6f3ceaf3c420b90160803"; //Production DB
+    private String orgId = "5972aedebde4270bc53b23e3"; //Test DB
 
     @Test
     public void insert(){
@@ -31,10 +32,10 @@ public class QueryBusinessRuleCreateSynonym {
         rule.setRuleName("Small Measurement Modifier; Ovarian Cyst");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","structure","structures")));
         rule.setEdgeNameExists(true);
-        rule.setEdgeName("disease modifier");
+        rule.setEdgeName("simple cyst modifiers");
         rule.setEdgeValues(new ArrayList<>(Collections.singletonList("small")));
         rule.setSynonymousEdge("measurement");
-        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList(".1cm")));
+        rule.setSynonymousValue(".1cm");
         rule.setDiscreteDataToMatch(new ArrayList<>());
         Map<String, List<String>> edges = new HashMap<>();
         edges.put("existence", new ArrayList<>());
@@ -47,10 +48,10 @@ public class QueryBusinessRuleCreateSynonym {
         rule.setRuleName("Small Measurement Modifier; Thyroid Nodule");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
         rule.setEdgeNameExists(true);
-        rule.setEdgeName("disease modifier");
+        rule.setEdgeName("simple cyst modifiers");
         rule.setEdgeValues(new ArrayList<>(Collections.singletonList("small")));
         rule.setSynonymousEdge("measurement");
-        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList(".1cm")));
+        rule.setSynonymousValue(".1cm");
         rule.setDiscreteDataToMatch(new ArrayList<>());
         edges = new HashMap<>();
         edges.put("existence", new ArrayList<>());
@@ -63,10 +64,10 @@ public class QueryBusinessRuleCreateSynonym {
         rule.setRuleName("Large Measurement Modifier; Thyroid Nodule; Age 0-18");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
         rule.setEdgeNameExists(true);
-        rule.setEdgeName("disease modifier");
+        rule.setEdgeName("simple cyst modifiers");
         rule.setEdgeValues(new ArrayList<>(Collections.singletonList("large")));
         rule.setSynonymousEdge("measurement");
-        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList(".1cm")));
+        rule.setSynonymousValue(".1cm");
         DiscreteDataType patientAge = new DiscreteDataType();
         patientAge.setName("patientAge");
         patientAge.setDataType(NUMERIC_RANGE);
@@ -85,10 +86,10 @@ public class QueryBusinessRuleCreateSynonym {
         rule.setRuleName("Large Measurement Modifier; Thyroid Nodule; Age > 18");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
         rule.setEdgeNameExists(true);
-        rule.setEdgeName("disease modifier");
+        rule.setEdgeName("simple cyst modifiers");
         rule.setEdgeValues(new ArrayList<>(Collections.singletonList("large")));
         rule.setSynonymousEdge("measurement");
-        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList("1.5cm")));
+        rule.setSynonymousValue("1.5cm");
         patientAge = new DiscreteDataType();
         patientAge.setName("patientAge");
         patientAge.setDataType(NUMERIC_RANGE);
@@ -107,25 +108,26 @@ public class QueryBusinessRuleCreateSynonym {
         rule.setRuleName("Too Small To Characterize");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation","structure","structures")));
         rule.setEdgeNameExists(true);
-        rule.setEdgeName("disease modifier");
+        rule.setEdgeName("simple cyst modifiers");
         rule.setEdgeValues(new ArrayList<>(Arrays.asList("Too small to characterize","TSTC")));
         rule.setSynonymousEdge("measurement");
-        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList(".4mm")));
+        rule.setSynonymousValue(".4mm");
         rule.setDiscreteDataToMatch(new ArrayList<>());
         edges = new HashMap<>();
         edges.put("existence", new ArrayList<>());
         rule.setEdgeValuesToMatch(edges);
         rules.add(rule);
 
-        // rule 5 for thyroid nodule no measurement
+        // rule 5 for thyroid nodule no measurement and no modifier of small or large
+        //TODO this rule needs an additional edgeName for measurement which does not exist in the current design
         rule = new QueryBusinessRule.Rule();
         rule.setRuleName("No Measurement Modifier; Thyroid Nodule");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation","structure","structures")));
         rule.setEdgeNameExists(false);
-        rule.setEdgeName("measurement");
-        rule.setEdgeValues(new ArrayList<>());
+        rule.setEdgeName("simple cyst modifiers");
+        rule.setEdgeValues(new ArrayList<>(Arrays.asList("small","large")));
         rule.setSynonymousEdge("measurement");
-        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList(".9cm")));
+        rule.setSynonymousValue(".9cm");
         rule.setDiscreteDataToMatch(new ArrayList<>());
         edges = new HashMap<>();
         edges.put("existence", new ArrayList<>());
@@ -141,7 +143,7 @@ public class QueryBusinessRuleCreateSynonym {
         rule.setEdgeName("measurement");
         rule.setEdgeValues(new ArrayList<>());
         rule.setSynonymousEdge("measurement");
-        rule.setSynonymousValues(new ArrayList<>(Collections.singletonList(".9cm")));
+        rule.setSynonymousValue(".9cm");
         rule.setDiscreteDataToMatch(new ArrayList<>());
         edges = new HashMap<>();
         edges.put("existence", new ArrayList<>());
@@ -168,22 +170,20 @@ public class QueryBusinessRuleCreateSynonym {
 
         List<QueryBusinessRule.Rule> rules = queryRule.getRules();
         assertNotNull("Rule list is null;", rules);
-        assertTrue(rules.size() == 7);
+        assertEquals(7, rules.size());
 
         for (int i = 0; i < rules.size(); ++i) {
             QueryBusinessRule.Rule rule = rules.get(i);
             List<String> tokens = rule.getQueryTokens();
-            List<String> synonymousValues = rule.getSynonymousValues();
+            String synonymousValue = rule.getSynonymousValue();
             List<DiscreteDataType> discreteData = rule.getDiscreteDataToMatch();
             Map<String, List<String>> edges = rule.getEdgeValuesToMatch();
 
             assertNotNull(tokens);
             if (i != 5 && i != 6) {
                 assertTrue(rule.isEdgeNameExists());
-                assertEquals(rule.getEdgeName(), "disease modifier");
+                assertEquals(rule.getEdgeName(), "simple cyst modifiers");
                 assertEquals(rule.getSynonymousEdge(), "measurement");
-                assertNotNull(synonymousValues);
-                assertTrue(synonymousValues.size() > 0);
             }
             assertNotNull(edges);
             assertTrue(edges.size() >= 1);
@@ -196,12 +196,12 @@ public class QueryBusinessRuleCreateSynonym {
                     assertEquals(tokens.get(0), "cyst");
                     assertEquals(tokens.get(5), "structures");
                     assertEquals(rule.getEdgeValues().get(0), "small");
-                    assertEquals(synonymousValues.get(0), ".1cm");
+                    assertEquals(synonymousValue, ".1cm");
                     for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
                             assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
                             if (entry.getKey().equals("disease location")) {
                                 assertEquals(entry.getKey(), "disease location");
-                                assertTrue(entry.getValue().size() == 7);
+                                assertEquals(7, entry.getValue().size());
                                 assertEquals(entry.getValue().get(0), "adnexa");
                                 assertEquals(entry.getValue().get(6), "paraovarian");
                             }
@@ -213,12 +213,12 @@ public class QueryBusinessRuleCreateSynonym {
                     assertEquals(tokens.get(0), "cyst");
                     assertEquals(tokens.get(9), "attenuation");
                     assertEquals(rule.getEdgeValues().get(0), "small");
-                    assertEquals(synonymousValues.get(0), ".1cm");
+                    assertEquals(synonymousValue, ".1cm");
                     for (Map.Entry<String, List<String>> entry : edges.entrySet()) {
                         assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
                         if (entry.getKey().equals("disease location")) {
                             assertEquals(entry.getKey(), "disease location");
-                            assertTrue(entry.getValue().size() == 2);
+                            assertEquals(2, entry.getValue().size());
                             assertEquals(entry.getValue().get(0), "isthmus");
                             assertEquals(entry.getValue().get(1), "thyroid");
                         }
@@ -230,9 +230,9 @@ public class QueryBusinessRuleCreateSynonym {
                     assertEquals(tokens.get(0), "cyst");
                     assertEquals(tokens.get(9), "attenuation");
                     assertEquals(rule.getEdgeValues().get(0), "large");
-                    assertEquals(synonymousValues.get(0), ".1cm");
+                    assertEquals(synonymousValue, ".1cm");
                     assertNotNull(discreteData);
-                    assertTrue(discreteData.size() == 1);
+                    assertEquals(1, discreteData.size());
                     for (DiscreteDataType dataType : discreteData) {
                         assertEquals(dataType.getName(), "patientAge");
                         assertEquals(dataType.getDataType(), NUMERIC_RANGE);
@@ -243,7 +243,7 @@ public class QueryBusinessRuleCreateSynonym {
                         assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
                         if (entry.getKey().equals("disease location")) {
                             assertEquals(entry.getKey(), "disease location");
-                            assertTrue(entry.getValue().size() == 2);
+                            assertEquals(2, entry.getValue().size());
                             assertEquals(entry.getValue().get(0), "isthmus");
                         }
                     }
@@ -254,9 +254,9 @@ public class QueryBusinessRuleCreateSynonym {
                     assertEquals(tokens.get(0), "cyst");
                     assertEquals(tokens.get(9), "attenuation");
                     assertEquals(rule.getEdgeValues().get(0), "large");
-                    assertEquals(synonymousValues.get(0), "1.5cm");
+                    assertEquals(synonymousValue, "1.5cm");
                     assertNotNull(discreteData);
-                    assertTrue(discreteData.size() == 1);
+                    assertEquals(1, discreteData.size());
                     for (DiscreteDataType dataType : discreteData) {
                         assertEquals(dataType.getName(), "patientAge");
                         assertEquals(dataType.getDataType(), NUMERIC_RANGE);
@@ -267,7 +267,7 @@ public class QueryBusinessRuleCreateSynonym {
                         assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
                         if (entry.getKey().equals("disease location")) {
                             assertEquals(entry.getKey(), "disease location");
-                            assertTrue(entry.getValue().size() == 2);
+                            assertEquals(2, entry.getValue().size());
                             assertEquals(entry.getValue().get(1), "thyroid");
                         }
                     }
