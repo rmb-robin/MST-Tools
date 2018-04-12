@@ -5,3 +5,11 @@
 .classpath
 .project
 /src/log4j.properties
+.DS_Store
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+MST-Tools.iml
+
