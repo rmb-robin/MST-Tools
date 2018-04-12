@@ -77,39 +77,6 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	private List<DiscreteData> getDiscreteDatas(SentenceQueryInput input){
 		return discreteDataDao.getDiscreteDatas(input.getDiscreteDataFilter(), input.getOrganizationId(),false);
 	}
-
-	@Override
-	public List<SentenceDb> getSentencesForRuleProcessing(SentenceQueryInput input) {
-		List<SentenceDb> sentences = new ArrayList<>();
-		Datastore datastore = datastoreProvider.getDefaultDb();
-		String organizationId = input.getOrganizationId();
-		List<SentenceQueryInstance> queryInstances = input.getSentenceQueryInstances();
-
-		boolean filterOnDiscreteData = false;
-		List<DiscreteData> discreteDataIds = null;
-		if (input.getDiscreteDataFilter()!= null && !input.getDiscreteDataFilter().isEmpty()) {
-			filterOnDiscreteData = true;
-			init();
-			discreteDataIds = getDiscreteDatas(input);
-		}
-
-		for (SentenceQueryInstance queryInstance : queryInstances) {
-			List<String> tokens = queryInstance.getTokens();
-
-			for (String token : queryInstance.getTokens()) {
-				Query<SentenceDb> query = datastore.createQuery(SentenceDb.class);
-				query.search(token).field("organizationId").equal(organizationId);
-
-				if (filterOnDiscreteData)
-					query.field("discreteData").hasAnyOf(discreteDataIds);
-
-				query.retrievedFields(true, "id", "tokenRelationships", "normalizedSentence", "origSentence", "discreteData");
-				sentences.addAll(query.asList());
-			}
-		}
-
-		return sentences;
-	}
 	
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input){
 		List<SentenceQueryResult> result = getSentences(input, null);

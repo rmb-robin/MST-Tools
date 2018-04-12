@@ -12,9 +12,7 @@ import com.mst.model.sentenceProcessing.SentenceDb;
 public interface SentenceQueryDao extends IDao {
 
 	List<SentenceQueryResult> getSentences(SentenceQueryInput input);
-	List<SentenceQueryResult> getSentences(SentenceQueryInput input, List<SentenceDb> sentences);
 	List<String> getEdgeNamesByTokens(List<String> tokens);
-	List<SentenceDb> getSentencesForRuleProcessing(SentenceQueryInput input);
 	List<SentenceDb> getSentencesForReprocess(SentenceReprocessingInput input);
 	List<SentenceDb> getSentencesByDiscreteDataIds(Set<String> ids);
 	List<SentenceDb> getSentencesForDiscreteDataId(String id);
