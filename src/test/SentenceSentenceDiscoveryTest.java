@@ -90,13 +90,13 @@ public class SentenceSentenceDiscoveryTest {
 		ArrayList<IterationDataRule> leftRules = new ArrayList<>();
 		
 		
-		IterationDataRule rule = getIterationDataRule(WordEmbeddingTypes.firstVerb,20);
+		IterationDataRule rule = getIterationDataRule(WordEmbeddingTypes.firstVerb,20, WordEmbeddingTypes.secondVerb);
 		leftRules.add(rule);
 		
-		rule = getIterationDataRule(WordEmbeddingTypes.secondPrep,30);
+		rule = getIterationDataRule(WordEmbeddingTypes.secondPrep,30,WordEmbeddingTypes.secondVerb);
 		leftRules.add(rule);
 		
-		rule = getIterationDataRule(WordEmbeddingTypes.secondVerb,10);
+		rule = getIterationDataRule(WordEmbeddingTypes.secondVerb,10,WordEmbeddingTypes.secondVerb);
 		leftRules.add(rule);
 		
 		
@@ -111,10 +111,11 @@ public class SentenceSentenceDiscoveryTest {
 		return request;
 	}
 	
-	private IterationDataRule getIterationDataRule(String endRelationship, int points){
+	private IterationDataRule getIterationDataRule(String endRelationship, int points, String startRelationship){
 		IterationDataRule rule = new IterationDataRule();
 		rule.setPointValue(points);
 		rule.setEdgeNameTolookfor(endRelationship);
+		rule.setStartRelationship(startRelationship);
 		return rule;
 	}
 	

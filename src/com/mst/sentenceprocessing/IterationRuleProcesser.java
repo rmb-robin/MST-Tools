@@ -17,10 +17,7 @@ import com.mst.model.sentenceProcessing.TokenRelationship;
 
 public class IterationRuleProcesser {
 
-	private class IterateRightOnTokenTokenResult{
-		public int pointValue; 
-		public List<RecommendedTokenRelationship> createdEdges;
-	}
+
 	
 	private TokenRelationshipFactory tokenRelationshipFactory;
 	
@@ -36,131 +33,104 @@ public class IterationRuleProcesser {
 		return result;
 	}
 	
-	private int getIndexOfStartRule(List<RecommendedTokenRelationship> relationships, IterationDataRule rule){
-		
-		
-		
-		
-		return -1;
-	}
-	
-	
 	private List<RecommendedTokenRelationship> processLeft(List<RecommendedTokenRelationship> recommendedTokenRelationships, List<IterationDataRule> leftRules){
-	
 		List<RecommendedTokenRelationship> result = new ArrayList<>();
+		int maxRuleScore = 0; 
 		for(IterationDataRule rule: leftRules){
-			String startRelationship = rule.getStartRelationship();
-	
-			List<Integer> verbMinusOneIndexes = getStartIndexes(recommendedTokenRelationships,startRelationship, true);
-			
-			for(int index: verbMinusOneIndexes){
-				RecommendedTokenRelationship relationship = iterateLeft(recommendedTokenRelationships, leftRules, index);
-				if(relationship!=null) result.add(relationship);
-			}
+			List<RecommendedTokenRelationship> relationships = iterateLeft(recommendedTokenRelationships, rule);
+			if(relationships.isEmpty()) continue; 
+		
+			if(rule.getPointValue()> maxRuleScore) 
+				result = relationships;
 		}
 		return result;
+		
 	}
+	
+	private List<RecommendedTokenRelationship> iterateLeft(List<RecommendedTokenRelationship> recommendedTokenRelationships, IterationDataRule rule){
+		
+		List<Integer> indexes = getIndexes(recommendedTokenRelationships,rule.getStartRelationship(), true);
+		List<RecommendedTokenRelationship> result = new ArrayList<>();
+		
+		
+		for(int index: indexes) {
+			for(int i = index; i>=0; i--){
+				if(i==index) continue; 
+				
+				RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
+				boolean isMatch = isIterationRuleForRelationshipMatch(rule, relationship);
+				if(isMatch)
+					result.add(createSubjectEdge(relationship,  recommendedTokenRelationships.get(index)));
+			}	
+		}
+		return result;
+}
+	
+	
 	
 	private List<RecommendedTokenRelationship> processRight(List<RecommendedTokenRelationship> recommendedTokenRelationships, List<IterationDataRule> rightRules){
 		
-		List<Integer> verbMinusOneIndexes = getStartIndexes(recommendedTokenRelationships,false);
 		List<RecommendedTokenRelationship> result = new ArrayList<>();
-		for(int index : verbMinusOneIndexes){
-			List<RecommendedTokenRelationship> relationships = iterateRight(recommendedTokenRelationships, rightRules, index);
-			if(relationships!=null)
-				result.addAll(relationships);
-			
+		int maxRuleScore = 0; 
+		for(IterationDataRule rule: rightRules){
+			List<RecommendedTokenRelationship> relationships = iterateRight(recommendedTokenRelationships, rule);
+			if(relationships.isEmpty()) continue; 
+		
+			if(rule.getPointValue()> maxRuleScore) 
+				result = relationships;
 		}
 		return result;
 	
 	}
+
+	
+	private List<RecommendedTokenRelationship> iterateRight(List<RecommendedTokenRelationship> recommendedTokenRelationships, IterationDataRule rule){	
+		List<Integer> indexes = getIndexes(recommendedTokenRelationships,rule.getStartRelationship(), true);
+		if(!rule.getEdgeNameTolookfor().equals(WordEmbeddingTypes.defaultEdge)) 
+			return iterateRightNonTokenToken(recommendedTokenRelationships, indexes, rule);
+		return iterateRightTokenToken(recommendedTokenRelationships, indexes, rule);
 		
-	private RecommendedTokenRelationship iterateLeft(List<RecommendedTokenRelationship> recommendedTokenRelationships, List<IterationDataRule> leftRules, int verbMinusOneIndex){
-			
-			IterationDataRule foundRule = null;
-			RecommendedTokenRelationship matchedRelationship = null;
-			Map<String,IterationDataRule> rulesByStopEdgeName = getRulesByStopEdgeName(leftRules);
-			for(int i = verbMinusOneIndex; i>=0; i--){
-				if(i==verbMinusOneIndex) continue; 
+	}
+
+	
+	private List<RecommendedTokenRelationship> iterateRightNonTokenToken(List<RecommendedTokenRelationship> recommendedTokenRelationships,List<Integer> indexes,IterationDataRule rule){
+		List<RecommendedTokenRelationship> result = new ArrayList<>();
+		for(int index: indexes) {
+			for(int i = index; i<recommendedTokenRelationships.size(); i++){
+				if(i==index) continue; 
 				
 				RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
-				IterationDataRule matchedRule = getIterationRuleForRelationship(rulesByStopEdgeName, relationship);
-				if(matchedRule==null)continue; 
-				
-				if(isOverridingExistingMatchedRule(foundRule,matchedRule)){
-					foundRule = matchedRule;
-					matchedRelationship = relationship;
-				}
-				
-			}
-			
-			if(foundRule==null)return null;
-			return createSubjectEdge(matchedRelationship,  recommendedTokenRelationships.get(verbMinusOneIndex));
+				boolean isMatch = isIterationRuleForRelationshipMatch(rule, relationship);
+				if(isMatch)
+					result.add(createSubjectComplimentEdge(recommendedTokenRelationships.get(index),relationship));
+			}	
+		}
+		return result;
 	}
-
 	
-	private List<RecommendedTokenRelationship> iterateRight(List<RecommendedTokenRelationship> recommendedTokenRelationships, List<IterationDataRule> rightRules, int verbPlusOneIndex){
-		
-		IterationDataRule foundRule = null;
-		RecommendedTokenRelationship matchedRelationship = null;
-		Map<String,IterationDataRule> rulesByStopEdgeName = getRulesByStopEdgeName(rightRules);
+	
+	
+	private List<RecommendedTokenRelationship> iterateRightTokenToken(List<RecommendedTokenRelationship> recommendedTokenRelationships,List<Integer> indexes,IterationDataRule rule){
 
-		IterationDataRule tokenTokenRule = null;
-		if(rulesByStopEdgeName.containsKey(WordEmbeddingTypes.defaultEdge)){
-			tokenTokenRule = rulesByStopEdgeName.get(WordEmbeddingTypes.defaultEdge);
-			rulesByStopEdgeName.remove(WordEmbeddingTypes.defaultEdge);
-		}
-		
-		
-		for(int i = verbPlusOneIndex; i<recommendedTokenRelationships.size(); i++){
-			if(i==verbPlusOneIndex) continue; 
-			
-			RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
-			IterationDataRule matchedRule = getIterationRuleForRelationship(rulesByStopEdgeName, relationship);
-			if(matchedRule==null)continue; 
-			
-			if(isOverridingExistingMatchedRule(foundRule,matchedRule)){
-				foundRule = matchedRule;
-				matchedRelationship = relationship;
-			}
-		}
-		
-		
-		if(tokenTokenRule!=null){
-			IterateRightOnTokenTokenResult  result = iterateRightOnTokenToken(verbPlusOneIndex, recommendedTokenRelationships, tokenTokenRule);
-			if(result.pointValue > foundRule.getPointValue())
-				return result.createdEdges;
-		}
-		
-		if(foundRule==null)return null;
-		RecommendedTokenRelationship createdRelationship = createSubjectComplimentEdge(recommendedTokenRelationships.get(verbPlusOneIndex), matchedRelationship);
 		List<RecommendedTokenRelationship> result = new ArrayList<>();
-		result.add(createdRelationship);
-		return result;
-	}
-
-
-	
-	private IterateRightOnTokenTokenResult iterateRightOnTokenToken(int verbPlusOneIndex, List<RecommendedTokenRelationship> relationships, IterationDataRule tokenTokenRule){
-		IterateRightOnTokenTokenResult result = new IterateRightOnTokenTokenResult();
-		result.createdEdges = new ArrayList<>();
-		for(int i = verbPlusOneIndex; i<relationships.size(); i++){
-			if(i==verbPlusOneIndex) continue;
-		
-			RecommendedTokenRelationship relationship = relationships.get(i);
-			if(!relationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge))continue;
-			if(relationship.getTokenRelationship().getToToken().getPropertyValueType().equals(tokenTokenRule.getPropertyValueType())){
-				result.pointValue = tokenTokenRule.getPointValue();
-				result.createdEdges.add(
-						createSubjectComplimentEdge(relationships.get(verbPlusOneIndex), relationship));
-
+		for(int index: indexes){
+			for(int i = index; i<recommendedTokenRelationships.size(); i++){
+				if(i==index) continue;
+			
+				RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
+				if(!relationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge))continue;
+				if(relationship.getTokenRelationship().getToToken().getPropertyValueType().equals(rule.getPropertyValueType())){
+					
+					result.add(
+							createSubjectComplimentEdge(recommendedTokenRelationships.get(index), relationship));
+				}
 			}
 		}
-		
 		return result;
-		
 	}
-
+	
+	
+	
 
 	
 	
@@ -180,58 +150,29 @@ public class IterationRuleProcesser {
 				this.getClass().getName());
 	}
 	
-	private boolean isOverridingExistingMatchedRule(IterationDataRule foundRule, IterationDataRule matchedRule){
-		//need to abstract... 
-		if(foundRule== null){
-			return true;
-		}
 
-		if(foundRule.getPointValue() < matchedRule.getPointValue())
-			return true;
-		
-		return false;
+	private boolean isIterationRuleForRelationshipMatch(IterationDataRule rule, RecommendedTokenRelationship recommendedTokenRelationship){
+		return rule.getEdgeNameTolookfor().equals(recommendedTokenRelationship.getTokenRelationship().getEdgeName());
 	}
 	
-	private IterationDataRule getIterationRuleForRelationship(Map<String, IterationDataRule> rules, RecommendedTokenRelationship recommendedTokenRelationship){
-		String key = recommendedTokenRelationship.getTokenRelationship().getEdgeName();
-		if(!rules.containsKey(key))return null; 
-		return rules.get(key);
-	}
-	
-	
-	
-	private Map<String,IterationDataRule> getRulesByStopEdgeName(List<IterationDataRule> rules){
-		Map<String, IterationDataRule> result= new HashMap<>();
 		
-		for(IterationDataRule rule: rules){
-			if(!result.containsKey(rule.getEdgeNameTolookfor())){
-				result.put(rule.getEdgeNameTolookfor(),rule);
-			}
-		}
-
-		return result;
-		
-	}
-		
-	private List<Integer> getStartIndexes(List<RecommendedTokenRelationship> recommendedTokenRelationships,String startEdgeName, boolean isLeft){
+	private List<Integer> getIndexes(List<RecommendedTokenRelationship> recommendedTokenRelationships,String edgeName, boolean isLeft){
 		
 		List<Integer> result = new ArrayList<>();
-		
-		String edgeName = startEdgeName;
-		
+	
 		for(int i =0;i<recommendedTokenRelationships.size();i++){
 			
 			RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
 			if(relationship.getTokenRelationship().getEdgeName().equals(edgeName)){
 				
 				if(i==0){
+					
 					if(!isLeft)
 						result.add(i);
 				}
 				else {
 					result.add(i);
 				}
-				
 			}
 		}
 		return result;
