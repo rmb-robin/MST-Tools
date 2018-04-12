@@ -35,7 +35,7 @@ public class QueryBusinessRule {
         private String edgeName;                                        //e.g., disease modifier
         private List<String> edgeValues;                                //e.g., small
         private String synonymousEdge;                                  //e.g., measurement
-        private List<String> synonymousValues;                          //e.g., [".1cm"]
+        private String synonymousValue;                                 //e.g., [".1cm"]
         private List<DiscreteDataType> discreteDataToMatch;
         private Map<String, List<String>> edgeValuesToMatch;            //e.g., existence, disease location["ovary", "ovarian"]
 
@@ -95,12 +95,12 @@ public class QueryBusinessRule {
             this.synonymousEdge = synonymousEdge;
         }
 
-        public List<String> getSynonymousValues() {
-            return synonymousValues;
+        public String getSynonymousValue() {
+            return synonymousValue;
         }
 
-        public void setSynonymousValues(List<String> synonymousValues) {
-            this.synonymousValues = synonymousValues;
+        public void setSynonymousValue(String synonymousValue) {
+            this.synonymousValue = synonymousValue;
         }
 
         public List<DiscreteDataType> getDiscreteDataToMatch() {
