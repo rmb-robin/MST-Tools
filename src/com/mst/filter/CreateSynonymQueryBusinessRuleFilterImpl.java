@@ -26,6 +26,8 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
             List<SentenceQueryInstance> queryInstances = new ArrayList<>(input.getSentenceQueryInstances());
 
             for (QueryBusinessRule.Rule rule : rules) {
+                if (!rulesApplied.isEmpty())
+                    break;
                 List<String> tokens = rule.getQueryTokens();
                 Map<String, List<String>> edgesToMatch = rule.getEdgeValuesToMatch();
                 String edgeName = rule.getEdgeName();
@@ -36,6 +38,8 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
                 int index = 0;
 
                 for (SentenceQueryInstance queryInstance : queryInstances) {
+                    if (!rulesApplied.isEmpty())
+                        break;
                     List<EdgeQuery> edgeQueries = queryInstance.getEdges();
                     boolean edgeNotFound = false;
                     if (queryInstance.getTokens() == null || queryInstance.getTokens().isEmpty())
@@ -58,15 +62,14 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
                                 input.getSentenceQueryInstances().add(index + 1, newQueryInstance);
                                 rulesApplied.add(rule);
                                 break;
-                            } else if (!edgeExists)
+                            }
+                            else if (!edgeExists)
                                 edgeNotFound = isEdgeToMatchNotFound(edgeQueries, edgeName);
                         }
                     }
-
                     index++;
-                    if (edgeNotFound) {
+                    if (edgeNotFound)
                         rulesApplied.add(rule);
-                    }
                 }
             }
         } catch (Exception e) {
@@ -85,7 +88,7 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
                 for (QueryBusinessRule.Rule rule : rulesApplied) {
                     List<DiscreteDataType> discreteDataToMatch = rule.getDiscreteDataToMatch();
                     boolean ruleHasDiscreteData = (discreteDataToMatch != null && !discreteDataToMatch.isEmpty());
-                    //TODO the only DiscreteData in the rules is patientAge, this can be make generic if that changes
+                    //TODO the only DiscreteData in the rules is patientAge, this code can be made generic if that changes
                     int minRangeValue = 999;
                     int maxRangeValue = -999;
 
