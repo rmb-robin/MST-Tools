@@ -28,6 +28,7 @@ public class SentenceProcessingMetaDataInput {
 	private RelationshipInput phraseRelationshipInput; 
 	private List<PrepPhraseRelationshipMapping> phraseRelationshipMappings;
 	private boolean isSentenceProcessing; 
+	private IterationRuleProcesserInput iterationRuleProcesserInput;
 	
 	
 	public List<NGramsModifierEntity> getNgramsInput() {
@@ -119,5 +120,11 @@ public class SentenceProcessingMetaDataInput {
 	}
 	public void setIsSentenceProcessing(boolean isSentenceProcessing) {
 		this.isSentenceProcessing = isSentenceProcessing;
+	}
+	public IterationRuleProcesserInput getIterationRuleProcesserInput() {
+		return iterationRuleProcesserInput;
+	}
+	public void setIterationRuleProcesserInput(IterationRuleProcesserInput iterationRuleProcesserInput) {
+		this.iterationRuleProcesserInput = iterationRuleProcesserInput;
 	}
 }

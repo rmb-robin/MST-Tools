@@ -43,6 +43,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private RecommandedSubjectAnnotator subjectAnnotator; 
 	private RecommendedNegativeRelationshipFactoryImpl negativeRelationshipfactory;
 	private VerbExistanceProcessor verbExistanceProcessor; 
+	private IterationRuleProcesser iterationRuleProcesser;
+	
 	
 	public SentenceDiscoveryProcessorImpl(){
 		sentenceFactory = new SentenceFactory();
@@ -56,6 +58,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		subjectAnnotator = new RecommandedSubjectAnnotatorImpl();
 		negativeRelationshipfactory = new RecommendedNegativeRelationshipFactoryImpl();
 		verbExistanceProcessor = new VerbExistanceProcessorImpl();
+		iterationRuleProcesser  = new IterationRuleProcesser();
 	}
 
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
@@ -88,6 +91,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
 			
 			List<RecommendedTokenRelationship> edges = nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(), this.sentenceProcessingMetaDataInput.getNounRelationshipsInput());
+			
+			edges.addAll(iterationRuleProcesser.process(edges, sentenceProcessingMetaDataInput.getIterationRuleProcesserInput()));
 			discovery.setWordEmbeddings(edges);
 			
 			
