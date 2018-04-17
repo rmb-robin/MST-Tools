@@ -39,7 +39,7 @@ public class QueryBusinessRuleCreateSynonym {
         QueryBusinessRule.Rule.Edge.SynonymousEdgeValue synonymousEdgeValue = new QueryBusinessRule.Rule.Edge.SynonymousEdgeValue();
         synonymousEdgeValue.setHasMinRangeValue(false);
         synonymousEdgeValue.setHasMaxRangeValue(false);
-        synonymousEdgeValue.setSynonymousValue(".1cm");
+        synonymousEdgeValue.setSynonymousValue(".9cm");
         List<QueryBusinessRule.Rule.Edge.SynonymousEdgeValue> synonymousEdgeValues = new ArrayList<>(Collections.singletonList(synonymousEdgeValue));
         edge.setSynonymousEdgeValues(synonymousEdgeValues);
         rule.setEdges(new ArrayList<>(Collections.singletonList(edge)));
@@ -62,7 +62,7 @@ public class QueryBusinessRuleCreateSynonym {
         synonymousEdgeValue = new QueryBusinessRule.Rule.Edge.SynonymousEdgeValue();
         synonymousEdgeValue.setHasMinRangeValue(false);
         synonymousEdgeValue.setHasMaxRangeValue(false);
-        synonymousEdgeValue.setSynonymousValue(".1cm");
+        synonymousEdgeValue.setSynonymousValue(".9cm");
         synonymousEdgeValues = new ArrayList<>(Collections.singletonList(synonymousEdgeValue));
         edge.setSynonymousEdgeValues(synonymousEdgeValues);
         rule.setEdges(new ArrayList<>(Collections.singletonList(edge)));
@@ -261,7 +261,7 @@ public class QueryBusinessRuleCreateSynonym {
                     assertEquals(edge.getEdgeName(), "simple cyst modifiers");
                     assertEquals(edge.getEdgeValue(), "small");
                     assertEquals(1, edge.getSynonymousEdgeValues().size());
-                    assertEquals(edge.getSynonymousEdgeValues().get(0).getSynonymousValue(), ".1cm");
+                    assertEquals(edge.getSynonymousEdgeValues().get(0).getSynonymousValue(), ".9cm");
                     for (Map.Entry<String, List<String>> entry : edgeValuesToMatch.entrySet()) {
                             assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
                             if (entry.getKey().equals("disease location")) {
@@ -282,7 +282,7 @@ public class QueryBusinessRuleCreateSynonym {
                     assertEquals(edges.get(0).getEdgeName(), "simple cyst modifiers");
                     assertEquals(edge.getEdgeValue(), "small");
                     assertEquals(1, edge.getSynonymousEdgeValues().size());
-                    assertEquals(edge.getSynonymousEdgeValues().get(0).getSynonymousValue(), ".1cm");
+                    assertEquals(edge.getSynonymousEdgeValues().get(0).getSynonymousValue(), ".9cm");
                     for (Map.Entry<String, List<String>> entry : edgeValuesToMatch.entrySet()) {
                         assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location"));
                         if (entry.getKey().equals("disease location")) {
