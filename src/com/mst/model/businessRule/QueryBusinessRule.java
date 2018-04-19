@@ -31,7 +31,7 @@ public class QueryBusinessRule {
         private String ruleName;
         private List<String> queryTokens;                               //e.g., cyst, cysts, lesion
         private List<Edge> edges;
-        private boolean addEdgesToQuery;
+        private boolean searchSentenceForEdge;                          // if true, the edge is not created during sentence processing
         private Map<String, List<String>> edgeValuesToMatch;            //e.g., existence, disease location["ovary", "ovarian"]
         private String synonymousEdge;                                  //e.g., measurement
         private List<SynonymousEdgeValue> synonymousEdgeValues;
@@ -165,12 +165,12 @@ public class QueryBusinessRule {
             this.edges = edges;
         }
 
-        public boolean isAddEdgesToQuery() {
-            return addEdgesToQuery;
+        public boolean isSearchSentenceForEdge() {
+            return searchSentenceForEdge;
         }
 
-        public void setAddEdgesToQuery(boolean addEdgesToQuery) {
-            this.addEdgesToQuery = addEdgesToQuery;
+        public void setSearchSentenceForEdge(boolean searchSentenceForEdge) {
+            this.searchSentenceForEdge = searchSentenceForEdge;
         }
 
         public Map<String, List<String>> getEdgeValuesToMatch() {

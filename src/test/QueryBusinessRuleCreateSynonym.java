@@ -25,31 +25,68 @@ public class QueryBusinessRuleCreateSynonym {
         queryRule.setOrganizationId(orgId);
         queryRule.setRuleType(QueryBusinessRuleTypes.CREATE_SYNONYM);
         List<QueryBusinessRule.Rule> rules = new ArrayList<>();
+        QueryBusinessRule.Rule rule;
+        QueryBusinessRule.Rule.Edge edge;
+        QueryBusinessRule.Rule.SynonymousEdgeValue synonymousEdgeValue;
+        List<QueryBusinessRule.Rule.SynonymousEdgeValue> synonymousEdgeValues;
+        Map<String, List<String>> edgesToMatch;
 
-        // rule 0 for small ovarian cyst
-        QueryBusinessRule.Rule rule = new QueryBusinessRule.Rule();
+        // rule 0 for too small to characterize
+        rule = new QueryBusinessRule.Rule();
+        rule.setRuleName("Too Small To Characterize");
+        rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation","structure","structures")));
+        List<QueryBusinessRule.Rule.Edge> edges = new ArrayList<>();
+        edge = new QueryBusinessRule.Rule.Edge();
+        edge.setLogicalOperator(OR);
+        edge.setEdgeNameExists(true);
+        edge.setEdgeName("TSTC");
+        edge.setEdgeNumeric(false);
+        edges.add(edge);
+        edge = new QueryBusinessRule.Rule.Edge();
+        edge.setLogicalOperator(OR);
+        edge.setEdgeNameExists(true);
+        edge.setEdgeName("Too small to characterize");
+        edge.setEdgeNumeric(false);
+        edges.add(edge);
+        rule.setEdges(edges);
+        rule.setSearchSentenceForEdge(true);
+        rule.setSynonymousEdge("measurement");
+        synonymousEdgeValue = new QueryBusinessRule.Rule.SynonymousEdgeValue();
+        synonymousEdgeValue.setHasMinRangeValue(false);
+        synonymousEdgeValue.setHasMaxRangeValue(false);
+        synonymousEdgeValue.setSynonymousValue(".4mm");
+        synonymousEdgeValues = new ArrayList<>(Collections.singletonList(synonymousEdgeValue));
+        rule.setSynonymousEdgeValues(synonymousEdgeValues);
+        edgesToMatch = new HashMap<>();
+        edgesToMatch.put("existence", new ArrayList<>());
+        rule.setEdgeValuesToMatch(edgesToMatch);
+        rules.add(rule);
+
+
+        // rule 1 for small ovarian cyst
+        rule = new QueryBusinessRule.Rule();
         rule.setRuleName("Small Measurement Modifier; Ovarian Cyst");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","structure","structures")));
-        QueryBusinessRule.Rule.Edge edge = new QueryBusinessRule.Rule.Edge();
+        edge = new QueryBusinessRule.Rule.Edge();
         edge.setEdgeNameExists(true);
         edge.setEdgeName("simple cyst modifiers");
         edge.setEdgeValue("small");
         rule.setEdges(new ArrayList<>(Collections.singletonList(edge)));
-        rule.setAddEdgesToQuery(false);
+        rule.setSearchSentenceForEdge(false);
         rule.setSynonymousEdge("measurement");
-        QueryBusinessRule.Rule.SynonymousEdgeValue synonymousEdgeValue = new QueryBusinessRule.Rule.SynonymousEdgeValue();
+        synonymousEdgeValue = new QueryBusinessRule.Rule.SynonymousEdgeValue();
         synonymousEdgeValue.setHasMinRangeValue(false);
         synonymousEdgeValue.setHasMaxRangeValue(false);
         synonymousEdgeValue.setSynonymousValue(".9cm");
-        List<QueryBusinessRule.Rule.SynonymousEdgeValue> synonymousEdgeValues = new ArrayList<>(Collections.singletonList(synonymousEdgeValue));
+        synonymousEdgeValues = new ArrayList<>(Collections.singletonList(synonymousEdgeValue));
         rule.setSynonymousEdgeValues(synonymousEdgeValues);
-        Map<String, List<String>> edgesToMatch = new HashMap<>();
+        edgesToMatch = new HashMap<>();
         edgesToMatch.put("existence", new ArrayList<>());
         edgesToMatch.put("disease location", new ArrayList<>(Arrays.asList("adnexa","adnexal","adnexum","ovarian","ovaries","ovary","paraovarian")));
         rule.setEdgeValuesToMatch(edgesToMatch);
         rules.add(rule);
 
-        // rule 1 for small thyroid nodule
+        // rule 2 for small thyroid nodule
         rule = new QueryBusinessRule.Rule();
         rule.setRuleName("Small Measurement Modifier; Thyroid Nodule");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
@@ -58,7 +95,7 @@ public class QueryBusinessRuleCreateSynonym {
         edge.setEdgeName("simple cyst modifiers");
         edge.setEdgeValue("small");
         rule.setEdges(new ArrayList<>(Collections.singletonList(edge)));
-        rule.setAddEdgesToQuery(false);
+        rule.setSearchSentenceForEdge(false);
         rule.setSynonymousEdge("measurement");
         synonymousEdgeValue = new QueryBusinessRule.Rule.SynonymousEdgeValue();
         synonymousEdgeValue.setHasMinRangeValue(false);
@@ -72,7 +109,7 @@ public class QueryBusinessRuleCreateSynonym {
         rule.setEdgeValuesToMatch(edgesToMatch);
         rules.add(rule);
 
-        // rule 2 for large thyroid nodule
+        // rule 3 for large thyroid nodule
         rule = new QueryBusinessRule.Rule();
         rule.setRuleName("Large Measurement Modifier; Thyroid Nodule");
         rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
@@ -81,7 +118,7 @@ public class QueryBusinessRuleCreateSynonym {
         edge.setEdgeName("disease modifier");
         edge.setEdgeValue("large");
         rule.setEdges(new ArrayList<>(Collections.singletonList(edge)));
-        rule.setAddEdgesToQuery(false);
+        rule.setSearchSentenceForEdge(false);
         rule.setSynonymousEdge("measurement");
         synonymousEdgeValue = new QueryBusinessRule.Rule.SynonymousEdgeValue();
         synonymousEdgeValue.setHasMinRangeValue(true);
@@ -103,39 +140,6 @@ public class QueryBusinessRuleCreateSynonym {
         rule.setEdgeValuesToMatch(edgesToMatch);
         rules.add(rule);
 
-        // rule 3 for too small to characterize
-        rule = new QueryBusinessRule.Rule();
-        rule.setRuleName("Too Small To Characterize");
-        rule.setQueryTokens(new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation","structure","structures")));
-        List<QueryBusinessRule.Rule.Edge> edges = new ArrayList<>();
-        edge = new QueryBusinessRule.Rule.Edge();
-        edge.setLogicalOperator(AND);
-        edge.setEdgeNameExists(true);
-        edge.setEdgeName("simple cyst modifiers");
-        edge.setEdgeValue("TSTC");
-        edge.setEdgeNumeric(false);
-        edges.add(edge);
-        edge = new QueryBusinessRule.Rule.Edge();
-        edge.setLogicalOperator(OR);
-        edge.setEdgeNameExists(true);
-        edge.setEdgeName("simple cyst modifiers");
-        edge.setEdgeValue("Too small to characterize");
-        edge.setEdgeNumeric(false);
-        edges.add(edge);
-        rule.setEdges(edges);
-        rule.setAddEdgesToQuery(true);
-        rule.setSynonymousEdge("measurement");
-        synonymousEdgeValue = new QueryBusinessRule.Rule.SynonymousEdgeValue();
-        synonymousEdgeValue.setHasMinRangeValue(false);
-        synonymousEdgeValue.setHasMaxRangeValue(false);
-        synonymousEdgeValue.setSynonymousValue(".4mm");
-        synonymousEdgeValues = new ArrayList<>(Collections.singletonList(synonymousEdgeValue));
-        rule.setSynonymousEdgeValues(synonymousEdgeValues);
-        edgesToMatch = new HashMap<>();
-        edgesToMatch.put("existence", new ArrayList<>());
-        rule.setEdgeValuesToMatch(edgesToMatch);
-        rules.add(rule);
-
         // rule 4 for physiologic, follicular, follicular-type, and dominant ovarian cyst
         rule = new QueryBusinessRule.Rule();
         rule.setRuleName("Physiologic, Follicular, Follicular-type, and Dominant Ovarian Cyst");
@@ -144,7 +148,7 @@ public class QueryBusinessRuleCreateSynonym {
         edge.setEdgeNameExists(false);
         edge.setEdgeName("measurement");
         rule.setEdges(new ArrayList<>(Collections.singletonList(edge)));
-        rule.setAddEdgesToQuery(false);
+        rule.setSearchSentenceForEdge(false);
         rule.setSynonymousEdge("measurement");
         synonymousEdgeValue = new QueryBusinessRule.Rule.SynonymousEdgeValue();
         synonymousEdgeValue.setHasMinRangeValue(false);
@@ -182,7 +186,7 @@ public class QueryBusinessRuleCreateSynonym {
         edge.setEdgeName("measurement");
         edges.add(edge);
         rule.setEdges(edges);
-        rule.setAddEdgesToQuery(false);
+        rule.setSearchSentenceForEdge(false);
         rule.setSynonymousEdge("measurement");
         synonymousEdgeValue = new QueryBusinessRule.Rule.SynonymousEdgeValue();
         synonymousEdgeValue.setHasMinRangeValue(false);
@@ -231,6 +235,9 @@ public class QueryBusinessRuleCreateSynonym {
             switch(i)
             {
                 case 0:
+                assertEquals(rule.getRuleName(), "Too Small To Characterize");
+                break;
+                case 1:
                     assertEquals(rule.getRuleName(), "Small Measurement Modifier; Ovarian Cyst");
                     assertEquals(tokens.size(), 6);
                     assertEquals(tokens.get(0), "cyst");
@@ -251,7 +258,7 @@ public class QueryBusinessRuleCreateSynonym {
                             }
                     }
                     break;
-                case 1:
+                case 2:
                     assertEquals(rule.getRuleName(), "Small Measurement Modifier; Thyroid Nodule");
                     assertEquals(tokens.size(), 10);
                     assertEquals(tokens.get(0), "cyst");
@@ -272,7 +279,7 @@ public class QueryBusinessRuleCreateSynonym {
                         }
                     }
                     break;
-                case 2:
+                case 3:
                     assertEquals(rule.getRuleName(), "Large Measurement Modifier; Thyroid Nodule");
                     assertEquals(tokens.size(), 10);
                     assertEquals(tokens.get(0), "cyst");
@@ -302,9 +309,6 @@ public class QueryBusinessRuleCreateSynonym {
                             assertEquals(entry.getValue().get(0), "isthmus");
                         }
                     }
-                    break;
-                case 3:
-                    assertEquals(rule.getRuleName(), "Too Small To Characterize");
                     break;
                 case 4:
                     assertEquals(rule.getRuleName(), "Physiologic, Follicular, Follicular-type, and Dominant Ovarian Cyst");
