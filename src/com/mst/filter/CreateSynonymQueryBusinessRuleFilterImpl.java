@@ -5,10 +5,15 @@ import com.mst.model.SentenceQuery.*;
 import com.mst.model.businessRule.QueryBusinessRule;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.metadataTypes.CreateSynonymQueryBusinessRuleType;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.mst.model.businessRule.QueryBusinessRule.Rule.Edge.LogicalOperator.*;
 
 public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRuleFilter {
     @Override
@@ -26,11 +31,11 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
             for (QueryBusinessRule.Rule rule : rules) {
                 if (!rulesApplied.isEmpty())
                     break;
-
                 boolean addEdgesToQuery = rule.isAddEdgesToQuery();
                 List<String> tokens = rule.getQueryTokens();
                 Map<String, List<String>> edgesToMatch = rule.getEdgeValuesToMatch();
-                boolean edgeNotFoundAndSynonymousEdgeNotFound = true;
+                boolean containsNonexistentEdge = false;
+                boolean nonexistentEdgeNotFoundAndSynonymousEdgeNotFound = true;
                 boolean tokensAndEdgesToMatchFound = false;
 
                 for (SentenceQueryInstance queryInstance : queryInstances) {
@@ -41,28 +46,30 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
                         continue;
 
                     for (String token : queryInstance.getTokens()) {
+                        if (!rulesApplied.isEmpty())
+                            break;
                         if (tokens.contains(token) && areEdgesToMatchFound(edgeQueries, edgesToMatch)) {
                             tokensAndEdgesToMatchFound = true;
                             List<QueryBusinessRule.Rule.Edge> edges = rule.getEdges();
 
                             for (QueryBusinessRule.Rule.Edge edge : edges) {
                                 boolean edgeExists = edge.isEdgeNameExists();
+                                if (!containsNonexistentEdge && !edgeExists)
+                                    containsNonexistentEdge = true;
                                 boolean edgeFound = isEdgeMatchFound(edgeQueries, edge.getEdgeName(), edge.getEdgeValue());
-                                boolean synonymousEdgeNotFound = isSynonymousEdgeNotFound(edgeQueries, edge.getSynonymousEdge(), edge.getSynonymousEdgeValues());
-
+                                boolean synonymousEdgeNotFound = isSynonymousEdgeNotFound(edgeQueries, rule.getSynonymousEdge(), rule.getSynonymousEdgeValues());
                                 if (edgeExists && edgeFound && synonymousEdgeNotFound) {
                                     rulesApplied.add(rule);
                                     break;
-                                } else if ((!edgeExists && edgeFound) || !synonymousEdgeNotFound)
-                                    edgeNotFoundAndSynonymousEdgeNotFound = false;
+                                }
+                                else if ((!edgeExists && edgeFound) || !synonymousEdgeNotFound)
+                                    nonexistentEdgeNotFoundAndSynonymousEdgeNotFound = false;
                             }
-
                         }
                     }
                 }
-                if (tokensAndEdgesToMatchFound && edgeNotFoundAndSynonymousEdgeNotFound && addEdgesToQuery) {
+                if (tokensAndEdgesToMatchFound && containsNonexistentEdge && nonexistentEdgeNotFoundAndSynonymousEdgeNotFound && addEdgesToQuery) {
                     List<QueryBusinessRule.Rule.Edge> edges = rule.getEdges();
-                    //TODO determine whether to add 1 instance with 2 edges instead of 2 instances with 1 edge
                     for (QueryBusinessRule.Rule.Edge edge : edges) {
                         SentenceQueryInstance newQueryInstance = new SentenceQueryInstance();
                         newQueryInstance.setTokens(rule.getQueryTokens());
@@ -79,7 +86,7 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
                     rulesApplied.add(rule);
                     break;
                 }
-                else if (tokensAndEdgesToMatchFound && edgeNotFoundAndSynonymousEdgeNotFound) {
+                else if (tokensAndEdgesToMatchFound && containsNonexistentEdge && nonexistentEdgeNotFoundAndSynonymousEdgeNotFound) {
                     rulesApplied.add(rule);
                     break;
                 }
@@ -96,30 +103,35 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
             for (SentenceQueryResult sentenceQueryResult : sentenceQueryResults) {
                 DiscreteData discreteData = sentenceQueryResult.getDiscreteData();
                 List<SentenceQueryEdgeResult> edgeResults = sentenceQueryResult.getSentenceQueryEdgeResults();
+                boolean newEdgeAdded = false;
 
                 for (QueryBusinessRule.Rule rule : rulesApplied) {
                     List<QueryBusinessRule.Rule.Edge> edges = rule.getEdges();
+                    boolean nonexistentEdgeFound = false;
+                    boolean containsNonexistentEdge = false;
 
                     for (QueryBusinessRule.Rule.Edge edge : edges) {
-                        boolean edgeNameExists = edge.isEdgeNameExists();
+                        boolean edgeExists = edge.isEdgeNameExists();
                         String edgeName = edge.getEdgeName();
-                        if ((edgeNameExists && isEdgeToMatchFoundInResults(edgeResults, edgeName, edge.getEdgeValue()) || (!edgeNameExists && isEdgeToMatchNotFoundInResults(edgeResults, edgeName)))) {
-                            SentenceQueryEdgeResult newEdgeResult = new SentenceQueryEdgeResult();
-                            newEdgeResult.setEdgeName(edge.getSynonymousEdge());
-                            List<QueryBusinessRule.Rule.Edge.SynonymousEdgeValue> synonymousEdgeValues = edge.getSynonymousEdgeValues();
-                            for (QueryBusinessRule.Rule.Edge.SynonymousEdgeValue value : synonymousEdgeValues) {
-                                if (!value.isHasMinRangeValue() && !value.isHasMaxRangeValue())
-                                    newEdgeResult.setMatchedValue(value.getSynonymousValue());
-                                else if (discreteData != null) {
-                                    int patientAge = discreteData.getPatientAge();
-                                    if (value.isHasMinRangeValue() && value.isHasMaxRangeValue() && patientAge >= value.getMinRangeValue() && patientAge <= value.getMaxRangeValue())
-                                        newEdgeResult.setMatchedValue(value.getSynonymousValue());
-                                    else if (value.isHasMinRangeValue() && !value.isHasMaxRangeValue() && patientAge >= value.getMinRangeValue())
-                                        newEdgeResult.setMatchedValue(value.getSynonymousValue());
-                                }
-                            }
-                            edgeResults.add(newEdgeResult);
+                        if (!containsNonexistentEdge && !edgeExists)
+                            containsNonexistentEdge = true;
+
+                        if (edgeExists && isEdgeToMatchFoundInResults(edgeResults, edgeName, edge.getEdgeValue()) && !newEdgeAdded) {
+                            addSynonymousEdge(edgeResults, rule, discreteData);
+                            newEdgeAdded = true;
                         }
+                        else if ((!edgeExists && !isEdgeToMatchNotFoundInResults(edgeResults, edgeName))) {
+                            QueryBusinessRule.Rule.Edge.LogicalOperator logicalOperator = edge.getLogicalOperator();
+                            if ((logicalOperator == null || logicalOperator == OR) && !newEdgeAdded) {
+                                addSynonymousEdge(edgeResults, rule, discreteData);
+                                newEdgeAdded = true;
+                            }
+                            else nonexistentEdgeFound = true;
+                        }
+                    }
+                    if (containsNonexistentEdge && !nonexistentEdgeFound && !newEdgeAdded) {
+                        addSynonymousEdge(edgeResults, rule, discreteData);
+                        newEdgeAdded = true;
                     }
                 }
             }
@@ -129,12 +141,30 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
         return sentenceQueryResults;
     }
 
-    private boolean isSynonymousEdgeNotFound(List<EdgeQuery> edgeQuery, String synonymousEdge, List<QueryBusinessRule.Rule.Edge.SynonymousEdgeValue> synonymousValues) {
+    private void addSynonymousEdge(List<SentenceQueryEdgeResult> edgeResults, QueryBusinessRule.Rule rule, DiscreteData discreteData) {
+        SentenceQueryEdgeResult newEdgeResult = new SentenceQueryEdgeResult();
+        newEdgeResult.setEdgeName(rule.getSynonymousEdge());
+        List<QueryBusinessRule.Rule.SynonymousEdgeValue> synonymousEdgeValues = rule.getSynonymousEdgeValues();
+        for (QueryBusinessRule.Rule.SynonymousEdgeValue value : synonymousEdgeValues) {
+            if (!value.isHasMinRangeValue() && !value.isHasMaxRangeValue())
+                newEdgeResult.setMatchedValue(value.getSynonymousValue());
+            else if (discreteData != null) {
+                int patientAge = discreteData.getPatientAge();
+                if (value.isHasMinRangeValue() && value.isHasMaxRangeValue() && patientAge >= value.getMinRangeValue() && patientAge <= value.getMaxRangeValue())
+                    newEdgeResult.setMatchedValue(value.getSynonymousValue());
+                else if (value.isHasMinRangeValue() && !value.isHasMaxRangeValue() && patientAge >= value.getMinRangeValue())
+                    newEdgeResult.setMatchedValue(value.getSynonymousValue());
+            }
+        }
+        edgeResults.add(newEdgeResult);
+    }
+
+    private boolean isSynonymousEdgeNotFound(List<EdgeQuery> edgeQuery, String synonymousEdge, List<QueryBusinessRule.Rule.SynonymousEdgeValue> synonymousValues) {
         if (edgeQuery != null && !edgeQuery.isEmpty())
             for (EdgeQuery edge : edgeQuery) {
                 if (edge != null && edge.getName() != null && edge.getName().equals(synonymousEdge)) {
                     if (synonymousValues != null && (edge.getValues() != null))
-                        for (QueryBusinessRule.Rule.Edge.SynonymousEdgeValue synonymousEdgeValue : synonymousValues)
+                        for (QueryBusinessRule.Rule.SynonymousEdgeValue synonymousEdgeValue : synonymousValues)
                             if (edge.getValues().contains(synonymousEdgeValue.getSynonymousValue()))
                                 return false;
                 }
@@ -158,9 +188,13 @@ public class CreateSynonymQueryBusinessRuleFilterImpl implements QueryBusinessRu
             return false;
         for (Map.Entry<String, List<String>> entry : edgesToMatch.entrySet()) {
             List<String> values = entry.getValue();
-            for (String value : values)
-                if (!isEdgeMatchFound(edgeQuery, entry.getKey(), value))
-                    return false;
+            if (values != null && !values.isEmpty()) {
+                for (String value : values)
+                    if (!isEdgeMatchFound(edgeQuery, entry.getKey(), value))
+                        return false;
+            }
+            else if (!isEdgeMatchFound(edgeQuery, entry.getKey(), null))
+                return false;
         }
         return true;
     }

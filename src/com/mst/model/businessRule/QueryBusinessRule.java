@@ -33,65 +33,16 @@ public class QueryBusinessRule {
         private List<Edge> edges;
         private boolean addEdgesToQuery;
         private Map<String, List<String>> edgeValuesToMatch;            //e.g., existence, disease location["ovary", "ovarian"]
+        private String synonymousEdge;                                  //e.g., measurement
+        private List<SynonymousEdgeValue> synonymousEdgeValues;
 
         public static class Edge {
-            public enum LogicalOperator {AND, OR, NOT_APPLICABLE}
+            public enum LogicalOperator {AND, OR}
             private LogicalOperator logicalOperator;                    // applies to the previous edge in the collection
             private boolean edgeNameExists;                             // if false, create synonym if edgeName does not exist
             private String edgeName;                                    //e.g., disease modifier
             private String edgeValue;                                   //e.g., large
-            private String synonymousEdge;                              //e.g., measurement
-            private List<SynonymousEdgeValue> synonymousEdgeValues;
             private boolean isEdgeNumeric;
-            private boolean isSynonymousEdgeNumeric;
-
-            public static class SynonymousEdgeValue {
-                private boolean hasMinRangeValue;
-                private boolean hasMaxRangeValue;
-                private int minRangeValue;
-                private int maxRangeValue;
-                private String synonymousValue;                         //e.g., [".1cm"]
-
-                public boolean isHasMinRangeValue() {
-                    return hasMinRangeValue;
-                }
-
-                public void setHasMinRangeValue(boolean hasMinRangeValue) {
-                    this.hasMinRangeValue = hasMinRangeValue;
-                }
-
-                public boolean isHasMaxRangeValue() {
-                    return hasMaxRangeValue;
-                }
-
-                public void setHasMaxRangeValue(boolean hasMaxRangeValue) {
-                    this.hasMaxRangeValue = hasMaxRangeValue;
-                }
-
-                public int getMinRangeValue() {
-                    return minRangeValue;
-                }
-
-                public void setMinRangeValue(int minRangeValue) {
-                    this.minRangeValue = minRangeValue;
-                }
-
-                public int getMaxRangeValue() {
-                    return maxRangeValue;
-                }
-
-                public void setMaxRangeValue(int maxRangeValue) {
-                    this.maxRangeValue = maxRangeValue;
-                }
-
-                public String getSynonymousValue() {
-                    return synonymousValue;
-                }
-
-                public void setSynonymousValue(String synonymousValue) {
-                    this.synonymousValue = synonymousValue;
-                }
-            }
 
             public LogicalOperator getLogicalOperator() {
                 return logicalOperator;
@@ -125,22 +76,6 @@ public class QueryBusinessRule {
                 this.edgeValue = edgeValue;
             }
 
-            public String getSynonymousEdge() {
-                return synonymousEdge;
-            }
-
-            public void setSynonymousEdge(String synonymousEdge) {
-                this.synonymousEdge = synonymousEdge;
-            }
-
-            public List<SynonymousEdgeValue> getSynonymousEdgeValues() {
-                return synonymousEdgeValues;
-            }
-
-            public void setSynonymousEdgeValues(List<SynonymousEdgeValue> synonymousEdgeValues) {
-                this.synonymousEdgeValues = synonymousEdgeValues;
-            }
-
             public boolean isEdgeNumeric() {
                 return isEdgeNumeric;
             }
@@ -148,13 +83,53 @@ public class QueryBusinessRule {
             public void setEdgeNumeric(boolean edgeNumeric) {
                 isEdgeNumeric = edgeNumeric;
             }
+        }
 
-            public boolean isSynonymousEdgeNumeric() {
-                return isSynonymousEdgeNumeric;
+        public static class SynonymousEdgeValue {
+            private boolean hasMinRangeValue;
+            private boolean hasMaxRangeValue;
+            private int minRangeValue;
+            private int maxRangeValue;
+            private String synonymousValue;                         //e.g., [".1cm"]
+
+            public boolean isHasMinRangeValue() {
+                return hasMinRangeValue;
             }
 
-            public void setSynonymousEdgeNumeric(boolean synonymousEdgeNumeric) {
-                isSynonymousEdgeNumeric = synonymousEdgeNumeric;
+            public void setHasMinRangeValue(boolean hasMinRangeValue) {
+                this.hasMinRangeValue = hasMinRangeValue;
+            }
+
+            public boolean isHasMaxRangeValue() {
+                return hasMaxRangeValue;
+            }
+
+            public void setHasMaxRangeValue(boolean hasMaxRangeValue) {
+                this.hasMaxRangeValue = hasMaxRangeValue;
+            }
+
+            public int getMinRangeValue() {
+                return minRangeValue;
+            }
+
+            public void setMinRangeValue(int minRangeValue) {
+                this.minRangeValue = minRangeValue;
+            }
+
+            public int getMaxRangeValue() {
+                return maxRangeValue;
+            }
+
+            public void setMaxRangeValue(int maxRangeValue) {
+                this.maxRangeValue = maxRangeValue;
+            }
+
+            public String getSynonymousValue() {
+                return synonymousValue;
+            }
+
+            public void setSynonymousValue(String synonymousValue) {
+                this.synonymousValue = synonymousValue;
             }
         }
 
@@ -204,6 +179,22 @@ public class QueryBusinessRule {
 
         public void setEdgeValuesToMatch(Map<String, List<String>> edgeValuesToMatch) {
             this.edgeValuesToMatch = edgeValuesToMatch;
+        }
+
+        public String getSynonymousEdge() {
+            return synonymousEdge;
+        }
+
+        public void setSynonymousEdge(String synonymousEdge) {
+            this.synonymousEdge = synonymousEdge;
+        }
+
+        public List<SynonymousEdgeValue> getSynonymousEdgeValues() {
+            return synonymousEdgeValues;
+        }
+
+        public void setSynonymousEdgeValues(List<SynonymousEdgeValue> synonymousEdgeValues) {
+            this.synonymousEdgeValues = synonymousEdgeValues;
         }
     }
 
