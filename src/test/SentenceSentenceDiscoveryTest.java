@@ -46,42 +46,53 @@ import com.mst.sentenceprocessing.SentenceDiscoveryProcessorImpl;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
 import com.mst.util.MongoDatastoreProviderDefault;
+import com.mst.util.RecommandedTokenRelationshipUtil;
 import com.mst.util.TokenRelationshipComparer;
+import com.mst.util.TokenRelationshipUtil;
 
 //import static org.junit.Assert.*;
 
 public class SentenceSentenceDiscoveryTest {
 
 	
-	//@Test
+	@Test
 	public void run() throws Exception{
 	
 		SentenceTextRequest request = TestDataProvider.getSentenceTextRequest(createFullPath());
+		
+		
 		//request.getDiscreteData().setOrganizationId("58ab6f9f96c2958294a1fdf0");
 		List<Sentence> sentences = getSentences(request);
 		List<SentenceDiscovery> discoveries = getSentenceDiscovery(request);
 		this.assertProcess(sentences, discoveries);
 	}
 	
-	@Test
+	//@Test
 	public void RunIterationRule() throws Exception {
-		 SentenceTextRequest request = getRequest("Borderline aneurysmal dilation of the infrarenal aorta measures 2.8 cm.");
-		//request.getDiscreteData().setOrganizationId("58ab6f9f96c2958294a1fdf0");
+		 //SentenceTextRequest request = getRequest("she has a simple cyst.");
+		 //  
+		SentenceTextRequest request = getRequest("There is a dominant follicle within the right ovary measuring 2.1 x 1.7 cm");
+		   
+		//SentenceTextRequest request = getRequest("the left ovary measure 4.7x2.4x2.7 cm in size");
+		   
+		 //request.getDiscreteData().setOrganizationId("58ab6f9f96c2958294a1fdf0");
 		List<SentenceDiscovery> discoveries = getSentenceDiscovery(request);
+		
+		
+		StringBuilder sb = new StringBuilder();
+		List<TokenRelationship> r = RecommandedTokenRelationshipUtil.getTokenRelationshipsFromRecommendedTokenRelationships(discoveries.get(0).getWordEmbeddings());
+		
+		appendEdgesToFile(sb, r,false);
+		
+		System.out.println(sb.toString());
+		
+		
+		
+		
+		
 
-		IterationRuleProcesser ruleProcesser = new IterationRuleProcesser();
-		
-		IterationRuleProcesserInput input =getIterationInput();
-		
-		List<RecommendedTokenRelationship> newEdges = ruleProcesser.process(discoveries.get(0).getWordEmbeddings(), input);
-		
-		
-		
 		request.setText("There is a dominant follicle within the right ovary measuring 2.1 x 1.7 cm");
 		discoveries = getSentenceDiscovery(request);
-		newEdges = ruleProcesser.process(discoveries.get(0).getWordEmbeddings(), input);
-	
-
 	}
 	
 	private IterationRuleProcesserInput getIterationInput(){
@@ -255,9 +266,9 @@ public class SentenceSentenceDiscoveryTest {
 		
 		
 			
-			sb.append("Old Env Sentence : " + sentence.getNormalizedSentence());
+			sb.append("Sentence : " + sentence.getNormalizedSentence());
 			sb.append(System.getProperty("line.separator"));
-			sb.append("New Env Sentence : "  + discovery.getNormalizedSentence());
+			sb.append("Discovery: "  + discovery.getNormalizedSentence());
 //			
 			if(TokenRelationshipComparer.areCollectionsSame(sentence.getTokenRelationships(), discoveryEdges,true)){
 				sb.append(System.getProperty("line.separator"));
@@ -270,7 +281,7 @@ public class SentenceSentenceDiscoveryTest {
 			sb.append("Sentence Count: " + sentence.getTokenRelationships().size());
 			sb.append(System.getProperty("line.separator"));
 			appendEdgesToFile(sb,sentence.getTokenRelationships(), false);
-			sb.append("Sentence (New) Count: " + discoveryEdges.size());
+			sb.append("Discovery Count: " + discoveryEdges.size());
 			sb.append(System.getProperty("line.separator"));
 			appendEdgesToFile(sb,discoveryEdges, true);
 			appendEndOfSentenceToFile(sb);
@@ -336,6 +347,9 @@ public class SentenceSentenceDiscoveryTest {
 		}
 		sb.append(System.getProperty("line.separator"));
 	}
+	
+
+	
 	
 	
 	private void appendEndOfSentenceToFile(StringBuilder sb){

@@ -10,7 +10,7 @@ public class IterationDataRule {
 	private String edgeNameTolookfor; 
 	private String edgeNameToStopfor; 
 	private PropertyValueTypes propertyValueType; 
-	
+	private boolean useSameEdgeName; 
 	
 	
 	public String getStartRelationship() {
@@ -45,6 +45,12 @@ public class IterationDataRule {
 	}
 	public void setPropertyValueType(PropertyValueTypes propertyValueType) {
 		this.propertyValueType = propertyValueType;
+	}
+	public boolean getUseSameEdgeName() {
+		return useSameEdgeName;
+	}
+	public void setUseSameEdgeName(boolean useSameEdgeName) {
+		this.useSameEdgeName = useSameEdgeName;
 	} 
 		
 }

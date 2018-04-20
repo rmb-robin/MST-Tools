@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeTypes;
@@ -20,6 +21,7 @@ public class IterationRuleProcesser {
 
 	
 	private TokenRelationshipFactory tokenRelationshipFactory;
+	private DistinctTokenRelationshipDeterminer distinctDeterminer = new DistinctTokenRelationshipDeterminerImpl();
 	
 	public IterationRuleProcesser(){
 		tokenRelationshipFactory = new TokenRelationshipFactoryImpl();
@@ -30,7 +32,7 @@ public class IterationRuleProcesser {
 		List<RecommendedTokenRelationship> result = new ArrayList<>();
 		result.addAll(processLeft(recommendedTokenRelationships, input.getLeftRules()));
 		result.addAll(processRight(recommendedTokenRelationships, input.getRightRules()));
-		return result;
+		return distinctDeterminer.getDistinctRecommendedRelationships(result);
 	}
 	
 	private List<RecommendedTokenRelationship> processLeft(List<RecommendedTokenRelationship> recommendedTokenRelationships, List<IterationDataRule> leftRules){
@@ -51,16 +53,22 @@ public class IterationRuleProcesser {
 		
 		List<Integer> indexes = getIndexes(recommendedTokenRelationships,rule.getStartRelationship(), true);
 		List<RecommendedTokenRelationship> result = new ArrayList<>();
-		
-		
+
 		for(int index: indexes) {
 			for(int i = index; i>=0; i--){
-				if(i==index) continue; 
+				if(rule.getUseSameEdgeName() && rule.getEdgeNameTolookfor().equals(rule.getStartRelationship())){
+					result.add(createSubjectEdge(recommendedTokenRelationships.get(index),  recommendedTokenRelationships.get(index),rule));
+					continue;
+				}
 				
+				if(index==0) continue;
+				if(i==index) continue; 
 				RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
+				if(shouldBreakIteration(rule,relationship)) break;
+				
 				boolean isMatch = isIterationRuleForRelationshipMatch(rule, relationship);
 				if(isMatch)
-					result.add(createSubjectEdge(relationship,  recommendedTokenRelationships.get(index)));
+					result.add(createSubjectEdge(relationship,  recommendedTokenRelationships.get(index),rule));
 			}	
 		}
 		return result;
@@ -100,10 +108,14 @@ public class IterationRuleProcesser {
 				if(i==index) continue; 
 				
 				RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
+				if(shouldBreakIteration(rule,relationship)){
+					break; 
+				}
 				boolean isMatch = isIterationRuleForRelationshipMatch(rule, relationship);
 				if(isMatch)
-					result.add(createSubjectComplimentEdge(recommendedTokenRelationships.get(index),relationship));
-			}	
+					result.add(createSubjectComplimentEdge(recommendedTokenRelationships.get(index),relationship,rule));
+			}
+			
 		}
 		return result;
 	}
@@ -118,11 +130,14 @@ public class IterationRuleProcesser {
 				if(i==index) continue;
 			
 				RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
+				if(shouldBreakIteration(rule,relationship)){
+					break; 
+				}
 				if(!relationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge))continue;
 				if(relationship.getTokenRelationship().getToToken().getPropertyValueType().equals(rule.getPropertyValueType())){
 					
 					result.add(
-							createSubjectComplimentEdge(recommendedTokenRelationships.get(index), relationship));
+							createSubjectComplimentEdge(recommendedTokenRelationships.get(index), relationship, rule));
 				}
 			}
 		}
@@ -134,23 +149,27 @@ public class IterationRuleProcesser {
 
 	
 	
-	private RecommendedTokenRelationship createSubjectEdge(RecommendedTokenRelationship startEdge, RecommendedTokenRelationship endEdge){
-
-		//currently 
-		return tokenRelationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.subjectVerb, EdgeTypes.related, startEdge.getTokenRelationship().getFromToken(), endEdge.getTokenRelationship().getToToken(), 
-				this.getClass().getName());
-		
-		
+	private RecommendedTokenRelationship createSubjectEdge(RecommendedTokenRelationship startEdge, RecommendedTokenRelationship endEdge,IterationDataRule rule){
+		RecommendedTokenRelationship relationship =  tokenRelationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.subjectVerb, EdgeTypes.related, startEdge.getTokenRelationship().getFromToken(), endEdge.getTokenRelationship().getToToken(), 
+				this.getClass().getName());	
+		relationship.setIterationPoint(rule.getPointValue());
+		return relationship;
 	}
 	
-	private RecommendedTokenRelationship createSubjectComplimentEdge(RecommendedTokenRelationship startEdge, RecommendedTokenRelationship endEdge){
+	private RecommendedTokenRelationship createSubjectComplimentEdge(RecommendedTokenRelationship startEdge, RecommendedTokenRelationship endEdge, IterationDataRule rule){
 
-		//currently 
-		return tokenRelationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.subjectComplementVerb, EdgeTypes.related, startEdge.getTokenRelationship().getFromToken(), endEdge.getTokenRelationship().getToToken(), 
+		RecommendedTokenRelationship relationship =  tokenRelationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.subjectComplementVerb, EdgeTypes.related, startEdge.getTokenRelationship().getFromToken(), endEdge.getTokenRelationship().getToToken(), 
 				this.getClass().getName());
+		relationship.setIterationPoint(rule.getPointValue());
+		return relationship;
 	}
 	
 
+	private boolean shouldBreakIteration(IterationDataRule rule, RecommendedTokenRelationship recommendedTokenRelationship){
+		if(rule.getEdgeNameToStopfor()==null) return false; 
+		return rule.getEdgeNameToStopfor().equals(recommendedTokenRelationship.getTokenRelationship().getEdgeName());
+	}
+	
 	private boolean isIterationRuleForRelationshipMatch(IterationDataRule rule, RecommendedTokenRelationship recommendedTokenRelationship){
 		return rule.getEdgeNameTolookfor().equals(recommendedTokenRelationship.getTokenRelationship().getEdgeName());
 	}
@@ -164,15 +183,8 @@ public class IterationRuleProcesser {
 			
 			RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(i);
 			if(relationship.getTokenRelationship().getEdgeName().equals(edgeName)){
+				result.add(i);
 				
-				if(i==0){
-					
-					if(!isLeft)
-						result.add(i);
-				}
-				else {
-					result.add(i);
-				}
 			}
 		}
 		return result;

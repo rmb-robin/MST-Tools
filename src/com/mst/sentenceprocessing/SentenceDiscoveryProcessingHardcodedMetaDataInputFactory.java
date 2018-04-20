@@ -34,7 +34,7 @@ public class SentenceDiscoveryProcessingHardcodedMetaDataInputFactory implements
 		return metaDataInput;
 	}
 	
-	private IterationRuleProcesserInput createIterationRuleProcessorInput(){
+	public IterationRuleProcesserInput createIterationRuleProcessorInput(){
 		
 		IterationRuleProcesserInput input = new IterationRuleProcesserInput();
 		input.setLeftRules(getLeftRules());
@@ -45,23 +45,35 @@ public class SentenceDiscoveryProcessingHardcodedMetaDataInputFactory implements
 	private List<IterationDataRule> getLeftRules(){
 		List<IterationDataRule> rules = new ArrayList<>();
 		
-		rules.add(createRule(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.firstVerb, 10));
-		rules.add(createRule(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.secondPrep, 20));
-		rules.add(createRule(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.secondVerb, 30));
+		rules.add(createRuleWithStop(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.firstVerb, 10, WordEmbeddingTypes.defaultEdge));
+		rules.add(createRuleWithStop(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.secondPrep, 20, WordEmbeddingTypes.firstVerb));
+		rules.add(createRuleWithSameStartEnd(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.secondVerb, 30));
 		return rules;
 	}
-	
+//	
 	private List<IterationDataRule> getRightRules(){
 		List<IterationDataRule> rules = new ArrayList<>();
 		rules.add(createRule(WordEmbeddingTypes.verbPrep, WordEmbeddingTypes.firstPrep, 5));	
 		rules.add(createRule(WordEmbeddingTypes.verbPrep, WordEmbeddingTypes.defaultEdge, 10, PropertyValueTypes.NounPhraseEnd));
-		rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.firstVerb, 20));
-		rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.defaultEdge, 30, PropertyValueTypes.NounPhraseEnd));
-		rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.secondPrep, 40));
+		rules.add(createRuleWithSameStartEnd(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.firstVerb, 20));
+		rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.defaultEdge, 30, PropertyValueTypes.NounPhraseEnd,WordEmbeddingTypes.secondVerb));
+		rules.add(createRuleWithStop(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.secondPrep, 40,WordEmbeddingTypes.secondVerb));
 		
 		
 		return rules;
 	}
+	
+//	private List<IterationDataRule> getRightRules(){
+//		List<IterationDataRule> rules = new ArrayList<>();
+//		rules.add(createRule(WordEmbeddingTypes.verbPrep, WordEmbeddingTypes.firstPrep, 5));	
+//		rules.add(createRule(WordEmbeddingTypes.verbPrep, WordEmbeddingTypes.defaultEdge, 10, PropertyValueTypes.NounPhraseEnd));
+//		rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.firstVerb, 20));
+//		rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.defaultEdge, 30, PropertyValueTypes.NounPhraseEnd,WordEmbeddingTypes.secondVerb));
+//		//rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.secondPrep, 40));
+//		rules.add(createRuleWithStop(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.secondPrep, 40,WordEmbeddingTypes.secondVerb));
+//		
+//		return rules;
+//	}
 	
 	private IterationDataRule createRule(String startEdge, String endEdge,int point){
 		IterationDataRule rule = new IterationDataRule();
@@ -77,6 +89,28 @@ public class SentenceDiscoveryProcessingHardcodedMetaDataInputFactory implements
 		rule.setPropertyValueType(propertyValueTypes);
 		return rule;
 	}
+
+	private IterationDataRule createRule(String startEdge, String endEdge,int point, PropertyValueTypes propertyValueTypes,String stopEdge){
+		IterationDataRule rule = createRule(startEdge, endEdge, point);
+		rule.setPropertyValueType(propertyValueTypes);
+		rule.setEdgeNameToStopfor(stopEdge);
+		return rule;
+	}
+	
+	
+	private IterationDataRule createRuleWithSameStartEnd(String startEdge, String endEdge,int point){
+		IterationDataRule rule = createRule(startEdge, endEdge, point);
+		rule.setUseSameEdgeName(true);
+		return rule;
+	}
+	
+	private IterationDataRule createRuleWithStop(String startEdge, String endEdge,int point,String stopEdge){
+		IterationDataRule rule = createRule(startEdge, endEdge, point);
+		rule.setEdgeNameToStopfor(stopEdge);
+		rule.setUseSameEdgeName(true);
+		return rule;
+	}
+	
 	
 	
 }

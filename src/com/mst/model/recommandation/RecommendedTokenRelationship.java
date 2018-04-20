@@ -21,6 +21,7 @@ public class RecommendedTokenRelationship {
 
 	private TokenRelationship tokenRelationship;
 	private String key;
+	private int iterationPoint;  
 	
 	private boolean isVerified;
 	public TokenRelationship getTokenRelationship() {
@@ -41,5 +42,13 @@ public class RecommendedTokenRelationship {
 	public void setKey(String key) {
 		this.key = key;
 	}
+	public int getIterationPoint() {
+		return iterationPoint;
+	}
+	public void setIterationPoint(int iterationPoint) {
+		this.iterationPoint = iterationPoint;
+	}
 
+	
+	
 }

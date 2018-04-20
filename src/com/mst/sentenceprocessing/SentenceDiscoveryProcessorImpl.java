@@ -44,8 +44,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private RecommendedNegativeRelationshipFactoryImpl negativeRelationshipfactory;
 	private VerbExistanceProcessor verbExistanceProcessor; 
 	private IterationRuleProcesser iterationRuleProcesser;
-	
-	
+
 	public SentenceDiscoveryProcessorImpl(){
 		sentenceFactory = new SentenceFactory();
 		ngramProcessor = new NGramsSentenceProcessorImpl();
@@ -86,13 +85,16 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			sentence.setModifiedWordList(tokens);
 			SentenceDiscovery discovery =  convert(sentence, nounPhraseResult);		
 			discovery.getWordEmbeddings().addAll(nounPhraseProcesser.addEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
-			subjectAnnotator.annotate(discovery);
+		//	subjectAnnotator.annotate(discovery);
 			discovery.getWordEmbeddings().addAll(negativeRelationshipfactory.create(discovery.getModifiedWordList()));
+		
+			discovery.getWordEmbeddings().addAll(iterationRuleProcesser.process(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getIterationRuleProcesserInput()));
 			discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
-			
+				
+		
+			//should always be last.....
 			List<RecommendedTokenRelationship> edges = nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(), this.sentenceProcessingMetaDataInput.getNounRelationshipsInput());
 			
-			edges.addAll(iterationRuleProcesser.process(edges, sentenceProcessingMetaDataInput.getIterationRuleProcesserInput()));
 			discovery.setWordEmbeddings(edges);
 			
 			

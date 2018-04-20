@@ -97,4 +97,16 @@ public class RecommandedTokenRelationshipUtil {
 	}
     
 
+    public static Map<String, List<RecommendedTokenRelationship>> getRelationshipsByEdgeName(List<RecommendedTokenRelationship> relationships){
+    		HashMap<String,List<RecommendedTokenRelationship>> result = new HashMap<>();
+    	 
+    		
+    		for(RecommendedTokenRelationship tokenRelationship: relationships){
+    			if(!result.containsKey(tokenRelationship.getTokenRelationship().getEdgeName()))
+    				result.put(tokenRelationship.getTokenRelationship().getEdgeName(), new ArrayList<RecommendedTokenRelationship>());
+    			result.get(tokenRelationship.getTokenRelationship().getEdgeName()).add(tokenRelationship);
+    		}
+    		return result;
+    	}	
+   
 }
