@@ -154,7 +154,7 @@ labia,bpoc
 vulvas,bpoc
 almost,qlco
 findings,dysn
-calcified,dysn
+calcified,qlco
 bruise,sympto
 follicular,qlco-simple
 kidney,bpoc
@@ -215,7 +215,7 @@ hepatic,bpoc
 shoulder,bpoc
 tamoxifen,drugpr
 jaw,bpoc
-margin,qlco-sym
+margin,dysn
 cts,proc
 genes,gene
 probable,qlco
@@ -243,7 +243,7 @@ bowel,bpoc
 fallopians,bpoc
 tumor,dysn
 hyperechoic,qlco-simple
-margins,qlco-sym
+margins,dysn
 lesions,dysn
 thigh,bpoc
 basilar,qlco
@@ -473,7 +473,7 @@ stage,neop-stage
 complicated,qlco
 maximum,qlco-measu
 polyp,dysn
-opacity,qlco
+opacity,dysn
 under,qlco
 multiples,qlco
 brca,gene
@@ -1874,3 +1874,57 @@ density,dysn
 attenuation,dysn
 squamous,qlco-neop
 less,qlco
+apex,bpoc
+rml,bpoc
+rll,bpoc
+rul,bpoc
+lul,bpoc
+lll,bpoc
+lingual,bpoc
+perifissural,bpoc
+fissural,bpoc
+fissures,bpoc
+subpleural,bpoc
+diaphragmatic,bpoc
+hemidiaphragm,bpoc
+hemi-diaphragm,bpoc
+hemi diaphragm,bpoc
+azygo esophageal,bpoc
+azygos lobe,bpoc
+cardiacophrenic,bpoc
+costophrenic,bpoc
+juxtapleural,bpoc
+juxtafissural,bpoc
+lower,qlco
+sub-solid,qlco
+sub solid,qlco
+hazy,qlco
+part-solid,qlco
+part solid,qlco
+internal,qlco
+target,qlco
+popcorn,qlco
+concentric,qlco
+lamellar,qlco
+fatty,qlco
+hamartoma,qlco
+pfn,qlco
+lentiform,qlco
+triangular,qlco
+polygonal,qlco
+innumerable,qlco
+multiple,qlco
+spiculated,qlco
+bubbly,qlco
+opacities,dysn
+lucency,dysn
+lecencies,dysn
+appearance,dysn
+emphysema,dysn
+copd,dysn
+emphysematous,dysn
+fibrosis,dysn
+uip,dysn
+aids,dysn
+hiv,dysn
+single,qlco
