@@ -108,3 +108,9 @@ dominant follicles,dominant-follicles
 thoracic spine,thoracic-spine
 ground glass,ground-glass
 lumbar spine,lumbar-spine
+ground glass,ground-glass
+sub solid,sub-solid
+part solid,part-solid
+hemi diaphragm,hemi-diaphragm
+azygo esophageal,azygo-esophageal
+azygos lobe,azygos-lobe
