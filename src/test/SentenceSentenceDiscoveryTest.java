@@ -71,7 +71,7 @@ public class SentenceSentenceDiscoveryTest {
 	public void RunIterationRule() throws Exception {
 		 //SentenceTextRequest request = getRequest("she has a simple cyst.");
 		 //  
-		SentenceTextRequest request = getRequest("There is a dominant follicle within the right ovary measuring 2.1 x 1.7 cm");
+		SentenceTextRequest request = getRequest("There is a dominant follicle within the middle ovary measuring 3 cm");
 		   
 		//SentenceTextRequest request = getRequest("the left ovary measure 4.7x2.4x2.7 cm in size");
 		   
@@ -339,6 +339,9 @@ public class SentenceSentenceDiscoveryTest {
 				name = relationship.getNamedEdge();
 			sb.append("EdgeName: " + name);
 			sb.append(System.getProperty("line.separator"));
+			sb.append("Source:" + relationship.getSource());
+			sb.append(System.getProperty("line.separator"));
+			
 			
 			sb.append("  From: " +relationship.getFromToken().getToken());
 			sb.append(System.getProperty("line.separator"));
@@ -362,7 +365,9 @@ public class SentenceSentenceDiscoveryTest {
 		List<TokenRelationship> result = new ArrayList<>();
 		for(RecommendedTokenRelationship rt : discovery.getWordEmbeddings()){
 			if(rt.getTokenRelationship().getNamedEdge()!=null)
-				result.add(rt.getTokenRelationship());
+			{	result.add(rt.getTokenRelationship());
+				continue;
+			}
 			
 			if(rt.getTokenRelationship().getEdgeName().equals(EdgeNames.existence))
 				result.add(rt.getTokenRelationship());
@@ -370,10 +375,6 @@ public class SentenceSentenceDiscoveryTest {
 		}
 		return result;
 		
-		
 	}
-	
-	
-	
-	
+
 }

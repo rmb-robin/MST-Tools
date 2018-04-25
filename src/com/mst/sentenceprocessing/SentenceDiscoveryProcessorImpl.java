@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
+import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
 import com.mst.interfaces.sentenceprocessing.PrepositionPhraseProcessor;
@@ -21,6 +23,7 @@ import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.RecommandationRequest;
 import com.mst.model.requests.SentenceTextRequest;
+import com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl;
 import com.mst.model.sentenceProcessing.RecommandedNounPhraseResult;
 import com.mst.model.sentenceProcessing.RecommandedSubjectAnnotatorImpl;
 import com.mst.model.sentenceProcessing.Sentence;
@@ -44,7 +47,9 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private RecommendedNegativeRelationshipFactoryImpl negativeRelationshipfactory;
 	private VerbExistanceProcessor verbExistanceProcessor; 
 	private IterationRuleProcesser iterationRuleProcesser;
-
+	private DistinctTokenRelationshipDeterminer distinctTokenRelationshipDeterminer;
+	private AdditionalExistenceEdgeProcesser additionalExistenceEdgeProcesser; 
+	
 	public SentenceDiscoveryProcessorImpl(){
 		sentenceFactory = new SentenceFactory();
 		ngramProcessor = new NGramsSentenceProcessorImpl();
@@ -58,6 +63,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		negativeRelationshipfactory = new RecommendedNegativeRelationshipFactoryImpl();
 		verbExistanceProcessor = new VerbExistanceProcessorImpl();
 		iterationRuleProcesser  = new IterationRuleProcesser();
+		distinctTokenRelationshipDeterminer = new DistinctTokenRelationshipDeterminerImpl();
+		additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
 	}
 
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
@@ -91,12 +98,16 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			discovery.getWordEmbeddings().addAll(iterationRuleProcesser.process(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getIterationRuleProcesserInput()));
 			discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
 				
-		
+			
 			//should always be last.....
 			List<RecommendedTokenRelationship> edges = nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(), this.sentenceProcessingMetaDataInput.getNounRelationshipsInput());
 			
+			edges = distinctTokenRelationshipDeterminer.getDistinctRecommendedRelationships(edges);
 			discovery.setWordEmbeddings(edges);
 			
+			RecommendedTokenRelationship relationship = additionalExistenceEdgeProcesser.processDiscovery(discovery);
+			if(relationship!=null)
+				discovery.getWordEmbeddings().add(relationship);
 			
 			discoveries.add(discovery);
 		}

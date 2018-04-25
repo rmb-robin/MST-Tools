@@ -4,7 +4,7 @@ complicate,complicates,complicated,complicating,complicate,no,yes
 compose,composes,composed,composing,build
 measure,measures,measured,measuring,calculate,,yes
 get,gets,got,gotten
-demonstrate,demonstrates,demonstrated,demonstrating, demonstrate
+demonstrate,demonstrates,demonstrated,demonstrating, demonstrate,yes
 appear,appears,appeared,appearing,appear,yes
 detect,detects,detected,detecting,see,yes,yes
 visualize,visualizes,visualized,visualizing,view,yes

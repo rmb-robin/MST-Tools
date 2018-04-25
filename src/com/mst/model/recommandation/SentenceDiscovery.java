@@ -16,6 +16,7 @@ import org.mongodb.morphia.annotations.Reference;
 import org.mongodb.morphia.utils.IndexType;
 
 import com.mst.model.discrete.DiscreteData;
+import com.mst.model.sentenceProcessing.BaseSentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.Verb;
 import com.mst.model.sentenceProcessing.WordToken;
@@ -24,7 +25,7 @@ import com.mst.model.sentenceProcessing.WordToken;
 @Indexes({
     @Index(fields = {@Field(value = "origSentence", type = IndexType.TEXT)})
 })
-public class SentenceDiscovery {
+public class SentenceDiscovery extends BaseSentence {
 
 	@Id
 	private ObjectId id;
@@ -37,7 +38,6 @@ public class SentenceDiscovery {
 	
 	
 	private List<String> originalWords;
-	private List<WordToken> modifiedWordList = new ArrayList<>();
 	private Map<Integer, Integer> nounPhraseIndexes; 
 	
 	private List<RecommendedTokenRelationship> wordEmbeddings = new ArrayList<>();
@@ -95,12 +95,7 @@ public class SentenceDiscovery {
 	public void setOriginalWords(List<String> originalWords) {
 		this.originalWords = originalWords;
 	}
-	public List<WordToken> getModifiedWordList() {
-		return modifiedWordList;
-	}
-	public void setModifiedWordList(List<WordToken> modifiedWordList) {
-		this.modifiedWordList = modifiedWordList;
-	}
+
 	public List<RecommendedTokenRelationship> getWordEmbeddings() {
 		return wordEmbeddings;
 	}

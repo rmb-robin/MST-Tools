@@ -12,7 +12,7 @@ import com.mst.model.discrete.DiscreteData;
 import java.time.LocalDate;
 
 
-public class Sentence {
+public class Sentence extends BaseSentence {
 
 	private int position;
 	private long lineId;
@@ -21,7 +21,6 @@ public class Sentence {
 	private LocalDate processingDate;
 	
 	private List<String> originalWords;
-	private List<WordToken> modifiedWordList = new ArrayList<>();
 	private List<TokenRelationship> tokenRelationships = new ArrayList<>();
 	private String id, source, practice, study;
 	private String organizationId;
@@ -43,17 +42,7 @@ public class Sentence {
 		this.normalizedSentence = fullSentence;
 	}
 	
-	public WordToken getTokenBySemanticType(String semanticType){
-		if(this.modifiedWordList==null) return null;
-		
-		for(WordToken wordToken: this.modifiedWordList){
-			if(wordToken.getSemanticType()==null) continue;
-			if(wordToken.getSemanticType().equals(semanticType))
-				return wordToken;
-			
-		}
-		return null;
-	}
+
 	
 	public Map<String,List<TokenRelationship>> getTokenRelationsByNameMap(){
 		HashMap<String,List<TokenRelationship>> result = new HashMap<>();
@@ -157,13 +146,6 @@ public class Sentence {
 		this.origSentence = sentence;
 	}
 
-	public List<WordToken> getModifiedWordList() {
-		return modifiedWordList;
-	}
-
-	public void setModifiedWordList(List<WordToken> modifiedWordList) {
-		this.modifiedWordList = modifiedWordList;
-	}
 
 	public List<String> getOriginalWords() {
 		return originalWords;
