@@ -8,21 +8,17 @@ import org.mongodb.morphia.annotations.Id;
 
 import java.util.List;
 
-@Entity("queryBusinessRule")
-public class QueryBusinessRule {
+@Entity("businessRule")
+public class BusinessRule {
     @Id
     @JsonSerialize(using=ObjectIdJsonSerializer.class)
     private ObjectId id;
     private String organizationId;
     private String ruleType;
-    private List<String> tokenSequenceToExlude;
+    private List<BusinessRule> rules;
 
     public ObjectId getId() {
         return id;
-    }
-
-    public void setId(ObjectId id) {
-        this.id = id;
     }
 
     public String getOrganizationId() {
@@ -41,11 +37,11 @@ public class QueryBusinessRule {
         this.ruleType = ruleType;
     }
 
-    public List<String> getTokenSequenceToExlude() {
-		return this.tokenSequenceToExlude;
-	}
+    public List<BusinessRule> getRules() {
+        return rules;
+    }
 
-	public void setTokenSequenceToExlude(List<String> tokenSequenceToExlude) {
-		this.tokenSequenceToExlude = tokenSequenceToExlude;
-	}
+    public void setRules(List<BusinessRule> rules) {
+        this.rules = rules;
+    }
 }

@@ -96,3 +96,7 @@ multi-nodular,f,bpoc,t,null,heterogeneous finding site
 cardinal number,t,cgy,f,null,radiation dosage
 cardinal number,t,fraction,f,null,radiation fractions
 cardinal number,t,fractions,f,null,radiation fractions
+qlco-shape,t,dysn,t,null,disease modifier
+single,f,dysn,t,null,quantity
+multiple,f,dysn,t,null,quantity
+innumerable,f,dysn,t,null,quantity
