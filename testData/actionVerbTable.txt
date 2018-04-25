@@ -744,7 +744,6 @@ lay,lays,laid,laying,,yes,no,no
 lead,leads,led,leading,,yes,no,no
 lean,leans,leaned,leaning,,yes,no,no
 learn,learns,learned,learning,,yes,no,no
-leave,leaves,left,leaving,,yes,no,no
 lend,lends,lent,lending,,yes,no,no
 lengthen,lengthens,lengthened,lengthening,,yes,no,no
 lessen,lessens,lessened,lessening,,yes,no,no
@@ -1093,7 +1092,6 @@ revive,revives,revived,reviving,,yes,no,no
 revolutionize,revolutionizes,revolutionized,revolutionizing,,yes,no,no
 revolve,revolves,revolved,revolving,,yes,no,no
 rework,reworks,reworked,reworking,,yes,no,no
-right,rights,righted,righting,,yes,no,no
 risk,risks,risked,risking,,yes,no,no
 rock,rocks,rocked,rocking,,yes,no,no
 rotate,rotates,rotated,rotating,,yes,no,no
