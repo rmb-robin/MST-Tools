@@ -2219,11 +2219,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: adrenal
+  From: lesions
   To: density
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: lesions
+  From: adrenal
   To: density
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
@@ -2819,11 +2819,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cyst
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cyst
+  From: cm
   To: imaging
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cm
+  From: cyst
   To: imaging
 EdgeName: laterality
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
