@@ -21,7 +21,7 @@ public class TokenRelationshipComparer {
 			List<TokenRelationship> secondCollection){
 		return firstCollection.size()== secondCollection.size();
 	}
-	
+	  
 	
 	private static boolean compareCollections(Map<String, List<TokenRelationship>> firstCollectionMap, Map<String, List<TokenRelationship>> secondCollection){
 		for(Entry<String, List<TokenRelationship>> entry: firstCollectionMap.entrySet()){			

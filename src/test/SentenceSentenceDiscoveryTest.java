@@ -10,7 +10,10 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.junit.Test;
 //import org.junit.Test;
@@ -26,6 +29,7 @@ import com.mst.interfaces.sentenceprocessing.NounRelationshipProcesserSentenceDi
 import com.mst.metadataProviders.TestDataProvider;
 import com.mst.metadataProviders.TestHl7Provider;
 import com.mst.model.metadataTypes.EdgeNames;
+import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.raw.RawReportFile;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
@@ -65,6 +69,7 @@ public class SentenceSentenceDiscoveryTest {
 		List<Sentence> sentences = getSentences(request);
 		List<SentenceDiscovery> discoveries = getSentenceDiscovery(request);
 		this.assertProcess(sentences, discoveries);
+		this.assertSummary(sentences, discoveries);
 	}
 	
 	//@Test
@@ -140,7 +145,7 @@ public class SentenceSentenceDiscoveryTest {
 		request.getDiscreteData().setOrganizationId("58ab6f9f96c2958294a1fdf0");
 	
 		 ObjectMapper mapper = new ObjectMapper();
-		mapper.writeValue(new File(createOutputPath()), request);
+		mapper.writeValue(new File(createOutputPath("sentencetextresult.txt")), request);
 		
 			List<SentenceDb> oldSentences = processAndGetSentences(request,
 				"http://10.12.128.100:8080/mst-sentence-service/webapi/sentence/savetext","10.12.128.98", false);
@@ -252,9 +257,9 @@ public class SentenceSentenceDiscoveryTest {
 				File.separator + "sentences.txt" ;
 	}
 	
-	private String createOutputPath(){
+	private String createOutputPath(String fileName){
 		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + "Sentence_SentenceDiscoveryTesting" + 
-				File.separator + "sentencesresult.txt" ;
+				File.separator + fileName ;
 	}
 	
 	private void assertProcess(List<Sentence> sentences, List<SentenceDiscovery> discoveries) throws Exception{
@@ -289,7 +294,7 @@ public class SentenceSentenceDiscoveryTest {
 			appendEndOfSentenceToFile(sb);
 		}
 		
-		String fileName = createOutputPath();
+		String fileName = createOutputPath("sentencesresult.txt");
 		FileWriter fileWriter = new FileWriter(fileName);
 		PrintWriter printWriter = new PrintWriter(fileWriter);
 		printWriter.print(sb.toString());
@@ -297,6 +302,75 @@ public class SentenceSentenceDiscoveryTest {
 
 	}
 	
+	private void sbAppendWithLineBreak(String value, StringBuilder sb){
+		sb.append(value);
+		sb.append(System.getProperty("line.separator"));
+	}
+	
+	
+	private void assertSummary(List<Sentence> sentences, List<SentenceDiscovery> discoveries) throws Exception{
+		StringBuilder sb = new StringBuilder();
+		sbAppendWithLineBreak("Sentence Count"  + sentences.size(), sb);
+		List<String> edges = TestDataProvider.readLines(createOutputPath("secondaryedges.txt"));
+		edges.add(0, EdgeNames.existence);
+
+		Map<String, Integer> edgesByMatchingCount = new HashMap<>();
+		for(String edge: edges){
+			edgesByMatchingCount.put(edge,0);
+		}
+		
+		for(int i =0;i<sentences.size();i++){
+			Sentence sentence = sentences.get(i);
+			SentenceDiscovery discovery = discoveries.get(i);
+		
+			List<TokenRelationship> discoveryTokenRelationships = RecommandedTokenRelationshipUtil.getTokenRelationshipsFromRecommendedTokenRelationships(discovery.getWordEmbeddings());
+		
+		
+			
+			
+			Map<String, List<TokenRelationship>> sentenceEdges  = TokenRelationshipUtil.getMapByEdgeName(sentence.getTokenRelationships(), false);
+			Map<String, List<TokenRelationship>> discoveryEdges = TokenRelationshipUtil.getMapByEdgeName(discoveryTokenRelationships, true);
+			
+					 
+			for(Entry<String,Integer>  entry: edgesByMatchingCount.entrySet()){
+				
+				String edge = entry.getKey();
+				if(!sentenceEdges.containsKey(edge) && discoveryEdges.containsKey(edge) ) {
+					continue; 
+				}
+		
+				if(sentenceEdges.containsKey(edge) && !discoveryEdges.containsKey(edge) ) {
+					continue; 
+				}
+				
+				if(!sentenceEdges.containsKey(edge) && !discoveryEdges.containsKey(edge) ) {
+					entry.setValue(entry.getValue()+1);
+					continue; 
+				}
+				List<TokenRelationship> sentenceEdgesForEdgeName = sentenceEdges.get(edge);
+				List<TokenRelationship> discoveryEdgesForEdgeName = discoveryEdges.get(edge);
+				if(TokenRelationshipComparer.areCollectionsSame(sentenceEdgesForEdgeName, discoveryEdgesForEdgeName,true))
+					entry.setValue(entry.getValue()+1);
+		}
+		
+	}
+		
+	
+		
+		for(Entry<String,Integer> entry: edgesByMatchingCount.entrySet()){
+			sbAppendWithLineBreak(entry.getKey() + " " + entry.getValue(), sb);
+		}
+
+		String fileName = createOutputPath("sentenceSummary.txt");
+		FileWriter fileWriter = new FileWriter(fileName);
+		PrintWriter printWriter = new PrintWriter(fileWriter);
+		printWriter.print(sb.toString());
+		printWriter.close();
+		
+		
+		
+	
+	}
 	
 	private void assertEdges(List<SentenceDb> old, List<SentenceDb> newSentences, boolean useSecondAsDiscovery) throws Exception{
 		
@@ -326,7 +400,7 @@ public class SentenceSentenceDiscoveryTest {
 			appendEndOfSentenceToFile(sb);
 		}
 		
-		String fileName = createOutputPath();
+		String fileName = createOutputPath("sentencesresult.txt");
 		FileWriter fileWriter = new FileWriter(fileName);
 		PrintWriter printWriter = new PrintWriter(fileWriter);
 		printWriter.print(sb.toString());
