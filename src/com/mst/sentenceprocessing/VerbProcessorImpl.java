@@ -1,6 +1,7 @@
 package com.mst.sentenceprocessing;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.model.metadataTypes.VerbTense;
@@ -64,7 +65,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		if(item.getVerbType().equals(VerbType.LV))
 			isExistance = true;
 		
-		Verb verb = createVerb(item.getVerbTense(),item.getVerbType(),item.getVerbState(),null,isExistance,false,false);
+		Verb verb = createVerb(item.getVerbTense(),item.getVerbType(),item.getVerbState(),null,isExistance,false,false,null);
 		wordToken.setVerb(verb);
 		return true;
 	}
@@ -78,7 +79,13 @@ public class VerbProcessorImpl implements VerbProcessor {
 		
 		ActionVerbItem item = actionVerbTable.getVerbsByWord().get(key);
 		wordToken.setPos(VerbType.AV.toString());	
-		Verb verb = createVerb(item.getVerbTense(), VerbType.AV,null,item.getVerbNetClass(), item.getIsExistance(),item.getIsMaintainVerbNetClass(),item.getIsNegation());
+		UUID presentId = item.getInfinitivePresentId();
+		ActionVerbItem presentVerb = actionVerbTable.getVerbyById().get(presentId);
+		String presentVerbName = null;
+		if(presentVerb!=null)
+			presentVerbName = presentVerb.getVerb();
+		
+		Verb verb = createVerb(item.getVerbTense(), VerbType.AV,null,item.getVerbNetClass(), item.getIsExistance(),item.getIsMaintainVerbNetClass(),item.getIsNegation(),presentVerbName);
 		wordToken.setVerb(verb);
 		
 		if(item.getId()== item.getInfinitivePresentId()) return true;
@@ -90,7 +97,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		return true;
 	}
 	
-	private Verb createVerb(VerbTense verbTense, VerbType verbType, String state, String verbNetClass, boolean isExistance,boolean isMaintainVerbNetClass,boolean isNegation){
+	private Verb createVerb(VerbTense verbTense, VerbType verbType, String state, String verbNetClass, boolean isExistance,boolean isMaintainVerbNetClass,boolean isNegation,String presentTerm){
 		Verb verb = new Verb();
 		verb.setVerbTense(verbTense);
 		verb.setVerbType(verbType);
@@ -99,6 +106,7 @@ public class VerbProcessorImpl implements VerbProcessor {
 		verb.setExistance(isExistance);
 		verb.setMaintainVerbNetClass(isMaintainVerbNetClass);
 		verb.setNegation(isNegation);
+		verb.setPresentVerb(presentTerm);
 		return verb;
 	}
 

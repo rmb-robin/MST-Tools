@@ -119,6 +119,8 @@ public class SentenceSentenceDiscoveryTest {
 	private SentenceTextRequest getRequest(String text){
 		SentenceTextRequest request = TestDataProvider.getSentenceTextRequest(createFullPath());
 		request.setText(text);
+		request.setConvertLargest(true);
+		request.setConvertMeasurements(true);
 		return request;
 	}
 	

@@ -52,7 +52,47 @@ Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
 *************************************************
 Sentence : ct demonstrates a large complex ovarian cyst.
 Discovery: ct demonstrate large complex ovarian cyst 
-Edges Match
+Sentence Count: 4
+EdgeName: disease modifier
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: complex
+  To: cyst
+EdgeName: disease modifier
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: large
+  To: cyst
+EdgeName: disease location
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: ovarian
+  To: cyst
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ct
+  To: cyst
+
+Discovery Count: 5
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ct
+  To: cyst
+EdgeName: demonstrate
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ct
+  To: cyst
+EdgeName: disease modifier
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: complex
+  To: cyst
+EdgeName: disease modifier
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: large
+  To: cyst
+EdgeName: disease location
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: ovarian
+  To: cyst
+
+
 *************************************************
 Sentence : ct demonstrates a large complex ovarian cyst 4 cm.
 Discovery: ct demonstrate large complex ovarian cyst 4 cm 
@@ -90,8 +130,12 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 4
   To: cm
 
-Discovery Count: 6
+Discovery Count: 7
 EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ct
+  To: cm
+EdgeName: demonstrate
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: ct
   To: cm
@@ -123,18 +167,30 @@ Discovery: bilateral thyroid goiter is demonstrate
 Edges Match
 *************************************************
 Sentence : punctate calcifications are seen within the left thyroid lobe, nonspecific.
-Discovery: punctate calcifications are see within leave thyroid lobe nonspecific 
-Sentence Count: 1
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: calcifications
+Discovery: punctate calcifications are see within left thyroid lobe nonspecific 
+Sentence Count: 4
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: see
   To: lobe
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: see
+  To: thyroid
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: lobe
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: thyroid
 
 Discovery Count: 1
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: within
-  To: nonspecific
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: thyroid
 
 
 *************************************************
@@ -170,7 +226,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: distal
   To: abdominal
 
-Discovery Count: 5
+Discovery Count: 6
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: aneurysm
+  To: cm
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: large
@@ -262,7 +322,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.8
   To: cm
 
-Discovery Count: 3
+Discovery Count: 4
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: dilation
+  To: cm
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2.8
@@ -291,7 +355,7 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: the
+  From: right
   To: cm
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
@@ -299,7 +363,7 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: cm
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: the
+  From: right
   To: cm
 EdgeName: laterality
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
@@ -307,27 +371,27 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: ovary
 
 Discovery Count: 2
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ovary
+  To: 2.3x1.6x2.2
 EdgeName: laterality
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
   From: right
   To: ovary
 
 
 *************************************************
 Sentence : the left ovary measure 4.7x2.4x2.7  cm in size.
-Discovery: leave ovary measure 4.7x2.4x2.7 cm in size 
-Sentence Count: 4
+Discovery: left ovary measure 4.7x2.4x2.7 cm in size 
+Sentence Count: 5
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: ovary
   To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: the
+  From: left
   To: cm
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
@@ -335,10 +399,22 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: cm
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: the
+  From: left
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovary
 
-Discovery Count: 0
+Discovery Count: 2
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ovary
+  To: 4.7x2.4x2.7
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovary
 
 
 *************************************************
@@ -354,7 +430,15 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: cm
 
-Discovery Count: 2
+Discovery Count: 4
+EdgeName: see
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: is
+  To: which
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: is
+  To: 1.8x1.5x1.4
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: is
@@ -368,35 +452,39 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
 *************************************************
 Sentence : there is a dominant-follicle within the right ovary measuring 2.1x1.7 cm.
 Discovery: there is dominant-follicle within right ovary measure 2.1x1.7 cm 
-Sentence Count: 1
+Sentence Count: 2
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: dominant-follicle
+  To: ovary
 EdgeName: laterality
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: right
   To: ovary
 
-Discovery Count: 4
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovary
-EdgeName: existence
+Discovery Count: 3
+EdgeName: measure
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: dominant-follicle
-  To: ovary
+  To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: dominant-follicle
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovary
 
 
 *************************************************
 Sentence : there is a dominant-follicle within the right ovary measuring 2.1x1.7 cm and no further follow-up is recommended.
 Discovery: there is dominant-follicle within right ovary measure 2.1x1.7 cm and no further follow-up is recommend 
-Sentence Count: 3
+Sentence Count: 4
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: dominant-follicle
+  To: ovary
 EdgeName: negation
 Source:com.mst.sentenceprocessing.NegationTokenRelationshipProcessorImpl
   From: no
@@ -410,29 +498,29 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: right
   To: ovary
 
-Discovery Count: 4
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovary
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: dominant-follicle
-  To: ovary
+Discovery Count: 3
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: dominant-follicle
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: dominant-follicle
+  To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovary
 
 
 *************************************************
 Sentence : 2.1 cm greatest length dominant-follicle within the right ovary with no associated finding.
 Discovery: 2.1 cm greatest length dominant-follicle within right ovary with no associate find 
-Sentence Count: 13
+Sentence Count: 10
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: dominant-follicle
+  To: ovary
 EdgeName: negation
 Source:com.mst.sentenceprocessing.NegationTokenRelationshipProcessorImpl
   From: no
@@ -443,15 +531,7 @@ Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
   To: find
 EdgeName: identify
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.1
-  To: find
-EdgeName: identify
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: dominant-follicle
-  To: find
-EdgeName: identify
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovary
   To: find
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
@@ -467,15 +547,7 @@ Source:com.mst.sentenceprocessing.ExistenceToExistenceNoConverterImpl
   To: associate
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.1
-  To: find
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: dominant-follicle
-  To: find
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovary
   To: find
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
@@ -486,23 +558,15 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: right
   To: ovary
 
-Discovery Count: 4
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovary
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: dominant-follicle
-  To: ovary
+Discovery Count: 2
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2.1
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovary
 
 
 *************************************************
@@ -530,27 +594,23 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2
   To: cm
 
-Discovery Count: 6
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: adnexa
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: adnexa
+Discovery Count: 5
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: that
+  To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: cyst
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: within
-  To: adnexa
 EdgeName: simple cyst modifiers
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: anechoic
   To: cyst
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: adnexa
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2
@@ -560,7 +620,7 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
 *************************************************
 Sentence : right ovarian cyst versus prominent focal fluid-filled fallopian tube.
 Discovery: right ovarian cyst versus prominent focal fluid-filled fallopian tube 
-Sentence Count: 7
+Sentence Count: 8
 EdgeName: enlarged finding site
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: prominent
@@ -569,6 +629,10 @@ EdgeName: disease location
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: ovarian
   To: cyst
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: has
+  To: fallopian
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: ovarian
@@ -591,14 +655,14 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: ovarian
 
 Discovery Count: 5
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovarian
 EdgeName: finding site modifier
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: focal
   To: fallopian
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovarian
 EdgeName: finding site modifier
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: prominent
@@ -623,12 +687,12 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: ovary
 
 Discovery Count: 2
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ovary
+  To: cm
 EdgeName: laterality
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
   From: right
   To: ovary
 
@@ -642,15 +706,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: right
   To: ovary
 
-Discovery Count: 5
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovary
+Discovery Count: 4
+EdgeName: appear
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: simple
+  To: dominant-follicle
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: simple
@@ -659,9 +719,9 @@ EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: small
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: within
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
   To: ovary
 
 
@@ -691,26 +751,50 @@ Discovery Count: 0
 
 *************************************************
 Sentence : left ovary measures approximately 3.2x2.3x3.5  cm.
-Discovery: leave ovary measure approximately 3.2x2.3x3.5 cm 
-Edges Match
+Discovery: left ovary measure approximately 3.2x2.3x3.5 cm 
+Sentence Count: 1
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovary
+
+Discovery Count: 2
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ovary
+  To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovary
+
+
 *************************************************
 Sentence : within the left ovary there is a 1.6x1.6x0.9  cm simple appearing   dominant-follicle.
-Discovery: within leave ovary there is 1.6x1.6x0.9 cm simple appear dominant-follicle 
-Sentence Count: 0
+Discovery: within left ovary there is 1.6x1.6x0.9 cm simple appear dominant-follicle 
+Sentence Count: 1
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovary
 
-Discovery Count: 3
+Discovery Count: 4
+EdgeName: appear
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: simple
+  To: dominant-follicle
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: simple
   To: dominant-follicle
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: within
-  To: ovary
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: 1.6x1.6x0.9
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovary
 
 
 *************************************************
@@ -731,8 +815,8 @@ Discovery Count: 0
 
 *************************************************
 Sentence : simple appearing 2.9 cm left ovarian cyst.
-Discovery: simple appear 2.9 cm leave ovarian cyst 
-Sentence Count: 9
+Discovery: simple appear 2.9 cm left ovarian cyst 
+Sentence Count: 8
 EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
@@ -751,52 +835,64 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cyst
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.9
-  To: cm
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: simple
   To: 2.9
 EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: simple
-  To: cyst
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cm
   To: cyst
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.9
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovarian
 
-Discovery Count: 5
+Discovery Count: 7
+EdgeName: simple cyst modifiers
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: simple
+  To: cyst
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: simple
-  To: 2.9
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cm
   To: cyst
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2.9
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovarian
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: ovarian
   To: cyst
+EdgeName: measure
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: cm
+  To: cyst
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
-  From: ovarian
+  From: simple
   To: cyst
 
 
 *************************************************
 Sentence : there are bilateral follicular changes present with a left dominant ovarian cyst 3.1 cm in diameter simple in nature noted.
-Discovery: there are bilateral follicular change present with leave dominant ovarian cyst 3.1 cm in diameter simple in nature note 
-Sentence Count: 8
+Discovery: there are bilateral follicular change present with left dominant ovarian cyst 3.1 cm in diameter simple in nature note 
+Sentence Count: 11
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: present
+  To: cyst
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: present
+  To: cm
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: present
@@ -825,6 +921,10 @@ EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: dominant
   To: cyst
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovarian
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 3.1
@@ -835,14 +935,14 @@ EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: bilateral
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: with
-  To: dominant
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 3.1
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: left
+  To: ovarian
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: ovarian
@@ -859,8 +959,8 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : there is an anechoic left ovarian cyst measuring approximately 2.6 cm in size.
-Discovery: there is anechoic leave ovarian cyst measure approximately 2.6 cm in size 
-Sentence Count: 15
+Discovery: there is anechoic left ovarian cyst measure approximately 2.6 cm in size 
+Sentence Count: 14
 EdgeName: measure
 Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
   From: cyst
@@ -891,10 +991,6 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: 2.6
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovarian
-  To: 2.6
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: anechoic
   To: 2.6
 EdgeName: define
@@ -911,22 +1007,22 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: 2.6
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovarian
-  To: 2.6
-EdgeName: define
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: anechoic
   To: 2.6
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovarian
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.6
   To: cm
 
-Discovery Count: 5
-EdgeName: existence
+Discovery Count: 7
+EdgeName: measure
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: is
-  To: ovarian
+  From: cyst
+  To: approximately
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
@@ -935,20 +1031,28 @@ EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2.6
   To: cm
+EdgeName: simple cyst modifiers
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: anechoic
+  To: cyst
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovarian
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: ovarian
   To: cyst
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
-  From: ovarian
+  From: anechoic
   To: cyst
 
 
 *************************************************
 Sentence : left ovary:  left ovary demonstrates a small complex cyst 9 mm in size.
-Discovery: leave ovary leave ovary demonstrate small complex cyst 9 mm in size 
-Sentence Count: 10
+Discovery: left ovary left ovary demonstrate small complex cyst 9 mm in size 
+Sentence Count: 13
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: complex
@@ -967,6 +1071,10 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cyst
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: left
+  To: 9
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: 9
   To: mm
 EdgeName: existence
@@ -979,21 +1087,33 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: 9
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: left
+  To: 9
+EdgeName: define
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: 9
   To: mm
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: ovary
   To: 9
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovary
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 9
   To: mm
 
-Discovery Count: 5
+Discovery Count: 7
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: leave
+  From: ovary
+  To: small
+EdgeName: demonstrate
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ovary
   To: small
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
@@ -1007,6 +1127,10 @@ EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 9
   To: mm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovary
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: complex
@@ -1015,12 +1139,20 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : lesion noted on prior ct corresponds to a 7 cm simple cyst in the left ovary.
-Discovery: lesion note on prior ct correspond to 7 cm simple cyst in leave ovary 
+Discovery: lesion note on prior ct correspond to 7 cm simple cyst in left ovary 
 Sentence Count: 12
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: note
   To: ct
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: note
+  To: ovary
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: correspond
+  To: ovary
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: note
@@ -1033,6 +1165,10 @@ EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
   To: cyst
+EdgeName: disease location
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: cyst
+  To: ovary
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 7
@@ -1041,22 +1177,6 @@ EdgeName: simple cyst modifiers
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: simple
   To: cyst
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: note
-  To: ovary
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 7
-  To: ovary
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: lesion
-  To: ovary
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ct
-  To: ovary
 EdgeName: procedure timing
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: prior
@@ -1065,15 +1185,19 @@ EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 7
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovary
 
-Discovery Count: 5
+Discovery Count: 7
+EdgeName: note
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: lesion
+  To: ovary
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: lesion
-  To: 7
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cyst
   To: ovary
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
@@ -1083,24 +1207,32 @@ EdgeName: simple cyst modifiers
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: simple
   To: cyst
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovary
 EdgeName: measure
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: cm
   To: cyst
+EdgeName: correspond
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ct
+  To: ovary
 
 
 *************************************************
 Sentence : right ovary: the right ovary is normal appearance including a simple appearing 2.2 cm right follicular cysts and normal doppler blood flow.
 Discovery: right ovary right ovary is normal appearance include simple appear 2.2 cm right follicular cysts and normal doppler blood flow 
-Sentence Count: 16
+Sentence Count: 13
 EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
   To: cysts
 EdgeName: disease location
-Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: ovary
-  To: cysts
+  To: appearance
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.2
@@ -1115,24 +1247,12 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cysts
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.2
-  To: cysts
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: ovary
   To: 2.2
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: 2.2
-  To: cm
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.2
   To: blood
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: :
-  To: 2.2
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: simple
@@ -1159,48 +1279,48 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cm
 
 Discovery Count: 9
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovary
+EdgeName: appear
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: include
+  To: cysts
+EdgeName: include
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: appearance
+  To: simple
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: right
-  To: normal
+  From: include
+  To: cysts
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: appearance
   To: simple
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cm
-  To: cysts
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: include
-  To: 2.2
+  From: ovary
+  To: normal
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2.2
   To: cm
+EdgeName: measure
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: cm
+  To: cysts
 EdgeName: simple cyst modifiers
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: follicular
   To: cysts
-EdgeName: existence
-Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
-  From: follicular
-  To: cysts
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovary
 
 
 *************************************************
 Sentence : 3.5 cm right ovarian simple cyst probably a dominant-follicle/physiological cyst.
 Discovery: 3.5 cm right ovarian simple cyst probably dominant-follicle/physiological cyst 
-Sentence Count: 10
+Sentence Count: 9
 EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
@@ -1222,17 +1342,13 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: simple
   To: cyst
 EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 3.5
-  To: ovarian
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cm
-  To: ovarian
-EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: ovarian
   To: cyst
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: has
+  To: probably
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 3.5
@@ -1243,18 +1359,14 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: ovarian
 
 Discovery Count: 7
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovarian
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cm
-  To: cyst
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 3.5
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovarian
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: probably
@@ -1267,6 +1379,10 @@ EdgeName: disease location
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: ovarian
   To: cyst
+EdgeName: measure
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: cm
+  To: cyst
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: cyst
@@ -1275,8 +1391,8 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : 1.6 cm left adrenal lesion is stable compared to 01/01/2012  consistent with benign etiology, likely an adenoma.
-Discovery: 1.6 cm leave adrenal lesion is stable compare to 01/01/2012 consistent with benign etiology likely adenoma 
-Sentence Count: 8
+Discovery: 1.6 cm left adrenal lesion is stable compare to 01/01/2012 consistent with benign etiology likely adenoma 
+Sentence Count: 9
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: consistent
@@ -1309,8 +1425,16 @@ EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 1.6
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: adrenal
 
-Discovery Count: 5
+Discovery Count: 7
+EdgeName: compare
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: is
+  To: adenoma
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: lesion
@@ -1319,10 +1443,14 @@ EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: is
   To: adenoma
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
   To: adrenal
+EdgeName: measure
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: cm
+  To: lesion
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: adrenal
@@ -1336,15 +1464,19 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
 *************************************************
 Sentence : enlarged heterogeneous appearance of the thyroid gland demonstrating multiple thyroid nodules.
 Discovery: enlarge heterogeneous appearance of thyroid gland demonstrate multiple thyroid nodules 
-Sentence Count: 14
-EdgeName: 
-Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
-  From: appearance
-  To: thyroid
-EdgeName: 
-Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
-  From: appearance
-  To: gland
+Sentence Count: 16
+EdgeName: quantity
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: multiple
+  To: nodules
+EdgeName: disease modifier
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: heterogeneous
+  To: appearance
+EdgeName: disease modifier
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: enlarge
+  To: appearance
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: multiple
@@ -1358,6 +1490,10 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: heterogeneous
   To: gland
 EdgeName: disease location
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: appearance
+  To: thyroid
+EdgeName: disease location
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: gland
   To: nodules
@@ -1365,13 +1501,13 @@ EdgeName: disease location
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: thyroid
   To: nodules
+EdgeName: disease location
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: appearance
+  To: gland
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: gland
-  To: nodules
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: thyroid
+  From: appearance
   To: nodules
 EdgeName: finding site modifier
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
@@ -1394,8 +1530,12 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: enlarge
   To: thyroid
 
-Discovery Count: 3
+Discovery Count: 4
 EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: appearance
+  To: nodules
+EdgeName: demonstrate
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: appearance
   To: nodules
@@ -1411,8 +1551,16 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
 
 *************************************************
 Sentence : thyroid nodules are present measuring up to 1.5 cm on the left.
-Discovery: thyroid nodules are present measure up to 1.5 cm on leave 
-Sentence Count: 6
+Discovery: thyroid nodules are present measure up to 1.5 cm on left 
+Sentence Count: 8
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: up
+  To: left
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: cm
+  To: left
 EdgeName: measure
 Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
   From: nodules
@@ -1455,8 +1603,8 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : 5 mm low attention lesion/ nodule in the left lobe of the thyroid gland is redemonstrated.
-Discovery: 5 mm low attention lesion/ nodule in leave lobe of thyroid gland is redemonstrated 
-Sentence Count: 9
+Discovery: 5 mm low attention lesion/ nodule in left lobe of thyroid gland is redemonstrated 
+Sentence Count: 11
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: lobe
@@ -1482,31 +1630,39 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: lobe
   To: redemonstrated
 EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 5
-  To: redemonstrated
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: nodule
-  To: redemonstrated
+  To: gland
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 5
   To: mm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: lobe
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: gland
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: thyroid
 
 Discovery Count: 4
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: lobe
-  To: redemonstrated
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: nodule
-  To: lobe
+  To: redemonstrated
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 5
   To: mm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: lobe
 EdgeName: measure
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: mm
@@ -1595,8 +1751,8 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : thyroid appears heterogeneous with enlargement of the left lobe which is similar to the previous ct from 04/14/2017.
-Discovery: thyroid appear heterogeneous with enlargement of leave lobe which is similar to previous ct from 04/14/2017 
-Sentence Count: 19
+Discovery: thyroid appear heterogeneous with enlargement of left lobe which is similar to previous ct from 04/14/2017 
+Sentence Count: 21
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: enlargement
@@ -1605,6 +1761,10 @@ EdgeName:
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: enlargement
   To: 04/14/2017
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: enlargement
+  To: lobe
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: similar
@@ -1619,12 +1779,20 @@ Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   To: 04/14/2017
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
-  From: heterogeneous
-  To: enlargement
+  From: enlargement
+  To: which
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: heterogeneous
   To: 04/14/2017
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: heterogeneous
+  To: lobe
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: heterogeneous
+  To: which
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: heterogeneous
@@ -1639,27 +1807,19 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: lobe
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: thyroid
+  From: enlargement
   To: ct
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: thyroid
-  To: lobe
+  To: heterogeneous
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: heterogeneous
-  To: lobe
+  To: enlargement
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: lobe
-  To: which
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: which
-  To: ct
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: heterogeneous
+  From: thyroid
   To: ct
 EdgeName: finding site modifier
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
@@ -1673,26 +1833,34 @@ EdgeName: procedure location
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: lobe
   To: ct
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: lobe
 
-Discovery Count: 3
+Discovery Count: 4
+EdgeName: appear
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: thyroid
+  To: lobe
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: appear
+  From: heterogeneous
   To: similar
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: thyroid
-  To: heterogeneous
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: heterogeneous
+  To: lobe
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
   To: lobe
 
 
 *************************************************
 Sentence : large heterogeneous nodules replaces the left thyroid gland.
-Discovery: large heterogeneous nodules replace leave thyroid gland 
-Sentence Count: 8
+Discovery: large heterogeneous nodules replace left thyroid gland 
+Sentence Count: 11
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: large
@@ -1709,6 +1877,10 @@ EdgeName: heterogeneous finding site
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: heterogeneous
   To: gland
+EdgeName: disease location
+Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
+  From: nodules
+  To: thyroid
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: large
@@ -1725,8 +1897,24 @@ EdgeName: finding site modifier
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: heterogeneous
   To: gland
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: gland
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: thyroid
 
-Discovery Count: 3
+Discovery Count: 5
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: nodules
+  To: gland
+EdgeName: replace
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: nodules
+  To: gland
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: large
@@ -1735,10 +1923,10 @@ EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: heterogeneous
   To: nodules
-EdgeName: existence
-Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
-  From: large
-  To: nodules
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: thyroid
 
 
 *************************************************
@@ -1778,7 +1966,19 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: soft
   To: thyroid
 
-Discovery Count: 5
+Discovery Count: 8
+EdgeName: see
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: mass
+  To: gland
+EdgeName: round
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: cm
+  To: soft
+EdgeName: visualize
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: is
+  To: 4.5x4.9
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: cm
@@ -1803,12 +2003,20 @@ Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
 
 *************************************************
 Sentence : there is a 2.3 cm hypodense nodule within the left thyroid lobe.
-Discovery: there is 2.3 cm hypodense nodule within leave thyroid lobe 
-Sentence Count: 6
+Discovery: there is 2.3 cm hypodense nodule within left thyroid lobe 
+Sentence Count: 8
 EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
   To: nodule
+EdgeName: disease location
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: nodule
+  To: lobe
+EdgeName: disease location
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: nodule
+  To: thyroid
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.3
@@ -1816,29 +2024,25 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
-  To: lobe
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: nodule
-  To: lobe
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.3
-  To: lobe
+  To: nodule
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.3
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: lobe
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: thyroid
 
 Discovery Count: 4
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: nodule
-  To: lobe
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
-  To: 2.3
+  To: lobe
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2.3
@@ -1847,12 +2051,16 @@ EdgeName: measure
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: cm
   To: nodule
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: thyroid
 
 
 *************************************************
 Sentence : largest left thyroid nodule measures approximately 3.6 cm.
-Discovery: largest leave thyroid nodule measure approximately 3.6 cm 
-Sentence Count: 5
+Discovery: largest left thyroid nodule measure approximately 3.6 cm 
+Sentence Count: 6
 EdgeName: measure
 Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
   From: nodule
@@ -1869,16 +2077,20 @@ EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: thyroid
   To: nodule
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: thyroid
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 3.6
   To: cm
 
-Discovery Count: 4
-EdgeName: existence
+Discovery Count: 5
+EdgeName: measure
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: largest
-  To: thyroid
+  From: nodule
+  To: cm
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 3.6
@@ -1887,6 +2099,10 @@ EdgeName: disease location
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: thyroid
   To: nodule
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: thyroid
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: thyroid
@@ -1951,8 +2167,8 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : there is a 1.1 cm indeterminate nodular lesions seen within the left adrenal gland, with an average hounsfield density of approximately 45.
-Discovery: there is 1.1 cm indeterminate nodular lesions see within leave adrenal gland with average hounsfield density of approximately 45 
-Sentence Count: 21
+Discovery: there is 1.1 cm indeterminate nodular lesions see within left adrenal gland with average hounsfield density of approximately 45 
+Sentence Count: 19
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: density
@@ -1961,6 +2177,14 @@ EdgeName:
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: see
   To: 45
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: see
+  To: gland
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: see
+  To: ,
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: ,
@@ -1995,40 +2219,16 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: nodular
-  To: gland
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: lesions
-  To: density
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 1.1
-  To: density
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: there
-  To: gland
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: gland
-  To: ,
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: there
+  From: adrenal
   To: density
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: lesions
-  To: gland
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ,
   To: density
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 1.1
-  To: gland
+  From: there
+  To: density
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: nodular
@@ -2037,8 +2237,24 @@ EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 1.1
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: adrenal
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: gland
 
-Discovery Count: 9
+Discovery Count: 11
+EdgeName: average
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: gland
+  To: 45
+EdgeName: see
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: lesions
+  To: 45
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: gland
@@ -2049,12 +2265,12 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: 45
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: within
-  To: adrenal
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: 1.1
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: adrenal
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 1.1
@@ -2080,7 +2296,11 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 *************************************************
 Sentence : there is a dominant simple appearing cyst identified in the right ovary which measures 3.6x3.6x4.0  cm.
 Discovery: there is dominant simple appear cyst identify in right ovary which measure 3.6x3.6x4.0 cm 
-Sentence Count: 5
+Sentence Count: 6
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: identify
+  To: ovary
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
   From: cyst
@@ -2102,19 +2322,19 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: right
   To: ovary
 
-Discovery Count: 7
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovary
-EdgeName: existence
+Discovery Count: 8
+EdgeName: simple cyst modifiers
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: simple
+  To: cyst
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: which
+  To: cm
+EdgeName: identify
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: appear
-  To: ovary
+  To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: appear
@@ -2127,6 +2347,10 @@ EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: simple
   To: cyst
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovary
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: simple
@@ -2136,7 +2360,7 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 *************************************************
 Sentence : lobulated 3.3 cm simple cyst of the right ovary.
 Discovery: lobulated 3.3 cm simple cyst of right ovary 
-Sentence Count: 9
+Sentence Count: 8
 EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
@@ -2146,7 +2370,7 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: lobulated
   To: cyst
 EdgeName: disease location
-Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: cyst
   To: ovary
 EdgeName: unit of measure
@@ -2159,12 +2383,8 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cyst
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cyst
-  To: ovary
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: lobulated
-  To: ovary
+  From: has
+  To: cyst
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 3.3
@@ -2174,19 +2394,7 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: right
   To: ovary
 
-Discovery Count: 7
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovary
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cyst
-  To: ovary
+Discovery Count: 6
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 3.3
@@ -2195,6 +2403,10 @@ EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: lobulated
   To: cyst
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovary
 EdgeName: simple cyst modifiers
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: simple
@@ -2202,6 +2414,10 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
 EdgeName: measure
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: cm
+  To: cyst
+EdgeName: existence
+Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
+  From: lobulated
   To: cyst
 
 
@@ -2242,7 +2458,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 4
   To: cm
 
-Discovery Count: 5
+Discovery Count: 6
+EdgeName: see
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: cysts
+  To: ovary
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: cysts
@@ -2268,7 +2488,7 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
 *************************************************
 Sentence : right ovarian simple follicular cyst 2.5 cm diameter requires no additional follow-up.
 Discovery: right ovarian simple follicular cyst 2.5 cm diameter require no additional follow-up 
-Sentence Count: 12
+Sentence Count: 10
 EdgeName: negation
 Source:com.mst.sentenceprocessing.NegationTokenRelationshipProcessorImpl
   From: no
@@ -2298,14 +2518,6 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: simple
   To: cyst
 EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: right
-  To: ovarian
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovarian
-  To: cm
-EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: ovarian
   To: cyst
@@ -2319,18 +2531,18 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cm
 
 Discovery Count: 8
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovarian
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovarian
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: diameter
   To: follow-up
+EdgeName: require
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: diameter
+  To: follow-up
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovarian
 EdgeName: simple cyst modifiers
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: follicular
@@ -2356,7 +2568,7 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 *************************************************
 Sentence : there is a right ovarian simple cyst 2.2 cm in size.
 Discovery: there is right ovarian simple cyst 2.2 cm in size 
-Sentence Count: 13
+Sentence Count: 12
 EdgeName: measure
 Source:com.mst.sentenceprocessing.DynamicEdgeCreationProcesserImpl
   From: cyst
@@ -2375,31 +2587,27 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cyst
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: right
-  To: ovarian
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
-  To: ovarian
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovarian
   To: cm
 EdgeName: existence
-Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
-  From: ovarian
-  To: cyst
-EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: right
-  To: ovarian
+  From: 2.2
+  To: cm
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: cyst
+  To: cm
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
-  To: ovarian
+  To: cm
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovarian
+  From: 2.2
+  To: cm
+EdgeName: define
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: cyst
   To: cm
 EdgeName: laterality
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
@@ -2411,12 +2619,12 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cm
 
 Discovery Count: 6
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: there
+  To: right
 EdgeName: laterality
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovarian
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
   From: right
   To: ovarian
 EdgeName: unit of measure
@@ -2439,8 +2647,8 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : there is a simple left ovarian cyst 2.0 cm in maximum dimension requiring no additional imaging evaluation.
-Discovery: there is simple leave ovarian cyst 2.0 cm in maximum dimension require no additional imaging evaluation 
-Sentence Count: 16
+Discovery: there is simple left ovarian cyst 2.0 cm in maximum dimension require no additional imaging evaluation 
+Sentence Count: 13
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: cm
@@ -2479,38 +2687,22 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: imaging
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: simple
-  To: imaging
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: imaging
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.0
-  To: cm
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: simple
   To: cyst
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: simple
-  To: 2.0
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: there
-  To: 2.0
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovarian
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.0
   To: cm
 
-Discovery Count: 7
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: is
-  To: ovarian
+Discovery Count: 9
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: cm
@@ -2519,10 +2711,22 @@ EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
   To: simple
+EdgeName: require
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: cm
+  To: evaluation
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2.0
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovarian
+EdgeName: simple cyst modifiers
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: simple
+  To: cyst
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: ovarian
@@ -2533,14 +2737,14 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   To: evaluation
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
-  From: ovarian
+  From: simple
   To: cyst
 
 
 *************************************************
 Sentence : small subendometrial cyst within the myometrium most likely a focus of adenomyosis; simple left ovarian cyst 2.3 cm in maximum dimension requiring no additional imaging evaluation.
-Discovery: small subendometrial cyst within myometrium most likely focus of adenomyosis ; simple leave ovarian cyst 2.3 cm in maximum dimension require no additional imaging evaluation 
-Sentence Count: 23
+Discovery: small subendometrial cyst within myometrium most likely focus of adenomyosis ; simple left ovarian cyst 2.3 cm in maximum dimension require no additional imaging evaluation 
+Sentence Count: 22
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: cyst
@@ -2556,15 +2760,15 @@ Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: focus
-  To: simple
-EdgeName: 
-Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
-  From: cyst
-  To: simple
+  To: cyst
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: focus
   To: adenomyosis
+EdgeName: 
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: cyst
+  To: cyst
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: cm
@@ -2615,41 +2819,41 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cyst
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: cyst
+  To: imaging
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: cm
   To: imaging
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cyst
-  To: imaging
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.3
-  To: cm
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cyst
-  To: 2.3
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovarian
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.3
   To: cm
 
-Discovery Count: 8
+Discovery Count: 10
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: likely
   To: focus
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: cm
+  From: cyst
   To: evaluation
-EdgeName: existence
+EdgeName: focus
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: cyst
   To: evaluation
-EdgeName: existence
+EdgeName: require
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: cyst
+  To: evaluation
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
   To: ovarian
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
@@ -2658,6 +2862,10 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
 EdgeName: simple cyst modifiers
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: small
+  To: cyst
+EdgeName: simple cyst modifiers
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: simple
   To: cyst
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
@@ -2672,7 +2880,7 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
 *************************************************
 Sentence : the right ovary measures 2x1.5x1.7   cm and contains a simple appearing cyst measuring 1.7 cm in size.
 Discovery: right ovary measure 2x1.5x1.7 cm and contain simple appear cyst measure 1.7 cm in size 
-Sentence Count: 20
+Sentence Count: 18
 EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
@@ -2691,10 +2899,6 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cyst
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: the
-  To: 1.7
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: cm
   To: 1.7
 EdgeName: existence
@@ -2716,10 +2920,6 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: ovary
-  To: 1.7
-EdgeName: define
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: the
   To: 1.7
 EdgeName: define
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
@@ -2754,15 +2954,23 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 1.7
   To: cm
 
-Discovery Count: 5
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovary
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovary
+Discovery Count: 8
+EdgeName: appear
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: contain
+  To: cyst
+EdgeName: contain
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: and
+  To: simple
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: contain
+  To: 1.7
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ovary
+  To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: contain
@@ -2771,6 +2979,10 @@ EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: and
   To: simple
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovary
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 1.7
@@ -2780,7 +2992,7 @@ Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
 *************************************************
 Sentence : right ovarian follicular cyst 3.7 cm greatest diameter requires no additional follow-up.
 Discovery: right ovarian follicular cyst 3.7 cm greatest diameter require no additional follow-up 
-Sentence Count: 11
+Sentence Count: 9
 EdgeName: negation
 Source:com.mst.sentenceprocessing.NegationTokenRelationshipProcessorImpl
   From: no
@@ -2806,14 +3018,6 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: follicular
   To: cyst
 EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: right
-  To: ovarian
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovarian
-  To: cm
-EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: ovarian
   To: cyst
@@ -2827,15 +3031,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cm
 
 Discovery Count: 7
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
-  From: right
-  To: ovarian
-EdgeName: laterality
-Source:com.mst.sentenceprocessing.IterationRuleProcesser
-  From: right
-  To: ovarian
 EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: diameter
+  To: follow-up
+EdgeName: require
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: diameter
   To: follow-up
@@ -2843,6 +3043,10 @@ EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 3.7
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: right
+  To: ovarian
 EdgeName: simple cyst modifiers
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: follicular
@@ -2859,8 +3063,8 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : left ovary demonstrates 2 small cysts, one simple measuring about 2.0 cm and second complex measuring about 3 cm, a follow-up of the complex cyst is advised in 3-6 months time.
-Discovery: leave ovary demonstrate 2 small cysts one simple measure about 2.0 cm and second complex measure about 3 cm follow-up of complex cyst is advise in 3-6 months time 
-Sentence Count: 38
+Discovery: left ovary demonstrate 2 small cysts one simple measure about 2.0 cm and second complex measure about 3 cm follow-up of complex cyst is advise in 3-6 months time 
+Sentence Count: 45
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: follow-up
@@ -2891,6 +3095,10 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cysts
 EdgeName: advise
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: left
+  To: 2.0
+EdgeName: advise
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: 3
   To: follow-up
 EdgeName: advise
@@ -2899,19 +3107,15 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: 3
 EdgeName: advise
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovary
-  To: 2.0
-EdgeName: advise
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: complex
   To: 3
 EdgeName: advise
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: 2.0
-  To: follow-up
+  From: ovary
+  To: 2
 EdgeName: advise
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: ovary
+  From: left
   To: 2
 EdgeName: advise
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
@@ -2919,6 +3123,22 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: simple
 EdgeName: advise
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: left
+  To: 3
+EdgeName: advise
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: simple
+  To: 3
+EdgeName: advise
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ovary
+  To: 2.0
+EdgeName: advise
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: 2.0
+  To: follow-up
+EdgeName: advise
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: 2
   To: follow-up
 EdgeName: advise
@@ -2933,10 +3153,6 @@ EdgeName: advise
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: 2.0
   To: complex
-EdgeName: advise
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: simple
-  To: 3
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.0
@@ -2951,6 +3167,10 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   To: cysts
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: left
+  To: 2.0
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: 3
   To: follow-up
 EdgeName: existence
@@ -2967,8 +3187,16 @@ Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   To: 2
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: left
+  To: 2
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: 2
   To: simple
+EdgeName: existence
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: left
+  To: 3
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: simple
@@ -3005,6 +3233,10 @@ EdgeName: time
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.0
   To: second
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
+  To: ovary
 EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 2.0
@@ -3014,15 +3246,31 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 3
   To: cm
 
-Discovery Count: 6
+Discovery Count: 10
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: leave
+  From: ovary
+  To: 2
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: complex
+  To: about
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: simple
+  To: cm
+EdgeName: demonstrate
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: ovary
   To: 2
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 2.0
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovary
 EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: complex
@@ -3043,8 +3291,8 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 
 *************************************************
 Sentence : a 5.5 cm simple left ovarian cyst is identified.
-Discovery: 5.5 cm simple leave ovarian cyst is identify 
-Sentence Count: 6
+Discovery: 5.5 cm simple left ovarian cyst is identify 
+Sentence Count: 7
 EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
@@ -3069,23 +3317,35 @@ EdgeName: measurement
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 5.5
   To: cm
-
-Discovery Count: 4
-EdgeName: existence
-Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
-  From: simple
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: left
   To: ovarian
+
+Discovery Count: 6
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 5.5
   To: cm
+EdgeName: laterality
+Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
+  From: left
+  To: ovarian
+EdgeName: simple cyst modifiers
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: simple
+  To: cyst
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: ovarian
   To: cyst
+EdgeName: measure
+Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
+  From: cm
+  To: cyst
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
-  From: ovarian
+  From: simple
   To: cyst
 
 
@@ -3174,7 +3434,11 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: infrarenal
   To: aneurysm
 
-Discovery Count: 4
+Discovery Count: 5
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: aneurysm
+  To: cm
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl
   From: infrarenal
@@ -3222,7 +3486,11 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: infrarenal
   To: aneurysm
 
-Discovery Count: 6
+Discovery Count: 7
+EdgeName: compare
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: when
+  To: 08/25/2017
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: when
@@ -3286,7 +3554,11 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: infrarenal
   To: aneurysm
 
-Discovery Count: 4
+Discovery Count: 5
+EdgeName: compare
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: aneurysm
+  To: 08/25/2017
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: aneurysm
@@ -3346,7 +3618,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 5.1
   To: cm
 
-Discovery Count: 4
+Discovery Count: 5
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: aneurysm
+  To: up
 EdgeName: unit of measure
 Source:com.mst.sentenceprocessing.WordEmbeddingProcesseorImpl
   From: 5.1
@@ -3450,7 +3726,11 @@ Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: 4.8
   To: cm
 
-Discovery Count: 6
+Discovery Count: 7
+EdgeName: obtain
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: dilatation
+  To: unchanged
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
@@ -3498,7 +3778,11 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
   From: infrarenal
   To: aneurysm
 
-Discovery Count: 5
+Discovery Count: 6
+EdgeName: measure
+Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
+  From: aneurysm
+  To: cm
 EdgeName: existence
 Source:com.mst.sentenceprocessing.VerbExistanceProcessorImpl
   From: there
@@ -3524,15 +3808,11 @@ Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
 *************************************************
 Sentence : stable appearance of a 4.5x4.1 cm abdominal aortic aneurysm, for which follow-up recommendations have previously been made.
 Discovery: stable appearance of 4.5x4.1 cm abdominal aortic aneurysm for which follow-up recommendations have previously been make 
-Sentence Count: 7
+Sentence Count: 10
 EdgeName: 
 Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
   From: appearance
   To: aneurysm
-EdgeName: 
-Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
-  From: appearance
-  To: abdominal
 EdgeName: measure
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: cm
@@ -3541,18 +3821,34 @@ EdgeName: disease modifier
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: aortic
   To: aneurysm
+EdgeName: disease modifier
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: stable
+  To: appearance
+EdgeName: disease stability
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: stable
+  To: appearance
+EdgeName: disease location
+Source:com.mst.sentenceprocessing.PrepPhraseRelationshipProcessorImpl
+  From: appearance
+  To: abdominal
 EdgeName: disease location
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: abdominal
   To: aneurysm
 EdgeName: existence
 Source:com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl
-  From: abdominal
-  To: aneurysm
+  From: stable
+  To: appearance
 EdgeName: finding site modifier
 Source:com.mst.sentenceprocessing.NounRelationshipProcessor
   From: stable
   To: abdominal
+EdgeName: disease stablity
+Source:com.mst.sentenceprocessing.NounRelationshipProcessor
+  From: stable
+  To: appearance
 
 Discovery Count: 5
 EdgeName: existence
