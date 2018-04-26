@@ -1,1 +1,10 @@
 measure
+measurement
+disease location
+disease modifier
+simple cyst modifiers
+laterality
+finding site modifier
+procedure location
+heterogeneous finding site
+enlarged finding site
