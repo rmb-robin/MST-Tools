@@ -10,4 +10,10 @@ public class MongoDatastoreProviderDefault extends MongoDatastoreProviderBase im
 		connectionEntity.setDatabaseName("test");
 		connectionEntity.setIpAddress("10.0.129.218");
 	}
+
+    public MongoDatastoreProviderDefault(String ipAddress, String databaseName) {
+        connectionEntity = new MongoConnectionEntity();
+        connectionEntity.setIpAddress(ipAddress);
+        connectionEntity.setDatabaseName(databaseName);
+    }
 }

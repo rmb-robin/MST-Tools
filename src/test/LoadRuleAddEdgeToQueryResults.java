@@ -16,12 +16,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class LoadRuleAddEdgeToQueryResults {
-    //private String orgId = "58c6f3ceaf3c420b90160803"; //Production DB
-    private String orgId = "5972aedebde4270bc53b23e3"; //Test DB
+    //private String orgId = "58c6f3ceaf3c420b90160803";
+    private String orgId = "5972aedebde4270bc53b23e3"; //Test
+    private String testServer = "10.0.129.218";
+    private String testDatabaseName = "test";
 
     @Test
     public void insert() {
-        MongoDatastoreProviderDefault provider = new MongoDatastoreProviderDefault();
+        MongoDatastoreProviderDefault provider = new MongoDatastoreProviderDefault(testServer, testDatabaseName);
         BusinessRuleDao dao = new BusinessRuleDaoImpl(BusinessRule.class);
         dao.setMongoDatastoreProvider(provider);
 
