@@ -52,5 +52,8 @@ public class IterationDataRule {
 	public void setUseSameEdgeName(boolean useSameEdgeName) {
 		this.useSameEdgeName = useSameEdgeName;
 	} 
-		
+	
+	public boolean shouldUseSameEdge(){
+		return this.getUseSameEdgeName() && this.getEdgeNameTolookfor().equals(this.getStartRelationship());
+	}
 }

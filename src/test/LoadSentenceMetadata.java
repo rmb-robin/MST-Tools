@@ -25,8 +25,5 @@ public class LoadSentenceMetadata {
     	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
     	ds.delete(ds.createQuery(SentenceProcessingMetaDataInput.class));
     	ds.save(input); 
-	
-	
-	
 	}
 }

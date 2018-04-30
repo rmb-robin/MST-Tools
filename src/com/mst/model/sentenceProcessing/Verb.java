@@ -14,6 +14,8 @@ public class Verb implements Serializable {
 	private boolean isExistance;
 	private boolean isMaintainVerbNetClass;
 	private boolean isNegation; 
+	private String presentVerb; 
+	
 	
 	public String getVerbNetClass() {
 		return verbNetClass;
@@ -58,5 +60,11 @@ public class Verb implements Serializable {
 	}
 	public void setNegation(boolean isNegation) {
 		this.isNegation = isNegation;
+	}
+	public String getPresentVerb() {
+		return presentVerb;
+	}
+	public void setPresentVerb(String presentVerb) {
+		this.presentVerb = presentVerb;
 	}
 }

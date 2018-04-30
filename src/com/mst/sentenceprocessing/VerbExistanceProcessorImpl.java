@@ -67,11 +67,7 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 		List<TokenRelationship> relationships = RecommandedTokenRelationshipUtil.getTokenRelationshipsFromRecommendedTokenRelationships(discovery.getWordEmbeddings());
 		setVerbValuesFromEdge(relationships);
 		
-		RecommendedTokenRelationship relationship = createEdgeForSubjectSubjectCompEdges();
-		List<RecommendedTokenRelationship> result = new ArrayList<>();
-		if(relationship!=null) 
-			result.add(relationship);		
-		return result;
+		return createEdgeForSubjectSubjectCompEdges();
 	}
 	
 	private void setVerbValuesFromEdge(List<TokenRelationship> relationships){
@@ -185,23 +181,31 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 	}
 	
 	
-	private RecommendedTokenRelationship createEdgeForSubjectSubjectCompEdges(){
+	private List<RecommendedTokenRelationship> createEdgeForSubjectSubjectCompEdges(){
+		List<RecommendedTokenRelationship> result = new ArrayList<>();
 		for(TokenRelationship subjectRelationship: subjectsEdges){
 			for(TokenRelationship compRelationship: subjectCompEdges){
 				
 				WordToken subjectVerb = subjectRelationship.getToToken();
 				WordToken subjectComplVerb = compRelationship.getFromToken();
 				if(subjectComplVerb.getPosition()== subjectVerb.getPosition()){
-					return createEdgeForSingleVerb(subjectRelationship,compRelationship,subjectComplVerb);
-
+					RecommendedTokenRelationship existenceRelationship =  createExistenceEdgeForSingleVerb(subjectRelationship,compRelationship,subjectComplVerb);
+					if(existenceRelationship!=null) 
+						result.add(existenceRelationship);
+					
+					
+					RecommendedTokenRelationship actionVerbEdge = createVerbEdgeForSingleVerb(subjectRelationship,compRelationship,subjectComplVerb);
+					if(actionVerbEdge!=null)
+						result.add(actionVerbEdge);
+					
 				}
 			}
-		}					
-		return null;
+		}				
+		return result;
 	}
 	
 	
-	private RecommendedTokenRelationship createEdgeForSingleVerb(TokenRelationship subjectRelationship, TokenRelationship compRelationship,  WordToken subjectComplVerb){
+	private RecommendedTokenRelationship createExistenceEdgeForSingleVerb(TokenRelationship subjectRelationship, TokenRelationship compRelationship,  WordToken subjectComplVerb){
 			String edgeName = getEdgeNamefromVerb(subjectComplVerb);
 			if(edgeName==null) return null;
 			
@@ -212,6 +216,29 @@ public class VerbExistanceProcessorImpl implements VerbExistanceProcessor{
 			return result;
 	}
 
+	private RecommendedTokenRelationship createVerbEdgeForSingleVerb(TokenRelationship subjectRelationship, TokenRelationship compRelationship,  WordToken subjectComplVerb){
+		if(subjectComplVerb.getVerb()==null)
+			return null; 
+		if(!subjectComplVerb.getVerb().getVerbType().equals(VerbType.AV))
+			return null; 
+		
+		if(subjectComplVerb.getVerb().getPresentVerb()==null) 
+			return null;
+		
+		String edgeName = subjectComplVerb.getVerb().getPresentVerb();
+		
+		RecommendedTokenRelationship result =  this.tokenRelationshipFactory.createRecommendedRelationship(edgeName,
+					EdgeTypes.related, subjectRelationship.getFromToken(),compRelationship.getToToken() ,this.getClass().getName());
+
+		result.getTokenRelationship().setNamedEdge(edgeName);
+		return result;
+
+	}
+
+	
+	
+	
+	
 	private boolean isExistanceEdge(List<TokenRelationship> tokenRelationships){
 		for(TokenRelationship tokenRelationship: tokenRelationships){
 			if(tokenRelationship.getEdgeName()==null) continue;
