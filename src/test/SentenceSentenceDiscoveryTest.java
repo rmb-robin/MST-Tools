@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.junit.Test;
+import org.mongodb.morphia.Datastore;
 //import org.junit.Test;
 //import org.junit.Test;
 import org.omg.CORBA.Environment;
@@ -23,6 +24,7 @@ import org.omg.CORBA.Environment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.mst.dao.SentenceCompareSummaryDao;
 import com.mst.dao.SentenceDaoImpl;
 import com.mst.interfaces.dao.SentenceDao;
 import com.mst.interfaces.sentenceprocessing.NounRelationshipProcesserSentenceDiscovery;
@@ -42,6 +44,9 @@ import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.model.test.SentenceCompareSummary;
+import com.mst.model.test.SentenceEdgeCompare;
+import com.mst.model.test.SingleSentenceCompare;
 import com.mst.model.util.MongoConnectionEntity;
 import com.mst.sentenceprocessing.IterationRuleProcesser;
 import com.mst.sentenceprocessing.RecommendedNounPhraseProcesserImpl;
@@ -58,8 +63,13 @@ import com.mst.util.TokenRelationshipUtil;
 
 public class SentenceSentenceDiscoveryTest {
 
+	private class sentenceEdgeCompare{
+		public double exactMatch;
+		public double discoveryContainsAll;
+	}
 	
-	@Test
+	
+	//@Test
 	public void run() throws Exception{
 	
 		SentenceTextRequest request = TestDataProvider.getSentenceTextRequest(createFullPath());
@@ -70,13 +80,14 @@ public class SentenceSentenceDiscoveryTest {
 		List<SentenceDiscovery> discoveries = getSentenceDiscovery(request);
 		this.assertProcess(sentences, discoveries);
 		this.assertSummary(sentences, discoveries);
+		this.assertSummaryToMongo(sentences, discoveries);
 	}
 	
 	//@Test
 	public void RunIterationRule() throws Exception {
 		 //SentenceTextRequest request = getRequest("she has a simple cyst.");
 		 //  
-		SentenceTextRequest request = getRequest("There is a dominant follicle within the middle ovary measuring 3 cm");
+		SentenceTextRequest request = getRequest("left ovary measure 4.7x2.4x2.7 cm in size");
 		   
 		//SentenceTextRequest request = getRequest("the left ovary measure 4.7x2.4x2.7 cm in size");
 		   
@@ -314,9 +325,9 @@ public class SentenceSentenceDiscoveryTest {
 		List<String> edges = TestDataProvider.readLines(createOutputPath("secondaryedges.txt"));
 		edges.add(0, EdgeNames.existence);
 
-		Map<String, Integer> edgesByMatchingCount = new HashMap<>();
+		Map<String, sentenceEdgeCompare> edgesByMatchingCount = new HashMap<>();
 		for(String edge: edges){
-			edgesByMatchingCount.put(edge,0);
+			edgesByMatchingCount.put(edge,new sentenceEdgeCompare());
 		}
 		
 		for(int i =0;i<sentences.size();i++){
@@ -332,7 +343,7 @@ public class SentenceSentenceDiscoveryTest {
 			Map<String, List<TokenRelationship>> discoveryEdges = TokenRelationshipUtil.getMapByEdgeName(discoveryTokenRelationships, true);
 			
 					 
-			for(Entry<String,Integer>  entry: edgesByMatchingCount.entrySet()){
+			for(Entry<String,sentenceEdgeCompare>  entry: edgesByMatchingCount.entrySet()){
 				
 				String edge = entry.getKey();
 				if(!sentenceEdges.containsKey(edge) && discoveryEdges.containsKey(edge) ) {
@@ -344,21 +355,32 @@ public class SentenceSentenceDiscoveryTest {
 				}
 				
 				if(!sentenceEdges.containsKey(edge) && !discoveryEdges.containsKey(edge) ) {
-					entry.setValue(entry.getValue()+1);
+					entry.getValue().exactMatch+=1;
 					continue; 
 				}
 				List<TokenRelationship> sentenceEdgesForEdgeName = sentenceEdges.get(edge);
 				List<TokenRelationship> discoveryEdgesForEdgeName = discoveryEdges.get(edge);
-				if(TokenRelationshipComparer.areCollectionsSame(sentenceEdgesForEdgeName, discoveryEdgesForEdgeName,true))
-					entry.setValue(entry.getValue()+1);
+				if(TokenRelationshipComparer.areCollectionsSame(sentenceEdgesForEdgeName, discoveryEdgesForEdgeName,true)){
+					entry.getValue().exactMatch+=1;
+					continue;
+				}
+				
+				if(TokenRelationshipComparer.doesCollectionB_HaveAllofA(sentenceEdgesForEdgeName, discoveryEdgesForEdgeName)){
+					entry.getValue().discoveryContainsAll+=1;
+				}
+				
 		}
 		
 	}
 		
 	
 		
-		for(Entry<String,Integer> entry: edgesByMatchingCount.entrySet()){
-			sbAppendWithLineBreak(entry.getKey() + " " + entry.getValue(), sb);
+		for(Entry<String,sentenceEdgeCompare> entry: edgesByMatchingCount.entrySet()){
+			sbAppendWithLineBreak("Edge Name: " +  entry.getKey(),sb);
+			sbAppendWithLineBreak("Exact Match: " + entry.getValue().exactMatch,sb);
+			sbAppendWithLineBreak("Discovery Contains All Sentence Edges:  " + entry.getValue().discoveryContainsAll,sb);
+			sb.append(System.getProperty("line.separator"));
+			sb.append(System.getProperty("line.separator"));
 		}
 
 		String fileName = createOutputPath("sentenceSummary.txt");
@@ -372,6 +394,100 @@ public class SentenceSentenceDiscoveryTest {
 	
 	}
 	
+	private void assertSummaryToMongo(List<Sentence> sentences, List<SentenceDiscovery> discoveries) throws Exception{
+		StringBuilder sb = new StringBuilder();
+		SentenceCompareSummary summary = new SentenceCompareSummary();
+		summary.setTotalSentencesProcessed(sentences.size());
+
+		
+		for(int i =0;i<sentences.size();i++){
+			Sentence sentence = sentences.get(i);
+			SentenceDiscovery discovery = discoveries.get(i);
+			SingleSentenceCompare sentenceCompare = createSingleSentenceCompare(sentence.getNormalizedSentence(),discovery.getNormalizedSentence());
+		
+			
+			List<TokenRelationship> discoveryTokenRelationships = RecommandedTokenRelationshipUtil.getTokenRelationshipsFromRecommendedTokenRelationships(discovery.getWordEmbeddings());
+			List<TokenRelationship> discoveryEdges = getNamedEdges(discovery);	
+				
+		
+			if(TokenRelationshipComparer.areCollectionsSame(sentence.getTokenRelationships(), discoveryEdges,true)){
+				summary.setTotalSentencesMatched(summary.getTotalSentencesMatched()+1);
+				continue; 
+			}
+			else {
+				summary.setTotalSentenceMismatched(summary.getTotalSentenceMismatched()+1);
+			}
+	
+			Map<String, List<TokenRelationship>> sentenceEdgesByEdgeName  = TokenRelationshipUtil.getMapByEdgeName(sentence.getTokenRelationships(), false);
+			Map<String, List<TokenRelationship>> discoveryEdgesByEdgeName = TokenRelationshipUtil.getMapByEdgeName(discoveryTokenRelationships, true);
+			
+			
+			for(Entry<String,List<TokenRelationship>> entry: sentenceEdgesByEdgeName.entrySet()){
+				List<String> sentenceToFroms = getUniqueToFrom(entry.getValue());
+				
+				if(!discoveryEdgesByEdgeName.containsKey(entry.getKey())){
+					SentenceEdgeCompare edgeCompare = createSentenceEdgeCompare(entry.getKey(), 
+							 sentenceToFroms.size(),0,sentenceToFroms, null);
+					
+				sentenceCompare.getDismatchedEdges().add(edgeCompare);
+				continue; 	
+				}
+				
+				List<TokenRelationship> discoveryRelations = discoveryEdgesByEdgeName.get(entry.getKey());
+				List<String> tofroms = getUniqueToFrom(discoveryRelations);
+				
+         	   SentenceEdgeCompare edgeCompare = createSentenceEdgeCompare(entry.getKey(), 
+							  sentenceToFroms.size(),tofroms.size(),sentenceToFroms,tofroms);
+         	   
+               if(TokenRelationshipComparer.compareCollectionWithSameEdgeName(entry.getValue(), discoveryRelations)){
+            	   sentenceCompare.getMatchingEdges().add(edgeCompare);	   
+               }
+               else
+               {
+            	   sentenceCompare.getDismatchedEdges().add(edgeCompare);
+               }
+            
+			}
+			
+			summary.getMismatchedSentences().add(sentenceCompare);
+		}
+		
+		SentenceCompareSummaryDao dao = new SentenceCompareSummaryDao();
+		dao.setMongoDatastoreProvider( new MongoDatastoreProviderDefault());
+		dao.save(summary);
+	}
+		
+		
+		
+		
+		
+		
+	
+	private List<String> getUniqueToFrom(List<TokenRelationship> tokenRelationship){
+		Map<String, List<TokenRelationship>> map = TokenRelationshipUtil.getMapByToFrom(tokenRelationship);
+		return new ArrayList<>(map.keySet());
+	}
+		
+		
+	private SentenceEdgeCompare createSentenceEdgeCompare(String edgeName,int sentenceAOccurance, int sentenceBOcurrance, List<String>  sentenceAToFrom, List<String> sentenceBtoFrom){
+		SentenceEdgeCompare compare = new SentenceEdgeCompare();
+		compare.setEdgeName(edgeName);
+		compare.setSentenceAOccurance(sentenceAOccurance);
+		compare.setSentenceBOccurance(sentenceBOcurrance);
+		compare.setSentenceAToFrom(sentenceAToFrom);
+		compare.setSentenceBToFrom(sentenceBtoFrom);
+		return compare;
+	}
+	
+	
+	private SingleSentenceCompare createSingleSentenceCompare(String sentenceA, String sentenceB){
+		SingleSentenceCompare compare = new SingleSentenceCompare();
+		compare.setSentenceA(sentenceA);
+		compare.setSentenceB(sentenceB);
+		return compare;
+	}
+		
+	
 	private void assertEdges(List<SentenceDb> old, List<SentenceDb> newSentences, boolean useSecondAsDiscovery) throws Exception{
 		
 		StringBuilder sb = new StringBuilder();
@@ -382,7 +498,7 @@ public class SentenceSentenceDiscoveryTest {
 			sb.append("Sentence : " + sentence.getNormalizedSentence());
 			sb.append(System.getProperty("line.separator"));
 			sb.append("Sentence (New) : "  + discovery.getNormalizedSentence());
-//			
+			
 			if(TokenRelationshipComparer.areCollectionsSame(sentence.getTokenRelationships(), discovery.getTokenRelationships(),useSecondAsDiscovery)){
 				sb.append(System.getProperty("line.separator"));
 				sb.append("Edges Match");
@@ -391,6 +507,7 @@ public class SentenceSentenceDiscoveryTest {
 			}
 			
 			sb.append(System.getProperty("line.separator"));
+
 			sb.append("Sentence Count: " + sentence.getTokenRelationships().size());
 			sb.append(System.getProperty("line.separator"));
 			appendEdgesToFile(sb,sentence.getTokenRelationships(), false);

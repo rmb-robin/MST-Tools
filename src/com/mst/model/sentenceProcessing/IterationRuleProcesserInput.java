@@ -3,8 +3,16 @@ package com.mst.model.sentenceProcessing;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IterationRuleProcesserInput {
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
 
+@Entity("iterationRuleProcesserInput")
+public class IterationRuleProcesserInput {
+ 	
+	@Id
+	private ObjectId id;
+	
 	private List<IterationDataRule> leftRules; 
 	private List<IterationDataRule> rightRules; 
 	
@@ -27,6 +35,14 @@ public class IterationRuleProcesserInput {
 
 	public void setRightRules(List<IterationDataRule> rightRules) {
 		this.rightRules = rightRules;
+	}
+
+	public ObjectId getId() {
+		return id;
+	}
+
+	public void setId(ObjectId id) {
+		this.id = id;
 	}
 	
 	
