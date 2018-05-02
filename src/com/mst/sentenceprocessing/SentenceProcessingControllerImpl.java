@@ -2,6 +2,7 @@ package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.types.ObjectId;
 
@@ -148,8 +149,10 @@ public class SentenceProcessingControllerImpl implements  SentenceProcessingCont
 	
 		sentence.setTokenRelationships(existenceToExistenceNoConverter.convertExistenceNo(negationRelationships,sentence.getTokenRelationships()));
 		
+		List<WordToken> modified = sentence.getModifiedWordList();
+		Map<String,List<TokenRelationship>> map = sentence.getTokenRelationsByNameMap();
 		sentence.getTokenRelationships().addAll(dynamicEdgeCreationProcesser.
-					process(this.sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), sentence));
+					process(this.sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), map,modified));
 		
 		sentence.setModifiedWordList(tokens);
 		List<TokenRelationship> distinctTokenRelations = distinctTokenRelationshipDeterminer.getDistinctTokenRelationships(sentence);

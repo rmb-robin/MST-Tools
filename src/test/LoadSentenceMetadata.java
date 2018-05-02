@@ -17,7 +17,7 @@ import com.mst.util.MongoDatastoreProviderDefault;
 
 public class LoadSentenceMetadata {
 	
-	@Test
+	//@Test
 	public void loadSentenceMetaData(){
     	SentenceProcessingMetaDataInput input =new SentenceProcessingHardcodedMetaDataInputFactory().create();
     	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
@@ -25,7 +25,7 @@ public class LoadSentenceMetadata {
     	ds.save(input); 
 	}
 	
-	//@Test 
+	@Test 
 	public void loadDiscoveryMetaData(){
 		SentenceProcessingMetaDataInput input =new SentenceDiscoveryProcessingHardcodedMetaDataInputFactory().create();
     	Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
@@ -36,7 +36,10 @@ public class LoadSentenceMetadata {
     	ds.save(input); 
 	}
 
-	@Test
+	
+	
+	
+	//@Test
 	public void difference(){
 		Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();
 		Query<SentenceProcessingMetaDataInput> q = ds.createQuery(SentenceProcessingMetaDataInput.class);
@@ -53,24 +56,7 @@ public class LoadSentenceMetadata {
 		
 		
 		
-//		MongoDatastoreProviderDefault datastoreProviderDefault = new MongoDatastoreProviderDefault();
-//		MongoConnectionEntity entity = new MongoConnectionEntity();
-//		entity.setIpAddress("10.0.129.219");
-//		entity.setDatabaseName("test");
-//		datastoreProviderDefault.set(entity);
-//		ds = datastoreProviderDefault.getDefaultDb();
-//		
-//		
-		
-//		Query<SentenceProcessingMetaDataInput> qProd = ds.createQuery(SentenceProcessingMetaDataInput.class);
-//		SentenceProcessingMetaDataInput paData = qProd.get();
-//		
-//		List<RelationshipMapping> prodMappings = paData.getNounRelationshipsInput().getRelationshipMappings();
-//		
-//		System.out.println("QA" + s.size());
-//		System.out.println("Prod" + prodMappings.size());
-//		
-	
+
 		
 		
 	}

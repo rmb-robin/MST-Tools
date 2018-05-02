@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
 import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
+import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcesser;
+import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
 import com.mst.interfaces.sentenceprocessing.PrepositionPhraseProcessor;
@@ -49,6 +51,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 	private IterationRuleProcesser iterationRuleProcesser;
 	private DistinctTokenRelationshipDeterminer distinctTokenRelationshipDeterminer;
 	private AdditionalExistenceEdgeProcesser additionalExistenceEdgeProcesser; 
+	private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor; 
+	private DynamicEdgeCreationProcesser dynamicEdgeCreationProcesser;
 	
 	public SentenceDiscoveryProcessorImpl(){
 		sentenceFactory = new SentenceFactory();
@@ -65,6 +69,9 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 		iterationRuleProcesser  = new IterationRuleProcesser();
 		distinctTokenRelationshipDeterminer = new DistinctTokenRelationshipDeterminerImpl();
 		additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
+		negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
+		dynamicEdgeCreationProcesser = new DynamicEdgeCreationProcesserImpl();
+		
 	}
 
 	public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput){
@@ -91,16 +98,23 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
 			RecommandedNounPhraseResult nounPhraseResult = nounPhraseProcesser.process(wordEmbeddings);
 			sentence.setModifiedWordList(tokens);
 			SentenceDiscovery discovery =  convert(sentence, nounPhraseResult);		
+			List<RecommendedTokenRelationship> negationRelationships =negationTokenRelationshipProcessor.processDiscovery(tokens);
+			discovery.getWordEmbeddings().addAll(negationRelationships);
+			
+			
 			discovery.getWordEmbeddings().addAll(nounPhraseProcesser.addEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
-		//	subjectAnnotator.annotate(discovery);
 			discovery.getWordEmbeddings().addAll(negativeRelationshipfactory.create(discovery.getModifiedWordList()));
 		
 			discovery.getWordEmbeddings().addAll(iterationRuleProcesser.process(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getIterationRuleProcesserInput()));
 			discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
 				
 			
+			
+			
 			//should always be last.....
 			List<RecommendedTokenRelationship> edges = nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(), this.sentenceProcessingMetaDataInput.getNounRelationshipsInput());
+			dynamicEdgeCreationProcesser.processDiscovery(this.sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), discovery);
+			
 			
 			edges = distinctTokenRelationshipDeterminer.getDistinctRecommendedRelationships(edges);
 			discovery.setWordEmbeddings(edges);
