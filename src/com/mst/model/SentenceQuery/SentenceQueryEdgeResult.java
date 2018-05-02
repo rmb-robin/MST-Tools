@@ -5,10 +5,10 @@ public class SentenceQueryEdgeResult {
 	private String edgeName; 
 	private String fromToken;
 	private String toToken;
-	private String EdgeResultType; 
-	
+	private String EdgeResultType;
 	private String matchedValue; 
-	private String tokenType; 
+	private String tokenType;
+	private boolean displayEdge;
 	
 	public String getEdgeName() {
 		return edgeName;
@@ -45,7 +45,11 @@ public class SentenceQueryEdgeResult {
 	}
 	public void setTokenType(String tokenType) {
 		this.tokenType = tokenType;
-	} 
-	
-	
+	}
+	public boolean isDisplayEdge() {
+		return displayEdge;
+	}
+	public void setDisplayEdge(boolean displayEdge) {
+		this.displayEdge = displayEdge;
+	}
 }
