@@ -69,7 +69,7 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 
 						if (isEdgeInSearchQuery)
 							queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship, EdgeResultTypes.primaryEdge, matches, true));
-						else if (!relationship.getEdgeName().equals(EdgeNames.existence) && !relationship.getEdgeName().isEmpty())
+						else if (!relationship.getEdgeName().isEmpty())
 							queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship, EdgeResultTypes.primaryEdge, matches, false));
 
 						oppositeToken = relationship.getOppositeToken(token);
