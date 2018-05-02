@@ -1,0 +1,56 @@
+Sentence Count462
+Edge Name: measure
+Exact Match: 264.0
+Discovery Contains All Sentence Edges:  11.0
+
+
+Edge Name: disease modifier
+Exact Match: 377.0
+Discovery Contains All Sentence Edges:  3.0
+
+
+Edge Name: enlarged finding site
+Exact Match: 459.0
+Discovery Contains All Sentence Edges:  0.0
+
+
+Edge Name: heterogeneous finding site
+Exact Match: 449.0
+Discovery Contains All Sentence Edges:  0.0
+
+
+Edge Name: disease location
+Exact Match: 269.0
+Discovery Contains All Sentence Edges:  4.0
+
+
+Edge Name: existence
+Exact Match: 79.0
+Discovery Contains All Sentence Edges:  28.0
+
+
+Edge Name: simple cyst modifiers
+Exact Match: 440.0
+Discovery Contains All Sentence Edges:  0.0
+
+
+Edge Name: finding site modifier
+Exact Match: 365.0
+Discovery Contains All Sentence Edges:  2.0
+
+
+Edge Name: procedure location
+Exact Match: 447.0
+Discovery Contains All Sentence Edges:  1.0
+
+
+Edge Name: measurement
+Exact Match: 46.0
+Discovery Contains All Sentence Edges:  0.0
+
+
+Edge Name: laterality
+Exact Match: 383.0
+Discovery Contains All Sentence Edges:  0.0
+
+

@@ -100,3 +100,23 @@ qlco-shape,t,dysn,t,null,disease modifier
 single,f,dysn,t,null,quantity
 multiple,f,dysn,t,null,quantity
 innumerable,f,dysn,t,null,quantity
+diag,t,diagnosis,f,7,diagnosis
+mr.,f,*,f,7,pii
+mrs.,f,*,f,7,pii
+ms.,f,*,f,7,pii
+evidence,f,seen,f,7,disease modifier
+dysn,t,resection,f,7,procedure location
+sonographic,f,evidence,f,7,procedure
+qlco-degree,t,proc,t,7,procedure modifier
+qlco,t,proc,t,7,procedure modifier
+qlco-simple,t,proc,t,7,procedure modifier
+dysn,t,proc,t,7,procedure type
+qlco,t,neop-can,t,7,disease modifier
+qlco-simple,t,neop-can,t,7,disease modifier
+qlco-degree,t,neop-can,t,7,disease modifier
+proc,t,qlco,t,7,procedure modifier
+proc,t,qlco-simple,t,7,procedure modifier
+proc,t,qlco-degree,t,7,procedure modifier
+sympto,t,qlco,t,7,symptom modifier
+sympto,t,qlco-simple,t,7,symptom modifier
+sympto,t,qlco-degree,t,7,symptom modifier

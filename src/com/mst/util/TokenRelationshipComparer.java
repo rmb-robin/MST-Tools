@@ -1,5 +1,6 @@
 package com.mst.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,11 +18,17 @@ public class TokenRelationshipComparer {
 		return compareCollections(firstCollectionMap, secondCollectionMap);
 	}
 	
+	public static boolean doesCollectionB_HaveAllofA(List<TokenRelationship> firstCollection, List<TokenRelationship> secondCollection){
+	
+		return compareCollectionWithSameEdgeName(firstCollection,secondCollection);	
+	}
+	
+	
 	private static boolean areSizesSame(List<TokenRelationship> firstCollection, 
 			List<TokenRelationship> secondCollection){
 		return firstCollection.size()== secondCollection.size();
 	}
-	
+	  
 	
 	private static boolean compareCollections(Map<String, List<TokenRelationship>> firstCollectionMap, Map<String, List<TokenRelationship>> secondCollection){
 		for(Entry<String, List<TokenRelationship>> entry: firstCollectionMap.entrySet()){			
@@ -38,7 +45,7 @@ public class TokenRelationshipComparer {
 	}
 	
 	
-	private static boolean compareCollectionWithSameEdgeName(List<TokenRelationship> firstCollcetion, List<TokenRelationship> secondCollection){
+	public static boolean compareCollectionWithSameEdgeName(List<TokenRelationship> firstCollcetion, List<TokenRelationship> secondCollection){
 		Map<String, List<TokenRelationship>> firstCollectionMap = TokenRelationshipUtil.getMapByToFrom(firstCollcetion);
 		Map<String, List<TokenRelationship>> secondCollectionMap  = TokenRelationshipUtil.getMapByToFrom(secondCollection);
 		
@@ -48,8 +55,5 @@ public class TokenRelationshipComparer {
 			if(!secondCollectionMap.containsKey(key)) return false;	
 		}
 		return true;
-	}
-	
-	
-	
+	}	
 }

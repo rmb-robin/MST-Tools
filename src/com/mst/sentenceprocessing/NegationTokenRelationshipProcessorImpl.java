@@ -11,6 +11,7 @@ import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.PropertyValueTypes;
 import com.mst.model.metadataTypes.VerbType;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
@@ -166,5 +167,22 @@ public class NegationTokenRelationshipProcessorImpl implements NegationTokenRela
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public List<RecommendedTokenRelationship> processDiscovery(List<WordToken> wordTokens) {
+		List<TokenRelationship> tokenRelationships = process(wordTokens);
+		
+		
+		List<RecommendedTokenRelationship> result = new ArrayList<>();
+		
+		for(TokenRelationship relationship: tokenRelationships){
+			RecommendedTokenRelationship recommended = this.tokenRelationshipFactory.createRecommendedRelationshipFromTokenRelationship(relationship);
+			recommended.getTokenRelationship().setNamedEdge(recommended.getTokenRelationship().getEdgeName());
+			result.add(recommended);
+		}
+		
+		return result;
+		
 	}
 }

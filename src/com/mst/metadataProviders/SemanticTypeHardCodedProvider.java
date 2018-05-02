@@ -9,18 +9,14 @@ import com.mst.interfaces.sentenceprocessing.SemanticTypeProvider;
 
 public class SemanticTypeHardCodedProvider  {
 
-	private String getFullFilePath(String filePath, boolean isSentence){
-		if(isSentence)
-			return System.getProperty("user.dir") + File.separator + "testData" + File.separator + "sentenceSpecificMetadata" + File.separator + filePath;
-		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + "sentenceDiscoverySpecificMetadata" + File.separator + filePath;
-		
+	private String getFullFilePath(String filePath){
+			return System.getProperty("user.dir") + File.separator + "testData" + File.separator + filePath;
 	}
-	
-	
+
 	public Map<String, String> getSemanticTypes(boolean isSentence) {
 		
 		Map<String,String> result = new HashMap<String,String>();
-		List<String> lines = TestDataProvider.readLines(getFullFilePath("semanticTypes.txt",isSentence));
+		List<String> lines = TestDataProvider.readLines(getFullFilePath("semanticTypes.txt"));
 		for(String line: lines){
 			String [] contents = line.split(",");
 			if(result.containsKey(contents[0])) continue;

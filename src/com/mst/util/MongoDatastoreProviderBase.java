@@ -21,4 +21,6 @@ public abstract class MongoDatastoreProviderBase {
 	public void set(MongoConnectionEntity connection){
 		this.connectionEntity = connection;
 	}
+	
+	 
 }
