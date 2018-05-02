@@ -41,7 +41,7 @@ public class AddEdgeBusinessRuleFilterImpl implements BusinessRuleFilter {
                     if (newEdgeAdded)
                         break;
                     AddEdgeToQueryResults rule = (AddEdgeToQueryResults) baseRule;
-                    if (!areEdgesToMatchFound(edgeResults, rule.getEdgesToMatch()) || !isEdgeToAddNotFound(edgeResults, rule.getEdgeToAdd(), rule.getEdgeToAddValues()))
+                    if (!areEdgesToMatchFound(edgeResults, rule.getEdgesToMatch()) || !isEdgeToAddNotFound(edgeResults, rule.getEdgeToAdd()))
                         continue;
                     List<AddEdgeToQueryResults.Edge> specialEdges = rule.getSpecialEdges();
                     boolean nonexistentEdgeFound = false;
@@ -153,15 +153,11 @@ public class AddEdgeBusinessRuleFilterImpl implements BusinessRuleFilter {
         return true;
     }
 
-    private boolean isEdgeToAddNotFound(List<SentenceQueryEdgeResult> edgeResults, String edgeToAdd, List<AddEdgeToQueryResults.EdgeToAddValue> values) {
+    private boolean isEdgeToAddNotFound(List<SentenceQueryEdgeResult> edgeResults, String edgeToAdd) {
         if (edgeResults != null && !edgeResults.isEmpty())
             for (SentenceQueryEdgeResult edge : edgeResults) {
-                if (edge != null && edge.getEdgeName() != null && edge.getEdgeName().equals(edgeToAdd)) {
-                    if (values != null && (edge.getMatchedValue() != null))
-                        for (AddEdgeToQueryResults.EdgeToAddValue edgeToAddValue : values)
-                            if (edge.getMatchedValue().equals(edgeToAddValue.getValue()))
-                                return false;
-                }
+                if (edge != null && edge.getEdgeName() != null && edge.getEdgeName().equals(edgeToAdd))
+                    return false;
             }
         return true;
     }
