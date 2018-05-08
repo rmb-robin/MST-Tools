@@ -158,8 +158,9 @@ public class Constants {
 	public static final Pattern TNM_STAGING_REGEX_NO_SPACE = Pattern.compile("(?i)p?T[0-4x][abcruy]*[,]*(p?N[0-3x][abcruy]*)*[|,|&|and]*(M[01x])*[,]*(R[0-2])*");
 	
 	// https://www.regex101.com/r/oG3fE2/1
-	public static final Pattern MEASUREMENT_REGEX = Pattern.compile("\\d+\\.?\\d*\\s*[x|X]\\s*\\d+\\.?\\d*\\s*([x|X]\\s*\\d+\\.?\\d*)?");
-	
+	public static final Pattern MEASUREMENT_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*\\s*[x|X]\\s*\\.?\\d+\\.?\\d*\\s*([x|X]\\s*\\.?\\d+\\.?\\d*)?");
+	public static final Pattern NUMERIC_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*(mm|cm)+");
+
 	public static final Pattern SALUTATION_REGEX = Pattern.compile("Dr\\.|Mr\\.|Ms\\.|Mrs\\.");
 	
 	//public static final Pattern GENE_POS = Pattern.compile("(?i).*\\-(positive|pos)");
