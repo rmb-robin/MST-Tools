@@ -19,73 +19,80 @@ public class SentenceMeasureNormalizerTests {
 	@Test
 	public void testMMtoCM() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
-
-		List<WordToken> words = getWordTokens("The right kidney measuring 90 x 32 x 62 mm, volume 93 mL.");
-		
+		String text = "measuring 90 x 32 x 62 mm";
+        System.out.println(text);
+		List<WordToken> words = getWordTokens(text);
 		System.out.println(words);
 		normalizer.Normalize(words, true, false);
-		System.out.println(words);
-		
-		assertEquals(words.get(4).getToken(), "9.0x3.2x6.2");
-		assertEquals(words.get(5).getToken(), "cm");
+		System.out.println(words + "\n\n");
+		assertEquals(words.get(1).getToken(), "9.0");
+        assertEquals(words.get(2).getToken(), "3.2");
+        assertEquals(words.get(3).getToken(), "6.2");
+		assertEquals(words.get(4).getToken(), "cm");
 	}
 
 	@Test
 	public void testMMtoCM2() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
-
-		List<WordToken> words = getWordTokens("The left kidney measures 9.1 x 3.2 cm.");
-		
+        String text = "measures 91 x 32 mm";
+        System.out.println(text);
+        List<WordToken> words = getWordTokens(text);
 		System.out.println(words);
 		normalizer.Normalize(words, true, false);
-		System.out.println(words);
-		
-		assertEquals(words.get(4).getToken(), "9.1x3.2");
-		assertEquals(words.get(5).getToken(), "cm");
+        System.out.println(words + "\n\n");
+		assertEquals(words.get(1).getToken(), "9.1");
+        assertEquals(words.get(2).getToken(), "3.2");
+		assertEquals(words.get(3).getToken(), "cm");
 	}
 	
 	@Test
 	public void testMMtoCM3() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
-
-		List<WordToken> words = getWordTokens("The laceration is 21 mm.");
-		
+        String text = "measures 21mm";
+        System.out.println(text);
+        List<WordToken> words = getWordTokens(text);
 		System.out.println(words);
 		normalizer.Normalize(words, true, false);
-		System.out.println(words);
-		
-		assertEquals(words.get(3).getToken(), "2.1");
-		assertEquals(words.get(4).getToken(), "cm");
+        System.out.println(words + "\n\n");
+		assertEquals(words.get(1).getToken(), "2.1");
+		assertEquals(words.get(2).getToken(), "cm");
 	}
-	
-	@Test
-	public void testGetLargestValue() {
-		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
 
-		List<WordToken> words = getWordTokens("The right kidney measures 90 x 32 x 62 mm, volume 93 mL.");
-		
-		System.out.println(words);
-		normalizer.Normalize(words, true, true);
-		System.out.println(words);
-		
-		assertEquals(words.get(4).getToken(), "9.0");
-		assertEquals(words.get(5).getToken(), "cm");
-	}
-	
 	@Test
-	public void testGetLargestNoConversion() {
-		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+	public void testTokenizeMeasurements() {
+        SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+        List<WordToken> words;
+        String text;
 
-		List<WordToken> words = getWordTokens("The right kidney measuring 70 x 22 x 52 mm, volume 93 mL.");
-		
-		System.out.println(words);
-		normalizer.Normalize(words, false, true);
-		System.out.println(words);
-		
-		assertEquals(words.get(4).getToken(), "70.0");
-		assertEquals(words.get(5).getToken(), "mm");
+        text = "measuring .7x.3x1.2cm";
+        System.out.println(text);
+        words = getWordTokens(text);
+        System.out.println(words);
+		normalizer.Normalize(words, false, false);
+        System.out.println(words +"\n");
+
+        text = "measuring .7 x .3 x 1.2 cm";
+        System.out.println(text);
+        words = getWordTokens(text);
+        System.out.println(words);
+        normalizer.Normalize(words, false, false);
+        System.out.println(words +"\n");
+
+        text = "measuring .7cm x .3cm x 1.2cm";
+        System.out.println(text);
+        words = getWordTokens(text);
+        System.out.println(words);
+        normalizer.Normalize(words, false, false);
+        System.out.println(words +"\n");
+
+        text = "measuring .7 cm x .3 cm x 1.2 cm";
+        System.out.println(text);
+        words = getWordTokens(text);
+        System.out.println(words);
+        normalizer.Normalize(words, false, false);
+		System.out.println(words +"\n\n");
 	}
-	
+
 	private List<WordToken> getWordTokens(String text) {
 		List<WordToken> words = new ArrayList<>();
 		
