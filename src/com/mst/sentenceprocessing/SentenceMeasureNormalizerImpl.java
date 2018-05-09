@@ -36,8 +36,7 @@ public class SentenceMeasureNormalizerImpl implements SentenceMeasureNormalizer 
                         itr.add(newWord);
                     }
                 }
-            }
-            else if (Constants.NUMERIC_REGEX.matcher(word.getToken()).matches()) {
+            } else if (Constants.MEASUREMENT_1_DIMENSION_REGEX.matcher(word.getToken()).matches()) {
                 String[] measurement = word.getToken().split("(mm|cm)+");
                 String[] unit = word.getToken().split("\\.?\\d+");
                 itr.remove();
@@ -57,21 +56,20 @@ public class SentenceMeasureNormalizerImpl implements SentenceMeasureNormalizer 
         ListIterator<WordToken> itr = words.listIterator();
         while (itr.hasNext() && itr.nextIndex() < words.size() - 1) {
             WordToken word = itr.next();
-            if ((word.getSemanticType() != null && word.getSemanticType().equalsIgnoreCase(SemanticTypes.cardinalNumber)) || Constants.MEASUREMENT_REGEX.matcher(word.getToken()).matches()) {
+
+            if ((word.getSemanticType() != null && word.getSemanticType().equalsIgnoreCase(SemanticTypes.cardinalNumber)) || Constants.CARDINAL_NUMBER_REGEX.matcher(word.getToken()).matches()) {
                 WordToken nextWord = words.get(itr.nextIndex());
                 WordToken secondWord;
                 WordToken thirdWord;
-                if (!nextWord.getToken().matches("(?i)(cm|centimeters)+")) {
-                    if (nextWord.getToken().matches("(?i)(mm|millimeters)+")) {
+                if (nextWord.getToken().matches("(?i)(mm|millimeters)+")) {
+                    word.setToken(String.valueOf(Float.parseFloat(word.getToken()) / 10));
+                    nextWord.setToken("cm");
+                } else if (itr.nextIndex() + 1 < words.size()) {
+                    secondWord = words.get(itr.nextIndex() + 1);
+                    if (secondWord.getToken().matches("(?i)(mm|millimeters)+")) {
                         word.setToken(String.valueOf(Float.parseFloat(word.getToken()) / 10));
-                        nextWord.setToken("cm");
-                    } else if (itr.nextIndex() + 1 < words.size()) {
-                        secondWord = words.get(itr.nextIndex() + 1);
-                        if (secondWord.getToken().matches("(?i)(mm|millimeters)+")) {
-                            word.setToken(String.valueOf(Float.parseFloat(word.getToken()) / 10));
-                            nextWord.setToken(String.valueOf(Float.parseFloat(nextWord.getToken()) / 10));
-                            secondWord.setToken("cm");
-                        }
+                        nextWord.setToken(String.valueOf(Float.parseFloat(nextWord.getToken()) / 10));
+                        secondWord.setToken("cm");
                     } else if (itr.nextIndex() + 2 < words.size()) {
                         secondWord = words.get(itr.nextIndex() + 1);
                         thirdWord = words.get(itr.nextIndex() + 2);
