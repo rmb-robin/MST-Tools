@@ -18,19 +18,17 @@ import com.mst.model.SentenceQuery.SentenceQueryResult;
 import com.mst.model.SentenceQuery.ShouldMatchOnSentenceEdgesResult;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeResultTypes;
-import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
-import com.mst.model.sentenceProcessing.WordToken;
-import com.mst.util.TokenRelationshipUtil;
+
 
 public class SentenceFilterControllermpl implements SentenceFilterController {
 	private HashSet<String> processedSentences; 
 	private SentenceFilter sentenceFilter;
 	private Map<String,SentenceQueryResult> queryResults;
 	public Map<String,SentenceDb> cumalativeSentenceResults;
-	private FriendOfFriendService friendOfFriendService; 
-	
+	private FriendOfFriendService friendOfFriendService;
+
 	public SentenceFilterControllermpl(){
 		processedSentences = new HashSet<>();
 		queryResults = new HashMap<>();
@@ -43,58 +41,54 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 		return queryResults;
 	}
 	
-	private Map<String, MatchInfo> matches; 
-	public List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, String searchToken){
-		 
+	private Map<String, MatchInfo> matches;
+
+	public List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, String searchToken) {
 		List<SentenceQueryResult> result = new ArrayList<>();
-		for(SentenceDb sentenceDb : sentences){
-			try{
-			String id = sentenceDb.getId().toString();
-			if(processedSentences.contains(id))continue;
-			if(shouldByPassResult(sentenceDb.getTokenRelationships(),edgeQuery,searchToken)) continue;
-		    
-			String oppositeToken = null;
-			TokenRelationship foundRelationship=null;
-			SentenceQueryResult queryResult = null;
-			HashSet<String> edgeNameHash = new HashSet<>();
-			edgeQuery.forEach(a-> edgeNameHash.add(a.getName()) );
-			boolean addFriendofFriendExistence=true;
-			Map<String, List<TokenRelationship>> relationsByUniqueTofrom = TokenRelationshipUtil.getMapByDistinctToFrom(sentenceDb.getTokenRelationships());
-			for(TokenRelationship relationship: sentenceDb.getTokenRelationships()){
-			  if(relationship.getEdgeName()==null)continue;
-			  boolean isEdgeInSearchQuery = edgeNameHash.contains(relationship.getEdgeName());
+		for (SentenceDb sentenceDb : sentences) {
+			try {
+				String id = sentenceDb.getId().toString();
+				if (processedSentences.contains(id) || shouldByPassResult(sentenceDb.getTokenRelationships(), edgeQuery, searchToken))
+					continue;
 
-			  ShouldMatchOnSentenceEdgesResult edgesResult  = sentenceFilter.shouldAddTokenFromRelationship(relationship,token);
-			  if(edgesResult.isMatch())
-				{	
-				    if(queryResult==null){
-				    	queryResult = SentenceQueryResultFactory.createSentenceQueryResult(sentenceDb);
-				    }
+				String oppositeToken;
+				TokenRelationship foundRelationship;
+				SentenceQueryResult queryResult = null;
+				HashSet<String> edgeNameHash = new HashSet<>();
+				edgeQuery.forEach(a -> edgeNameHash.add(a.getName()));
+				//Map<String, List<TokenRelationship>> relationsByUniqueTofrom = TokenRelationshipUtil.getMapByDistinctToFrom(sentenceDb.getTokenRelationships());
 
-				    if(isEdgeInSearchQuery){
-				    	queryResult.getSentenceQueryEdgeResults()
-							.add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship,EdgeResultTypes.primaryEdge,matches));
-				    }
-					oppositeToken = relationship.getOppositeToken(token);
-					foundRelationship = relationship;
-										
-					ShouldMatchOnSentenceEdgesResult friendResult = friendOfFriendService.findFriendOfFriendEdges(sentenceDb.getTokenRelationships(),oppositeToken,foundRelationship,edgeNameHash);
-					if(friendResult!=null)
-						queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(friendResult.getRelationship(),EdgeResultTypes.friendOfFriend,matches));
+				for (TokenRelationship relationship : sentenceDb.getTokenRelationships()) {
+					if (relationship.getEdgeName() == null)
+						continue;
+					boolean isEdgeInSearchQuery = edgeNameHash.contains(relationship.getEdgeName());
+					ShouldMatchOnSentenceEdgesResult edgesResult = sentenceFilter.shouldAddTokenFromRelationship(relationship, token);
+
+					if (edgesResult.isMatch()) {
+						queryResult = (queryResult == null) ? SentenceQueryResultFactory.createSentenceQueryResult(sentenceDb) : queryResult;
+
+						if (isEdgeInSearchQuery)
+							queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship, EdgeResultTypes.primaryEdge, matches, true));
+						else if (!relationship.getEdgeName().isEmpty())
+							queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(relationship, EdgeResultTypes.primaryEdge, matches, false));
+
+						oppositeToken = relationship.getOppositeToken(token);
+						foundRelationship = relationship;
+						ShouldMatchOnSentenceEdgesResult friendResult = friendOfFriendService.findFriendOfFriendEdges(sentenceDb.getTokenRelationships(), oppositeToken, foundRelationship, edgeNameHash);
+
+						if (friendResult != null) {
+							queryResult.getSentenceQueryEdgeResults().add(SentenceQueryResultFactory.createSentenceQueryEdgeResult(friendResult.getRelationship(), EdgeResultTypes.friendOfFriend, matches, true));
+						}
+					}
 				}
-			}
 
-			addFriendofFriendExistence = true;
-			if(addFriendofFriendExistence && queryResult!=null){
-				result.add(queryResult);
-				processedSentences.add(id);
+				if (queryResult != null) {
+					result.add(queryResult);
+					processedSentences.add(id);
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
-		}
-	     catch(Exception ex){
-	    	Exception e = ex;
-	    	ex.printStackTrace();
-	    	 //to do.. add logging .for now this wil do..
-	     }
 		}
 		return result;
 	}
@@ -125,6 +119,7 @@ public class SentenceFilterControllermpl implements SentenceFilterController {
 			}
 				
 			if(!tokenMatch) continue;
+
 			if(shouldByPassResult(entry.getValue().getTokenRelationships(),sentenceQueryInstance.getEdges(),matchedToken)) continue;
 		
 			matchedIds.add(entry.getKey());

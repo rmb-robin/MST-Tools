@@ -36,19 +36,24 @@ public class SentenceQueryResultFactory {
 		return result;
 	}
 	
-	public static SentenceQueryEdgeResult createSentenceQueryEdgeResult(TokenRelationship relationship, String edgeType,Map<String, MatchInfo> matches){
+	public static SentenceQueryEdgeResult createSentenceQueryEdgeResult(TokenRelationship relationship, String edgeType, Map<String, MatchInfo> matches, boolean displayEdge) {
 		SentenceQueryEdgeResult queryEdgeResult = new SentenceQueryEdgeResult();
 		queryEdgeResult.setEdgeName(relationship.getEdgeName());
 		queryEdgeResult.setFromToken(relationship.getFromToken().getToken());
 		queryEdgeResult.setToToken(relationship.getToToken().getToken());
 
-		if(matches.containsKey(relationship.getEdgeName())){
+		if (matches.containsKey(relationship.getEdgeName())) {
 			MatchInfo info = matches.get(relationship.getEdgeName());
 			queryEdgeResult.setTokenType(info.getTokenType());
 			queryEdgeResult.setMatchedValue(info.getValue());
 		}
+		else if (!displayEdge) {
+			queryEdgeResult.setTokenType("from");
+			queryEdgeResult.setMatchedValue(relationship.getFromToken().getToken());
+		}
 		
 		queryEdgeResult.setEdgeResultType(edgeType);
+		queryEdgeResult.setDisplayEdge(displayEdge);
 		return queryEdgeResult;
 	}
 

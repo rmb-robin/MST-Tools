@@ -3,6 +3,7 @@ package test;
 import com.mst.dao.BusinessRuleDaoImpl;
 import com.mst.interfaces.dao.BusinessRuleDao;
 import com.mst.model.businessRule.AddEdgeToQueryResults;
+import com.mst.model.businessRule.AddEdgeToQueryResults.*;
 import com.mst.model.businessRule.BusinessRule;
 import com.mst.util.MongoDatastoreProviderDefault;
 import org.junit.Test;
@@ -17,41 +18,42 @@ import static org.junit.Assert.assertTrue;
 
 public class LoadRuleAddEdgeToQueryResults {
     //private String orgId = "58c6f3ceaf3c420b90160803";
-    private String orgId = "5972aedebde4270bc53b23e3"; //Test
-    private String testServer = "10.0.129.218";
-    private String testDatabaseName = "test";
+    private final String ORG_ID = "5972aedebde4270bc53b23e3"; //Test
+    private final String TEST_SERVER = "10.0.129.218";
+    private final String TEST_DATABASE_NAME = "test";
 
     @Test
     public void insert() {
-        MongoDatastoreProviderDefault provider = new MongoDatastoreProviderDefault(testServer, testDatabaseName);
+        MongoDatastoreProviderDefault provider = new MongoDatastoreProviderDefault(TEST_SERVER, TEST_DATABASE_NAME);
         BusinessRuleDao dao = new BusinessRuleDaoImpl(BusinessRule.class);
         dao.setMongoDatastoreProvider(provider);
 
         BusinessRule businessRule = new BusinessRule();
-        businessRule.setOrganizationId(orgId);
+        businessRule.setOrganizationId(ORG_ID);
         businessRule.setRuleType(AddEdgeToQueryResults.class.getSimpleName());
         List<BusinessRule> rules = new ArrayList<>();
         AddEdgeToQueryResults rule;
-        AddEdgeToQueryResults.Edge edge;
-        AddEdgeToQueryResults.EdgeToAddValue edgeToAddValue;
-        List<AddEdgeToQueryResults.EdgeToAddValue> edgeToAddValues;
+        Edge edge;
+        EdgeToAddValue edgeToAddValue;
+        List<EdgeToAddValue> edgeToAddValues;
+        List<Edge> specialEdges;
         Map<String, List<String>> edgesToMatch;
 
         // rule 0 for too small to characterize
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Too Small To Characterize");
-        List<AddEdgeToQueryResults.Edge> edges = new ArrayList<>();
-        edge = new AddEdgeToQueryResults.Edge();
+        specialEdges = new ArrayList<>();
+        edge = new Edge();
         edge.setLogicalOperator(OR);
         edge.setEdgeExists(true);
         edge.setEdgeName("TSTC");
-        edges.add(edge);
-        edge = new AddEdgeToQueryResults.Edge();
+        specialEdges.add(edge);
+        edge = new Edge();
         edge.setLogicalOperator(OR);
         edge.setEdgeExists(true);
         edge.setEdgeName("Too small to characterize");
-        edges.add(edge);
-        rule.setSpecialEdges(edges);
+        specialEdges.add(edge);
+        rule.setSpecialEdges(specialEdges);
         rule.setSearchSentenceForSpecialEdges(true);
         rule.setEdgeToAdd("measurement");
         edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
@@ -68,6 +70,14 @@ public class LoadRuleAddEdgeToQueryResults {
         // rule 1 for small ovarian cyst
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Small Measurement Modifier; Ovarian Cyst");
+        specialEdges = new ArrayList<>();
+        edge = new Edge();
+        edge.setLogicalOperator(OR);
+        edge.setEdgeExists(true);
+        edge.setEdgeName("simple cyst modifiers");
+        edge.setEdgeValue("small");
+        specialEdges.add(edge);
+        rule.setSpecialEdges(specialEdges);
         rule.setEdgeToAdd("measurement");
         edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
         edgeToAddValue.setHasMinRangeValue(false);
@@ -77,16 +87,24 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setEdgeToAddValues(edgeToAddValues);
         edgesToMatch = new HashMap<>();
         edgesToMatch.put("existence", new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","structure","structures")));
-        edgesToMatch.put("simple cyst modifiers", new ArrayList<>(Collections.singletonList("small")));
         edgesToMatch.put("disease location", new ArrayList<>(Arrays.asList("adnexa","adnexal","adnexum","ovarian","ovaries","ovary","paraovarian")));
         rule.setEdgesToMatch(edgesToMatch);
+        rule.setSearchSentenceForSpecialEdges(false);
         rules.add(rule);
 
         // rule 2 for small thyroid nodule
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Small Measurement Modifier; Thyroid Nodule");
+        specialEdges = new ArrayList<>();
+        edge = new Edge();
+        edge.setLogicalOperator(OR);
+        edge.setEdgeExists(true);
+        edge.setEdgeName("simple cyst modifiers");
+        edge.setEdgeValue("small");
+        specialEdges.add(edge);
+        rule.setSpecialEdges(specialEdges);
         rule.setEdgeToAdd("measurement");
-        edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
+        edgeToAddValue = new EdgeToAddValue();
         edgeToAddValue.setHasMinRangeValue(false);
         edgeToAddValue.setHasMaxRangeValue(false);
         edgeToAddValue.setValue(".9");
@@ -94,23 +112,31 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setEdgeToAddValues(edgeToAddValues);
         edgesToMatch = new HashMap<>();
         edgesToMatch.put("existence", new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
-        edgesToMatch.put("simple cyst modifiers", new ArrayList<>(Collections.singletonList("small")));
         edgesToMatch.put("disease location", new ArrayList<>(Arrays.asList("isthmus","thyroid")));
         rule.setEdgesToMatch(edgesToMatch);
+        rule.setSearchSentenceForSpecialEdges(false);
         rules.add(rule);
 
         // rule 3 for large thyroid nodule
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Large Measurement Modifier; Thyroid Nodule");
+        specialEdges = new ArrayList<>();
+        edge = new Edge();
+        edge.setLogicalOperator(OR);
+        edge.setEdgeExists(true);
+        edge.setEdgeName("disease modifier");
+        edge.setEdgeValue("large");
+        specialEdges.add(edge);
+        rule.setSpecialEdges(specialEdges);
         rule.setEdgeToAdd("measurement");
-        edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
+        edgeToAddValue = new EdgeToAddValue();
         edgeToAddValue.setHasMinRangeValue(true);
         edgeToAddValue.setHasMaxRangeValue(true);
         edgeToAddValue.setMinRangeValue(0);
         edgeToAddValue.setMaxRangeValue(18);
         edgeToAddValue.setValue(".1");
         edgeToAddValues = new ArrayList<>(Collections.singletonList(edgeToAddValue));
-        edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
+        edgeToAddValue = new EdgeToAddValue();
         edgeToAddValue.setHasMinRangeValue(true);
         edgeToAddValue.setHasMaxRangeValue(false);
         edgeToAddValue.setMinRangeValue(19);
@@ -119,16 +145,36 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setEdgeToAddValues(edgeToAddValues);
         edgesToMatch = new HashMap<>();
         edgesToMatch.put("existence", new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","mass","masses","nodule","nodules","hypodensity","attenuation")));
-        edgesToMatch.put("disease modifier", new ArrayList<>(Collections.singletonList("large")));
         edgesToMatch.put("disease location", new ArrayList<>(Arrays.asList("isthmus","thyroid")));
         rule.setEdgesToMatch(edgesToMatch);
+        rule.setSearchSentenceForSpecialEdges(false);
         rules.add(rule);
 
         // rule 4 for physiologic, follicular, follicular-type, and dominant ovarian cyst
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Physiologic, Follicular, Follicular-type, and Dominant Ovarian Cyst");
+        specialEdges = new ArrayList<>();
+        edge = new Edge();
+        edge.setLogicalOperator(OR);
+        edge.setEdgeExists(true);
+        edge.setEdgeName("simple cyst modifiers");
+        edge.setEdgeValue("dominant");
+        specialEdges.add(edge);
+        edge = new Edge();
+        edge.setLogicalOperator(OR);
+        edge.setEdgeExists(true);
+        edge.setEdgeName("simple cyst modifiers");
+        edge.setEdgeValue("physiologic");
+        specialEdges.add(edge);
+        edge = new Edge();
+        edge.setLogicalOperator(OR);
+        edge.setEdgeExists(true);
+        edge.setEdgeName("simple cyst modifiers");
+        edge.setEdgeValue("follicular");
+        specialEdges.add(edge);
+        rule.setSpecialEdges(specialEdges);
         rule.setEdgeToAdd("measurement");
-        edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
+        edgeToAddValue = new EdgeToAddValue();
         edgeToAddValue.setHasMinRangeValue(false);
         edgeToAddValue.setHasMaxRangeValue(false);
         edgeToAddValue.setValue(".9");
@@ -136,31 +182,31 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setEdgeToAddValues(edgeToAddValues);
         edgesToMatch = new HashMap<>();
         edgesToMatch.put("existence", new ArrayList<>(Arrays.asList("cyst","cysts","lesion","lesions","structure","structures")));
-        edgesToMatch.put("simple cyst modifiers", new ArrayList<>(Arrays.asList("dominant","physiologic","follicular")));
         edgesToMatch.put("disease location", new ArrayList<>(Arrays.asList("adnexa","adnexal","adnexum","ovarian","ovaries","ovary","paraovarian")));
         rule.setEdgesToMatch(edgesToMatch);
+        rule.setSearchSentenceForSpecialEdges(false);
         rules.add(rule);
 
         // rule 5 no measurement and no large or small modifier for thyroid nodule
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("No Measurement Modifier; Thyroid Nodule");
-        edges = new ArrayList<>();
-        edge = new AddEdgeToQueryResults.Edge();
+        specialEdges = new ArrayList<>();
+        edge = new Edge();
         edge.setLogicalOperator(AND);
         edge.setEdgeExists(false);
         edge.setEdgeName("simple cyst modifiers");
         edge.setEdgeValue("small");
-        edges.add(edge);
-        edge = new AddEdgeToQueryResults.Edge();
+        specialEdges.add(edge);
+        edge = new Edge();
         edge.setLogicalOperator(AND);
         edge.setEdgeExists(false);
         edge.setEdgeName("disease modifier");
         edge.setEdgeValue("large");
-        edges.add(edge);
-        rule.setSpecialEdges(edges);
+        specialEdges.add(edge);
+        rule.setSpecialEdges(specialEdges);
         rule.setSearchSentenceForSpecialEdges(false);
         rule.setEdgeToAdd("measurement");
-        edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
+        edgeToAddValue = new EdgeToAddValue();
         edgeToAddValue.setHasMinRangeValue(false);
         edgeToAddValue.setHasMaxRangeValue(false);
         edgeToAddValue.setValue(".9");
@@ -173,19 +219,19 @@ public class LoadRuleAddEdgeToQueryResults {
         rules.add(rule);
 
         businessRule.setRules(rules);
-        dao.delete(orgId, businessRule.getRuleType()); //if updating an existing record, the dao would create and save a duplicate
+        dao.delete(ORG_ID, businessRule.getRuleType()); //if updating an existing record, the dao would create and save a duplicate
         dao.save(businessRule);
     }
 
     @Test
     public void get() {
-        MongoDatastoreProviderDefault provider = new  MongoDatastoreProviderDefault();
+        MongoDatastoreProviderDefault provider = new  MongoDatastoreProviderDefault(TEST_SERVER, TEST_DATABASE_NAME);
         BusinessRuleDao dao = new BusinessRuleDaoImpl(BusinessRule.class);
         dao.setMongoDatastoreProvider(provider);
 
-        BusinessRule businessRule = dao.get(orgId, AddEdgeToQueryResults.class.getSimpleName());
+        BusinessRule businessRule = dao.get(ORG_ID, AddEdgeToQueryResults.class.getSimpleName());
         assertNotNull(businessRule);
-        assertEquals(businessRule.getOrganizationId(), orgId);
+        assertEquals(businessRule.getOrganizationId(), ORG_ID);
         assertEquals(businessRule.getRuleType(), AddEdgeToQueryResults.class.getSimpleName());
 
         List<BusinessRule> rules = businessRule.getRules();
