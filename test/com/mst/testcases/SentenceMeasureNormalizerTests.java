@@ -19,12 +19,8 @@ public class SentenceMeasureNormalizerTests {
 	@Test
 	public void testMMtoCM() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
-		String text = "measuring 90 x 32 x 62 mm";
-        System.out.println(text);
-		List<WordToken> words = getWordTokens(text);
-		System.out.println(words);
+		List<WordToken> words = getWordTokens("measuring 90 x 32 x 62 mm");
 		normalizer.Normalize(words, true, false);
-		System.out.println(words + "\n\n");
 		assertEquals(words.get(1).getToken(), "9.0");
         assertEquals(words.get(2).getToken(), "3.2");
         assertEquals(words.get(3).getToken(), "6.2");
@@ -34,12 +30,8 @@ public class SentenceMeasureNormalizerTests {
 	@Test
 	public void testMMtoCM2() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
-        String text = "measures 91 x 32 mm";
-        System.out.println(text);
-        List<WordToken> words = getWordTokens(text);
-		System.out.println(words);
+        List<WordToken> words = getWordTokens("measures 91 x 32 mm");
 		normalizer.Normalize(words, true, false);
-        System.out.println(words + "\n\n");
 		assertEquals(words.get(1).getToken(), "9.1");
         assertEquals(words.get(2).getToken(), "3.2");
 		assertEquals(words.get(3).getToken(), "cm");
@@ -48,12 +40,8 @@ public class SentenceMeasureNormalizerTests {
 	@Test
 	public void testMMtoCM3() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
-        String text = "measures 21mm";
-        System.out.println(text);
-        List<WordToken> words = getWordTokens(text);
-		System.out.println(words);
+        List<WordToken> words = getWordTokens("measures 21mm");
 		normalizer.Normalize(words, true, false);
-        System.out.println(words + "\n\n");
 		assertEquals(words.get(1).getToken(), "2.1");
 		assertEquals(words.get(2).getToken(), "cm");
 	}
@@ -62,40 +50,22 @@ public class SentenceMeasureNormalizerTests {
 	public void testTokenizeMeasurements() {
         SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
         List<WordToken> words;
-        String text;
-
-        text = "measuring .7x.3x1.2cm";
-        System.out.println(text);
-        words = getWordTokens(text);
-        System.out.println(words);
+        words = getWordTokens("measuring .7x.3x1.2cm");
 		normalizer.Normalize(words, false, false);
-        System.out.println(words +"\n");
-
-        text = "measuring .7 x .3 x 1.2 cm";
-        System.out.println(text);
-        words = getWordTokens(text);
-        System.out.println(words);
+        assertEquals(words.get(1).getToken(), ".7");
+        assertEquals(words.get(2).getToken(), ".3");
+        assertEquals(words.get(3).getToken(), "1.2");
+        assertEquals(words.get(4).getToken(), "cm");
+        words = getWordTokens("measuring .7 x .3 x 1.2 cm");
         normalizer.Normalize(words, false, false);
-        System.out.println(words +"\n");
-
-        text = "measuring .7cm x .3cm x 1.2cm";
-        System.out.println(text);
-        words = getWordTokens(text);
-        System.out.println(words);
-        normalizer.Normalize(words, false, false);
-        System.out.println(words +"\n");
-
-        text = "measuring .7 cm x .3 cm x 1.2 cm";
-        System.out.println(text);
-        words = getWordTokens(text);
-        System.out.println(words);
-        normalizer.Normalize(words, false, false);
-		System.out.println(words +"\n\n");
+        assertEquals(words.get(1).getToken(), ".7");
+        assertEquals(words.get(2).getToken(), ".3");
+        assertEquals(words.get(3).getToken(), "1.2");
+        assertEquals(words.get(4).getToken(), "cm");
 	}
 
 	private List<WordToken> getWordTokens(String text) {
 		List<WordToken> words = new ArrayList<>();
-		
 		try {
 			SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
 			controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
@@ -109,7 +79,6 @@ public class SentenceMeasureNormalizerTests {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		
 		return words;
 	}
 }
