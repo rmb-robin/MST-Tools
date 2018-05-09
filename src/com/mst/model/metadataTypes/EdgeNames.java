@@ -22,6 +22,8 @@ public class EdgeNames {
 	public static final String hetrogeneous_finding_sites = "heterogeneous finding site";
 	public static final String enlarged_finding_sites = "enlarged finding site";
 
+	public static final String hasICD = "has-icd";
+	
 	public static HashSet<String> getExistenceSet(){
 		HashSet<String> result = new HashSet<String>();
 		result.add(EdgeNames.existence);
