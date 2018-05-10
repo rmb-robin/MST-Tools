@@ -46,8 +46,7 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
                                 if (!edge.getName().equals(edgeToAppend))
                                     newEdges.add(edge);
                             }
-                            newInstance.setAppender(instance.getAppender());
-                            instance.setAppender("or");
+                            newInstance.setAppender("or");
                             newInstance.setEdges(newEdges);
                         }
 
