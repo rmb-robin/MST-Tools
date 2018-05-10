@@ -13,6 +13,7 @@ public class BusinessRule {
     @Id
     @JsonSerialize(using=ObjectIdJsonSerializer.class)
     private ObjectId id;
+    public enum LogicalOperator {AND, OR, AND_NOT, OR_NOT}
     private String organizationId;
     private String ruleType;
     private List<BusinessRule> rules;

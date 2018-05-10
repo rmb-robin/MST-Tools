@@ -4,30 +4,55 @@ import com.mst.dao.BusinessRuleDaoImpl;
 import com.mst.interfaces.dao.BusinessRuleDao;
 import com.mst.model.businessRule.AddEdgeToQueryResults;
 import com.mst.model.businessRule.AddEdgeToQueryResults.*;
+import com.mst.model.businessRule.AppendToQueryInput;
 import com.mst.model.businessRule.BusinessRule;
 import com.mst.util.MongoDatastoreProviderDefault;
 import org.junit.Test;
 
 import java.util.*;
 
-import static com.mst.model.businessRule.AddEdgeToQueryResults.Edge.LogicalOperator.AND;
-import static com.mst.model.businessRule.AddEdgeToQueryResults.Edge.LogicalOperator.OR;
+import static com.mst.model.businessRule.BusinessRule.LogicalOperator.OR;
+import static com.mst.model.businessRule.BusinessRule.LogicalOperator.AND;
+import static com.mst.model.businessRule.BusinessRule.LogicalOperator.OR_NOT;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-public class LoadRuleAddEdgeToQueryResults {
-    //private String orgId = "58c6f3ceaf3c420b90160803";
-    private final String ORG_ID = "5972aedebde4270bc53b23e3"; //Test
-    private final String TEST_SERVER = "10.0.129.218";
-    private final String TEST_DATABASE_NAME = "test";
+public class LoadBusinessRules {
+    private final String ORG_ID = "5972aedebde4270bc53b23e3";
+    private BusinessRuleDao dao;
+
+    public LoadBusinessRules() {
+        String SERVER = "10.0.129.218";
+        String DATABASE = "test";
+        MongoDatastoreProviderDefault provider = new  MongoDatastoreProviderDefault(SERVER, DATABASE);
+        dao = new BusinessRuleDaoImpl(BusinessRule.class);
+        dao.setMongoDatastoreProvider(provider);
+    }
 
     @Test
-    public void insert() {
-        MongoDatastoreProviderDefault provider = new MongoDatastoreProviderDefault(TEST_SERVER, TEST_DATABASE_NAME);
-        BusinessRuleDao dao = new BusinessRuleDaoImpl(BusinessRule.class);
-        dao.setMongoDatastoreProvider(provider);
+    public void saveAppendToQueryInput() {
+        BusinessRule businessRule = new BusinessRule();
+        businessRule.setOrganizationId(ORG_ID);
+        businessRule.setRuleType(AppendToQueryInput.class.getSimpleName());
+        List<BusinessRule> rules = new ArrayList<>();
 
+        // rule 0 append OR no measurement
+        AppendToQueryInput rule = new AppendToQueryInput();
+        rule.setRuleName("Append no measurement");
+        Map<String, List<String>> edgesToMatch  = new HashMap<>();
+        edgesToMatch.put("measurement", new ArrayList<>());
+        rule.setEdgesToMatch(edgesToMatch);
+        rule.setEdgeToAppend("measurement");
+        rule.setLogicalOperator(OR_NOT);
+        rules.add(rule);
+
+        businessRule.setRules(rules);
+        dao.delete(ORG_ID, businessRule.getRuleType());
+        dao.save(businessRule);
+    }
+
+    @Test
+    public void saveAddEdgeToQueryResults() {
         BusinessRule businessRule = new BusinessRule();
         businessRule.setOrganizationId(ORG_ID);
         businessRule.setRuleType(AddEdgeToQueryResults.class.getSimpleName());
@@ -39,7 +64,7 @@ public class LoadRuleAddEdgeToQueryResults {
         List<Edge> specialEdges;
         Map<String, List<String>> edgesToMatch;
 
-        // rule 0 for too small to characterize
+        // rule 0 - too small to characterize
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Too Small To Characterize");
         specialEdges = new ArrayList<>();
@@ -67,7 +92,7 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setEdgesToMatch(edgesToMatch);
         rules.add(rule);
 
-        // rule 1 for small ovarian cyst
+        // rule 1 - small ovarian cyst
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Small Measurement Modifier; Ovarian Cyst");
         specialEdges = new ArrayList<>();
@@ -92,7 +117,7 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setSearchSentenceForSpecialEdges(false);
         rules.add(rule);
 
-        // rule 2 for small thyroid nodule
+        // rule 2 - small thyroid nodule
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Small Measurement Modifier; Thyroid Nodule");
         specialEdges = new ArrayList<>();
@@ -117,7 +142,7 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setSearchSentenceForSpecialEdges(false);
         rules.add(rule);
 
-        // rule 3 for large thyroid nodule
+        // rule 3 - large thyroid nodule
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Large Measurement Modifier; Thyroid Nodule");
         specialEdges = new ArrayList<>();
@@ -150,7 +175,7 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setSearchSentenceForSpecialEdges(false);
         rules.add(rule);
 
-        // rule 4 for physiologic, follicular, follicular-type, and dominant ovarian cyst
+        // rule 4 - physiologic, follicular, follicular-type, and dominant ovarian cyst
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("Physiologic, Follicular, Follicular-type, and Dominant Ovarian Cyst");
         specialEdges = new ArrayList<>();
@@ -187,7 +212,7 @@ public class LoadRuleAddEdgeToQueryResults {
         rule.setSearchSentenceForSpecialEdges(false);
         rules.add(rule);
 
-        // rule 5 no measurement and no large or small modifier for thyroid nodule
+        // rule 5 - no measurement and no large or small modifier for thyroid nodule
         rule = new AddEdgeToQueryResults();
         rule.setRuleName("No Measurement Modifier; Thyroid Nodule");
         specialEdges = new ArrayList<>();
@@ -219,97 +244,29 @@ public class LoadRuleAddEdgeToQueryResults {
         rules.add(rule);
 
         businessRule.setRules(rules);
-        dao.delete(ORG_ID, businessRule.getRuleType()); //if updating an existing record, the dao would create and save a duplicate
+        dao.delete(ORG_ID, businessRule.getRuleType());
         dao.save(businessRule);
     }
 
     @Test
-    public void get() {
-        MongoDatastoreProviderDefault provider = new  MongoDatastoreProviderDefault(TEST_SERVER, TEST_DATABASE_NAME);
-        BusinessRuleDao dao = new BusinessRuleDaoImpl(BusinessRule.class);
-        dao.setMongoDatastoreProvider(provider);
+    public void getAppendToQueryInput() {
+        BusinessRule businessRule = dao.get(ORG_ID, AppendToQueryInput.class.getSimpleName());
+        assertNotNull(businessRule);
+        assertEquals(businessRule.getOrganizationId(), ORG_ID);
+        assertEquals(businessRule.getRuleType(), AppendToQueryInput.class.getSimpleName());
+        List<BusinessRule> rules = businessRule.getRules();
+        assertNotNull("Rule list is null;", rules);
+        assertEquals(1, rules.size());
+    }
 
+    @Test
+    public void getAddEdgeToQueryResults() {
         BusinessRule businessRule = dao.get(ORG_ID, AddEdgeToQueryResults.class.getSimpleName());
         assertNotNull(businessRule);
         assertEquals(businessRule.getOrganizationId(), ORG_ID);
         assertEquals(businessRule.getRuleType(), AddEdgeToQueryResults.class.getSimpleName());
-
         List<BusinessRule> rules = businessRule.getRules();
         assertNotNull("Rule list is null;", rules);
         assertEquals(6, rules.size());
-
-        for (int i = 0; i < rules.size(); ++i) {
-            AddEdgeToQueryResults rule = (AddEdgeToQueryResults)rules.get(i);
-            Map<String, List<String>> edgeValuesToMatch = rule.getEdgesToMatch();
-            assertNotNull(edgeValuesToMatch);
-            assertTrue(edgeValuesToMatch.size() >= 1);
-
-            switch(i)
-            {
-                case 0:
-                    assertEquals(rule.getRuleName(), "Too Small To Characterize");
-                    break;
-                case 1:
-                    assertEquals(rule.getRuleName(), "Small Measurement Modifier; Ovarian Cyst");
-                    assertEquals(1, rule.getEdgeToAddValues().size());
-                    assertEquals(rule.getEdgeToAddValues().get(0).getValue(), ".9");
-                    for (Map.Entry<String, List<String>> entry : edgeValuesToMatch.entrySet()) {
-                        assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location") || entry.getKey().equals("simple cyst modifiers"));
-                        if (entry.getKey().equals("disease location")) {
-                            assertEquals(entry.getKey(), "disease location");
-                            assertEquals(7, entry.getValue().size());
-                            assertEquals(entry.getValue().get(0), "adnexa");
-                            assertEquals(entry.getValue().get(6), "paraovarian");
-                        }
-                    }
-                    break;
-                case 2:
-                    assertEquals(rule.getRuleName(), "Small Measurement Modifier; Thyroid Nodule");
-                    assertEquals(1, rule.getEdgeToAddValues().size());
-                    assertEquals(rule.getEdgeToAddValues().get(0).getValue(), ".9");
-                    for (Map.Entry<String, List<String>> entry : edgeValuesToMatch.entrySet()) {
-                        assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location") || entry.getKey().equals("simple cyst modifiers"));
-                        if (entry.getKey().equals("disease location")) {
-                            assertEquals(entry.getKey(), "disease location");
-                            assertEquals(2, entry.getValue().size());
-                            assertEquals(entry.getValue().get(0), "isthmus");
-                            assertEquals(entry.getValue().get(1), "thyroid");
-                        }
-                    }
-                    break;
-                case 3:
-                    assertEquals(rule.getRuleName(), "Large Measurement Modifier; Thyroid Nodule");
-                    List<AddEdgeToQueryResults.EdgeToAddValue> edgeToAddValues = rule.getEdgeToAddValues();
-                    assertEquals(2, edgeToAddValues.size());
-                    AddEdgeToQueryResults.EdgeToAddValue edgeValue = edgeToAddValues.get(0);
-                    assertTrue(edgeValue.isHasMinRangeValue());
-                    assertTrue(edgeValue.isHasMaxRangeValue());
-                    assertEquals(edgeValue.getMinRangeValue(), 0);
-                    assertEquals(edgeValue.getMaxRangeValue(), 18);
-                    assertEquals(edgeValue.getValue(), ".1");
-                    edgeValue = edgeToAddValues.get(1);
-                    assertTrue(edgeValue.isHasMinRangeValue());
-                    assertFalse(edgeValue.isHasMaxRangeValue());
-                    assertEquals(edgeValue.getMinRangeValue(), 19);
-                    assertEquals(edgeValue.getValue(), "1.5");
-                    for (Map.Entry<String, List<String>> entry : edgeValuesToMatch.entrySet()) {
-                        assertTrue(entry.getKey().equals("existence") || entry.getKey().equals("disease location") || entry.getKey().equals("disease modifier"));
-                        if (entry.getKey().equals("disease location")) {
-                            assertEquals(entry.getKey(), "disease location");
-                            assertEquals(2, entry.getValue().size());
-                            assertEquals(entry.getValue().get(0), "isthmus");
-                        }
-                    }
-                    break;
-                case 4:
-                    assertEquals(rule.getRuleName(), "Physiologic, Follicular, Follicular-type, and Dominant Ovarian Cyst");
-                    break;
-                case 5:
-                    assertEquals(rule.getRuleName(), "No Measurement Modifier; Thyroid Nodule");
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 }

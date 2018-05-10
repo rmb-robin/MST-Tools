@@ -12,17 +12,16 @@ public class AddEdgeToQueryResults extends BusinessRule {
     private List<EdgeToAddValue> edgeToAddValues;
 
     public static class Edge {
-        public enum LogicalOperator {AND, OR}
-        private AddEdgeToQueryResults.Edge.LogicalOperator logicalOperator;
+        private LogicalOperator logicalOperator;
         private boolean edgeExists;
         private String edgeName;
         private String edgeValue;
 
-        public AddEdgeToQueryResults.Edge.LogicalOperator getLogicalOperator() {
+        public LogicalOperator getLogicalOperator() {
             return logicalOperator;
         }
 
-        public void setLogicalOperator(AddEdgeToQueryResults.Edge.LogicalOperator logicalOperator) {
+        public void setLogicalOperator(LogicalOperator logicalOperator) {
             this.logicalOperator = logicalOperator;
         }
 
