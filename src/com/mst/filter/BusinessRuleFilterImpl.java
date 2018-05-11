@@ -24,20 +24,20 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
     @Override
     public SentenceQueryInput modifySentenceQueryInput(SentenceQueryInput input, BusinessRule businessRule) {
         if (businessRule instanceof AppendToQueryInput)
-            return processAppendToQueryInput(input, (AppendToQueryInput)businessRule);
-        else return input;
+            processAppendToQueryInput(input, (AppendToQueryInput) businessRule);
+            return input;
     }
 
     @Override
     public List<SentenceQueryResult> modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, BusinessRule businessRule) {
         if (businessRule instanceof AddEdgeToQueryResults)
-            return processAddEdgeToQueryResults(sentenceQueryResults, (AddEdgeToQueryResults)businessRule);
+            processAddEdgeToQueryResults(sentenceQueryResults, (AddEdgeToQueryResults) businessRule);
         if (businessRule instanceof RemoveEdgeFromQueryResults)
-            return processRemoveEdgeFromQueryResults(sentenceQueryResults, (RemoveEdgeFromQueryResults)businessRule);
-        else return sentenceQueryResults;
+            processRemoveEdgeFromQueryResults(sentenceQueryResults, (RemoveEdgeFromQueryResults) businessRule);
+            return sentenceQueryResults;
     }
 
-    private SentenceQueryInput processAppendToQueryInput(SentenceQueryInput input, AppendToQueryInput businessRule) {
+    private void processAppendToQueryInput(SentenceQueryInput input, AppendToQueryInput businessRule) {
         try {
             List<BusinessRule> rules = businessRule.getRules();
             List<SentenceQueryInstance> instances = input.getSentenceQueryInstances();
@@ -72,10 +72,9 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
         } catch (Exception e) {
             printException(e);
         }
-        return input;
     }
 
-    private List<SentenceQueryResult> processAddEdgeToQueryResults(List<SentenceQueryResult> sentenceQueryResults, AddEdgeToQueryResults businessRule) {
+    private void processAddEdgeToQueryResults(List<SentenceQueryResult> sentenceQueryResults, AddEdgeToQueryResults businessRule) {
         try {
             List<BusinessRule> rules = businessRule.getRules();
 
@@ -131,10 +130,9 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
         } catch (Exception e) {
             printException(e);
         }
-        return sentenceQueryResults;
     }
 
-    private List<SentenceQueryResult> processRemoveEdgeFromQueryResults(List<SentenceQueryResult> sentenceQueryResults, RemoveEdgeFromQueryResults businessRule) {
+    private void processRemoveEdgeFromQueryResults(List<SentenceQueryResult> sentenceQueryResults, RemoveEdgeFromQueryResults businessRule) {
         try {
             List<BusinessRule> rules = businessRule.getRules();
             for (SentenceQueryResult sentenceQueryResult : sentenceQueryResults) {
@@ -150,15 +148,16 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
                     while (itr.hasNext()) {
                         SentenceQueryEdgeResult edgeResult = itr.next();
                         boolean nullMatch = edgeResult.getMatchedValue() == null && removeIfNull;
-                        if (edgeResult.getEdgeName().equals(edgeToRemove) && (nullMatch || (values != null && values.contains(edgeResult.getMatchedValue()))))
+                        if (edgeResult.getEdgeName().equals(edgeToRemove) && (nullMatch || (values != null && values.contains(edgeResult.getMatchedValue())))) {
+                            String value = edgeResult.getMatchedValue() != null ? edgeResult.getMatchedValue() : "null";
                             itr.remove();
+                        }
                     }
                 }
             }
         } catch (Exception e) {
             printException(e);
         }
-        return sentenceQueryResults;
     }
 
     private void setDisplayEdgeTrue(List<SentenceQueryEdgeResult> results, String edgeName, String value) {
