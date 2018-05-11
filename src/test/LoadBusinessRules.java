@@ -6,6 +6,7 @@ import com.mst.model.businessRule.AddEdgeToQueryResults;
 import com.mst.model.businessRule.AddEdgeToQueryResults.*;
 import com.mst.model.businessRule.AppendToQueryInput;
 import com.mst.model.businessRule.BusinessRule;
+import com.mst.model.businessRule.RemoveEdgeFromQueryResults;
 import com.mst.util.MongoDatastoreProviderDefault;
 import org.junit.Test;
 
@@ -249,6 +250,25 @@ public class LoadBusinessRules {
     }
 
     @Test
+    public void saveRemoveEdgeFromQueryResults() {
+        BusinessRule businessRule = new BusinessRule();
+        businessRule.setOrganizationId(ORG_ID);
+        businessRule.setRuleType(RemoveEdgeFromQueryResults.class.getSimpleName());
+        List<BusinessRule> rules = new ArrayList<>();
+
+        // rule 0 remove measurement if null
+        RemoveEdgeFromQueryResults rule = new RemoveEdgeFromQueryResults();
+        rule.setRuleName("Remove measurement if null");
+        rule.setEdgeToRemove("measurement");
+        rule.setRemoveIfNull(true);
+        rules.add(rule);
+
+        businessRule.setRules(rules);
+        dao.delete(ORG_ID, businessRule.getRuleType());
+        dao.save(businessRule);
+    }
+
+    @Test
     public void getAppendToQueryInput() {
         BusinessRule businessRule = dao.get(ORG_ID, AppendToQueryInput.class.getSimpleName());
         assertNotNull(businessRule);
@@ -268,5 +288,16 @@ public class LoadBusinessRules {
         List<BusinessRule> rules = businessRule.getRules();
         assertNotNull("Rule list is null;", rules);
         assertEquals(6, rules.size());
+    }
+
+    @Test
+    public void getRemoveEdgeFromQueryResults() {
+        BusinessRule businessRule = dao.get(ORG_ID, RemoveEdgeFromQueryResults.class.getSimpleName());
+        assertNotNull(businessRule);
+        assertEquals(businessRule.getOrganizationId(), ORG_ID);
+        assertEquals(businessRule.getRuleType(), RemoveEdgeFromQueryResults.class.getSimpleName());
+        List<BusinessRule> rules = businessRule.getRules();
+        assertNotNull("Rule list is null;", rules);
+        assertEquals(1, rules.size());
     }
 }

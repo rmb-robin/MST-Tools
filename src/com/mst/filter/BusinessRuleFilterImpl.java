@@ -5,6 +5,7 @@ import com.mst.model.SentenceQuery.*;
 import com.mst.model.businessRule.AddEdgeToQueryResults;
 import com.mst.model.businessRule.AppendToQueryInput;
 import com.mst.model.businessRule.BusinessRule;
+import com.mst.model.businessRule.RemoveEdgeFromQueryResults;
 import com.mst.model.discrete.DiscreteData;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -22,6 +23,21 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
 
     @Override
     public SentenceQueryInput modifySentenceQueryInput(SentenceQueryInput input, BusinessRule businessRule) {
+        if (businessRule instanceof AppendToQueryInput)
+            return processAppendToQueryInput(input, (AppendToQueryInput)businessRule);
+        else return input;
+    }
+
+    @Override
+    public List<SentenceQueryResult> modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, BusinessRule businessRule) {
+        if (businessRule instanceof AddEdgeToQueryResults)
+            return processAddEdgeToQueryResults(sentenceQueryResults, (AddEdgeToQueryResults)businessRule);
+        if (businessRule instanceof RemoveEdgeFromQueryResults)
+            return processRemoveEdgeFromQueryResults(sentenceQueryResults, (RemoveEdgeFromQueryResults)businessRule);
+        else return sentenceQueryResults;
+    }
+
+    private SentenceQueryInput processAppendToQueryInput(SentenceQueryInput input, AppendToQueryInput businessRule) {
         try {
             List<BusinessRule> rules = businessRule.getRules();
             List<SentenceQueryInstance> instances = input.getSentenceQueryInstances();
@@ -35,22 +51,22 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
                     AppendToQueryInput rule = (AppendToQueryInput) baseRule;
                     if (!areEdgesToMatchFoundInInput(edges, rule.getEdgesToMatch()))
                         continue;
-                        String edgeToAppend = rule.getEdgeToAppend();
-                        SentenceQueryInstance newInstance = new SentenceQueryInstance();
-                        newInstance.setTokens(instance.getTokens());
-                        List<EdgeQuery> newEdges = new ArrayList<>();
-                        BusinessRule.LogicalOperator logicalOperator = rule.getLogicalOperator();
+                    String edgeToAppend = rule.getEdgeToAppend();
+                    SentenceQueryInstance newInstance = new SentenceQueryInstance();
+                    newInstance.setTokens(instance.getTokens());
+                    List<EdgeQuery> newEdges = new ArrayList<>();
+                    BusinessRule.LogicalOperator logicalOperator = rule.getLogicalOperator();
 
-                        if (logicalOperator == OR_NOT) { //TODO need to implement other logical operators
-                            for (EdgeQuery edge : edges) {
-                                if (!edge.getName().equals(edgeToAppend))
-                                    newEdges.add(edge);
-                            }
-                            newInstance.setAppender("or");
-                            newInstance.setEdges(newEdges);
+                    if (logicalOperator == OR_NOT) { //TODO need to implement other logical operators
+                        for (EdgeQuery edge : edges) {
+                            if (!edge.getName().equals(edgeToAppend))
+                                newEdges.add(edge);
                         }
+                        newInstance.setAppender("or");
+                        newInstance.setEdges(newEdges);
+                    }
 
-                        itr.add(newInstance);
+                    itr.add(newInstance);
                 }
             }
         } catch (Exception e) {
@@ -59,8 +75,7 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
         return input;
     }
 
-    @Override
-    public List<SentenceQueryResult> modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, BusinessRule businessRule) {
+    private List<SentenceQueryResult> processAddEdgeToQueryResults(List<SentenceQueryResult> sentenceQueryResults, AddEdgeToQueryResults businessRule) {
         try {
             List<BusinessRule> rules = businessRule.getRules();
 
@@ -119,33 +134,39 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
         return sentenceQueryResults;
     }
 
+    private List<SentenceQueryResult> processRemoveEdgeFromQueryResults(List<SentenceQueryResult> sentenceQueryResults, RemoveEdgeFromQueryResults businessRule) {
+        try {
+            List<BusinessRule> rules = businessRule.getRules();
+            for (SentenceQueryResult sentenceQueryResult : sentenceQueryResults) {
+                List<SentenceQueryEdgeResult> edgeResults = sentenceQueryResult.getSentenceQueryEdgeResults();
+
+                for (BusinessRule baseRule : rules) {
+                    RemoveEdgeFromQueryResults rule = (RemoveEdgeFromQueryResults) baseRule;
+                    String edgeToRemove = rule.getEdgeToRemove();
+                    boolean removeIfNull = rule.isRemoveIfNull();
+                    List<String> values = rule.getEdgeToRemoveValues();
+                    ListIterator<SentenceQueryEdgeResult> itr = edgeResults.listIterator();
+
+                    while (itr.hasNext()) {
+                        SentenceQueryEdgeResult edgeResult = itr.next();
+                        boolean nullMatch = edgeResult.getMatchedValue() == null && removeIfNull;
+                        if (edgeResult.getEdgeName().equals(edgeToRemove) && (nullMatch || (values != null && values.contains(edgeResult.getMatchedValue()))))
+                            itr.remove();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            printException(e);
+        }
+        return sentenceQueryResults;
+    }
+
     private void setDisplayEdgeTrue(List<SentenceQueryEdgeResult> results, String edgeName, String value) {
         for (SentenceQueryEdgeResult result : results)
             if (result.getEdgeName().equals(edgeName) && result.getMatchedValue().equals(value)) {
                 result.setDisplayEdge(true);
                 return;
             }
-    }
-
-    private void outputToFile(List<SentenceQueryInstance> instances) {
-        for (SentenceQueryInstance instance : instances) {
-            logger.debug("\n\nInstance");
-            List<String> tokens = instance.getTokens();
-            StringBuilder tokensStr = new StringBuilder("Tokens: ");
-            for (String token : tokens)
-                tokensStr.append(token).append(", ");
-            logger.debug(tokensStr.toString());
-            List<EdgeQuery> edges = instance.getEdges();
-            for (EdgeQuery edge : edges) {
-                String name = edge.getName();
-                StringBuilder valuesStr = new StringBuilder();
-                Set<String> values = edge.getValues();
-                for (String value : values)
-                    valuesStr.append(value).append(", ");
-                logger.debug("Edge: " + name + " : " + valuesStr);
-            }
-            logger.debug("Appender: " + instance.getAppender());
-        }
     }
 
     private void addEdgeToResults(List<SentenceQueryEdgeResult> results, AddEdgeToQueryResults rule, DiscreteData discreteData) {
