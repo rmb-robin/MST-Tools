@@ -1,9 +1,13 @@
 package com.mst.interfaces.dao;
 
 import com.mst.model.businessRule.BusinessRule;
+import com.mst.model.businessRule.BusinessRule.RuleType;
+
+
+import java.util.List;
 
 public interface BusinessRuleDao extends IDao {
     String save(BusinessRule rule);
-    BusinessRule get(String orgId, String ruleType);
-    void delete(String orgId, String ruleType);
+    List<BusinessRule> get(String orgId, RuleType ruleType);
+    void delete(String orgId, String className);
 }

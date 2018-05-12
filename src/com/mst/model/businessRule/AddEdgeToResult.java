@@ -3,13 +3,17 @@ package com.mst.model.businessRule;
 import java.util.List;
 import java.util.Map;
 
-public class AddEdgeToQueryResults extends BusinessRule {
+public class AddEdgeToResult extends BusinessRule {
     private String ruleName;
-    private List<AddEdgeToQueryResults.Edge> specialEdges;
+    private List<AddEdgeToResult.Edge> specialEdges;
     private boolean searchSentenceForSpecialEdges;
     private Map<String, List<String>> edgesToMatch;
     private String edgeToAdd;
     private List<EdgeToAddValue> edgeToAddValues;
+
+    public AddEdgeToResult() {
+        super(AddEdgeToResult.class.getSimpleName());
+    }
 
     public static class Edge {
         private LogicalOperator logicalOperator;

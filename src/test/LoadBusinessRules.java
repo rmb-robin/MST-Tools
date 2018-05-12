@@ -2,21 +2,23 @@ package test;
 
 import com.mst.dao.BusinessRuleDaoImpl;
 import com.mst.interfaces.dao.BusinessRuleDao;
-import com.mst.model.businessRule.AddEdgeToQueryResults;
-import com.mst.model.businessRule.AddEdgeToQueryResults.*;
-import com.mst.model.businessRule.AppendToQueryInput;
+import com.mst.model.businessRule.AddEdgeToResult;
+import com.mst.model.businessRule.AddEdgeToResult.*;
+import com.mst.model.businessRule.AppendToInput;
 import com.mst.model.businessRule.BusinessRule;
-import com.mst.model.businessRule.RemoveEdgeFromQueryResults;
+import com.mst.model.businessRule.RemoveEdgeFromResult;
 import com.mst.util.MongoDatastoreProviderDefault;
 import org.junit.Test;
 
 import java.util.*;
 
-import static com.mst.model.businessRule.BusinessRule.LogicalOperator.OR;
 import static com.mst.model.businessRule.BusinessRule.LogicalOperator.AND;
+import static com.mst.model.businessRule.BusinessRule.LogicalOperator.OR;
 import static com.mst.model.businessRule.BusinessRule.LogicalOperator.OR_NOT;
-import static org.junit.Assert.*;
+import static com.mst.model.businessRule.BusinessRule.RuleType.MODIFY_SENTENCE_QUERY_INPUT;
+import static com.mst.model.businessRule.BusinessRule.RuleType.MODIFY_SENTENCE_QUERY_RESULT;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class LoadBusinessRules {
     private final String ORG_ID = "5972aedebde4270bc53b23e3";
@@ -32,13 +34,13 @@ public class LoadBusinessRules {
 
     @Test
     public void saveAppendToQueryInput() {
-        BusinessRule businessRule = new BusinessRule();
+        BusinessRule businessRule = new AppendToInput();
         businessRule.setOrganizationId(ORG_ID);
-        businessRule.setRuleType(AppendToQueryInput.class.getSimpleName());
+        businessRule.setRuleType(MODIFY_SENTENCE_QUERY_INPUT);
         List<BusinessRule> rules = new ArrayList<>();
 
         // rule 0 append OR no measurement
-        AppendToQueryInput rule = new AppendToQueryInput();
+        AppendToInput rule = new AppendToInput();
         rule.setRuleName("Append no measurement");
         Map<String, List<String>> edgesToMatch  = new HashMap<>();
         edgesToMatch.put("measurement", new ArrayList<>());
@@ -48,17 +50,17 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         businessRule.setRules(rules);
-        dao.delete(ORG_ID, businessRule.getRuleType());
+        dao.delete(ORG_ID, AppendToInput.class.getSimpleName());
         dao.save(businessRule);
     }
 
     @Test
     public void saveAddEdgeToQueryResults() {
-        BusinessRule businessRule = new BusinessRule();
+        BusinessRule businessRule = new AddEdgeToResult();
         businessRule.setOrganizationId(ORG_ID);
-        businessRule.setRuleType(AddEdgeToQueryResults.class.getSimpleName());
+        businessRule.setRuleType(MODIFY_SENTENCE_QUERY_RESULT);
         List<BusinessRule> rules = new ArrayList<>();
-        AddEdgeToQueryResults rule;
+        AddEdgeToResult rule;
         Edge edge;
         EdgeToAddValue edgeToAddValue;
         List<EdgeToAddValue> edgeToAddValues;
@@ -66,7 +68,7 @@ public class LoadBusinessRules {
         Map<String, List<String>> edgesToMatch;
 
         // rule 0 - too small to characterize
-        rule = new AddEdgeToQueryResults();
+        rule = new AddEdgeToResult();
         rule.setRuleName("Too Small To Characterize");
         specialEdges = new ArrayList<>();
         edge = new Edge();
@@ -82,7 +84,7 @@ public class LoadBusinessRules {
         rule.setSpecialEdges(specialEdges);
         rule.setSearchSentenceForSpecialEdges(true);
         rule.setEdgeToAdd("measurement");
-        edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
+        edgeToAddValue = new AddEdgeToResult.EdgeToAddValue();
         edgeToAddValue.setHasMinRangeValue(false);
         edgeToAddValue.setHasMaxRangeValue(false);
         edgeToAddValue.setValue(".04");
@@ -94,7 +96,7 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         // rule 1 - small ovarian cyst
-        rule = new AddEdgeToQueryResults();
+        rule = new AddEdgeToResult();
         rule.setRuleName("Small Measurement Modifier; Ovarian Cyst");
         specialEdges = new ArrayList<>();
         edge = new Edge();
@@ -105,7 +107,7 @@ public class LoadBusinessRules {
         specialEdges.add(edge);
         rule.setSpecialEdges(specialEdges);
         rule.setEdgeToAdd("measurement");
-        edgeToAddValue = new AddEdgeToQueryResults.EdgeToAddValue();
+        edgeToAddValue = new AddEdgeToResult.EdgeToAddValue();
         edgeToAddValue.setHasMinRangeValue(false);
         edgeToAddValue.setHasMaxRangeValue(false);
         edgeToAddValue.setValue(".9");
@@ -119,7 +121,7 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         // rule 2 - small thyroid nodule
-        rule = new AddEdgeToQueryResults();
+        rule = new AddEdgeToResult();
         rule.setRuleName("Small Measurement Modifier; Thyroid Nodule");
         specialEdges = new ArrayList<>();
         edge = new Edge();
@@ -144,7 +146,7 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         // rule 3 - large thyroid nodule
-        rule = new AddEdgeToQueryResults();
+        rule = new AddEdgeToResult();
         rule.setRuleName("Large Measurement Modifier; Thyroid Nodule");
         specialEdges = new ArrayList<>();
         edge = new Edge();
@@ -177,7 +179,7 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         // rule 4 - physiologic, follicular, follicular-type, and dominant ovarian cyst
-        rule = new AddEdgeToQueryResults();
+        rule = new AddEdgeToResult();
         rule.setRuleName("Physiologic, Follicular, Follicular-type, and Dominant Ovarian Cyst");
         specialEdges = new ArrayList<>();
         edge = new Edge();
@@ -214,7 +216,7 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         // rule 5 - no measurement and no large or small modifier for thyroid nodule
-        rule = new AddEdgeToQueryResults();
+        rule = new AddEdgeToResult();
         rule.setRuleName("No Measurement Modifier; Thyroid Nodule");
         specialEdges = new ArrayList<>();
         edge = new Edge();
@@ -245,59 +247,65 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         businessRule.setRules(rules);
-        dao.delete(ORG_ID, businessRule.getRuleType());
+        dao.delete(ORG_ID, AddEdgeToResult.class.getSimpleName());
         dao.save(businessRule);
     }
 
     @Test
     public void saveRemoveEdgeFromQueryResults() {
-        BusinessRule businessRule = new BusinessRule();
+        BusinessRule businessRule = new RemoveEdgeFromResult();
         businessRule.setOrganizationId(ORG_ID);
-        businessRule.setRuleType(RemoveEdgeFromQueryResults.class.getSimpleName());
+        businessRule.setRuleType(MODIFY_SENTENCE_QUERY_RESULT);
         List<BusinessRule> rules = new ArrayList<>();
 
         // rule 0 remove measurement if null
-        RemoveEdgeFromQueryResults rule = new RemoveEdgeFromQueryResults();
+        RemoveEdgeFromResult rule = new RemoveEdgeFromResult();
         rule.setRuleName("Remove measurement if null");
         rule.setEdgeToRemove("measurement");
         rule.setRemoveIfNull(true);
         rules.add(rule);
 
         businessRule.setRules(rules);
-        dao.delete(ORG_ID, businessRule.getRuleType());
+        dao.delete(ORG_ID, RemoveEdgeFromResult.class.getSimpleName());
         dao.save(businessRule);
     }
 
     @Test
-    public void getAppendToQueryInput() {
-        BusinessRule businessRule = dao.get(ORG_ID, AppendToQueryInput.class.getSimpleName());
-        assertNotNull(businessRule);
-        assertEquals(businessRule.getOrganizationId(), ORG_ID);
-        assertEquals(businessRule.getRuleType(), AppendToQueryInput.class.getSimpleName());
-        List<BusinessRule> rules = businessRule.getRules();
-        assertNotNull("Rule list is null;", rules);
-        assertEquals(1, rules.size());
+    public void getModifySentenceQueryInputRules() {
+        List<BusinessRule> businessRules = dao.get(ORG_ID, MODIFY_SENTENCE_QUERY_INPUT);
+        assertNotNull(businessRules);
+        for (BusinessRule rule : businessRules) {
+            assertNotNull(rule);
+            assertEquals(rule.getOrganizationId(), ORG_ID);
+            assertEquals(rule.getRuleType(), MODIFY_SENTENCE_QUERY_INPUT);
+
+            if (rule instanceof AppendToInput) {
+                List<BusinessRule> rules = rule.getRules();
+                assertNotNull(rules);
+                assertEquals(1, rules.size());
+            }
+        }
     }
 
     @Test
-    public void getAddEdgeToQueryResults() {
-        BusinessRule businessRule = dao.get(ORG_ID, AddEdgeToQueryResults.class.getSimpleName());
-        assertNotNull(businessRule);
-        assertEquals(businessRule.getOrganizationId(), ORG_ID);
-        assertEquals(businessRule.getRuleType(), AddEdgeToQueryResults.class.getSimpleName());
-        List<BusinessRule> rules = businessRule.getRules();
-        assertNotNull("Rule list is null;", rules);
-        assertEquals(6, rules.size());
-    }
+    public void getModifySentenceQueryResultRules() {
+        List<BusinessRule> businessRules = dao.get(ORG_ID, MODIFY_SENTENCE_QUERY_RESULT);
+        assertNotNull(businessRules);
+        for (BusinessRule rule : businessRules) {
+            assertNotNull(rule);
+            assertEquals(rule.getOrganizationId(), ORG_ID);
+            assertEquals(rule.getRuleType(), MODIFY_SENTENCE_QUERY_RESULT);
 
-    @Test
-    public void getRemoveEdgeFromQueryResults() {
-        BusinessRule businessRule = dao.get(ORG_ID, RemoveEdgeFromQueryResults.class.getSimpleName());
-        assertNotNull(businessRule);
-        assertEquals(businessRule.getOrganizationId(), ORG_ID);
-        assertEquals(businessRule.getRuleType(), RemoveEdgeFromQueryResults.class.getSimpleName());
-        List<BusinessRule> rules = businessRule.getRules();
-        assertNotNull("Rule list is null;", rules);
-        assertEquals(1, rules.size());
+            if (rule instanceof AddEdgeToResult) {
+                List<BusinessRule> rules = rule.getRules();
+                assertNotNull(rules);
+                assertEquals(6, rules.size());
+            }
+            else if (rule instanceof RemoveEdgeFromResult) {
+                List<BusinessRule> rules = rule.getRules();
+                assertNotNull(rules);
+                assertEquals(1, rules.size());
+            }
+        }
     }
 }

@@ -3,12 +3,16 @@ package com.mst.model.businessRule;
 import java.util.List;
 import java.util.Map;
 
-public class RemoveEdgeFromQueryResults extends BusinessRule {
+public class RemoveEdgeFromResult extends BusinessRule {
     private String ruleName;
     private Map<String, List<String>> edgesToMatch;
     private String edgeToRemove;
     private List<String> edgeToRemoveValues;
     private boolean removeIfNull;
+
+    public RemoveEdgeFromResult() {
+        super(RemoveEdgeFromResult.class.getSimpleName());
+    }
 
     public String getRuleName() {
         return ruleName;

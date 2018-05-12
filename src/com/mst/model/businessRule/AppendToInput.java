@@ -4,13 +4,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-public class AppendToQueryInput extends BusinessRule {
+public class AppendToInput extends BusinessRule {
     private String ruleName;
     private Map<String, List<String>> edgesToMatch;
     private String edgeToAppend;
     private HashSet<String> edgeToAppendValues;
     private boolean isNumeric;
     private LogicalOperator logicalOperator;
+
+    public AppendToInput() {
+        super(AppendToInput.class.getSimpleName());
+    }
 
     public String getRuleName() {
         return ruleName;

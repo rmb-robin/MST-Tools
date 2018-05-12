@@ -7,6 +7,6 @@ import com.mst.model.businessRule.BusinessRule;
 import java.util.List;
 
 public interface BusinessRuleFilter {
-    SentenceQueryInput modifySentenceQueryInput(SentenceQueryInput input, BusinessRule rule);
-    List<SentenceQueryResult> modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, BusinessRule rule);
+    void modifySentenceQueryInput(SentenceQueryInput input, List<BusinessRule> rules);
+    void modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, List<BusinessRule> rule);
 }

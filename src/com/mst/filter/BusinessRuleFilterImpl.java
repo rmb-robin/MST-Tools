@@ -2,10 +2,10 @@ package com.mst.filter;
 
 import com.mst.interfaces.filter.BusinessRuleFilter;
 import com.mst.model.SentenceQuery.*;
-import com.mst.model.businessRule.AddEdgeToQueryResults;
-import com.mst.model.businessRule.AppendToQueryInput;
+import com.mst.model.businessRule.AddEdgeToResult;
+import com.mst.model.businessRule.AppendToInput;
 import com.mst.model.businessRule.BusinessRule;
-import com.mst.model.businessRule.RemoveEdgeFromQueryResults;
+import com.mst.model.businessRule.RemoveEdgeFromResult;
 import com.mst.model.discrete.DiscreteData;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -22,22 +22,26 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
     private static final Logger logger = LogManager.getLogger(BusinessRuleFilterImpl.class);
 
     @Override
-    public SentenceQueryInput modifySentenceQueryInput(SentenceQueryInput input, BusinessRule businessRule) {
-        if (businessRule instanceof AppendToQueryInput)
-            processAppendToQueryInput(input, (AppendToQueryInput) businessRule);
-            return input;
+    public void modifySentenceQueryInput(SentenceQueryInput input, List<BusinessRule> businessRules) {
+        for (BusinessRule businessRule : businessRules) {
+            if (businessRule instanceof AppendToInput)
+                processAppendToInput(input, (AppendToInput) businessRule);
+        }
     }
 
     @Override
-    public List<SentenceQueryResult> modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, BusinessRule businessRule) {
-        if (businessRule instanceof AddEdgeToQueryResults)
-            processAddEdgeToQueryResults(sentenceQueryResults, (AddEdgeToQueryResults) businessRule);
-        if (businessRule instanceof RemoveEdgeFromQueryResults)
-            processRemoveEdgeFromQueryResults(sentenceQueryResults, (RemoveEdgeFromQueryResults) businessRule);
-            return sentenceQueryResults;
+    public void modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, List<BusinessRule> businessRules) {
+        for (BusinessRule businessRule : businessRules) {
+            if (businessRule instanceof AddEdgeToResult)
+                processAddEdgeToResult(sentenceQueryResults, (AddEdgeToResult) businessRule);
+        }
+        for (BusinessRule businessRule : businessRules) {
+            if (businessRule instanceof RemoveEdgeFromResult)
+                processRemoveEdgeFromResult(sentenceQueryResults, (RemoveEdgeFromResult) businessRule);
+        }
     }
 
-    private void processAppendToQueryInput(SentenceQueryInput input, AppendToQueryInput businessRule) {
+    private void processAppendToInput(SentenceQueryInput input, AppendToInput businessRule) {
         try {
             List<BusinessRule> rules = businessRule.getRules();
             List<SentenceQueryInstance> instances = input.getSentenceQueryInstances();
@@ -48,7 +52,7 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
                 List<EdgeQuery> edges = instance.getEdges();
 
                 for (BusinessRule baseRule : rules) {
-                    AppendToQueryInput rule = (AppendToQueryInput) baseRule;
+                    AppendToInput rule = (AppendToInput) baseRule;
                     if (!areEdgesToMatchFoundInInput(edges, rule.getEdgesToMatch()))
                         continue;
                     String edgeToAppend = rule.getEdgeToAppend();
@@ -74,7 +78,7 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
         }
     }
 
-    private void processAddEdgeToQueryResults(List<SentenceQueryResult> sentenceQueryResults, AddEdgeToQueryResults businessRule) {
+    private void processAddEdgeToResult(List<SentenceQueryResult> sentenceQueryResults, AddEdgeToResult businessRule) {
         try {
             List<BusinessRule> rules = businessRule.getRules();
 
@@ -87,15 +91,15 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
                 for (BusinessRule baseRule : rules) {
                     if (newEdgeAdded)
                         break;
-                    AddEdgeToQueryResults rule = (AddEdgeToQueryResults) baseRule;
+                    AddEdgeToResult rule = (AddEdgeToResult) baseRule;
                     if (!areEdgesToMatchFoundInResults(edgeResults, rule.getEdgesToMatch()) || !isEdgeToAddNotFoundInResults(edgeResults, rule.getEdgeToAdd()))
                         continue;
-                    List<AddEdgeToQueryResults.Edge> specialEdges = rule.getSpecialEdges();
+                    List<AddEdgeToResult.Edge> specialEdges = rule.getSpecialEdges();
                     boolean nonexistentEdgeFound = false;
                     boolean containsNonexistentEdge = false;
 
                     if (specialEdges != null && !specialEdges.isEmpty()) {
-                        for (AddEdgeToQueryResults.Edge specialEdge : specialEdges) {
+                        for (AddEdgeToResult.Edge specialEdge : specialEdges) {
                             if (!containsNonexistentEdge && !specialEdge.isEdgeExists())
                                 containsNonexistentEdge = true;
 
@@ -132,14 +136,14 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
         }
     }
 
-    private void processRemoveEdgeFromQueryResults(List<SentenceQueryResult> sentenceQueryResults, RemoveEdgeFromQueryResults businessRule) {
+    private void processRemoveEdgeFromResult(List<SentenceQueryResult> sentenceQueryResults, RemoveEdgeFromResult businessRule) {
         try {
             List<BusinessRule> rules = businessRule.getRules();
             for (SentenceQueryResult sentenceQueryResult : sentenceQueryResults) {
                 List<SentenceQueryEdgeResult> edgeResults = sentenceQueryResult.getSentenceQueryEdgeResults();
 
                 for (BusinessRule baseRule : rules) {
-                    RemoveEdgeFromQueryResults rule = (RemoveEdgeFromQueryResults) baseRule;
+                    RemoveEdgeFromResult rule = (RemoveEdgeFromResult) baseRule;
                     String edgeToRemove = rule.getEdgeToRemove();
                     boolean removeIfNull = rule.isRemoveIfNull();
                     List<String> values = rule.getEdgeToRemoveValues();
@@ -148,10 +152,8 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
                     while (itr.hasNext()) {
                         SentenceQueryEdgeResult edgeResult = itr.next();
                         boolean nullMatch = edgeResult.getMatchedValue() == null && removeIfNull;
-                        if (edgeResult.getEdgeName().equals(edgeToRemove) && (nullMatch || (values != null && values.contains(edgeResult.getMatchedValue())))) {
-                            String value = edgeResult.getMatchedValue() != null ? edgeResult.getMatchedValue() : "null";
+                        if (edgeResult.getEdgeName().equals(edgeToRemove) && (nullMatch || (values != null && values.contains(edgeResult.getMatchedValue()))))
                             itr.remove();
-                        }
                     }
                 }
             }
@@ -168,12 +170,12 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
             }
     }
 
-    private void addEdgeToResults(List<SentenceQueryEdgeResult> results, AddEdgeToQueryResults rule, DiscreteData discreteData) {
+    private void addEdgeToResults(List<SentenceQueryEdgeResult> results, AddEdgeToResult rule, DiscreteData discreteData) {
         SentenceQueryEdgeResult newEdgeResult = new SentenceQueryEdgeResult();
         newEdgeResult.setEdgeName(rule.getEdgeToAdd());
         newEdgeResult.setDisplayEdge(true);
-        List<AddEdgeToQueryResults.EdgeToAddValue> edgeToAddValues = rule.getEdgeToAddValues();
-        for (AddEdgeToQueryResults.EdgeToAddValue value : edgeToAddValues) {
+        List<AddEdgeToResult.EdgeToAddValue> edgeToAddValues = rule.getEdgeToAddValues();
+        for (AddEdgeToResult.EdgeToAddValue value : edgeToAddValues) {
             if (!value.isHasMinRangeValue() && !value.isHasMaxRangeValue())
                 newEdgeResult.setMatchedValue(value.getValue());
             else if (discreteData != null) {
