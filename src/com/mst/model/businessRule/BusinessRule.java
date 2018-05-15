@@ -13,9 +13,19 @@ public class BusinessRule {
     @Id
     @JsonSerialize(using=ObjectIdJsonSerializer.class)
     private ObjectId id;
+    public enum LogicalOperator {AND, OR, AND_NOT, OR_NOT}
+    public enum RuleType {MODIFY_SENTENCE_QUERY_INPUT, MODIFY_SENTENCE_QUERY_RESULT}
+    private String className;
     private String organizationId;
-    private String ruleType;
+    private RuleType ruleType;
     private List<BusinessRule> rules;
+
+    public BusinessRule() {
+    }
+
+    public BusinessRule (String className) {
+        this.className = className;
+    }
 
     public ObjectId getId() {
         return id;
@@ -29,11 +39,11 @@ public class BusinessRule {
         this.organizationId = organizationId;
     }
 
-    public String getRuleType() {
+    public RuleType getRuleType() {
         return ruleType;
     }
 
-    public void setRuleType(String ruleType) {
+    public void setRuleType(RuleType ruleType) {
         this.ruleType = ruleType;
     }
 

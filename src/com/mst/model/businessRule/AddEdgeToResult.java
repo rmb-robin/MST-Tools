@@ -3,26 +3,29 @@ package com.mst.model.businessRule;
 import java.util.List;
 import java.util.Map;
 
-public class AddEdgeToQueryResults extends BusinessRule {
+public class AddEdgeToResult extends BusinessRule {
     private String ruleName;
-    private List<AddEdgeToQueryResults.Edge> specialEdges;
+    private List<AddEdgeToResult.Edge> specialEdges;
     private boolean searchSentenceForSpecialEdges;
     private Map<String, List<String>> edgesToMatch;
     private String edgeToAdd;
     private List<EdgeToAddValue> edgeToAddValues;
 
+    public AddEdgeToResult() {
+        super(AddEdgeToResult.class.getSimpleName());
+    }
+
     public static class Edge {
-        public enum LogicalOperator {AND, OR}
-        private AddEdgeToQueryResults.Edge.LogicalOperator logicalOperator;
+        private LogicalOperator logicalOperator;
         private boolean edgeExists;
         private String edgeName;
         private String edgeValue;
 
-        public AddEdgeToQueryResults.Edge.LogicalOperator getLogicalOperator() {
+        public LogicalOperator getLogicalOperator() {
             return logicalOperator;
         }
 
-        public void setLogicalOperator(AddEdgeToQueryResults.Edge.LogicalOperator logicalOperator) {
+        public void setLogicalOperator(LogicalOperator logicalOperator) {
             this.logicalOperator = logicalOperator;
         }
 
