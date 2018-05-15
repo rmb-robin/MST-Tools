@@ -1,85 +1,88 @@
 package com.mst.sentenceprocessing;
 
 import java.util.List;
-import java.util.ListIterator;
 
 import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
+import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.util.Constants;
 
 public class SentenceMeasureNormalizerImpl implements SentenceMeasureNormalizer {
 
-    public List<WordToken> Normalize(List<WordToken> wordTokens, boolean convertMeasurements, boolean convertLargest) { //TODO remove last parameter
+    public List<WordToken> Normalize(List<WordToken> wordTokens, boolean convertMeasurements, boolean convertLargest) {
+        if(!convertMeasurements && !convertLargest) return wordTokens;
+
         try {
-            tokenizeMeasurements(wordTokens);
-            if (convertMeasurements)
+            if(convertMeasurements) {
                 convertMMtoCM(wordTokens);
-        } catch (Exception e) {
+            }
+
+            if(convertLargest) {
+                convertToLargestMeasurement(wordTokens);
+            }
+        } catch(Exception e) {
             e.printStackTrace();
         }
         return wordTokens;
     }
 
-    private void tokenizeMeasurements(List<WordToken> words) {
-        ListIterator<WordToken> itr = words.listIterator();
-        while (itr.hasNext()) {
-            WordToken word = itr.next();
-            if (Constants.MEASUREMENT_REGEX.matcher(word.getToken()).matches()) {
-                String[] dimensions = word.getToken().split("x");
-                if (dimensions.length > 1) {
-                    itr.remove();
-                    for (String dimension : dimensions) {
-                        WordToken newWord = new WordToken();
-                        newWord.setToken(dimension);
-                        newWord.setSemanticType(word.getSemanticType());
-                        itr.add(newWord);
+    private void convertMMtoCM(List<WordToken> words) {
+        // https://medicalsearchtechnologies.atlassian.net/browse/UI-140
+
+        for(WordToken word : words) {
+            try {
+                if((word.getSemanticType() != null &&
+                        word.getSemanticType().equalsIgnoreCase(SemanticTypes.cardinalNumber)) ||
+                        Constants.MEASUREMENT_REGEX.matcher(word.getToken()).matches()) {
+
+                    // getPosition is 0-based so don't add one to get the next token
+                    WordToken nextWord = Constants.getToken(words, word.getPosition());
+
+                    if(nextWord.getToken().matches("(?i)mm|millimeters?")) {
+                        WordToken nextWordPlusOne = Constants.getToken(words, word.getPosition()+1);
+
+                        if(!nextWordPlusOne.getToken().equalsIgnoreCase("hg")) {
+                            String[] values = word.getToken().split("x");
+                            StringBuilder newValue = new StringBuilder();
+
+                            for(String v : values) {
+                                newValue.append(Float.parseFloat(v) / 10);
+                                newValue.append("x");
+                            }
+                            newValue.deleteCharAt(newValue.length()-1);
+
+                            word.setToken(newValue.toString());
+                            nextWord.setToken("cm");
+                        }
                     }
                 }
-            } else if (Constants.MEASUREMENT_1_DIMENSION_REGEX.matcher(word.getToken()).matches()) {
-                String[] measurement = word.getToken().split("(mm|cm)+");
-                String[] unit = word.getToken().split("\\.?\\d+");
-                itr.remove();
-                WordToken newWord = new WordToken();
-                newWord.setToken(measurement[0]);
-                itr.add(newWord);
-                newWord = new WordToken();
-                newWord.setToken(unit[1]);
-                newWord.setSemanticType("uom");
-                itr.add(newWord);
+            } catch(Exception e) {
+                System.out.println(e.toString());
             }
         }
     }
 
-    private void convertMMtoCM(List<WordToken> words) {
-        //TODO check that next word after mm is NOT hg
-        ListIterator<WordToken> itr = words.listIterator();
-        while (itr.hasNext() && itr.nextIndex() < words.size() - 1) {
-            WordToken word = itr.next();
+    private void convertToLargestMeasurement(List<WordToken> words) {
+        // https://medicalsearchtechnologies.atlassian.net/browse/UI-179
 
-            if ((word.getSemanticType() != null && word.getSemanticType().equalsIgnoreCase(SemanticTypes.cardinalNumber)) || Constants.CARDINAL_NUMBER_REGEX.matcher(word.getToken()).matches()) {
-                WordToken nextWord = words.get(itr.nextIndex());
-                WordToken secondWord;
-                WordToken thirdWord;
-                if (nextWord.getToken().matches("(?i)(mm|millimeters)+")) {
-                    word.setToken(String.valueOf(Float.parseFloat(word.getToken()) / 10));
-                    nextWord.setToken("cm");
-                } else if (itr.nextIndex() + 1 < words.size()) {
-                    secondWord = words.get(itr.nextIndex() + 1);
-                    if (secondWord.getToken().matches("(?i)(mm|millimeters)+")) {
-                        word.setToken(String.valueOf(Float.parseFloat(word.getToken()) / 10));
-                        nextWord.setToken(String.valueOf(Float.parseFloat(nextWord.getToken()) / 10));
-                        secondWord.setToken("cm");
-                    } else if (itr.nextIndex() + 2 < words.size()) {
-                        secondWord = words.get(itr.nextIndex() + 1);
-                        thirdWord = words.get(itr.nextIndex() + 2);
-                        if (thirdWord.getToken().matches("(?i)(mm|millimeters)+")) {
-                            word.setToken(String.valueOf(Float.parseFloat(word.getToken()) / 10));
-                            nextWord.setToken(String.valueOf(Float.parseFloat(nextWord.getToken()) / 10));
-                            secondWord.setToken(String.valueOf(Float.parseFloat(secondWord.getToken()) / 10));
-                            thirdWord.setToken("cm");
+        for(WordToken word : words) {
+            if(Constants.MEASUREMENT_REGEX.matcher(word.getToken()).matches()) {
+                // getPosition is 0-based so don't add one to get the next token
+                WordToken nextWord = Constants.getToken(words, word.getPosition());
+
+                if(nextWord.getToken().matches("(?i)mm|millimeters?|cm|centimeters?")) {
+                    String[] values = word.getToken().split("x");
+                    float newValue = Float.parseFloat(values[0]);
+
+                    for(String v : values) {
+                        if(Float.parseFloat(v) > newValue) {
+                            newValue = Float.parseFloat(v);
                         }
                     }
+
+                    word.setToken(String.valueOf(newValue));
+                    word.setSemanticType(SemanticTypes.cardinalNumber);
                 }
             }
         }

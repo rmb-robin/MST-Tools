@@ -20,7 +20,7 @@ public class SentenceMeasureNormalizerTests {
     public void testMMtoCM() {
         SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
         List<WordToken> words = getWordTokens("measuring 90 x 32 x 62 mm");
-        normalizer.Normalize(words, true, false);
+        normalizer.Normalize(words, true,false);
         assertEquals(words.get(1).getToken(), "9.0");
         assertEquals(words.get(2).getToken(), "3.2");
         assertEquals(words.get(3).getToken(), "6.2");
@@ -31,7 +31,7 @@ public class SentenceMeasureNormalizerTests {
     public void testMMtoCM2() {
         SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
         List<WordToken> words = getWordTokens("measuring 90x32x62mm");
-        normalizer.Normalize(words, true, false);
+        normalizer.Normalize(words, true,false);
         assertEquals(words.get(1).getToken(), "9.0");
         assertEquals(words.get(2).getToken(), "3.2");
         assertEquals(words.get(3).getToken(), "6.2");
@@ -42,7 +42,7 @@ public class SentenceMeasureNormalizerTests {
 	public void testMMtoCM3() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
         List<WordToken> words = getWordTokens("measures 91 x 32 mm");
-		normalizer.Normalize(words, true, false);
+		normalizer.Normalize(words, true,false);
 		assertEquals(words.get(1).getToken(), "9.1");
         assertEquals(words.get(2).getToken(), "3.2");
 		assertEquals(words.get(3).getToken(), "cm");
@@ -52,7 +52,7 @@ public class SentenceMeasureNormalizerTests {
 	public void testMMtoCM4() {
 		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
         List<WordToken> words = getWordTokens("measures 21mm");
-		normalizer.Normalize(words, true, false);
+		normalizer.Normalize(words, true,false);
 		assertEquals(words.get(1).getToken(), "2.1");
 		assertEquals(words.get(2).getToken(), "cm");
 	}
@@ -62,19 +62,19 @@ public class SentenceMeasureNormalizerTests {
         SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
         List<WordToken> words;
         words = getWordTokens("measuring .7x.3x1.2cm");
-		normalizer.Normalize(words, false, false);
+		normalizer.Normalize(words, false,false);
         assertEquals(words.get(1).getToken(), ".7");
         assertEquals(words.get(2).getToken(), ".3");
         assertEquals(words.get(3).getToken(), "1.2");
         assertEquals(words.get(4).getToken(), "cm");
         words = getWordTokens("measuring .7 x .3 x 1.2 cm");
-        normalizer.Normalize(words, false, false);
+        normalizer.Normalize(words, false,false);
         assertEquals(words.get(1).getToken(), ".7");
         assertEquals(words.get(2).getToken(), ".3");
         assertEquals(words.get(3).getToken(), "1.2");
         assertEquals(words.get(4).getToken(), "cm");
         words = getWordTokens("measuring .7 x .3 x 1.2cm");
-        normalizer.Normalize(words, false, false);
+        normalizer.Normalize(words, false,false);
         assertEquals(words.get(1).getToken(), ".7");
         assertEquals(words.get(2).getToken(), ".3");
         assertEquals(words.get(3).getToken(), "1.2");
