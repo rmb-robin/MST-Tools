@@ -30,14 +30,12 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
     }
 
     @Override
-    public void modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, List<BusinessRule> businessRules) {
+    public void modifySentenceQueryResult(List<SentenceQueryResult> results, List<BusinessRule> businessRules) {
         for (BusinessRule businessRule : businessRules) {
             if (businessRule instanceof AddEdgeToResult)
-                processAddEdgeToResult(sentenceQueryResults, (AddEdgeToResult) businessRule);
-        }
-        for (BusinessRule businessRule : businessRules) {
-            if (businessRule instanceof RemoveEdgeFromResult)
-                processRemoveEdgeFromResult(sentenceQueryResults, (RemoveEdgeFromResult) businessRule);
+                processAddEdgeToResult(results, (AddEdgeToResult) businessRule);
+            else if (businessRule instanceof RemoveEdgeFromResult)
+                processRemoveEdgeFromResult(results, (RemoveEdgeFromResult) businessRule);
         }
     }
 

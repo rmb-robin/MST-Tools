@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface BusinessRuleFilter {
     void modifySentenceQueryInput(SentenceQueryInput input, List<BusinessRule> rules);
-    void modifySentenceQueryResults(List<SentenceQueryResult> sentenceQueryResults, List<BusinessRule> rule);
+    void modifySentenceQueryResult(List<SentenceQueryResult> sentenceQueryResults, List<BusinessRule> rule);
 }
