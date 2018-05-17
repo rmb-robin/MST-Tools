@@ -161,6 +161,7 @@ public class Constants {
 	public static final Pattern MEASUREMENT_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*\\s*[x|X]\\s*\\.?\\d+\\.?\\d*\\s*([x|X]\\s*\\.?\\d+\\.?\\d*)?");
 	public static final Pattern MEASUREMENT_1_DIMENSION_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*(mm|cm)+");
     public static final Pattern CARDINAL_NUMBER_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*");
+	public static final Pattern UNIT_OF_MEASURE_REGEX = Pattern.compile("(mm|cm)");
 
 	public static final Pattern SALUTATION_REGEX = Pattern.compile("Dr\\.|Mr\\.|Ms\\.|Mrs\\.");
 	
