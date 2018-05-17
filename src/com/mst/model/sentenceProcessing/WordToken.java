@@ -8,77 +8,81 @@ import com.mst.model.metadataTypes.SemanticTypes;
 
 
 public class WordToken extends GenericToken implements Serializable {
-		
-	private String semanticType = null;
-	private String pos = null;  
-	private Verb verb;
-	private PropertyValueTypes propertyValueType;
-	private boolean isSubjectSetFromWildCard;
-	
-	
-	public WordToken() {
-		super();
-	}
-	
-	public WordToken(String word, int position) {
-		super(word, position);
-	}
+    private String descriptor = null;
+    private String semanticType = null;
+    private String pos = null;
+    private Verb verb;
+    private PropertyValueTypes propertyValueType;
+    private boolean isSubjectSetFromWildCard;
 
-	public boolean isVerb() {	
-		return verb != null;
-	}
-		
-	public String getPos() {
-		return pos;
-	}
+    public WordToken() {
+        super();
+    }
 
-	public void setPos(String pos) {
-		this.pos = pos;
-	}
+    public WordToken(String word, int position) {
+        super(word, position);
+    }
 
-	public String getSemanticType() {
-		//if(s)
-		return semanticType;
-	}
+    public String getDescriptor() {
+        return descriptor;
+    }
 
-	public void setSemanticType(String semanticType) {
-		this.semanticType = semanticType;
-	}
-	
-	
-	@Override
-	public String toString() {
-		return super.getToken();
-	}
+    public void setDescriptor(String descriptor) {
+        this.descriptor = descriptor;
+    }
 
-	public Verb getVerb() {
-		return verb;
-	}
+    public boolean isVerb() {
+        return verb != null;
+    }
 
-	public void setVerb(Verb verb) {
-		this.verb = verb;
-	}
+    public String getPos() {
+        return pos;
+    }
 
-	public PropertyValueTypes getPropertyValueType() {
-		if(propertyValueType==null) return PropertyValueTypes.NA;
-		return propertyValueType;
-	}
+    public void setPos(String pos) {
+        this.pos = pos;
+    }
 
-	public void setPropertyValueType(PropertyValueTypes propertyValueType) {
-		this.propertyValueType = propertyValueType;
-	}
-	
-	public boolean isSubjectSetFromWildCard() {
-		return isSubjectSetFromWildCard;
-	}
+    public String getSemanticType() {
+        return semanticType;
+    }
 
-	public void setSubjectSetFromWildCard(boolean isSubjectSetFromWildCard) {
-		this.isSubjectSetFromWildCard = isSubjectSetFromWildCard;
-	}
+    public void setSemanticType(String semanticType) {
+        this.semanticType = semanticType;
+    }
 
-	public boolean isCardinal(){
-		if(this.getSemanticType()==null) return false;
-		return this.getSemanticType().equals(SemanticTypes.cardinalNumber);
-	}
+    @Override
+    public String toString() {
+        return super.getToken();
+    }
 
+    public Verb getVerb() {
+        return verb;
+    }
+
+    public void setVerb(Verb verb) {
+        this.verb = verb;
+    }
+
+    public PropertyValueTypes getPropertyValueType() {
+        if (propertyValueType == null) return PropertyValueTypes.NA;
+        return propertyValueType;
+    }
+
+    public void setPropertyValueType(PropertyValueTypes propertyValueType) {
+        this.propertyValueType = propertyValueType;
+    }
+
+    public boolean isSubjectSetFromWildCard() {
+        return isSubjectSetFromWildCard;
+    }
+
+    public void setSubjectSetFromWildCard(boolean isSubjectSetFromWildCard) {
+        this.isSubjectSetFromWildCard = isSubjectSetFromWildCard;
+    }
+
+    public boolean isCardinal() {
+        if (this.getSemanticType() == null) return false;
+        return this.getSemanticType().equals(SemanticTypes.cardinalNumber);
+    }
 }
