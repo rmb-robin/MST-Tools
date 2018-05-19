@@ -1,58 +1,39 @@
 package com.mst.dao;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.QueryResults;
 
 import com.mst.filter.CystAndAAAReportFilterImpl;
 import com.mst.filter.ITNReportFilterImpl;
 import com.mst.filter.ImpressionReportFilterImpl;
 import com.mst.filter.ReportFilterByQueryImpl;
-import com.mst.filter.ReportFilterException;
 import com.mst.filter.ReportQueryFilter;
-import com.mst.filter.SentenceDiscoveryFilterImpl;
-import com.mst.filter.SentenceFilterControllermpl;
-import com.mst.filter.SentenceQueryResultFactory;
+import com.mst.filter.SentenceFilterControllerImpl;
 import com.mst.filter.TokenSequenceQueryBusinessRuleFilterImpl;
 import com.mst.interfaces.DiscreteDataDao;
 import com.mst.interfaces.MongoDatastoreProvider;
 import com.mst.interfaces.dao.SentenceQueryDao;
 import com.mst.interfaces.filter.SentenceDiscoveryFilter;
-import com.mst.interfaces.filter.SentenceFilterController;
-import com.mst.model.SemanticType;
-import com.mst.model.SentenceQuery.DiscreteDataFilter;
 import com.mst.model.SentenceQuery.EdgeQuery;
 import com.mst.model.SentenceQuery.SentenceQueryEdgeResult;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryInstanceResult;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
-import com.mst.model.SentenceQuery.SentenceQueryTextInput;
 import com.mst.model.SentenceQuery.SentenceReprocessingInput;
 import com.mst.model.businessRule.QueryBusinessRule;
 import com.mst.model.discrete.DiscreteData;
-import com.mst.model.graph.Edge;
-import com.mst.model.metadataTypes.EdgeNames;
-import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.metadataTypes.QueryBusinessRuleTypes;
-import com.mst.model.metadataTypes.SemanticTypes;
-import com.mst.model.metadataTypes.WordEmbeddingTypes;
-import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
-import com.mst.model.sentenceProcessing.WordToken;
-import com.mst.util.Constants;
 import com.mst.util.TokenRelationshipUtil;
 
 
@@ -60,7 +41,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 	
 	private MongoDatastoreProvider datastoreProvider;
 
-	public SentenceFilterControllermpl sentenceFilterController; 
+	public SentenceFilterControllerImpl sentenceFilterController;
 	private DiscreteDataDao discreteDataDao; 
 	private SentenceDiscoveryFilter sentenceDiscoveryFilter; 
 			
@@ -90,13 +71,13 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao  {
 		}
 
 		if(input.isFilterByReport())
-			result = filterResultsByDistinctReport(result,input, this.sentenceFilterController.cumalativeSentenceResults);
+			result = filterResultsByDistinctReport(result,input, this.sentenceFilterController.getCumulativeSentenceResults());
 		return result;
 	}
 
 	public List<SentenceQueryResult> getSentences(SentenceQueryInput input, List<SentenceDb> sentences) {
 
-		sentenceFilterController = new SentenceFilterControllermpl();
+		sentenceFilterController = new SentenceFilterControllerImpl();
 		Datastore datastore =  datastoreProvider.getDefaultDb();
 
 		boolean filterOnDiscreteData = false;
