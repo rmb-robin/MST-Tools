@@ -134,7 +134,7 @@ public class SentenceMeasureNormalizerTests {
 			SentenceRequest request = new SentenceRequest();
 			List<String> input = new ArrayList<>();
 			input.add(text);
-			request.setSenteceTexts(input);
+			request.setSentenceTexts(input);
 			List<Sentence> sentences = controller.processSentences(request);
             Sentence result = sentences.get(0);
             words = result.getModifiedWordList();
