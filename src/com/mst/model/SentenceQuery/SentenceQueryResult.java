@@ -6,12 +6,10 @@ import java.util.List;
 import com.mst.model.discrete.DiscreteData;
 
 public class SentenceQueryResult {
-
 	private String sentence;
 	private String sentenceId;
 	private DiscreteData discreteData;
 	private String reportText;
-
 	private List<SentenceQueryEdgeResult> sentenceQueryEdgeResults;
 
 	public SentenceQueryResult() {
@@ -26,6 +24,10 @@ public class SentenceQueryResult {
 		return reportText;
 	}
 
+    /**
+     * Gets the value of the input sentence
+     * @return value of normalized sentence
+     */
 	public String getSentence() {
 		return sentence;
 	}
@@ -57,18 +59,17 @@ public class SentenceQueryResult {
 	public void setSentenceQueryEdgeResults(List<SentenceQueryEdgeResult> sentenceQueryEdgeResults) {
 		this.sentenceQueryEdgeResults = sentenceQueryEdgeResults;
 	}
-	// Only using the sentenceId for array handling.
+
 	@Override
-	public int hashCode() {
+	public int hashCode() { // Only using the sentenceId for array handling
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((sentenceQueryEdgeResults == null) ? 0 : sentenceQueryEdgeResults.hashCode());
 		return result;
 	}
 
-	// Only using the sentenceId for array handling.
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(Object obj) { // Only using the sentenceId for array handling
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -77,11 +78,7 @@ public class SentenceQueryResult {
 			return false;
 		SentenceQueryResult other = (SentenceQueryResult) obj;
 		if (getSentenceId() == null) {
-			if (other.getSentenceId() != null)
-				return false;
-		} else if (!getSentenceId().equals(other.getSentenceId()))
-			return false;
-		return true;
+			return other.getSentenceId() == null;
+		} else return getSentenceId().equals(other.getSentenceId());
 	}
-
 }
