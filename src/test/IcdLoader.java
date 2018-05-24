@@ -35,11 +35,17 @@ public class IcdLoader {
 	
 		List<IcdTenSentenceInstance> instances = new ArrayList<>();
 		for(String line: lines){
-			String[] vals = line.split(",");
+			//System.out.println("line: " + line);
+			//String[] vals = line.split(",");
+			String code = line.substring(0,line.indexOf(","));
+			String sentence = line.substring(line.indexOf(",")+1, line.length());
 			IcdTenSentenceInstance instance = new IcdTenSentenceInstance();
-			instance.setIcdCode(vals[1]);
-			instance.setSentence(vals[0]);
+			//System.out.println("IcdCode being set: " + code);
+			//System.out.println("sentence being set: " + sentence);
+			instance.setIcdCode(code);
+			instance.setSentence(sentence);
 			instances.add(instance);
+			System.out.println(instance);
 		}
 		request.setSentenceInstances(instances);
 		return request;
@@ -47,6 +53,9 @@ public class IcdLoader {
 	
 	private String createFullPath() {
 		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + "icd.txt";
+		/*
+		 * C:\Users\Bryan\RABHU\eclipse-workspace\MST-Tools\testData
+		 */
 	}
 
 }

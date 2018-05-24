@@ -1,0 +1,7 @@
+Code,Description
+A00,Cholera
+A00.0,Cholera due to Vibrio cholerae 01, biovar cholerae
+A00.0,Classical cholera
+A00.1,Cholera due to Vibrio cholerae 01, biovar eltor
+A00.1,Cholera eltor
+A00.9,Cholera, unspecified

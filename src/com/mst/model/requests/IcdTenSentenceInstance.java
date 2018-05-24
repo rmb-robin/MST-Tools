@@ -16,6 +16,10 @@ public class IcdTenSentenceInstance{
     }
     public String getSentence(){
         return sentence;
-    }    
+    }
+	@Override
+	public String toString() {
+		return "IcdTenSentenceInstance [icdCode=" + icdCode + ", sentence=" + sentence + "]";
+	}    
     
 }

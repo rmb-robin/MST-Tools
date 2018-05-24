@@ -36,6 +36,7 @@ public class IDCTenProcesser {
 			SentenceTextRequest s = createRequest(sentenceInstance);
 			SentenceDiscovery discovery = discoveryProcessorImpl.process(s).get(0);
 			appendIcdEdge(sentenceInstance.getIcdCode(), discovery);
+			appendIcdEdge(sentenceInstance.getSentence(), discovery);
 			discoveries.add(discovery);
 		}
 		dao.saveCollection(discoveries);
@@ -49,8 +50,7 @@ public class IDCTenProcesser {
 		
 		WordToken token = new WordToken();
 		token.setToken(icdEdge);
-		
-		
+			
 		RecommendedTokenRelationship newEdge = 
 				this.factoryImpl.createRecommendedRelationship(EdgeNames.hasICD, EdgeTypes.related, relationship.getTokenRelationship().getToToken(), token, this.getClass().getName());
 		
