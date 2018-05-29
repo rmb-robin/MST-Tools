@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
@@ -17,62 +15,47 @@ import com.mst.util.RecommandedTokenRelationshipUtil;
 
 public class DistinctTokenRelationshipDeterminerImpl implements DistinctTokenRelationshipDeterminer {
 
-	@Override
-	public List<TokenRelationship> getDistinctTokenRelationships(Sentence sentence) {
-		
-		List<TokenRelationship> result = new ArrayList<>();
-		Map<String,List<TokenRelationship>> tokenRelationsByEdgeName = sentence.getTokenRelationsByNameMap();
-		for(Entry<String,List<TokenRelationship>> entry: tokenRelationsByEdgeName.entrySet()){
-			result.addAll(getDistinctRelationships(entry.getValue()));
-		}
+    @Override
+    public List<TokenRelationship> getDistinctTokenRelationships(Sentence sentence) {
+        List<TokenRelationship> result = new ArrayList<>();
+        Map<String, List<TokenRelationship>> tokenRelationsByEdgeName = sentence.getTokenRelationsByNameMap();
+        for (Entry<String, List<TokenRelationship>> entry : tokenRelationsByEdgeName.entrySet()) {
+            result.addAll(getDistinctRelationships(entry.getValue()));
+        }
+        return result;
+    }
 
-		return result;
-	}
-	
-	public List<RecommendedTokenRelationship> getDistinctRecommendedRelationships(List<RecommendedTokenRelationship> relationships){
-		Map<String, List<RecommendedTokenRelationship>> map = RecommandedTokenRelationshipUtil.getRelationshipsByEdgeName(relationships);
-		
-		List<RecommendedTokenRelationship> result = new ArrayList<>();
-		for(Entry<String,List<RecommendedTokenRelationship>> entry: map.entrySet()){
-			result.addAll(getDistinctRecommendRelationships(entry.getValue()));
-		}
+    public List<RecommendedTokenRelationship> getDistinctRecommendedRelationships(List<RecommendedTokenRelationship> relationships) {
+        Map<String, List<RecommendedTokenRelationship>> map = RecommandedTokenRelationshipUtil.getRelationshipsByEdgeName(relationships);
+        List<RecommendedTokenRelationship> result = new ArrayList<>();
+        for (Entry<String, List<RecommendedTokenRelationship>> entry : map.entrySet()) {
+            result.addAll(getDistinctRecommendRelationships(entry.getValue()));
+        }
+        return result;
+    }
 
-		return result;
-			
-		
-		
-		
-	}
-	
-	private List<RecommendedTokenRelationship> getDistinctRecommendRelationships(List<RecommendedTokenRelationship> tokenRelationships){
-		
-		Map<String, RecommendedTokenRelationship> distinctFromTo = new HashMap<String, RecommendedTokenRelationship>();
-		
-		for(RecommendedTokenRelationship tokenRelationship: tokenRelationships){
-			String key = getToken(tokenRelationship.getTokenRelationship().getFromToken()) + getToken(tokenRelationship.getTokenRelationship().getToToken());
-			if(distinctFromTo.containsKey(key))continue;
-			distinctFromTo.put(key, tokenRelationship);
-		}
-		return new ArrayList<RecommendedTokenRelationship>(distinctFromTo.values()); 
-	}
-	
-	private List<TokenRelationship> getDistinctRelationships(List<TokenRelationship> tokenRelationships){
-		
-		Map<String, TokenRelationship> distinctFromTo = new HashMap<String, TokenRelationship>();
-		
-		for(TokenRelationship tokenRelationship: tokenRelationships){
-			String key = getToken(tokenRelationship.getFromToken()) + getToken(tokenRelationship.getToToken());
-			if(distinctFromTo.containsKey(key))continue;
-			distinctFromTo.put(key, tokenRelationship);
-		}
-		return new ArrayList<TokenRelationship>(distinctFromTo.values()); 
-	}
-	
-	private String getToken(WordToken wordtoken){
-		if(wordtoken==null) return "";
-		return wordtoken.getToken().trim();
-	}
+    private List<RecommendedTokenRelationship> getDistinctRecommendRelationships(List<RecommendedTokenRelationship> tokenRelationships) {
+        Map<String, RecommendedTokenRelationship> distinctFromTo = new HashMap<>();
+        for (RecommendedTokenRelationship tokenRelationship : tokenRelationships) {
+            String key = getToken(tokenRelationship.getTokenRelationship().getFromToken()) + getToken(tokenRelationship.getTokenRelationship().getToToken());
+            if (distinctFromTo.containsKey(key)) continue;
+            distinctFromTo.put(key, tokenRelationship);
+        }
+        return new ArrayList<>(distinctFromTo.values());
+    }
 
-	
-	
+    private List<TokenRelationship> getDistinctRelationships(List<TokenRelationship> tokenRelationships) {
+        Map<String, TokenRelationship> distinctFromTo = new HashMap<>();
+        for (TokenRelationship tokenRelationship : tokenRelationships) {
+            String key = getToken(tokenRelationship.getFromToken()) + getToken(tokenRelationship.getToToken());
+            if (distinctFromTo.containsKey(key)) continue;
+            distinctFromTo.put(key, tokenRelationship);
+        }
+        return new ArrayList<>(distinctFromTo.values());
+    }
+
+    private String getToken(WordToken wordtoken) {
+        if (wordtoken == null) return "";
+        return wordtoken.getToken().trim();
+    }
 }

@@ -26,7 +26,7 @@ public class Constants {
 		semanticTypes.put("[age]","age");
 		semanticTypes.put("[number]","number");
 		semanticTypes.put("[proper noun]","propn");
-		semanticTypes.put("[date]","date");
+		semanticTypes.put("[DATE]","DATE");
 		semanticTypes.put("[tnm]","tnmstage");
 		semanticTypes.put("[time]","time");
 		semanticTypes.put("[gene_neg]","gene-neg");
@@ -158,8 +158,8 @@ public class Constants {
 	public static final Pattern TNM_STAGING_REGEX_NO_SPACE = Pattern.compile("(?i)p?T[0-4x][abcruy]*[,]*(p?N[0-3x][abcruy]*)*[|,|&|and]*(M[01x])*[,]*(R[0-2])*");
 	
 	// https://www.regex101.com/r/oG3fE2/1
-	public static final Pattern MEASUREMENT_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*\\s*[x|X]\\s*\\.?\\d+\\.?\\d*\\s*([x|X]\\s*\\.?\\d+\\.?\\d*)?");
-	public static final Pattern MEASUREMENT_1_DIMENSION_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*(mm|cm)+");
+	public static final Pattern MULTIDIMENSIONAL_MEASUREMENT_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*\\s*[x|X]\\s*\\.?\\d+\\.?\\d*\\s*([x|X]\\s*\\.?\\d+\\.?\\d*)?");
+	public static final Pattern SINGLE_DIMENSION_MEASUREMENT_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*(mm|cm)+");
     public static final Pattern CARDINAL_NUMBER_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*");
 	public static final Pattern UNIT_OF_MEASURE_REGEX = Pattern.compile("(mm|cm)");
 

@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import com.mst.interfaces.sentenceprocessing.DiscreteDataBucketIdentifier;
 import com.mst.metadataProviders.DiscreteDataCustomFieldNames;
-import com.mst.model.SemanticType;
 import com.mst.model.discrete.ComplianceDisplayFieldsBucketItem;
 import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
@@ -19,7 +18,6 @@ import com.mst.model.discrete.Followup;
 import com.mst.model.discrete.FollowupProcedure;
 import com.mst.model.metadataTypes.DiscreteDataBucketIdenticationType;
 import com.mst.model.metadataTypes.EdgeNames;
-import com.mst.model.metadataTypes.PartOfSpeachTypes;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -136,7 +134,7 @@ public class DiscreteDataBucketIdentifierImpl implements DiscreteDataBucketIdent
 	
 	private boolean isTokenCardinal(WordToken workToken){
 		if(workToken.getSemanticType()==null) return false;
-		return workToken.getSemanticType().equals(SemanticTypes.cardinalNumber);
+		return workToken.getSemanticType().equals(SemanticTypes.CARDINAL_NUMBER);
 	}
 	
 	private ComplianceDisplayFieldsBucketItem findBucketForSentence(Sentence sentence, List<ComplianceDisplayFieldsBucketItem> bucketItems){

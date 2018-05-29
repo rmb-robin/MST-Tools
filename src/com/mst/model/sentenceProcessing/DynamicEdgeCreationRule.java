@@ -7,24 +7,20 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;
 
-@Entity("dynamicedgecreationrules")
+@Entity("dynamicEdgeCreationRule")
 public class DynamicEdgeCreationRule {
-
-
 	@Id
 	private ObjectId id;
 	private String name; 
-	private List<DynamicEdgeCondition> conditions; 
-	
+	private List<DynamicEdgeCondition> conditions;
 	private String edgeName; 
 	private List<String> toEdgeNames; 
 	private String fromToken;
-	private boolean isFromTokenSementicType; 
+	private boolean isFromTokenSemanticType;
 	private List<String> fromEdgeNames; 
 	private String toToken;
-	private boolean isToTokenSementicType; 
-	
-	
+	private boolean isToTokenSemanticType;
+
 	public DynamicEdgeCreationRule(){
 		conditions = new ArrayList<>();
 		toEdgeNames = new ArrayList<>();
@@ -79,12 +75,12 @@ public class DynamicEdgeCreationRule {
 		this.fromToken = fromToken;
 	}
 
-	public boolean isFromTokenSementicType() {
-		return isFromTokenSementicType;
+	public boolean isFromTokenSemanticType() {
+		return isFromTokenSemanticType;
 	}
 
-	public void setFromTokenSementicType(boolean isFromTokenSementicType) {
-		this.isFromTokenSementicType = isFromTokenSementicType;
+	public void setFromTokenSemanticType(boolean isFromTokenSementicType) {
+		this.isFromTokenSemanticType = isFromTokenSementicType;
 	}
 
 	public List<String> getFromEdgeNames() {
@@ -103,13 +99,11 @@ public class DynamicEdgeCreationRule {
 		this.toToken = toToken;
 	}
 
-	public boolean isToTokenSementicType() {
-		return isToTokenSementicType;
+	public boolean isToTokenSemanticType() {
+		return isToTokenSemanticType;
 	}
 
-	public void setToTokenSementicType(boolean isToTokenSementicType) {
-		this.isToTokenSementicType = isToTokenSementicType;
+	public void setToTokenSemanticType(boolean isToTokenSementicType) {
+		this.isToTokenSemanticType = isToTokenSementicType;
 	}
-	
-	
 }

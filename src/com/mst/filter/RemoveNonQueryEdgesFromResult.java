@@ -8,6 +8,8 @@ import java.util.ListIterator;
 import static com.mst.model.metadataTypes.EdgeNames.measurement;
 
 public class RemoveNonQueryEdgesFromResult {
+    //TODO refactor to: remove edges with displayEdge = false
+
     public void process(SentenceQueryInput input, List<SentenceQueryResult> sentenceQueryResults) {
         List<SentenceQueryInstance> instances = input.getSentenceQueryInstances();
         for (SentenceQueryResult queryResult : sentenceQueryResults) {

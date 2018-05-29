@@ -20,7 +20,7 @@ public class VerbPhraseInputFactoryImpl implements VerbPhraseInputFactory {
 		firstWordSubjects.add("this");
 		firstWordSubjects.add("it");
 		
-		stTypes.add("dysn");
+		stTypes.add("DYSN");
 		stTypes.add("proc"); 
 		stTypes.add("drugpr");		
 		stTypes.add("cardinal number"); 

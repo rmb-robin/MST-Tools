@@ -83,6 +83,6 @@ public class WordToken extends GenericToken implements Serializable {
 
     public boolean isCardinal() {
         if (this.getSemanticType() == null) return false;
-        return this.getSemanticType().equals(SemanticTypes.cardinalNumber);
+        return this.getSemanticType().equals(SemanticTypes.CARDINAL_NUMBER);
     }
 }

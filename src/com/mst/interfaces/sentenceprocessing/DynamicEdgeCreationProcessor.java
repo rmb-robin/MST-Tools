@@ -9,7 +9,7 @@ import com.mst.model.sentenceProcessing.DynamicEdgeCreationRule;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
-public interface DynamicEdgeCreationProcesser {
+public interface DynamicEdgeCreationProcessor {
 
 	List<TokenRelationship> process(List<DynamicEdgeCreationRule> rules, Map<String,List<TokenRelationship>> map,List<WordToken> modifiedWords);
 	List<RecommendedTokenRelationship> processDiscovery(List<DynamicEdgeCreationRule> rules, SentenceDiscovery sentence);
