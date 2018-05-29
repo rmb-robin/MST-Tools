@@ -1,11 +1,12 @@
 package com.mst.testcases;
 
+import com.mst.interfaces.sentenceprocessing.MeasurementProcessor;
 import org.junit.Test;
 
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.WordToken;
-import com.mst.sentenceprocessing.SentenceMeasureNormalizerImpl;
+import com.mst.sentenceprocessing.MeasurementProcessorImpl;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
 
@@ -15,13 +16,13 @@ import static com.mst.model.metadataTypes.Descriptor.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SentenceMeasureNormalizerTests {
+public class MeasurementProcessorTest {
 
     @Test
     public void testMMtoCM() {
-        SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+        MeasurementProcessor processor = new MeasurementProcessorImpl();
         List<WordToken> words = getWordTokens("measuring 11 x 32 x 23 mm");
-        normalizer.Normalize(words, true);
+        processor.process(words, true);
         assertEquals(words.get(1).getToken(), "1.1");
         assertEquals(words.get(2).getToken(), "3.2");
         assertEquals(words.get(3).getToken(), "2.3");
@@ -37,9 +38,9 @@ public class SentenceMeasureNormalizerTests {
 
     @Test
     public void testMMtoCM2() {
-        SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+        MeasurementProcessor processor = new MeasurementProcessorImpl();
         List<WordToken> words = getWordTokens("measuring 21x32x63mm");
-        normalizer.Normalize(words, true);
+        processor.process(words, true);
         assertEquals(words.get(1).getToken(), "2.1");
         assertEquals(words.get(2).getToken(), "3.2");
         assertEquals(words.get(3).getToken(), "6.3");
@@ -55,9 +56,9 @@ public class SentenceMeasureNormalizerTests {
 
 	@Test
 	public void testMMtoCM3() {
-		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+		MeasurementProcessor processor = new MeasurementProcessorImpl();
         List<WordToken> words = getWordTokens("measures 31 x 32 mm");
-		normalizer.Normalize(words, true);
+		processor.process(words, true);
 		assertEquals(words.get(1).getToken(), "3.1");
         assertEquals(words.get(2).getToken(), "3.2");
 		assertEquals(words.get(3).getToken(), "cm");
@@ -70,9 +71,9 @@ public class SentenceMeasureNormalizerTests {
 	
 	@Test
 	public void testMMtoCM4() {
-		SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+		MeasurementProcessor processor = new MeasurementProcessorImpl();
         List<WordToken> words = getWordTokens("measures 41mm");
-		normalizer.Normalize(words, true);
+		processor.process(words, true);
 		assertEquals(words.get(1).getToken(), "4.1");
 		assertEquals(words.get(2).getToken(), "cm");
         assertEquals(words.get(1).getPosition(), 2);
@@ -82,9 +83,9 @@ public class SentenceMeasureNormalizerTests {
 
 	@Test
 	public void testTokenizeMeasurements() {
-        SentenceMeasureNormalizerImpl normalizer = new SentenceMeasureNormalizerImpl();
+        MeasurementProcessor processor = new MeasurementProcessorImpl();
         List<WordToken> words = getWordTokens("measuring 5.1x.2x8.3cm");
-		normalizer.Normalize(words, false);
+		processor.process(words, false);
         assertEquals(words.get(1).getToken(), "5.1");
         assertEquals(words.get(2).getToken(), ".2");
         assertEquals(words.get(3).getToken(), "8.3");
@@ -98,7 +99,7 @@ public class SentenceMeasureNormalizerTests {
         assertEquals(words.get(3).getDescriptor(), Z_AXIS);
 
         words = getWordTokens("measuring 6.1 x 7.2 x 1.3 cm");
-        normalizer.Normalize(words, false);
+        processor.process(words, false);
         assertEquals(words.get(1).getToken(), "6.1");
         assertEquals(words.get(2).getToken(), "7.2");
         assertEquals(words.get(3).getToken(), "1.3");
@@ -112,7 +113,7 @@ public class SentenceMeasureNormalizerTests {
         assertEquals(words.get(3).getDescriptor(), Z_AXIS);
 
         words = getWordTokens("measuring 7.1 x 2 x 3cm");
-        normalizer.Normalize(words, false);
+        processor.process(words, false);
         assertEquals(words.get(1).getToken(), "7.1");
         assertEquals(words.get(2).getToken(), "2");
         assertEquals(words.get(3).getToken(), "3");

@@ -18,18 +18,17 @@ import com.mst.sentenceprocessing.SentenceConverter;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
 import com.mst.util.MongoDatastoreProviderDefault;
+import org.junit.Test;
 
 import org.apache.log4j.Logger;
 
 public class LoadDataToMongo {
 
-	
 	//@Test
 	public void testLog(){
 		 Logger logger = Logger.getLogger(LoadDataToMongo.class);
 	        logger.error("Don't panic");
 	}
-	
 	
 //	@Test
 	public void process() throws Exception{
@@ -109,7 +108,7 @@ public class LoadDataToMongo {
 		return result;
 	}
 	
-	//@Test
+	@Test
 	public void loadDynamicEdgeMetadata(){
 		List<DynamicEdgeCreationRule> input =new DynamicRuleProvider().getRules();
 		Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();

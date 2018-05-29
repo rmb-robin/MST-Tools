@@ -15,9 +15,7 @@ public class SaveSentenceQueryInput {
     }
 
     public void process(SentenceQueryInput input) {
-        if (ON) {
-            input.setDebug(true);
+        if (ON)
             dao.saveInput(input);
-        }
     }
 }

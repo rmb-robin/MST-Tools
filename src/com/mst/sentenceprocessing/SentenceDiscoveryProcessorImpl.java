@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
+import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcessor;
 import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
-import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcesser;
+import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcessor;
 import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
 import com.mst.interfaces.sentenceprocessing.PartOfSpeechAnnotator;
 import com.mst.interfaces.sentenceprocessing.RecommendedNegativeRelationshipFactoryImpl;
 import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
 import com.mst.interfaces.sentenceprocessing.SentenceDiscoveryProcessor;
-import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
+import com.mst.interfaces.sentenceprocessing.MeasurementProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbExistanceProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.interfaces.sentenceprocessing.WordEmbeddingProcessor;
@@ -22,7 +22,7 @@ import com.mst.model.metadataTypes.TokenBypassTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.requests.SentenceTextRequest;
-import com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl;
+import com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcessorImpl;
 import com.mst.model.sentenceProcessing.RecommandedNounPhraseResult;
 import com.mst.model.sentenceProcessing.RecommandedSubjectAnnotatorImpl;
 import com.mst.model.sentenceProcessing.Sentence;
@@ -35,35 +35,35 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
     private NgramsSentenceProcessor ngramProcessor;
     private PartOfSpeechAnnotator partOfSpeechAnnotator;
     private SemanticTypeSentenceAnnotator stAnnotator;
-    private SentenceMeasureNormalizer sentenceMeasureNormalizer;
+    private MeasurementProcessor measurementProcessor;
     private WordEmbeddingProcessor wordEmbeddingProcessor;
     private VerbProcessor verbProcessor;
-    private RecommendedNounPhraseProcesserImpl nounPhraseProcesser;
+    private RecommendedNounPhraseProcessorImpl nounPhraseProcesser;
     private RecommendedNegativeRelationshipFactoryImpl negativeRelationshipfactory;
     private VerbExistanceProcessor verbExistanceProcessor;
     private IterationRuleProcesser iterationRuleProcesser;
     private DistinctTokenRelationshipDeterminer distinctTokenRelationshipDeterminer;
-    private AdditionalExistenceEdgeProcesser additionalExistenceEdgeProcesser;
+    private AdditionalExistenceEdgeProcessor additionalExistenceEdgeProcessor;
     private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor;
-    private DynamicEdgeCreationProcesser dynamicEdgeCreationProcesser;
+    private DynamicEdgeCreationProcessor dynamicEdgeCreationProcesser;
 
     public SentenceDiscoveryProcessorImpl() {
         sentenceFactory = new SentenceFactory();
         ngramProcessor = new NGramsSentenceProcessorImpl();
         partOfSpeechAnnotator = new PartOfSpeechAnnotatorImpl();
         stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
-        sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
+        measurementProcessor = new MeasurementProcessorImpl();
         wordEmbeddingProcessor = new WordEmbeddingProcesseorImpl();
         verbProcessor = new VerbProcessorImpl();
-        nounPhraseProcesser = new RecommendedNounPhraseProcesserImpl();
+        nounPhraseProcesser = new RecommendedNounPhraseProcessorImpl();
         new RecommandedSubjectAnnotatorImpl();
         negativeRelationshipfactory = new RecommendedNegativeRelationshipFactoryImpl();
         verbExistanceProcessor = new VerbExistanceProcessorImpl();
         iterationRuleProcesser = new IterationRuleProcesser();
         distinctTokenRelationshipDeterminer = new DistinctTokenRelationshipDeterminerImpl();
-        additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
+        additionalExistenceEdgeProcessor = new AdditionalExistenceEdgeProcessorImpl();
         negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
-        dynamicEdgeCreationProcesser = new DynamicEdgeCreationProcesserImpl();
+        dynamicEdgeCreationProcesser = new DynamicEdgeCreationProcessorImpl();
     }
 
     public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput) {
@@ -78,7 +78,6 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(), this.sentenceProcessingMetaDataInput.getSemanticTypes());
             sentence.setTokenRelationships(new ArrayList<>());
             tokens = partOfSpeechAnnotator.annotate(tokens, this.sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
-            tokens = sentenceMeasureNormalizer.Normalize(tokens, request.isConvertMeasurements());
             tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
             tokens = filterTokens(tokens);
             List<RecommendedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
@@ -93,9 +92,10 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
             List<RecommendedTokenRelationship> edges = nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(), this.sentenceProcessingMetaDataInput.getNounRelationshipsInput()); //should always be last
             dynamicEdgeCreationProcesser.processDiscovery(this.sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), discovery);
+            measurementProcessor.process(tokens, request.isConvertMeasurements());
             edges = distinctTokenRelationshipDeterminer.getDistinctRecommendedRelationships(edges);
             discovery.setWordEmbeddings(edges);
-            RecommendedTokenRelationship relationship = additionalExistenceEdgeProcesser.processDiscovery(discovery);
+            RecommendedTokenRelationship relationship = additionalExistenceEdgeProcessor.processDiscovery(discovery);
             if (relationship != null)
                 discovery.getWordEmbeddings().add(relationship);
             discoveries.add(discovery);

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
+import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcessor;
 import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
-import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcesser;
+import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcessor;
 import com.mst.interfaces.sentenceprocessing.ExistenceToExistenceNoConverter;
 import com.mst.interfaces.sentenceprocessing.NegationTokenRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.NgramsSentenceProcessor;
@@ -15,14 +15,14 @@ import com.mst.interfaces.sentenceprocessing.PrepPhraseRelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.PrepositionPhraseProcessor;
 import com.mst.interfaces.sentenceprocessing.RelationshipProcessor;
 import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
-import com.mst.interfaces.sentenceprocessing.SentenceMeasureNormalizer;
+import com.mst.interfaces.sentenceprocessing.MeasurementProcessor;
 import com.mst.interfaces.sentenceprocessing.SentenceProcessingController;
 import com.mst.interfaces.sentenceprocessing.VerbExistanceProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbPhraseProcessor;
 import com.mst.interfaces.sentenceprocessing.VerbProcessor;
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.requests.SentenceTextRequest;
-import com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcesserImpl;
+import com.mst.model.sentenceProcessing.AdditionalExistenceEdgeProcessorImpl;
 import com.mst.model.sentenceProcessing.FailedSentence;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingFailures;
@@ -36,37 +36,37 @@ public class SentenceProcessingControllerImpl implements SentenceProcessingContr
     private PrepositionPhraseProcessor prepPhraseProcessor;
     private PartOfSpeechAnnotator partOfSpeechAnnotator;
     private SemanticTypeSentenceAnnotator stAnnotator;
-    private RelationshipProcessor nounrelationshipProcessor;
+    private RelationshipProcessor nounRelationshipProcessor;
     private PrepPhraseRelationshipProcessor prepRelationshipProcessor;
     private VerbPhraseProcessor verbPhraseProcessor;
     private VerbProcessor verbProcessor;
     private SentenceFactory sentenceFactory;
-    private SentenceMeasureNormalizer sentenceMeasureNormalizer;
+    private MeasurementProcessor measurementProcessor;
     private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor;
     private VerbExistanceProcessor verbExistanceProcessor;
-    private AdditionalExistenceEdgeProcesser additionalExistenceEdgeProcesser;
+    private AdditionalExistenceEdgeProcessor additionalExistenceEdgeProcessor;
     private SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput;
     private ExistenceToExistenceNoConverter existenceToExistenceNoConverter;
     private DistinctTokenRelationshipDeterminer distinctTokenRelationshipDeterminer;
-    private DynamicEdgeCreationProcesser dynamicEdgeCreationProcesser;
+    private DynamicEdgeCreationProcessor dynamicEdgeCreationProcessor;
 
     public SentenceProcessingControllerImpl() {
         ngramProcessor = new NGramsSentenceProcessorImpl();
         prepPhraseProcessor = new PrepositionPhraseProcessorImpl();
         partOfSpeechAnnotator = new PartOfSpeechAnnotatorImpl();
         stAnnotator = new SemanticTypeSentenceAnnotatorImpl();
-        nounrelationshipProcessor = new NounRelationshipProcessor();
+        nounRelationshipProcessor = new NounRelationshipProcessor();
         prepRelationshipProcessor = new PrepPhraseRelationshipProcessorImpl();
         verbPhraseProcessor = new VerbPhraseProcessorImpl();
         verbProcessor = new VerbProcessorImpl();
         sentenceFactory = new SentenceFactory();
-        sentenceMeasureNormalizer = new SentenceMeasureNormalizerImpl();
+        measurementProcessor = new MeasurementProcessorImpl();
         negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
         verbExistanceProcessor = new VerbExistanceProcessorImpl();
-        additionalExistenceEdgeProcesser = new AdditionalExistenceEdgeProcesserImpl();
+        additionalExistenceEdgeProcessor = new AdditionalExistenceEdgeProcessorImpl();
         existenceToExistenceNoConverter = new ExistenceToExistenceNoConverterImpl();
         distinctTokenRelationshipDeterminer = new DistinctTokenRelationshipDeterminerImpl();
-        dynamicEdgeCreationProcesser = new DynamicEdgeCreationProcesserImpl();
+        dynamicEdgeCreationProcessor = new DynamicEdgeCreationProcessorImpl();
     }
 
     public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput) {
@@ -75,7 +75,7 @@ public class SentenceProcessingControllerImpl implements SentenceProcessingContr
 
     public List<Sentence> processSentences(SentenceRequest request) throws Exception {
         List<Sentence> sentences = new ArrayList<>();
-        for (String sentenceText : request.getSenteceTexts()) {
+        for (String sentenceText : request.getSentenceTexts()) {
             Sentence sentence = sentenceFactory.getSentence(sentenceText, request.getStudy(), request.getPractice(), request.getSource());
             sentence = processSentence(sentence, request.isConvertMeasurements());
             sentences.add(sentence);
@@ -87,9 +87,13 @@ public class SentenceProcessingControllerImpl implements SentenceProcessingContr
         return processSentences(sentences, true);
     }
 
+    public SentenceProcessingResult processText(SentenceTextRequest request) {
+        List<Sentence> sentences = sentenceFactory.getSentences(request.getText(), request.getStudy(), request.getPractice(), request.getSource());
+        return processSentences(sentences, request.isConvertMeasurements());
+    }
+
     private SentenceProcessingResult processSentences(List<Sentence> sentences, boolean isConvertMeasurements) {
         SentenceProcessingResult result = new SentenceProcessingResult();
-
         for (Sentence sentence : sentences) {
             try {
                 processSentence(sentence, isConvertMeasurements);
@@ -108,32 +112,27 @@ public class SentenceProcessingControllerImpl implements SentenceProcessingContr
         return result;
     }
 
-    public SentenceProcessingResult processText(SentenceTextRequest request) {
-        List<Sentence> sentences = sentenceFactory.getSentences(request.getText(), request.getStudy(), request.getPractice(), request.getSource());
-        return processSentences(sentences, request.isConvertMeasurements());
-    }
-
     private Sentence processSentence(Sentence sentence, boolean isConvertMeasurements) throws Exception {
-        sentence = ngramProcessor.process(sentence, this.sentenceProcessingMetaDataInput.getNgramsInput());
-        List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(), this.sentenceProcessingMetaDataInput.getSemanticTypes());
-        sentence.setTokenRelationships(new ArrayList<>());
-        tokens = partOfSpeechAnnotator.annotate(tokens, this.sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
-        tokens = sentenceMeasureNormalizer.Normalize(tokens, isConvertMeasurements);
-        tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
-        sentence.getTokenRelationships().addAll(nounrelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
-        tokens = prepPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseProcessingInput());
-        sentence.getTokenRelationships().addAll(prepRelationshipProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
-        tokens = verbPhraseProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbPhraseInput());
+        sentence = ngramProcessor.process(sentence, sentenceProcessingMetaDataInput.getNgramsInput());
+        List<WordToken> tokens = stAnnotator.annotate(sentence.getModifiedWordList(), sentenceProcessingMetaDataInput.getSemanticTypes());
+        tokens = partOfSpeechAnnotator.annotate(tokens, sentenceProcessingMetaDataInput.getPartOfSpeechAnnotatorEntity());
+        tokens = verbProcessor.process(tokens, sentenceProcessingMetaDataInput.getVerbProcessingInput());
+        sentence.getTokenRelationships().addAll(nounRelationshipProcessor.process(tokens, sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
+        tokens = prepPhraseProcessor.process(tokens, sentenceProcessingMetaDataInput.getPhraseProcessingInput());
+        sentence.getTokenRelationships().addAll(prepRelationshipProcessor.process(tokens, sentenceProcessingMetaDataInput.getPhraseRelationshipMappings()));
+        tokens = verbPhraseProcessor.process(tokens, sentenceProcessingMetaDataInput.getVerbPhraseInput());
         List<TokenRelationship> negationRelationships = negationTokenRelationshipProcessor.process(tokens);
         sentence.getTokenRelationships().addAll(negationRelationships);
         sentence.getTokenRelationships().addAll(verbExistanceProcessor.process(sentence));
-        TokenRelationship additionalExistence = additionalExistenceEdgeProcesser.process(sentence);
+        TokenRelationship additionalExistence = additionalExistenceEdgeProcessor.process(sentence);
         if (additionalExistence != null)
             sentence.getTokenRelationships().add(additionalExistence);
         sentence.setTokenRelationships(existenceToExistenceNoConverter.convertExistenceNo(negationRelationships, sentence.getTokenRelationships()));
         List<WordToken> modified = sentence.getModifiedWordList();
         Map<String, List<TokenRelationship>> map = sentence.getTokenRelationsByNameMap();
-        sentence.getTokenRelationships().addAll(dynamicEdgeCreationProcesser.process(this.sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), map, modified));
+        sentence.getTokenRelationships().addAll(dynamicEdgeCreationProcessor.process(sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), map, modified));
+        List<TokenRelationship> measurementRelationships = measurementProcessor.process(tokens, isConvertMeasurements);
+        sentence.getTokenRelationships().addAll(measurementRelationships);
         sentence.setModifiedWordList(tokens);
         List<TokenRelationship> distinctTokenRelations = distinctTokenRelationshipDeterminer.getDistinctTokenRelationships(sentence);
         sentence.setTokenRelationships(distinctTokenRelations);

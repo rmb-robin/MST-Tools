@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 
 import com.mst.model.metadataTypes.PartOfSpeachTypes;
 
-public class TokenRelationship {
+public class TokenRelationship implements Comparable<TokenRelationship> {
     private String edgeName;
     private String descriptor;
     private String frameName;
@@ -154,5 +154,10 @@ public class TokenRelationship {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    @Override
+    public int compareTo(TokenRelationship tokenRelationship) {
+        return Double.compare(Double.parseDouble(this.getFromToken().getToken()), Double.parseDouble(tokenRelationship.getFromToken().getToken()));
     }
 }

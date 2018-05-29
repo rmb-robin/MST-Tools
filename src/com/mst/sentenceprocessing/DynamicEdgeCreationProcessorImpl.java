@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 
-import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcesser;
+import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcessor;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
@@ -17,17 +17,20 @@ import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.util.RecommandedTokenRelationshipUtil;
 import com.mst.util.TokenRelationshipUtil;
 
-public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProcesser {
+import static com.mst.model.metadataTypes.Descriptor.X_AXIS;
+import static com.mst.model.metadataTypes.EdgeNames.measurement;
+import static com.mst.model.metadataTypes.SemanticTypes.DYSN;
+
+public class DynamicEdgeCreationProcessorImpl implements DynamicEdgeCreationProcessor {
     private TokenRelationshipFactory tokenRelationshipFactory;
 
-    public DynamicEdgeCreationProcesserImpl() {
+    public DynamicEdgeCreationProcessorImpl() {
         tokenRelationshipFactory = new TokenRelationshipFactoryImpl();
     }
 
     public List<TokenRelationship> process(List<DynamicEdgeCreationRule> rules, Map<String, List<TokenRelationship>> map, List<WordToken> modifiedWords) {
         // TODO Auto-generated method stub
         List<TokenRelationship> results = new ArrayList<>();
-
         for (DynamicEdgeCreationRule rule : rules) {
             if (isRuleValid(rule, map, modifiedWords)) {
                 TokenRelationship relationship = create(rule, map, modifiedWords);
@@ -46,7 +49,6 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
         List<WordToken> modifiedWords = sentence.getModifiedWordList();
         List<TokenRelationship> relationshipsToAdd = this.process(rules, map, modifiedWords);
         List<RecommendedTokenRelationship> result = new ArrayList<>();
-
         for (TokenRelationship r : relationshipsToAdd) {
             RecommendedTokenRelationship recommended = this.tokenRelationshipFactory.createRecommendedRelationshipFromTokenRelationship(r);
             recommended.getTokenRelationship().setNamedEdge(recommended.getTokenRelationship().getEdgeName());
@@ -99,7 +101,7 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
             return true;
         for (String edgeName : condition.getEdgeNames()) {
             if (map.containsKey(edgeName)) {
-                if (isTokenRelationshipmatch(map.get(edgeName), condition))
+                if (isTokenRelationshipMatch(map.get(edgeName), condition))
                     return true;
             }
         }
@@ -114,10 +116,9 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
         return false;
     }
 
-    private boolean isTokenRelationshipmatch(List<TokenRelationship> tokenRelationships, DynamicEdgeCondition condition) {
+    private boolean isTokenRelationshipMatch(List<TokenRelationship> tokenRelationships, DynamicEdgeCondition condition) {
         if (condition.getToTokens().isEmpty() && condition.getFromTokens().isEmpty())
             return true;
-
         for (TokenRelationship tokenRelationship : tokenRelationships) {
             if (!condition.getFromTokens().isEmpty()) {
                 if (areTokensMatch(condition.getIsFromTokenSemanticType(), condition.getIsFromTokenPOSType(), tokenRelationship.getFromToken(), condition.getFromTokens()))
@@ -139,21 +140,20 @@ public class DynamicEdgeCreationProcesserImpl implements DynamicEdgeCreationProc
             if (from == null)
                 return null;
         }
-
         for (WordToken token : modifiedWords) {
-            if (from == null && isTokenAMatch(rule.isFromTokenSementicType(), false, token, rule.getFromToken())) {
+            if (from == null && isTokenAMatch(rule.isFromTokenSemanticType(), false, token, rule.getFromToken())) {
                 from = token;
                 continue;
             }
-            if (to == null && isTokenAMatch(rule.isToTokenSementicType(), false, token, rule.getToToken()))
+            if (to == null && isTokenAMatch(rule.isToTokenSemanticType(), false, token, rule.getToToken()))
                 to = token;
         }
-
         if (from == null)
             return null;
         if (to == null)
             return null;
-        return tokenRelationshipFactory.create(rule.getEdgeName(), null, EdgeTypes.related, from, to, this.getClass().getName());
+        String descriptor = (rule.getEdgeName().equals(measurement) && from.getSemanticType().equals(DYSN) && to.getToken().equals("cm")) ? X_AXIS : null;
+        return tokenRelationshipFactory.create(rule.getEdgeName(), descriptor, EdgeTypes.related, from, to, this.getClass().getName());
     }
 
     private WordToken getFromTokenFromEdgesNames(List<String> edgeNames, Map<String, List<TokenRelationship>> map) {

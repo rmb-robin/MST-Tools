@@ -4,6 +4,8 @@ import com.mst.dao.BaseDocumentDaoImpl;
 import com.mst.model.SentenceQuery.SentenceQueryInput;
 import org.mongodb.morphia.query.Query;
 
+import java.util.List;
+
 public class SentenceQueryInputDao extends BaseDocumentDaoImpl<SentenceQueryInput> {
     public SentenceQueryInputDao(Class<SentenceQueryInput> entityClass) {
         super(entityClass);
@@ -13,10 +15,9 @@ public class SentenceQueryInputDao extends BaseDocumentDaoImpl<SentenceQueryInpu
         super.save(input);
     }
 
-    public SentenceQueryInput getInput(String orgId) {
+    public List<SentenceQueryInput> getInput(String orgId) {
         Query<SentenceQueryInput> query = this.getDatastore().createQuery(SentenceQueryInput.class);
         query.field("organizationId").equal(orgId);
-        query.field("debug").equal(true);
-        return query.get();
+        return query.asList();
     }
 }

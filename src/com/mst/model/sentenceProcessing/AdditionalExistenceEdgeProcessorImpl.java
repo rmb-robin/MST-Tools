@@ -2,7 +2,7 @@ package com.mst.model.sentenceProcessing;
 
 import java.util.List;
 
-import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcesser;
+import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcessor;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeTypes;
@@ -12,23 +12,23 @@ import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.sentenceprocessing.TokenRelationshipFactoryImpl;
 import com.mst.util.RecommandedTokenRelationshipUtil;
 
-public class AdditionalExistenceEdgeProcesserImpl implements AdditionalExistenceEdgeProcesser {
+public class AdditionalExistenceEdgeProcessorImpl implements AdditionalExistenceEdgeProcessor {
     private TokenRelationshipFactory tokenRelationshipFactory;
 
-    public AdditionalExistenceEdgeProcesserImpl() {
+    public AdditionalExistenceEdgeProcessorImpl() {
         tokenRelationshipFactory = new TokenRelationshipFactoryImpl();
     }
 
     public TokenRelationship process(Sentence sentence) {
         if (sentence.getTokenRelationships() == null || sentence.getTokenRelationships().isEmpty())
             return null;
-        WordToken dysnToken = sentence.getTokenBySemanticType(SemanticTypes.dysn);
+        WordToken dysnToken = sentence.getTokenBySemanticType(SemanticTypes.DYSN);
         return createRelationship(sentence.getTokenRelationships(), dysnToken, false);
     }
 
     @Override
     public RecommendedTokenRelationship processDiscovery(SentenceDiscovery discovery) {
-        WordToken dysnToken = discovery.getTokenBySemanticType(SemanticTypes.dysn);
+        WordToken dysnToken = discovery.getTokenBySemanticType(SemanticTypes.DYSN);
         List<TokenRelationship> relationships = RecommandedTokenRelationshipUtil.getTokenRelationshipsFromRecommendedTokenRelationships(discovery.getWordEmbeddings());
         TokenRelationship relationship = createRelationship(relationships, dysnToken, true);
         if (relationship == null)
