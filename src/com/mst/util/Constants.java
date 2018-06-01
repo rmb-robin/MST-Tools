@@ -162,6 +162,7 @@ public class Constants {
 	public static final Pattern SINGLE_DIMENSION_MEASUREMENT_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*(mm|cm)+");
     public static final Pattern CARDINAL_NUMBER_REGEX = Pattern.compile("\\.?\\d+\\.?\\d*");
 	public static final Pattern UNIT_OF_MEASURE_REGEX = Pattern.compile("(mm|cm)");
+	public static final Pattern MEASUREMENT_DELIMITER_REGEX = Pattern.compile("\\s*[x|X]\\s");
 
 	public static final Pattern SALUTATION_REGEX = Pattern.compile("Dr\\.|Mr\\.|Ms\\.|Mrs\\.");
 	

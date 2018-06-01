@@ -1,9 +1,6 @@
 package com.mst.sentenceprocessing;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 import com.mst.interfaces.sentenceprocessing.MeasurementProcessor;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -11,17 +8,30 @@ import com.mst.model.sentenceProcessing.WordToken;
 
 import static com.mst.model.metadataTypes.Descriptor.*;
 import static com.mst.model.metadataTypes.EdgeNames.*;
+import static com.mst.model.metadataTypes.MeasurementAnnotations.*;
 import static com.mst.model.metadataTypes.PropertyValueTypes.NA;
 import static com.mst.model.metadataTypes.SemanticTypes.*;
 import static com.mst.util.Constants.*;
 
 public class MeasurementProcessorImpl implements MeasurementProcessor {
+    private Map<String, Annotation> annotationsFound;
 
     public List<TokenRelationship> process(List<WordToken> wordTokens, boolean convertMillimeter) {
+        processAnnotations(wordTokens);
         addMeasurements(wordTokens);
         if (convertMillimeter)
             convertMMtoCM(wordTokens);
         return createTokenRelationships(wordTokens);
+    }
+
+    private class Annotation {
+        public String value;
+        public int position;
+
+        Annotation(String value, int position) {
+            this.value = value;
+            this.position = position;
+        }
     }
 
     private List<TokenRelationship> createTokenRelationships(List<WordToken> words) {
@@ -33,11 +43,11 @@ public class MeasurementProcessorImpl implements MeasurementProcessor {
         for (WordToken word : words) {
             String semanticType = word.getSemanticType();
             String descriptor = word.getDescriptor();
-            if (descriptor != null && descriptor.equals(X_AXIS))
+            if (descriptor != null && (descriptor.equals(X_AXIS) || descriptor.equals(LENGTH) || descriptor.equals(SHORT_AXIS) || descriptor.equals(LONG_AXIS)))
                 xAxis = word;
-            else if (descriptor != null && descriptor.equals(Y_AXIS))
+            else if (descriptor != null && (descriptor.equals(Y_AXIS) || descriptor.equals(TRANSVERSE) || descriptor.equals(SHORT_AXIS) || descriptor.equals(LONG_AXIS)))
                 yAxis = word;
-            else if (descriptor != null && descriptor.equals(Z_AXIS))
+            else if (descriptor != null && (descriptor.equals(Z_AXIS) || descriptor.equals(AP) || descriptor.equals(SHORT_AXIS) || descriptor.equals(LONG_AXIS)))
                 zAxis = word;
             else if (semanticType != null && semanticType.equals(UNIT_OF_MEASURE))
                 uom = word;
@@ -49,6 +59,54 @@ public class MeasurementProcessorImpl implements MeasurementProcessor {
         if (zAxis != null && uom != null)
             addRelationships(zAxis, uom, newRelationships);
         return newRelationships;
+    }
+
+    private void processAnnotations(List<WordToken> words) {
+        annotationsFound = new LinkedHashMap<>();
+        Map<String, List<String>> entries = getAnnotations();
+        int index = 0;
+        ListIterator<WordToken> itr = words.listIterator();
+        while (itr.hasNext()) {
+            WordToken word = itr.next();
+            while (index > 0) {
+                word = itr.next();
+                index--;
+            }
+            String token = word.getToken().toLowerCase();
+            boolean match = false;
+            for (Map.Entry<String, List<String>> entry : entries.entrySet()) {
+                if (match)
+                    break;
+                List<String> annotations = entry.getValue();
+                for (String annotation : annotations) {
+                    if (match)
+                        break;
+                    String[] annotationWords = annotation.split("\\s");
+                    if (annotationWords.length > 1 && annotationWords[0].equals(token)) {
+                        match = true;
+                        while (index < annotationWords.length) {
+                            if (itr.nextIndex() + index < words.size()) {
+                                token = words.get(itr.nextIndex() + index).getToken();
+                            }
+                            index++;
+                            if (!annotationWords[index].equals(token)) {
+                                match = false;
+                                break;
+                            }
+                            else if (index == annotationWords.length - 1) {
+                                annotationsFound.put(entry.getKey(), new Annotation(annotation, word.getPosition()));
+                                break;
+                            }
+                        }
+                    }
+                    else if (annotation.equals(token)) {
+                        annotationsFound.put(entry.getKey(), new Annotation(annotation, word.getPosition()));
+                        match = true;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     private void addRelationships(WordToken axis, WordToken uom, List<TokenRelationship> relationships) {
@@ -71,42 +129,40 @@ public class MeasurementProcessorImpl implements MeasurementProcessor {
     private void addMeasurements(List<WordToken> words) {
         int uomIndex = 0;
         boolean measurementsTokenized = false;
+        int measurementIndex = 0;
         ListIterator<WordToken> itr = words.listIterator();
         while (itr.hasNext()) {
             WordToken word = itr.next();
-            if (CARDINAL_NUMBER_REGEX.matcher(word.getToken()).matches() && itr.nextIndex() < words.size() - 1) {
+            String descriptor;
+            if (CARDINAL_NUMBER_REGEX.matcher(word.getToken()).matches() && itr.nextIndex() < words.size()) {
                 WordToken nextWord = words.get(itr.nextIndex());
-                if (UNIT_OF_MEASURE_REGEX.matcher(nextWord.getToken()).matches()) {
+                if (UNIT_OF_MEASURE_REGEX.matcher(nextWord.getToken()).matches() || MEASUREMENT_DELIMITER_REGEX.matcher(nextWord.getToken()).matches()) {
                     word.setSemanticType(CARDINAL_NUMBER);
-                    word.setDescriptor(X_AXIS);
+                    descriptor = getDescriptor(measurementIndex, word.getPosition());
+                    word.setDescriptor(descriptor);
                     word.setPropertyValueType(NA);
                     word.setSubjectSetFromWildCard(false);
                     nextWord.setSemanticType(UNIT_OF_MEASURE);
                     nextWord.setPropertyValueType(NA);
                     nextWord.setSubjectSetFromWildCard(false);
+                    measurementIndex++;
                 }
             } else if (MULTIDIMENSIONAL_MEASUREMENT_REGEX.matcher(word.getToken()).matches()) {
                 String[] dimensions = word.getToken().split("x");
                 uomIndex = word.getPosition() + dimensions.length;
                 if (dimensions.length > 1) {
                     itr.remove();
+                    int startingIndex = measurementIndex;
                     for (String dimension : dimensions) {
-                        int index = Arrays.asList(dimensions).indexOf(dimension);
+                        int index = startingIndex + Arrays.asList(dimensions).indexOf(dimension);
                         WordToken newWord = new WordToken();
                         newWord.setToken(dimension);
                         newWord.setSemanticType(CARDINAL_NUMBER);
                         newWord.setPosition(word.getPosition() + index);
-                        switch (index) {
-                            case 0:
-                                newWord.setDescriptor(X_AXIS);
-                                break;
-                            case 1:
-                                newWord.setDescriptor(Y_AXIS);
-                                break;
-                            case 2:
-                                newWord.setDescriptor(Z_AXIS);
-                        }
+                        descriptor = getDescriptor(index, word.getPosition() + index);
+                        newWord.setDescriptor(descriptor);
                         itr.add(newWord);
+                        measurementIndex++;
                     }
                 }
                 measurementsTokenized = true;
@@ -120,15 +176,41 @@ public class MeasurementProcessorImpl implements MeasurementProcessor {
                 newWord.setToken(measurement[0]);
                 newWord.setSemanticType(CARDINAL_NUMBER);
                 newWord.setPosition(word.getPosition());
-                newWord.setDescriptor(X_AXIS);
+                descriptor = getDescriptor(measurementIndex, word.getPosition());
+                newWord.setDescriptor(descriptor);
                 itr.add(newWord);
                 newWord = new WordToken();
                 newWord.setToken(unit[1]);
                 newWord.setSemanticType(UNIT_OF_MEASURE);
                 newWord.setPosition(word.getPosition() + 1);
                 itr.add(newWord);
+                measurementIndex++;
             }
         }
+    }
+
+    private String getDescriptor(int measurementIndex, int measurementPosition) {
+        if (annotationsFound.size() == 0)
+            switch (measurementIndex) {
+                case 0:
+                    return X_AXIS;
+                case 1:
+                    return Y_AXIS;
+                case 2:
+                    return Z_AXIS;
+            }
+        else {
+            Set<Map.Entry<String, Annotation>> mapSet = annotationsFound.entrySet();
+            @SuppressWarnings (value="unchecked")
+            Map.Entry<String, Annotation> element = (Map.Entry<String, Annotation>) mapSet.toArray()[measurementIndex];
+            int annotationPosition = element.getValue().position;
+            if (annotationPosition < measurementPosition || annotationPosition - measurementPosition <= 2) {
+                return element.getKey();
+            }
+            else if (annotationsFound.size() == 3)
+                return element.getKey();
+        }
+        return null;
     }
 
     private void convertMMtoCM(List<WordToken> words) {
