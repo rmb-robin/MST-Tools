@@ -41,7 +41,7 @@ public class SentenceFilterImpl implements SentenceFilter {
 
 		for(EdgeQuery edgeQuery: edgeQueries){
 			
-			if(edgeQuery.getName().equals(WordEmbeddingTypes.defaultEdge) && edgeQuery.getValues().isEmpty()){
+			if(edgeQuery.getName().equals(WordEmbeddingTypes.tokenToken) && edgeQuery.getValues().isEmpty()){
 				edgeQuery.getValues().add(searchToken);
 			}
 			

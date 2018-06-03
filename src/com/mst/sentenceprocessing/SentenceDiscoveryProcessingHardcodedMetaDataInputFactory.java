@@ -45,18 +45,18 @@ public class SentenceDiscoveryProcessingHardcodedMetaDataInputFactory implements
 	private List<IterationDataRule> getLeftRules(){
 		List<IterationDataRule> rules = new ArrayList<>();
 	
-		rules.add(createRuleWithSameStartEnd(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.secondVerb, 10));
-		rules.add(createRuleWithStop(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.firstVerb, 20, WordEmbeddingTypes.defaultEdge));
-		rules.add(createRuleWithStop(WordEmbeddingTypes.secondVerb, WordEmbeddingTypes.secondPrep, 30, WordEmbeddingTypes.firstVerb));
+		rules.add(createRuleWithSameStartEnd(WordEmbeddingTypes.verbMinus, WordEmbeddingTypes.verbMinus, 10));
+		rules.add(createRuleWithStop(WordEmbeddingTypes.verbMinus, WordEmbeddingTypes.verbPlus, 20, WordEmbeddingTypes.tokenToken));
+		rules.add(createRuleWithStop(WordEmbeddingTypes.verbMinus, WordEmbeddingTypes.prepMinus, 30, WordEmbeddingTypes.verbPlus));
 		return rules;
 	}
 //	
 	private List<IterationDataRule> getRightRules(){
 		List<IterationDataRule> rules = new ArrayList<>();
-		rules.add(createRule(WordEmbeddingTypes.verbPrep, WordEmbeddingTypes.firstPrep, 5));	
-		rules.add(createRule(WordEmbeddingTypes.verbPrep, WordEmbeddingTypes.defaultEdge, 10, PropertyValueTypes.NounPhraseEnd));
-		rules.add(createRuleWithSameStartEnd(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.firstVerb, 20));
-		rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.defaultEdge, 30, PropertyValueTypes.NounPhraseEnd,WordEmbeddingTypes.secondVerb));
+		rules.add(createRule(WordEmbeddingTypes.verbPrep, WordEmbeddingTypes.prepPlus, 5));	
+		rules.add(createRule(WordEmbeddingTypes.verbPrep, WordEmbeddingTypes.tokenToken, 10, PropertyValueTypes.NounPhraseEnd));
+		rules.add(createRuleWithSameStartEnd(WordEmbeddingTypes.verbPlus, WordEmbeddingTypes.verbPlus, 20));
+		rules.add(createRule(WordEmbeddingTypes.verbPlus, WordEmbeddingTypes.tokenToken, 30, PropertyValueTypes.NounPhraseEnd,WordEmbeddingTypes.verbMinus));
 		//rules.add(createRule(WordEmbeddingTypes.firstVerb, WordEmbeddingTypes.secondVerb, 40));
 		return rules;
 	}

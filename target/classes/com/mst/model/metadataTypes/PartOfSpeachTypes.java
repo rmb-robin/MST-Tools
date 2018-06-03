@@ -8,6 +8,7 @@ public class PartOfSpeachTypes {
 	public final static String NEG = "NEG";
 	public final static String DET = "DET";
 	public final static String DP = "DP";
+	public final static String COMMA = ",";
 	
 	//	
 //	IN, 

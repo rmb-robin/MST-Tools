@@ -36,13 +36,13 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 			//left.
 			if(fromToken.equals(left))
 			{
-				if(edgeName.equals(WordEmbeddingTypes.firstVerb) 
+				if(edgeName.equals(WordEmbeddingTypes.verbPlus) 
 						&& isLeftMatchVerb(fromToken,sentenceDiscovery.getWordEmbeddings(), i+1, true)){
 					if(!includeOnTokenTokenRight(sentenceDiscovery.getWordEmbeddings(),i+1)) return false;
 					return true;
 				}
 				
-				if(edgeName.equals(WordEmbeddingTypes.defaultEdge) && 
+				if(edgeName.equals(WordEmbeddingTypes.tokenToken) && 
 			       isLeftMatchVerb(fromToken,sentenceDiscovery.getWordEmbeddings(), i+1, false)){
 					if(!includeOnTokenTokenLeft(sentenceDiscovery.getWordEmbeddings(),i-1)) return false;
 					return true;
@@ -50,7 +50,7 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 			}
 		
 			//right.
-			if(toToken.equals(right) && edgeName.equals(WordEmbeddingTypes.defaultEdge) 
+			if(toToken.equals(right) && edgeName.equals(WordEmbeddingTypes.tokenToken) 
 					&& isRightMatchVerb(toToken,sentenceDiscovery.getWordEmbeddings(), i+1)){
 				
 				if(!includeOnTokenTokenRight(sentenceDiscovery.getWordEmbeddings(),i+1)) return false;
@@ -71,7 +71,7 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 
 	private boolean isRightMatchOnToAndFromToken(String edgeName, String toToken, String fromToken, String right){
 		if(right.equals(toToken)){
-			if(edgeName.equals(WordEmbeddingTypes.firstVerb)) return true;
+			if(edgeName.equals(WordEmbeddingTypes.verbPlus)) return true;
 			if(edgeName.equals(WordEmbeddingTypes.bothVerbs)) return true;
 		}
 		
@@ -96,11 +96,11 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 			
 			if(isFirst){
 				
-				if(edgeName.equals(WordEmbeddingTypes.secondVerb) || edgeName.equals(WordEmbeddingTypes.bothVerbs)) return true;
+				if(edgeName.equals(WordEmbeddingTypes.verbMinus) || edgeName.equals(WordEmbeddingTypes.bothVerbs)) return true;
 			}
 			else 
 			{
-				if(edgeName.equals(WordEmbeddingTypes.firstVerb)) return true;
+				if(edgeName.equals(WordEmbeddingTypes.verbPlus)) return true;
 				
 			}
 	
@@ -114,7 +114,7 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
 			if(!recommandedTokenRelationship.getTokenRelationship().getFromToken().getToken().equals(toToken))continue;
-			if(edgeName.equals(WordEmbeddingTypes.secondVerb)) return true;
+			if(edgeName.equals(WordEmbeddingTypes.verbMinus)) return true;
 		}
 		return false;
 	}
@@ -124,7 +124,7 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 		for(int i = 0;i<wordEmbeddings.size();i++){
 			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
-			if(!edgeName.equals(WordEmbeddingTypes.defaultEdge))continue;
+			if(!edgeName.equals(WordEmbeddingTypes.tokenToken))continue;
 			return true;
 		}
 		return false;
@@ -135,7 +135,7 @@ public class SentenceDiscoveryFilterImpl implements SentenceDiscoveryFilter {
 		for(int i = wordEmbeddings.size()-1;i>=0;i--){
 			RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
 			String edgeName = getEdgeName(recommandedTokenRelationship);
-			if(!edgeName.equals(WordEmbeddingTypes.defaultEdge))continue;
+			if(!edgeName.equals(WordEmbeddingTypes.tokenToken))continue;
 			return true;
 		}
 		return false;

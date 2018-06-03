@@ -45,7 +45,7 @@ public class RecommendedNegativeRelationshipFactoryImpl {
 				return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.verbMinusNeg, EdgeTypes.related, wordTokens.get(index),nextWordToken,sourceName);
 			}
 			
-			return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.negativeToken, EdgeTypes.related, wordTokens.get(index),nextWordToken,sourceName);
+			return relationshipFactory.createRecommendedRelationship(WordEmbeddingTypes.negationToken, EdgeTypes.related, wordTokens.get(index),nextWordToken,sourceName);
 		}
 		return null;
 			

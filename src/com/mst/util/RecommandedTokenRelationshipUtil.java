@@ -86,14 +86,14 @@ public class RecommandedTokenRelationshipUtil {
     	for(RecommendedTokenRelationship relationship: relationships){
     		String edgeName = relationship.getTokenRelationship().getEdgeName();
     		if(edgeName.equals(WordEmbeddingTypes.bothVerbs)) return true;
-    		if(edgeName.equals(WordEmbeddingTypes.firstVerb)) return true;
-    		if(edgeName.equals(WordEmbeddingTypes.secondVerb)) return true;  		
+    		if(edgeName.equals(WordEmbeddingTypes.verbPlus)) return true;
+    		if(edgeName.equals(WordEmbeddingTypes.verbMinus)) return true;  		
     	}
     	return false;  
     }
 	
     public static boolean isDefault(RecommendedTokenRelationship edge){
-		return edge.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge);
+		return edge.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.tokenToken);
 	}
     
 
