@@ -49,10 +49,11 @@ public class SentenceFilterImpl implements SentenceFilter {
 
     public EdgeMatchOnQueryResult matchEdgesOnQuery(List<TokenRelationship> existingTokenRelationships, List<EdgeQuery> edgeQueries, String searchToken, String measurementClassification, List<BusinessRule> businessRules) {
         SecondLargestMeasurementProcessing secondLargestMeasurementProcessingRule = null;
-        for (BusinessRule businessRule : businessRules) {
-            if (businessRule instanceof SecondLargestMeasurementProcessing)
-                secondLargestMeasurementProcessingRule = (SecondLargestMeasurementProcessing) businessRule;
-        }
+        if (businessRules != null)
+            for (BusinessRule businessRule : businessRules) {
+                if (businessRule instanceof SecondLargestMeasurementProcessing)
+                    secondLargestMeasurementProcessingRule = (SecondLargestMeasurementProcessing) businessRule;
+            }
         EdgeMatchOnQueryResult result = new EdgeMatchOnQueryResult();
         Map<String, List<TokenRelationship>> namedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingTokenRelationships, true);
         Map<String, List<TokenRelationship>> notNamedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingTokenRelationships, false);
