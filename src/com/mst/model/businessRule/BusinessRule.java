@@ -14,7 +14,7 @@ public class BusinessRule {
     @JsonSerialize(using=ObjectIdJsonSerializer.class)
     private ObjectId id;
     public enum LogicalOperator {AND, OR, AND_NOT, OR_NOT}
-    public enum RuleType {MODIFY_SENTENCE_QUERY_INPUT, MODIFY_SENTENCE_QUERY_RESULT}
+    public enum RuleType {MODIFY_SENTENCE_QUERY_INPUT, MODIFY_SENTENCE_QUERY_RESULT, SENTENCE_PROCESSING}
     private String className;
     private String organizationId;
     private RuleType ruleType;

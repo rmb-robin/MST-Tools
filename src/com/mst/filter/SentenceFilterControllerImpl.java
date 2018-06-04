@@ -10,6 +10,7 @@ import com.mst.interfaces.filter.FriendOfFriendService;
 import com.mst.interfaces.filter.SentenceFilter;
 import com.mst.interfaces.filter.SentenceFilterController;
 import com.mst.model.SentenceQuery.*;
+import com.mst.model.businessRule.BusinessRule;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -37,12 +38,12 @@ public class SentenceFilterControllerImpl implements SentenceFilterController {
         return queryResults;
     }
 
-    public List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, String measurementClassification) {
+    public List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, String measurementClassification, List<BusinessRule> businessRules) {
         List<SentenceQueryResult> results = new ArrayList<>();
         for (SentenceDb sentenceDb : sentences) {
             try {
                 String id = sentenceDb.getId().toString();
-                if (processedSentences.contains(id) || shouldByPassResult(sentenceDb.getTokenRelationships(), edgeQuery, token, measurementClassification))
+                if (processedSentences.contains(id) || shouldByPassResult(sentenceDb.getTokenRelationships(), edgeQuery, token, measurementClassification, businessRules))
                     continue;
                 String oppositeToken;
                 TokenRelationship foundRelationship;
@@ -79,7 +80,7 @@ public class SentenceFilterControllerImpl implements SentenceFilterController {
         return results;
     }
 
-    public void filterForAnd(SentenceQueryInstance sentenceQueryInstance) {
+    public void filterForAnd(SentenceQueryInstance sentenceQueryInstance, List<BusinessRule> businessRules) {
         Map<String, EdgeQuery> edgeQueriesByName = convertEdgeQueryToDictionary(sentenceQueryInstance);
         HashSet<String> matchedIds = new HashSet<>();
         String measurementClassification = sentenceQueryInstance.getMeasurementClassification();
@@ -105,21 +106,21 @@ public class SentenceFilterControllerImpl implements SentenceFilterController {
             }
             if (!tokenMatch)
                 continue;
-            if (shouldByPassResult(entry.getValue().getTokenRelationships(), sentenceQueryInstance.getEdges(), matchedToken, measurementClassification))
+            if (shouldByPassResult(entry.getValue().getTokenRelationships(), sentenceQueryInstance.getEdges(), matchedToken, measurementClassification, businessRules))
                 continue;
             matchedIds.add(entry.getKey());
         }
         updateExistingResults(matchedIds);
     }
 
-    public void filterForAndNot(SentenceQueryInstance sentenceQueryInstance) {
+    public void filterForAndNot(SentenceQueryInstance sentenceQueryInstance, List<BusinessRule> businessRules) {
         HashSet<String> matchedIds = new HashSet<>();
         for (Map.Entry<String, SentenceDb> entry : cumulativeSentenceResults.entrySet()) {
             for (String token : sentenceQueryInstance.getTokens()) {  // do all tokens as this is not a db query impact
                 if (!entry.getValue().getOrigSentence().contains(token)) {
                     continue;
                 }
-                EdgeMatchOnQueryResult result = sentenceFilter.matchEdgesOnQuery(entry.getValue().getTokenRelationships(), sentenceQueryInstance.getEdges(), token, sentenceQueryInstance.getMeasurementClassification());
+                EdgeMatchOnQueryResult result = sentenceFilter.matchEdgesOnQuery(entry.getValue().getTokenRelationships(), sentenceQueryInstance.getEdges(), token, sentenceQueryInstance.getMeasurementClassification(), businessRules);
                 if (result.isMatch()) {
                     matchedIds.add(entry.getKey());
                     break;
@@ -196,8 +197,8 @@ public class SentenceFilterControllerImpl implements SentenceFilterController {
         }
     }
 
-    private boolean shouldByPassResult(List<TokenRelationship> existingTokenRelationships, List<EdgeQuery> edgeQueries, String token, String measurementClassification) {
-        EdgeMatchOnQueryResult edgeMatchOnQueryResult = sentenceFilter.matchEdgesOnQuery(existingTokenRelationships, edgeQueries, token, measurementClassification);
+    private boolean shouldByPassResult(List<TokenRelationship> existingTokenRelationships, List<EdgeQuery> edgeQueries, String token, String measurementClassification, List<BusinessRule> businessRules) {
+        EdgeMatchOnQueryResult edgeMatchOnQueryResult = sentenceFilter.matchEdgesOnQuery(existingTokenRelationships, edgeQueries, token, measurementClassification, businessRules);
         matches = edgeMatchOnQueryResult.getMatches();
         return !edgeMatchOnQueryResult.isMatch();
     }

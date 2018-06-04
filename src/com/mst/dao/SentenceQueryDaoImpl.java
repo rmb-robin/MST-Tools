@@ -3,6 +3,8 @@ package com.mst.dao;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.mst.interfaces.dao.BusinessRuleDao;
+import com.mst.model.businessRule.BusinessRule;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
@@ -30,13 +32,16 @@ import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.util.TokenRelationshipUtil;
 
+import static com.mst.model.businessRule.BusinessRule.RuleType.SENTENCE_PROCESSING;
 import static com.mst.model.metadataTypes.EdgeNames.measurement;
 
-
+//TODO replace deprecated calls
 public class SentenceQueryDaoImpl implements SentenceQueryDao {
     private MongoDatastoreProvider datastoreProvider;
     private SentenceFilterControllerImpl sentenceFilterController;
     private DiscreteDataDao discreteDataDao;
+    private BusinessRuleDao businessRuleDao;
+    private List<BusinessRule> businessRules;
 
     @Override
     public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
@@ -45,6 +50,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
 
     public List<SentenceQueryResult> getSentences(SentenceQueryInput input) {
         List<SentenceQueryResult> result = getSentences(input, null);
+        businessRules = businessRuleDao.get(input.getOrganizationId(), SENTENCE_PROCESSING);
         if (input.isFilterByTokenSequence()) {
             QueryBusinessRuleDaoImpl queryBusinessRuleDao = new QueryBusinessRuleDaoImpl();
             queryBusinessRuleDao.setMongoDatastoreProvider(datastoreProvider);
@@ -58,6 +64,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
     }
 
     public List<SentenceQueryResult> getSentences(SentenceQueryInput input, List<SentenceDb> sentences) {
+        //TODO pass business rules to sentenceFilterController
         sentenceFilterController = new SentenceFilterControllerImpl();
         Datastore datastore = datastoreProvider.getDefaultDb();
         boolean filterOnDiscreteData = false;
@@ -80,11 +87,11 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
                     sentenceFilterController.addSentencesToResult(processQueryInstance(sentenceQueryInstance, datastore, input.getOrganizationId(), discreteDataIds, filterOnDiscreteData, sentences));
                     break;
                 case "and":
-                    sentenceFilterController.filterForAnd(sentenceQueryInstance);
+                    sentenceFilterController.filterForAnd(sentenceQueryInstance, businessRules);
                     break;
                 case "andnot":
                 case "and not":
-                    sentenceFilterController.filterForAndNot(sentenceQueryInstance);
+                    sentenceFilterController.filterForAndNot(sentenceQueryInstance, businessRules);
                     break;
                 case "andnotall":
                     sentenceFilterController.filterForAndNotAll(sentenceQueryInstance);
@@ -133,6 +140,8 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
     private void init() {
         discreteDataDao = new DiscreteDataDaoImpl();
         discreteDataDao.setMongoDatastoreProvider(datastoreProvider);
+        businessRuleDao = new BusinessRuleDaoImpl(BusinessRule.class);
+        businessRuleDao.setMongoDatastoreProvider(datastoreProvider);
     }
 
     private List<DiscreteData> getDiscreteData(SentenceQueryInput input) {
@@ -140,6 +149,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
     }
 
     private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance, Datastore datastore, String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete, List<SentenceDb> passedSentences) {
+        //TODO send business rules to sentenceFilterController
         Map<String, EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
         edgeQueriesByName.remove(measurement); //NOTE dysn tokens no longer have a measurement edge
         SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();
@@ -156,7 +166,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
                 sentences = query.asList();
             } else
                 sentences = new ArrayList<>(filterForEdges(passedSentences, edgeQueriesByName));
-            List<SentenceQueryResult> queryResults = sentenceFilterController.getSentenceQueryResults(sentences, token, sentenceQueryInstance.getEdges(), measurementClassification);
+            List<SentenceQueryResult> queryResults = sentenceFilterController.getSentenceQueryResults(sentences, token, sentenceQueryInstance.getEdges(), measurementClassification, businessRules);
             result.getSentenceQueryResult().addAll(queryResults);
             result.getSentences().addAll(getMatchedSentences(queryResults, sentences));
         }
