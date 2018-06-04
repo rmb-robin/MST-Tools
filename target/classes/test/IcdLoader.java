@@ -35,19 +35,14 @@ public class IcdLoader {
 	
 		List<IcdTenSentenceInstance> instances = new ArrayList<>();
 		for(String line: lines){
-			//System.out.println("line: " + line);
-			//String[] vals = line.split(",");
 			String code = line.substring(0,line.indexOf(","));
 			String sentence = line.substring(line.indexOf(",")+1, line.length());
 			IcdTenSentenceInstance instance = new IcdTenSentenceInstance();
-			//System.out.println("IcdCode being set: " + code);
-			//System.out.println("sentence being set: " + sentence);
 			instance.setIcdCode(code);
 			instance.setSentence(sentence);
 			instances.add(instance);
-			System.out.println(instance);
 		}
-		request.setSentenceInstances(instances);
+		request.setInstances(instances);
 		return request;
 	}
 	

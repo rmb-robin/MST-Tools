@@ -1,5 +1,6 @@
 package com.mst.model.metadataTypes;
 
+//Rabhu Changed the WordEmbeddingTypes names on 05/28/2018. Original Ticket EC-384
 public class WordEmbeddingTypes {
 	public static String verbPlus = "verb+1";
 	public static String verbMinus = "verb-1";
@@ -18,7 +19,7 @@ public class WordEmbeddingTypes {
 
 	public static String subjectVerb = "subj-verb";
 	public static String subjectComplementVerb = "subjComp-Verb";
-	public static String commaMinus = "comma-1";
+	public static String commaMinus = "comma-1";	//Added by Rabhu on 06/03/2018
 	
 
 }

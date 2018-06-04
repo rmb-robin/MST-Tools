@@ -172,8 +172,8 @@ public class RecommendationEdgesVerificationProcesser {
 		return matchedRecommandedTokenRelationship;
 	}
 	
-	//List<RecommendedTokenRelationship> recommendedTokenRelationships;
-	//RecommendedTokenRelationship relationship = recommendedTokenRelationships.get(index);
+	//Rabhu added following method to implement modifiedWordList Tokens Scores. Original ticket EC-387
+	
 
 	private void setScoreOnTokenValue(List<RecommendedTokenRelationship> embeddedwords){
 		//WordToken wordtoken = new WordToken();

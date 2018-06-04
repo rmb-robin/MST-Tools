@@ -70,7 +70,7 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 			return WordEmbeddingTypes.dependentSignalPlus;
 		if(secondPos.equals(PartOfSpeachTypes.DP))
 			return WordEmbeddingTypes.dependentSignalMinus;	
-		if(secondPos.equals(PartOfSpeachTypes.COMMA))
+		if(secondPos.equals(PartOfSpeachTypes.COMMA))	//Logic added by rabhu on 06/03/2018 to implement task 4 on EC-387
 			return WordEmbeddingTypes.commaMinus;
 		return WordEmbeddingTypes.tokenToken;
 	}

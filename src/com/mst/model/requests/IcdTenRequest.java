@@ -18,10 +18,10 @@ public class IcdTenRequest{
     public void setDiscreteData(DiscreteData discreteData) {
         this.discreteData = discreteData;
     }
-    public void setSentenceInstances(List<IcdTenSentenceInstance> instances){
+    public void setInstances(List<IcdTenSentenceInstance> instances){
         this.instances = instances;
     }
-    public List<IcdTenSentenceInstance> getSentenceInstances(){
+    public List<IcdTenSentenceInstance> getInstances(){
         return instances;
     }
         

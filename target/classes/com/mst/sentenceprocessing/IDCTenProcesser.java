@@ -32,11 +32,10 @@ public class IDCTenProcesser {
 	public void processAndSave(IcdTenRequest request) throws Exception{
 		List<SentenceDiscovery> discoveries = new ArrayList<>();
 		
-		for(IcdTenSentenceInstance  sentenceInstance: request.getSentenceInstances()){
+		for(IcdTenSentenceInstance  sentenceInstance: request.getInstances()){
 			SentenceTextRequest s = createRequest(sentenceInstance);
 			SentenceDiscovery discovery = discoveryProcessorImpl.process(s).get(0);
 			appendIcdEdge(sentenceInstance.getIcdCode(), discovery);
-			appendIcdEdge(sentenceInstance.getSentence(), discovery);
 			discoveries.add(discovery);
 		}
 		dao.saveCollection(discoveries);
@@ -48,12 +47,17 @@ public class IDCTenProcesser {
 		
 		if(relationship==null) return; 
 		
-		WordToken token = new WordToken();
-		token.setToken(icdEdge);
-			
-		RecommendedTokenRelationship newEdge = 
-				this.factoryImpl.createRecommendedRelationship(EdgeNames.hasICD, EdgeTypes.related, relationship.getTokenRelationship().getToToken(), token, this.getClass().getName());
+		WordToken toToken = new WordToken();
+        //was: token.setToken(icdEdge);
+		toToken.setToken(icdEdge);
 		
+		WordToken fromToken = relationship.getTokenRelationship().getToToken();
+		
+
+		RecommendedTokenRelationship newEdge = 
+				this.factoryImpl.createRecommendedRelationship(EdgeNames.hasICD, EdgeTypes.related, fromToken, toToken, this.getClass().getName());
+
+	
 		newEdge.getTokenRelationship().setNamedEdge(newEdge.getTokenRelationship().getEdgeName());
 		
 		discovery.getWordEmbeddings().add(newEdge);

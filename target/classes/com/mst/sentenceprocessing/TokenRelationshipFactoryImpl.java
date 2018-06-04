@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.jsonSerializers.DeepCloner;
 import com.mst.model.metadataTypes.Descriptor;
+import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -22,13 +23,19 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
         tokenRelationship.setDescriptor(descriptor);
         tokenRelationship.setFrameName(frameName);
         tokenRelationship.setSource(source);
+        //Sandeep added condition if(edgeName.equals(EdgeNames.hasICD)) to resolve the ticket EC-385 on 5/30/2018
+        if(edgeName.equals(EdgeNames.hasICD)) {
+            tokenRelationship.setFromToken(fromToken);
+            tokenRelationship.setToToken(toToken);
+        }
+        else {
         if (fromToken.getPosition() < toToken.getPosition()) {
             tokenRelationship.setFromToken(fromToken);
             tokenRelationship.setToToken(toToken);
         } else {
             tokenRelationship.setFromToken(toToken);
             tokenRelationship.setToToken(fromToken);
-        }
+        }}
         return tokenRelationship;
     }
 
