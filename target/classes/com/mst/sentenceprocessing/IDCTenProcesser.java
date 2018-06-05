@@ -12,6 +12,7 @@ import com.mst.model.requests.IcdTenRequest;
 import com.mst.model.requests.IcdTenSentenceInstance;
 import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
+import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.util.MongoDatastoreProviderDefault;
 import com.mst.util.RecommandedTokenRelationshipUtil;
@@ -42,8 +43,31 @@ public class IDCTenProcesser {
 	}
 	
 	private void appendIcdEdge(String icdEdge, SentenceDiscovery discovery){
+		//******************************************************************************************************************************************************
+		String highestValueEdge=null;
+		int TokVal =0;
+		List<RecommendedTokenRelationship> embeddedWords = discovery.getWordEmbeddings();
+		for (int i =0; i<embeddedWords.size(); i++) {
+			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
+			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
+			if(relationship.getFromToken().getTokenValue()>relationship.getToToken().getTokenValue() && relationship.getFromToken().getTokenValue()>TokVal){
+				highestValueEdge = relationship.getEdgeName(); 	//Tried but this caused typeMisMatch: highestValueToken = relationship.getFromToken();
+				TokVal = relationship.getFromToken().getTokenValue();				
+			}
+			else if(relationship.getToToken().getTokenValue()>relationship.getFromToken().getTokenValue() && relationship.getToToken().getTokenValue()>TokVal){
+				highestValueEdge = relationship.getEdgeName(); 	//Tried but this caused typeMisMatch: highestValueToken = relationship.getFromToken();
+				TokVal = relationship.getToToken().getTokenValue();
+			}
+						
+		}
+		
+		
+		//*****************************************************************************************************************************************************
+		//RecommendedTokenRelationship relationship = 
+		//	 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),EdgeNames.existence);
+		
 		RecommendedTokenRelationship relationship = 
-			 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),EdgeNames.existence);
+				 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),highestValueEdge );
 		
 		if(relationship==null) return; 
 		
