@@ -17,7 +17,7 @@ public class FriendOfFriendServiceImpl implements FriendOfFriendService {
     private HashSet<String> edgeNames = EdgeNames.getExistenceSet();
     private HashSet<String> nonExistenceSetOnly = EdgeNames.getNonExistenceSetOnly();
 
-    FriendOfFriendServiceImpl() {
+    public FriendOfFriendServiceImpl() {
         sentenceFilter = new SentenceFilterImpl();
     }
 
