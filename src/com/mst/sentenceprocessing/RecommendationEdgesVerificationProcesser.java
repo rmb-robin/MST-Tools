@@ -32,7 +32,7 @@ public class RecommendationEdgesVerificationProcesser {
 				sentenceDiscovery.getWordEmbeddings().addAll(matched); // the list matched is added into the list returned by getWordEmbeddings
 		}
 		setverifiedOnEdgeValue(sentenceDiscovery.getWordEmbeddings());
-		setScoreOnTokenValue(sentenceDiscovery.getWordEmbeddings());
+		setScoreOnTokenValue(sentenceDiscovery.getWordEmbeddings(), sentenceDiscovery.getModifiedWordList());
 		return sentenceDiscovery.getWordEmbeddings();
 	}
 	
@@ -175,14 +175,23 @@ public class RecommendationEdgesVerificationProcesser {
 	//Rabhu added following method to implement modifiedWordList Tokens Scores. Original ticket EC-387
 	
 
-	private void setScoreOnTokenValue(List<RecommendedTokenRelationship> embeddedwords){
+	private void setScoreOnTokenValue(List<RecommendedTokenRelationship> embeddedwords, List<WordToken> modifiedWordList){
 		//WordToken wordtoken = new WordToken();
 		for(int i =0; i<embeddedwords.size();i++) {
 			RecommendedTokenRelationship recommandedTokenRelationship = embeddedwords.get(i);
 			TokenRelationship relationship = recommandedTokenRelationship.getTokenRelationship();
 			String edgeName = relationship.getEdgeName();
-			
-							
+			//*******************************************************************************************************************************
+			//checking the condition for a single word sentence
+			if(edgeName==null) {
+				if(embeddedwords.size()==1) {
+					relationship.setEdgeName(WordEmbeddingTypes.tokenToken);
+					//wordToken word=modifiedWord
+					relationship.setToToken(modifiedWordList.get(i));
+					relationship.setFromToken(modifiedWordList.get(i));
+				}
+			}
+			//*******************************************************************************************************************************				
 			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
 				relationship.getFromToken().setTokenValue(2);
 				continue;

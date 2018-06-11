@@ -43,6 +43,8 @@ public class IDCTenProcesser {
 	}
 	
 	private void appendIcdEdge(String icdEdge, SentenceDiscovery discovery){
+		
+		//Rabhu added the following code to use the highestValueEdge instead of the existance in order to implement the has-Icd edge
 		//******************************************************************************************************************************************************
 		String highestValueEdge=null;
 		int TokVal =0;
