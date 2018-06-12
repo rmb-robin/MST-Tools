@@ -17,7 +17,7 @@ import com.mst.util.TokenRelationshipUtil;
 import static org.junit.Assert.*;
 
 
-public class AdditionalExistenceEdgeProcesserTest {
+public class AdditionalExistenceEdgeProcessorTest {
 
 	private SentenceProcessingControllerImpl sentenceController; 
 	

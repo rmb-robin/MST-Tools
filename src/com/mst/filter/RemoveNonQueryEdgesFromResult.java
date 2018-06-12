@@ -5,7 +5,11 @@ import com.mst.model.SentenceQuery.*;
 import java.util.List;
 import java.util.ListIterator;
 
+import static com.mst.model.metadataTypes.EdgeNames.measurement;
+
 public class RemoveNonQueryEdgesFromResult {
+    //TODO refactor to: remove edges with displayEdge = false
+
     public void process(SentenceQueryInput input, List<SentenceQueryResult> sentenceQueryResults) {
         List<SentenceQueryInstance> instances = input.getSentenceQueryInstances();
         for (SentenceQueryResult queryResult : sentenceQueryResults) {
@@ -33,7 +37,7 @@ public class RemoveNonQueryEdgesFromResult {
         if (input != null && !input.isEmpty())
             for (EdgeQuery edge : input) {
                 if (edge != null && edge.getName() != null && edge.getName().equals(edgeName)) {
-                    if (edge.getValues() != null && !edge.getValues().isEmpty() && edge.getValues().contains(value)) {
+                    if (edge.getValues() != null && !edge.getValues().isEmpty() && (edge.getValues().contains(value) || (edge.getName().equals(measurement) && value != null))) {
                         return true;
                     }
                 }

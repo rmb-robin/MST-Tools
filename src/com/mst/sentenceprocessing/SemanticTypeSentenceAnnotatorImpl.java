@@ -1,20 +1,13 @@
 package com.mst.sentenceprocessing;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.plaf.basic.BasicTreeUI.CellEditorHandler;
-
 import com.mst.interfaces.sentenceprocessing.SemanticTypeSentenceAnnotator;
-import com.mst.model.SemanticType;
 import com.mst.model.metadataTypes.SemanticTypes;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.util.DateParseValidator;
 
-import edu.stanford.nlp.ling.Word;
- 
 
 public class SemanticTypeSentenceAnnotatorImpl implements SemanticTypeSentenceAnnotator{
 
@@ -35,14 +28,14 @@ public class SemanticTypeSentenceAnnotatorImpl implements SemanticTypeSentenceAn
 	
 	private boolean checkForNumeric(WordToken wordToken){
 		if(!wordToken.getToken().matches("[-+]?\\d*\\.?\\d+")) return false;
-		wordToken.setSemanticType(SemanticTypes.cardinalNumber);
+		wordToken.setSemanticType(SemanticTypes.CARDINAL_NUMBER);
 		return true;
 	}
 	
 	private boolean checkForDate(WordToken token){
 		boolean isValid = DateParseValidator.isDate(token.getToken());
 		if(isValid)
-			token.setSemanticType(SemanticTypes.date);
+			token.setSemanticType(SemanticTypes.DATE);
 		return isValid;
 	}
 		

@@ -27,7 +27,7 @@ public class NGramsHardCodedProvider implements NGramsProvider {
 	}
 	
 //		result.add(getEntity("follow up","follow-up"));
-//		result.add(getEntity("up to date","current"));
+//		result.add(getEntity("up to DATE","current"));
 //		result.add(getEntity("caught up","caught-up"));
 //		result.add(getEntity("status post","after"));
 //		result.add(getEntity("time senstive","urgent"));

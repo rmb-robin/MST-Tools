@@ -7,7 +7,7 @@ public class WordTokenTypeConverter {
 
 	public static Double tryConvertToDouble(WordToken wordToken){
 		
-		if(!wordToken.getSemanticType().equals(SemanticTypes.cardinalNumber)) return null;
+		if(!wordToken.getSemanticType().equals(SemanticTypes.CARDINAL_NUMBER)) return null;
 		 try {  
 			 return Double.parseDouble(wordToken.getToken());  
 			 

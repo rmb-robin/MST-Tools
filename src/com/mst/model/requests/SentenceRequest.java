@@ -4,19 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SentenceRequest extends SentenceRequestBase {
-	private List<String> senteceTexts;
+    private List<String> sentenceTexts;
 
-	public SentenceRequest(){
-		senteceTexts = new ArrayList<>();
-	}
-	
-	public List<String> getSenteceTexts() {
-		return senteceTexts;
-	}
+    public SentenceRequest() {
+        sentenceTexts = new ArrayList<>();
+    }
 
-	public void setSenteceTexts(List<String> senteceTexts) {
-		this.senteceTexts = senteceTexts;
-	} 
-	
-	
+    public List<String> getSentenceTexts() {
+        return sentenceTexts;
+    }
+
+    public void setSentenceTexts(List<String> sentenceTexts) {
+        this.sentenceTexts = sentenceTexts;
+    }
 }

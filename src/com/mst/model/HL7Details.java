@@ -11,78 +11,68 @@ import com.mst.model.raw.HL7Element;
 
 @Entity("hl7Details")
 public class HL7Details {
-	
-	@Id
-	private ObjectId id;
-	private String org;
-	private HL7Element patientId;
-	private HL7Element date;
-	private HL7FreeText text = new HL7FreeText();
-	private List<HL7Element> discrete = new ArrayList<>();
-	private boolean convertMeasurements = true;
-	private boolean convertLargest = true;
-	
-	public ObjectId getId() {
-		return id;
-	}
-	
-	public void setId(ObjectId id) {
-		this.id = id;
-	}
+    @Id
+    private ObjectId id;
+    private String org;
+    private HL7Element patientId;
+    private HL7Element date;
+    private HL7FreeText text = new HL7FreeText();
+    private List<HL7Element> discrete = new ArrayList<>();
+    private boolean convertMeasurements = true;
 
-	public String getOrg() {
-		return org;
-	}
-	
-	public void setOrg(String org) {
-		this.org = org;
-	}
-	
-	public HL7Element getPatientId() {
-		return patientId;
-	}
-	
-	public void setPatientId(HL7Element patientId) {
-		this.patientId = patientId;
-	}
-	
-	public HL7Element getDate() {
-		return date;
-	}
-	
-	public void setDate(HL7Element date) {
-		this.date = date;
-	}
-	
-	public HL7FreeText getText() {
-		return text;
-	}
-	
-	public void setText(HL7FreeText text) {
-		this.text = text;
-	}
-	
-	public List<HL7Element> getDiscrete() {
-		return discrete;
-	}
-	
-	public void setDiscrete(List<HL7Element> discrete) {
-		this.discrete = discrete;
-	}
+    public ObjectId getId() {
+        return id;
+    }
 
-	public boolean isConvertMeasurements() {
-		return convertMeasurements;
-	}
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
 
-	public void setConvertMeasurements(boolean convertMeasurements) {
-		this.convertMeasurements = convertMeasurements;
-	}
+    public String getOrg() {
+        return org;
+    }
 
-	public boolean isConvertLargest() {
-		return convertLargest;
-	}
+    public void setOrg(String org) {
+        this.org = org;
+    }
 
-	public void setConvertLargest(boolean convertLargest) {
-		this.convertLargest = convertLargest;
-	}
+    public HL7Element getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(HL7Element patientId) {
+        this.patientId = patientId;
+    }
+
+    public HL7Element getDate() {
+        return date;
+    }
+
+    public void setDate(HL7Element date) {
+        this.date = date;
+    }
+
+    public HL7FreeText getText() {
+        return text;
+    }
+
+    public void setText(HL7FreeText text) {
+        this.text = text;
+    }
+
+    public List<HL7Element> getDiscrete() {
+        return discrete;
+    }
+
+    public void setDiscrete(List<HL7Element> discrete) {
+        this.discrete = discrete;
+    }
+
+    public boolean isConvertMeasurements() {
+        return convertMeasurements;
+    }
+
+    public void setConvertMeasurements(boolean convertMeasurements) {
+        this.convertMeasurements = convertMeasurements;
+    }
 }

@@ -26,7 +26,7 @@ public class DiscreteDataFilter {
 	private List<String> reportFinalizedBy; 
 	
 	
-	//questions. is processing date a rang should we epxcet to?
+	//questions. is processing DATE a rang should we epxcet to?
 	//report finailzied by or id?
 	// Report Finalized By,   
 	

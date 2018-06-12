@@ -15,7 +15,7 @@ public class PrepositionPhraseProcessingInputFactory {
 		punctuations.add(";");
 		punctuations.add(".");
 		
-		stLookups.add("dysn");
+		stLookups.add("DYSN");
 		stLookups.add("drugpr");
 		stLookups.add("proc");
 		stLookups.add("bpoc");

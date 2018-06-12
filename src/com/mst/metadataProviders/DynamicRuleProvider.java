@@ -10,48 +10,47 @@ import com.mst.model.sentenceProcessing.DynamicEdgeCreationRule;
 
 public class DynamicRuleProvider extends BaseProvider {
 
-	private String getFullFilePath(String filePath){
-		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + filePath;
-	}
-	
 	public List<DynamicEdgeCreationRule> getRules(){
-		List<String> lines = TestDataProvider.readLines(getFullFilePath("dynamicedgecreation.txt"));
+		List<String> lines = TestDataProvider.readLines(getFullFilePath());
 		List<DynamicEdgeCreationRule> rules = new ArrayList<>();
 		DynamicEdgeCreationRule rule=null;
-		for(String line:lines){
-			String[]contents = line.split(",");
-			String type = contents[0];
-			
-			if(type.equals("r")){
-				rule = getRule(contents);
-				rules.add(rule);
-				continue;
+		if (lines != null) {
+			for(String line:lines){
+				String[]contents = line.split(",");
+				String type = contents[0];
+				if(type.equals("r")){
+					rule = getRule(contents);
+					rules.add(rule);
+					continue;
+				}
+				if(type.equals("c"))
+					if(rule!=null)
+						rule.getConditions().add(getCondition(contents));
 			}
-			if(type.equals("c"))
-				if(rule!=null)
-					rule.getConditions().add(getCondition(contents));
 		}
 		return rules;
 	}
-	
+
+	private String getFullFilePath(){
+		return System.getProperty("user.dir") + File.separator + "testData" + File.separator + "dynamicEdgeCreation.txt";
+	}
+
 	private DynamicEdgeCreationRule getRule(String[] contents){
 		DynamicEdgeCreationRule rule = new DynamicEdgeCreationRule();
 		rule.setName(contents[1]);
 		rule.setEdgeName(contents[2]);
-		
 		if(!contents[3].equals("")){
 			String[] edgeArray = contents[3].split(";");
 			rule.setFromEdgeNames(new ArrayList<>(Arrays.asList(edgeArray)));
-			rule.setFromTokenSementicType(false);
+			rule.setFromTokenSemanticType(false);
 			rule.setFromToken(null);
 		}
 		else {
 			rule.setFromToken(contents[4]);
-			rule.setFromTokenSementicType(convertToBool(contents[5]));
+			rule.setFromTokenSemanticType(convertToBool(contents[5]));
 		}
-
 		rule.setToToken(contents[6]);
-		rule.setToTokenSementicType(convertToBool(contents[7]));
+		rule.setToTokenSemanticType(convertToBool(contents[7]));
 		return rule;
 	}
 

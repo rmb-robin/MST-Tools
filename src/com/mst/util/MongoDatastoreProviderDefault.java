@@ -7,7 +7,7 @@ public class MongoDatastoreProviderDefault extends MongoDatastoreProviderBase im
 	
 	public MongoDatastoreProviderDefault(){
 		connectionEntity = new MongoConnectionEntity();
-		connectionEntity.setDatabaseName("sentencediscoveryDB");
+		connectionEntity.setDatabaseName("test");
 		connectionEntity.setIpAddress("10.0.129.218");
 	}
 

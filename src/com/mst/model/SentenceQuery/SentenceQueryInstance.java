@@ -6,7 +6,8 @@ import java.util.List;
 public class SentenceQueryInstance {
 	private List<String> tokens; 
 	private List<EdgeQuery> edges;
-//	private List<EdgeQuery> exclusiveEdges; 
+//	private List<EdgeQuery> exclusiveEdges;
+  	private String measurementClassification;
 	private String appender; 
 	private boolean isSt; 
 	private boolean excludeTokenSequence; 
@@ -30,6 +31,14 @@ public class SentenceQueryInstance {
 
 	public void setEdges(List<EdgeQuery> edges) {
 		this.edges = edges;
+	}
+
+	public String getMeasurementClassification() {
+		return measurementClassification;
+	}
+
+	public void setMeasurementClassification(String measurementClassification) {
+		this.measurementClassification = measurementClassification;
 	}
 
 	public String getAppender() {
@@ -56,14 +65,11 @@ public class SentenceQueryInstance {
 		this.excludeTokenSequence = excludeTokenSequence;
 	}
 
-
-
 //	public List<EdgeQuery> getExclusiveEdges() {
 //		return exclusiveEdges;
 //	}
-//
+
 //	public void setExclusiveEdges(List<EdgeQuery> exclusiveEdges) {
 //		this.exclusiveEdges = exclusiveEdges;
 //	}
-//	
 }

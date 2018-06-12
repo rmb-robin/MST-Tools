@@ -12,7 +12,7 @@ import org.mongodb.morphia.mapping.MappedField;
 public class LocalDateConverter extends TypeConverter implements SimpleValueConverter {
 
     public LocalDateConverter() {
-        // TODO: Add other date/time supported classes here
+        // TODO: Add other DATE/time supported classes here
         // Other java.time classes: LocalDate.class, LocalTime.class
         // Arrays: LocalDateTime[].class, etc
         super(LocalDate.class);

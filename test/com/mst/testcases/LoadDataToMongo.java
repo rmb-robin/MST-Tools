@@ -1,58 +1,34 @@
 package com.mst.testcases;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.converters.DateConverter;
 
-import com.google.gson.Gson;
-import com.mongodb.MongoClient;
-import com.mst.dao.DisceteDataComplianceDisplayFieldsDaoImpl;
-import com.mst.dao.Hl7DetailsDaoImpl;
 import com.mst.dao.RejectedReportDaoImpl;
 import com.mst.dao.SentenceDaoImpl;
-import com.mst.interfaces.dao.DisceteDataComplianceDisplayFieldsDao;
-import com.mst.interfaces.dao.RejectedReportDao;
-import com.mst.metadataProviders.DiscreteDataComplianceFieldProvider;
 import com.mst.metadataProviders.DynamicRuleProvider;
-import com.mst.metadataProviders.TestHl7Provider;
-import com.mst.model.discrete.DisceteDataComplianceDisplayFields;
 import com.mst.model.discrete.DiscreteData;
-import com.mst.model.raw.RawReportFile;
 import com.mst.model.requests.RejectedReport;
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.sentenceProcessing.DynamicEdgeCreationRule;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceDb;
-import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.sentenceprocessing.SentenceConverter;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
 import com.mst.util.MongoDatastoreProviderDefault;
+import org.junit.Test;
 
 import org.apache.log4j.Logger;
 
 public class LoadDataToMongo {
 
-	
 	//@Test
 	public void testLog(){
 		 Logger logger = Logger.getLogger(LoadDataToMongo.class);
 	        logger.error("Don't panic");
 	}
-	
 	
 //	@Test
 	public void process() throws Exception{
@@ -125,14 +101,14 @@ public class LoadDataToMongo {
 		input.add(text);
 		
 		SentenceRequest request = new SentenceRequest();
-		request.setSenteceTexts(input);
+		request.setSentenceTexts(input);
 		
 		List<Sentence> sentences = controller.processSentences(request);
 		Sentence result = sentences.get(0);
 		return result;
 	}
 	
-	//@Test
+	@Test
 	public void loadDynamicEdgeMetadata(){
 		List<DynamicEdgeCreationRule> input =new DynamicRuleProvider().getRules();
 		Datastore ds = new MongoDatastoreProviderDefault().getDefaultDb();

@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
-import org.mongodb.morphia.Datastore;
+
 import static org.junit.Assert.*;
-import com.mst.interfaces.SentenceProcessingMetaDataInputFactory;
+
 import com.mst.model.requests.SentenceRequest;
 import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
@@ -15,7 +15,6 @@ import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
-import com.mst.util.MongoDatastoreProviderDefault;
 
 public class SentenceProcessingControllerIntegrationTest {
 
@@ -117,7 +116,7 @@ public class SentenceProcessingControllerIntegrationTest {
 		controller.setMetadata(input);
 		
 		SentenceRequest request = new SentenceRequest();
-		request.getSenteceTexts().add(text);
+		request.getSentenceTexts().add(text);
 		Sentence sentence = controller.processSentences(request).get(0);
 		
 		

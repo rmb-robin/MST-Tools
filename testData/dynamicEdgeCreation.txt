@@ -2,10 +2,6 @@ r,Create Existence Edges From Sub Edges,existence,simple cyst modifiers; disease
 c,t,dysn,t,f,,,,,,,,t
 c,f,,,,simple cyst modifiers;disease modifier; disease location,dysn,,,dysn,,,t
 c,f,,,,existence; existence-no; existence-maybe,dysn,,,dysn,,,t
-r,Create Measurement Edge,measure,,cm,f,dysn,t
-c,f,,,,existence,dysn,t,f,dysn,t,f,t
-c,f,,,,unit of measure,cm,f,f,cm,f,f,t
-c,f,,,,measure,cm,f,f,cm,f,f,f
 r,Create Disease Location Edge,disease location,,bpoc,t,dysn,t
 c,f,,,,existence,dysn,t,f,dysn,t,f,t
 c,f,,,,laterality,bpoc,t,f,bpoc,t,f,t
