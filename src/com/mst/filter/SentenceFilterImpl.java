@@ -58,7 +58,7 @@ public class SentenceFilterImpl implements SentenceFilter {
         Map<String, List<TokenRelationship>> namedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingTokenRelationships, true);
         Map<String, List<TokenRelationship>> notNamedRelationshipsByEdgeName = TokenRelationshipUtil.getMapByEdgeName(existingTokenRelationships, false);
         for (EdgeQuery edgeQuery : edgeQueries) {
-            if (edgeQuery.getName().equals(WordEmbeddingTypes.defaultEdge) && edgeQuery.getValues().isEmpty()) {
+            if (edgeQuery.getName().equals(WordEmbeddingTypes.tokenToken) && edgeQuery.getValues().isEmpty()) {
                 edgeQuery.getValues().add(searchToken);
             }
             HashSet<String> edgeValues = edgeQuery.getValuesLower();
