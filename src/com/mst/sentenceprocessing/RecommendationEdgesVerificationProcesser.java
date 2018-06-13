@@ -182,6 +182,7 @@ public class RecommendationEdgesVerificationProcesser {
 			TokenRelationship relationship = recommandedTokenRelationship.getTokenRelationship();
 			String edgeName = relationship.getEdgeName();
 			//checking the condition for a single word sentence
+			/*
 			if(edgeName==null) {
 				//if(embeddedwords.size()==1) {
 					relationship.setEdgeName(WordEmbeddingTypes.tokenToken);
@@ -190,7 +191,8 @@ public class RecommendationEdgesVerificationProcesser {
 					relationship.setFromToken(modifiedWordList.get(i));
 				//}
 			}
-			else if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
+			*/
+			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
 				relationship.getFromToken().setTokenRanking(2);
 				continue;
 			}
