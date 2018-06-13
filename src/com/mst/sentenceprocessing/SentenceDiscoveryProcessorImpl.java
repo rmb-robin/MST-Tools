@@ -39,7 +39,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
     private WordEmbeddingProcessor wordEmbeddingProcessor;
     private VerbProcessor verbProcessor;
     private RecommendedNounPhraseProcessorImpl nounPhraseProcesser;
-    private RecommendedNegativeRelationshipFactoryImpl negativeRelationshipfactory;
+    private RecommendedNegativeRelationshipFactoryImpl negativeRelationshipfactory;	
     private VerbExistanceProcessor verbExistanceProcessor;
     private IterationRuleProcesser iterationRuleProcesser;
     private DistinctTokenRelationshipDeterminer distinctTokenRelationshipDeterminer;
@@ -112,6 +112,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
         for (WordToken token : tokens) {
             if (token.getPos() != null && byPassPOS.contains(token.getPos())) continue;
             if (specialCharactersBypass.contains(token.getToken())) continue;
+            token.setPosition(result.size()+1);
             result.add(token);
         }
         return result;

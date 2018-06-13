@@ -19,11 +19,35 @@ public class RecommendationEdgesVerificationProcesser {
 		Map<String, RecommendedTokenRelationship> existingMap =  convertExistingToMap(existing); 
 		for(Entry<Integer, Integer> entry: sentenceDiscovery.getNounPhraseIndexes().entrySet()){
 			List<RecommendedTokenRelationship> matched = setVerifiedAndFindExistingMatches(entry.getKey(), entry.getValue(), sentenceDiscovery.getWordEmbeddings(),existingMap);
-			if(matched!=null) 
+			if(matched!=null) {
+				updateIndexesOnExisting(matched,sentenceDiscovery);
 				sentenceDiscovery.getWordEmbeddings().addAll(matched);
+			}
 		}
 		setverifiedOnPrepPhrases(sentenceDiscovery.getWordEmbeddings());
 		return sentenceDiscovery.getWordEmbeddings();
+	}
+	
+	public static void updateIndexesOnExisting(List<RecommendedTokenRelationship> matched, SentenceDiscovery discovery){
+		Map<String, Integer> tokensByIndex = new HashMap<>();
+		
+		for(WordToken token: discovery.getModifiedWordList()){
+			tokensByIndex.put(token.getToken(), token.getPosition());
+		}
+		
+		for(RecommendedTokenRelationship r: matched){
+			TokenRelationship relationship = r.getTokenRelationship();
+			if(tokensByIndex.containsKey(relationship.getFromToken().getToken())){
+				relationship.getFromToken().setPosition(tokensByIndex.get(relationship.getFromToken().getToken()));
+			}
+			
+			if(tokensByIndex.containsKey(relationship.getToToken().getToken())){
+				relationship.getToToken().setPosition(tokensByIndex.get(relationship.getToToken().getToken()));
+			}
+		}
+		
+		
+		
 	}
 
 	private void setverifiedOnPrepPhrases(List<RecommendedTokenRelationship> embeddedwords){

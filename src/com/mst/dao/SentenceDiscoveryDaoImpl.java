@@ -14,6 +14,7 @@ import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.SentenceProcessingFailures;
+import com.mst.sentenceprocessing.RecommendationEdgesVerificationProcesser;
 
 public class SentenceDiscoveryDaoImpl extends BaseDocumentDaoImpl<SentenceDiscovery> implements SentenceDiscoveryDao {
 
@@ -45,10 +46,11 @@ public class SentenceDiscoveryDaoImpl extends BaseDocumentDaoImpl<SentenceDiscov
 			for(SentenceDiscovery sentence: sentenceDiscoveries){
 				sentence.setDiscreteData(discreteData);
 				sentence.setOrganizationId(discreteData.getOrganizationId());
+				RecommendationEdgesVerificationProcesser.updateIndexesOnExisting(sentence.getWordEmbeddings(), sentence);
+				ds.save(sentence);
 			}
 		}
-		ds.save(sentenceDiscoveries);
-		
+	
 		if(failures!=null){
 			failures.setDate(LocalDate.now());
 			if(discreteData!=null){
