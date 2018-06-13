@@ -38,14 +38,15 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
     private MeasurementProcessor measurementProcessor;
     private WordEmbeddingProcessor wordEmbeddingProcessor;
     private VerbProcessor verbProcessor;
-    private RecommendedNounPhraseProcessorImpl nounPhraseProcesser;
+    private RecommendedNounPhraseProcessorImpl nounPhraseProcessor;
     private RecommendedNegativeRelationshipFactoryImpl negativeRelationshipfactory;
     private VerbExistanceProcessor verbExistanceProcessor;
     private IterationRuleProcesser iterationRuleProcesser;
     private DistinctTokenRelationshipDeterminer distinctTokenRelationshipDeterminer;
     private AdditionalExistenceEdgeProcessor additionalExistenceEdgeProcessor;
     private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor;
-    private DynamicEdgeCreationProcessor dynamicEdgeCreationProcesser;
+    private DynamicEdgeCreationProcessor dynamicEdgeCreationProcessor;
+    private RecommendationEdgesVerificationProcessor recommendationEdgesVerificationProcessor;
 
     public SentenceDiscoveryProcessorImpl() {
         sentenceFactory = new SentenceFactory();
@@ -55,7 +56,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
         measurementProcessor = new MeasurementProcessorImpl();
         wordEmbeddingProcessor = new WordEmbeddingProcesseorImpl();
         verbProcessor = new VerbProcessorImpl();
-        nounPhraseProcesser = new RecommendedNounPhraseProcessorImpl();
+        nounPhraseProcessor = new RecommendedNounPhraseProcessorImpl();
         new RecommandedSubjectAnnotatorImpl();
         negativeRelationshipfactory = new RecommendedNegativeRelationshipFactoryImpl();
         verbExistanceProcessor = new VerbExistanceProcessorImpl();
@@ -63,7 +64,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
         distinctTokenRelationshipDeterminer = new DistinctTokenRelationshipDeterminerImpl();
         additionalExistenceEdgeProcessor = new AdditionalExistenceEdgeProcessorImpl();
         negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
-        dynamicEdgeCreationProcesser = new DynamicEdgeCreationProcessorImpl();
+        dynamicEdgeCreationProcessor = new DynamicEdgeCreationProcessorImpl();
+        recommendationEdgesVerificationProcessor = new RecommendationEdgesVerificationProcessor();
     }
 
     public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput) {
@@ -81,23 +83,24 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             tokens = verbProcessor.process(tokens, this.sentenceProcessingMetaDataInput.getVerbProcessingInput());
             tokens = filterTokens(tokens);
             List<RecommendedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
-            RecommandedNounPhraseResult nounPhraseResult = nounPhraseProcesser.process(wordEmbeddings);
+            RecommandedNounPhraseResult nounPhraseResult = nounPhraseProcessor.process(wordEmbeddings);
             sentence.setModifiedWordList(tokens);
             SentenceDiscovery discovery = convert(sentence, nounPhraseResult);
             List<RecommendedTokenRelationship> negationRelationships = negationTokenRelationshipProcessor.processDiscovery(tokens);
             discovery.getWordEmbeddings().addAll(negationRelationships);
-            discovery.getWordEmbeddings().addAll(nounPhraseProcesser.addEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
+            discovery.getWordEmbeddings().addAll(nounPhraseProcessor.addEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
             discovery.getWordEmbeddings().addAll(negativeRelationshipfactory.create(discovery.getModifiedWordList()));
             discovery.getWordEmbeddings().addAll(iterationRuleProcesser.process(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getIterationRuleProcesserInput()));
             discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
-            List<RecommendedTokenRelationship> edges = nounPhraseProcesser.setNamedEdges(discovery.getWordEmbeddings(), this.sentenceProcessingMetaDataInput.getNounRelationshipsInput()); //should always be last
-            dynamicEdgeCreationProcesser.processDiscovery(this.sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), discovery);
+            List<RecommendedTokenRelationship> edges = nounPhraseProcessor.setNamedEdges(discovery.getWordEmbeddings(), this.sentenceProcessingMetaDataInput.getNounRelationshipsInput()); //should always be last
+            dynamicEdgeCreationProcessor.processDiscovery(this.sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), discovery);
             measurementProcessor.process(tokens, request.isConvertMeasurements());
             edges = distinctTokenRelationshipDeterminer.getDistinctRecommendedRelationships(edges);
             discovery.setWordEmbeddings(edges);
             RecommendedTokenRelationship relationship = additionalExistenceEdgeProcessor.processDiscovery(discovery);
             if (relationship != null)
                 discovery.getWordEmbeddings().add(relationship);
+            recommendationEdgesVerificationProcessor.setTokenRankings(discovery.getWordEmbeddings(), discovery.getModifiedWordList());
             discoveries.add(discovery);
         }
         return discoveries;
