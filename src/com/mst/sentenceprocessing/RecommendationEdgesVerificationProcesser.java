@@ -109,7 +109,7 @@ public class RecommendationEdgesVerificationProcesser {
 				 */
 				RecommendedTokenRelationship nextTokenToken = findNextTokenToken(i+1, embeddedwords);
 				if(nextTokenToken==null) continue; 
-				if(!relationship.getFromToken().getToken().equals(nextTokenToken.getTokenRelationship().getToToken()))
+				if(!relationship.getFromToken().getToken().equals(nextTokenToken.getTokenRelationship().getToToken().getToken()))
 					recommandedTokenRelationship.setIsVerified(true);
 			}		
 		}
@@ -181,7 +181,6 @@ public class RecommendationEdgesVerificationProcesser {
 			RecommendedTokenRelationship recommandedTokenRelationship = embeddedwords.get(i);
 			TokenRelationship relationship = recommandedTokenRelationship.getTokenRelationship();
 			String edgeName = relationship.getEdgeName();
-			//*******************************************************************************************************************************
 			//checking the condition for a single word sentence
 			if(edgeName==null) {
 				//if(embeddedwords.size()==1) {
@@ -191,27 +190,25 @@ public class RecommendationEdgesVerificationProcesser {
 					relationship.setFromToken(modifiedWordList.get(i));
 				//}
 			}
-			//*******************************************************************************************************************************				
-			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
-				relationship.getFromToken().setTokenValue(2);
+			else if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
+				relationship.getFromToken().setTokenRanking(2);
 				continue;
 			}
-			
-			if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
+			else if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
 				RecommendedTokenRelationship nextTokenToken = findNextTokenToken(i+1, embeddedwords);
 				if(nextTokenToken==null) continue; 
 				if(relationship.getToToken().equals(nextTokenToken.getTokenRelationship().getFromToken())){
 				if (i + 1 >= embeddedwords.size()) {
-                    relationship.getToToken().setTokenValue(2);
+                    relationship.getToToken().setTokenRanking(2);
                 } else {
-                    relationship.getToToken().setTokenValue(1);
+                    relationship.getToToken().setTokenRanking(1);
                     
                 }
 				continue;
 				}
 			}
-			if(edgeName.equals(WordEmbeddingTypes.commaMinus)) {
-				relationship.getToToken().setTokenValue(1);
+			else if(edgeName.equals(WordEmbeddingTypes.commaMinus)) {
+				relationship.getToToken().setTokenRanking(1);
 				continue;
 			}
 								

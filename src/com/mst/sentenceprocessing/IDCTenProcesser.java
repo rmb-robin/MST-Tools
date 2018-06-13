@@ -52,13 +52,13 @@ public class IDCTenProcesser {
 		for (int i =0; i<embeddedWords.size(); i++) {
 			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
 			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
-			if(relationship.getFromToken().getTokenValue()>relationship.getToToken().getTokenValue() && relationship.getFromToken().getTokenValue()>TokVal){
+			if(relationship.getFromToken().getTokenRanking()>relationship.getToToken().getTokenRanking() && relationship.getFromToken().getTokenRanking()>TokVal){
 				highestValueEdge = relationship.getEdgeName(); 	//Tried but this caused typeMisMatch: highestValueToken = relationship.getFromToken();
-				TokVal = relationship.getFromToken().getTokenValue();				
+				TokVal = relationship.getFromToken().getTokenRanking();
 			}
-			else if(relationship.getToToken().getTokenValue()>relationship.getFromToken().getTokenValue() && relationship.getToToken().getTokenValue()>TokVal){
+			else if(relationship.getToToken().getTokenRanking()>relationship.getFromToken().getTokenRanking() && relationship.getToToken().getTokenRanking()>TokVal){
 				highestValueEdge = relationship.getEdgeName(); 	//Tried but this caused typeMisMatch: highestValueToken = relationship.getFromToken();
-				TokVal = relationship.getToToken().getTokenValue();
+				TokVal = relationship.getToToken().getTokenRanking();
 			}
 						
 		}
