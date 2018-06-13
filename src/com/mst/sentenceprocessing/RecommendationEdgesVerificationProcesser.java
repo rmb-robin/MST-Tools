@@ -184,12 +184,12 @@ public class RecommendationEdgesVerificationProcesser {
 			//*******************************************************************************************************************************
 			//checking the condition for a single word sentence
 			if(edgeName==null) {
-				if(embeddedwords.size()==1) {
+				//if(embeddedwords.size()==1) {
 					relationship.setEdgeName(WordEmbeddingTypes.tokenToken);
 					//wordToken word=modifiedWord
 					relationship.setToToken(modifiedWordList.get(i));
 					relationship.setFromToken(modifiedWordList.get(i));
-				}
+				//}
 			}
 			//*******************************************************************************************************************************				
 			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
