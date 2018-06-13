@@ -42,7 +42,7 @@ public class RecommendedTokenRelationshipAutocompleteQueryImpl implements Recomm
 	
 	private String getNextTokensValuesForFinalToken(RecommendedTokenRelationship finalToken){
 		String edgeName = finalToken.getTokenRelationship().getEdgeName(); 
-		if(!edgeName.equals(WordEmbeddingTypes.defaultEdge) && !edgeName.equals(WordEmbeddingTypes.firstVerb)) return "";
+		if(!edgeName.equals(WordEmbeddingTypes.tokenToken) && !edgeName.equals(WordEmbeddingTypes.verbPlus)) return "";
 
 		// doing just one link for now...
 		 String result = "";
@@ -61,8 +61,8 @@ public class RecommendedTokenRelationshipAutocompleteQueryImpl implements Recomm
 		if(toTokenPropertyValuesType !=null && toTokenPropertyValuesType.equals(PropertyValueTypes.NounPhraseEnd)) 
 			return true; 
 	
-		if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.secondVerb) ||
-				recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.secondPrep))
+		if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.verbMinus) ||
+				recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.prepMinus))
 			return true; 
 		return false;
 	}

@@ -14,6 +14,7 @@ public class WordToken extends GenericToken implements Serializable {
     private Verb verb;
     private PropertyValueTypes propertyValueType;
     private boolean isSubjectSetFromWildCard;
+    private int tokenRanking;
 
     public WordToken() {
         super();
@@ -84,5 +85,13 @@ public class WordToken extends GenericToken implements Serializable {
     public boolean isCardinal() {
         if (this.getSemanticType() == null) return false;
         return this.getSemanticType().equals(SemanticTypes.CARDINAL_NUMBER);
+    }
+
+    public int getTokenRanking() {
+        return tokenRanking;
+    }
+
+    public void setTokenRanking(int tokenRanking) {
+        this.tokenRanking = tokenRanking;
     }
 }

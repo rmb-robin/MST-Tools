@@ -12,6 +12,7 @@ import com.mst.model.requests.IcdTenRequest;
 import com.mst.model.requests.IcdTenSentenceInstance;
 import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
+import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 import com.mst.util.MongoDatastoreProviderDefault;
 import com.mst.util.RecommandedTokenRelationshipUtil;
@@ -32,7 +33,7 @@ public class IDCTenProcesser {
 	public void processAndSave(IcdTenRequest request) throws Exception{
 		List<SentenceDiscovery> discoveries = new ArrayList<>();
 		
-		for(IcdTenSentenceInstance  sentenceInstance: request.getSentenceInstances()){
+		for(IcdTenSentenceInstance  sentenceInstance: request.getInstances()){
 			SentenceTextRequest s = createRequest(sentenceInstance);
 			SentenceDiscovery discovery = discoveryProcessorImpl.process(s).get(0);
 			appendIcdEdge(sentenceInstance.getIcdCode(), discovery);
@@ -42,18 +43,47 @@ public class IDCTenProcesser {
 	}
 	
 	private void appendIcdEdge(String icdEdge, SentenceDiscovery discovery){
+		
+		//Rabhu added the following code to use the highestValueEdge instead of the existance in order to implement the has-Icd edge
+		//******************************************************************************************************************************************************
+		String highestValueEdge=null;
+		int TokVal =0;
+		List<RecommendedTokenRelationship> embeddedWords = discovery.getWordEmbeddings();
+		for (int i =0; i<embeddedWords.size(); i++) {
+			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
+			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
+			if(relationship.getFromToken().getTokenRanking()>relationship.getToToken().getTokenRanking() && relationship.getFromToken().getTokenRanking()>TokVal){
+				highestValueEdge = relationship.getEdgeName(); 	//Tried but this caused typeMisMatch: highestValueToken = relationship.getFromToken();
+				TokVal = relationship.getFromToken().getTokenRanking();
+			}
+			else if(relationship.getToToken().getTokenRanking()>relationship.getFromToken().getTokenRanking() && relationship.getToToken().getTokenRanking()>TokVal){
+				highestValueEdge = relationship.getEdgeName(); 	//Tried but this caused typeMisMatch: highestValueToken = relationship.getFromToken();
+				TokVal = relationship.getToToken().getTokenRanking();
+			}
+						
+		}
+		
+		
+		//*****************************************************************************************************************************************************
+		//RecommendedTokenRelationship relationship = 
+		//	 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),EdgeNames.existence);
+		
 		RecommendedTokenRelationship relationship = 
-			 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),EdgeNames.existence);
+				 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),highestValueEdge );
 		
 		if(relationship==null) return; 
 		
-		WordToken token = new WordToken();
-		token.setToken(icdEdge);
+		WordToken toToken = new WordToken();
+        //was: token.setToken(icdEdge);
+		toToken.setToken(icdEdge);
 		
+		WordToken fromToken = relationship.getTokenRelationship().getToToken();
 		
+
 		RecommendedTokenRelationship newEdge = 
-				this.factoryImpl.createRecommendedRelationship(EdgeNames.hasICD, EdgeTypes.related, relationship.getTokenRelationship().getToToken(), token, this.getClass().getName());
-		
+				this.factoryImpl.createRecommendedRelationship(EdgeNames.hasICD, EdgeTypes.related, fromToken, toToken, this.getClass().getName());
+
+	
 		newEdge.getTokenRelationship().setNamedEdge(newEdge.getTokenRelationship().getEdgeName());
 		
 		discovery.getWordEmbeddings().add(newEdge);

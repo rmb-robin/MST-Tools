@@ -3,24 +3,26 @@ package com.mst.model.requests;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IcdTenRequest extends SentenceRequestBase { 
+import com.mst.model.discrete.DiscreteData;
 
-	private List<IcdTenSentenceInstance> sentenceInstances;
-	
-	public IcdTenRequest(){
-		sentenceInstances = new ArrayList<>();
-	}
-
-	public List<IcdTenSentenceInstance> getSentenceInstances() {
-		return sentenceInstances;
-	}
-
-	public void setSentenceInstances(List<IcdTenSentenceInstance> sentenceInstances) {
-		this.sentenceInstances = sentenceInstances;
-	}
-	
-	
-	
-	
-	
+public class IcdTenRequest{
+    private boolean convertMeasurements, convertLargest;
+    private DiscreteData discreteData;
+    private List<IcdTenSentenceInstance> instances = new ArrayList<>();
+    public void setConvertLargest(boolean convertLargest) {
+        this.convertLargest = convertLargest;
+    }
+    public void setConvertMeasurements(boolean convertMeasurements) {
+        this.convertMeasurements = convertMeasurements;
+    }
+    public void setDiscreteData(DiscreteData discreteData) {
+        this.discreteData = discreteData;
+    }
+    public void setInstances(List<IcdTenSentenceInstance> instances){
+        this.instances = instances;
+    }
+    public List<IcdTenSentenceInstance> getInstances(){
+        return instances;
+    }
+        
 }

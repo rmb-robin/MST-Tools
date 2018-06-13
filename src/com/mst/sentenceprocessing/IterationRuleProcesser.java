@@ -108,7 +108,7 @@ public class IterationRuleProcesser {
 			return result;
 		}
 		
-		if(!rule.getEdgeNameTolookfor().equals(WordEmbeddingTypes.defaultEdge)) 
+		if(!rule.getEdgeNameTolookfor().equals(WordEmbeddingTypes.tokenToken)) 
 			return iterateRightNonTokenToken(recommendedTokenRelationships, indexes, rule);
 		return iterateRightTokenToken(recommendedTokenRelationships, indexes, rule);
 		
@@ -147,7 +147,7 @@ public class IterationRuleProcesser {
 				if(shouldBreakIteration(rule,relationship)){
 					break; 
 				}
-				if(!relationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge))continue;
+				if(!relationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.tokenToken))continue;
 				if(relationship.getTokenRelationship().getToToken().getPropertyValueType().equals(rule.getPropertyValueType())){
 					
 					result.put(index,

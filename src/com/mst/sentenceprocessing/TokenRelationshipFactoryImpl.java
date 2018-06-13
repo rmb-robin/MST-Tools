@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import com.mst.interfaces.sentenceprocessing.TokenRelationshipFactory;
 import com.mst.jsonSerializers.DeepCloner;
-import com.mst.model.metadataTypes.Descriptor;
+import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.EdgeTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.sentenceProcessing.TokenRelationship;
@@ -22,22 +22,27 @@ public class TokenRelationshipFactoryImpl implements TokenRelationshipFactory {
         tokenRelationship.setDescriptor(descriptor);
         tokenRelationship.setFrameName(frameName);
         tokenRelationship.setSource(source);
-        if (fromToken.getPosition() < toToken.getPosition()) {
+        if (edgeName != null && edgeName.equals(EdgeNames.hasICD)) {
             tokenRelationship.setFromToken(fromToken);
             tokenRelationship.setToToken(toToken);
         } else {
-            tokenRelationship.setFromToken(toToken);
-            tokenRelationship.setToToken(fromToken);
+            if (fromToken.getPosition() < toToken.getPosition()) {
+                tokenRelationship.setFromToken(fromToken);
+                tokenRelationship.setToToken(toToken);
+            } else {
+                tokenRelationship.setFromToken(toToken);
+                tokenRelationship.setToToken(fromToken);
+            }
         }
         return tokenRelationship;
     }
 
     public RecommendedTokenRelationship createRecommendedRelationship(String edgeName, String frameName, WordToken fromToken, WordToken toToken, String source) {
-        RecommendedTokenRelationship recommandedTokenRelationship = new RecommendedTokenRelationship();
-        recommandedTokenRelationship.setTokenRelationship(create(edgeName, null, frameName, fromToken, toToken, source));
-        String key = recommandedTokenRelationship.getTokenRelationship().getFromTokenToTokenString();
-        recommandedTokenRelationship.setKey(key);
-        return recommandedTokenRelationship;
+        RecommendedTokenRelationship recommendedTokenRelationship = new RecommendedTokenRelationship();
+        recommendedTokenRelationship.setTokenRelationship(create(edgeName, null, frameName, fromToken, toToken, source));
+        String key = recommendedTokenRelationship.getTokenRelationship().getFromTokenToTokenString();
+        recommendedTokenRelationship.setKey(key);
+        return recommendedTokenRelationship;
     }
 
     public RecommendedTokenRelationship createRecommendedRelationshipFromTokenRelationship(TokenRelationship tokenRelationship) {

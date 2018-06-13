@@ -55,23 +55,25 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 		if(first.isVerb() && second.isVerb())
 			return WordEmbeddingTypes.bothVerbs;
 		if(first.isVerb()) 
-			return WordEmbeddingTypes.firstVerb;
+			return WordEmbeddingTypes.verbPlus;
 		if(second.isVerb())
-			return WordEmbeddingTypes.secondVerb;
+			return WordEmbeddingTypes.verbMinus;
 		if(firstPos.equals(PartOfSpeachTypes.IN))
-			return WordEmbeddingTypes.firstPrep;
+			return WordEmbeddingTypes.prepPlus;
 		if(secondPos.equals(PartOfSpeachTypes.IN))
-			return WordEmbeddingTypes.secondPrep;		
+			return WordEmbeddingTypes.prepMinus;		
 		
 		if(firstPos.equals(PartOfSpeachTypes.CC))
-			return WordEmbeddingTypes.firstConjunction;
+			return WordEmbeddingTypes.conjunctionPlus;
 		if(secondPos.equals(PartOfSpeachTypes.CC))
-			return WordEmbeddingTypes.secondConjunction;	
+			return WordEmbeddingTypes.conjunctionMinus;	
 		
 		if(firstPos.equals(PartOfSpeachTypes.DP))
-			return WordEmbeddingTypes.firstDependentSignal;
+			return WordEmbeddingTypes.dependentSignalPlus;
 		if(secondPos.equals(PartOfSpeachTypes.DP))
-			return WordEmbeddingTypes.secondDependentSignal;	
-		return WordEmbeddingTypes.defaultEdge;
+			return WordEmbeddingTypes.dependentSignalMinus;	
+		if(secondPos.equals(PartOfSpeachTypes.COMMA))	//Logic added by rabhu on 06/03/2018 to implement task 4 on EC-387
+			return WordEmbeddingTypes.commaMinus;
+		return WordEmbeddingTypes.tokenToken;
 	}
 }

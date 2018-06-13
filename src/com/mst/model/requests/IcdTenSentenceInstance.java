@@ -1,22 +1,25 @@
 package com.mst.model.requests;
 
-public class IcdTenSentenceInstance {
+import com.mst.model.discrete.DiscreteData;
 
-	private String sentence; 
-	private String icdCode;
-	
-	public String getSentence() {
-		return sentence;
+public class IcdTenSentenceInstance{
+    String icdCode, sentence;
+    
+    public void setIcdCode(String icdCode) {
+		this.icdCode = icdCode;
 	}
-	public void setSentence(String sentence) {
+    public void setSentence(String sentence) {
 		this.sentence = sentence;
 	}
-	public String getIcdCode() {
-		return icdCode;
-	}
-	public void setIcdCode(String icdCode) {
-		this.icdCode = icdCode;
-	} 
-	
-	
+    public String getIcdCode(){
+        return icdCode;
+    }
+    public String getSentence(){
+        return sentence;
+    }
+	@Override
+	public String toString() {
+		return "IcdTenSentenceInstance [icdCode=" + icdCode + ", sentence=" + sentence + "]";
+	}    
+    
 }

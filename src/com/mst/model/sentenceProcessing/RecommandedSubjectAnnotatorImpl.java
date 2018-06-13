@@ -23,7 +23,7 @@ public class RecommandedSubjectAnnotatorImpl implements RecommandedSubjectAnnota
 					isSubjectComplimentSet = isSet;
 			}
 		
-			if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.secondVerb))
+			if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.verbMinus))
 				processSubject(i, relationships);
 		}
 		if(!isSubjectComplimentSet)
@@ -33,7 +33,7 @@ public class RecommandedSubjectAnnotatorImpl implements RecommandedSubjectAnnota
 	private void setSubjectComplimentOnVerb(List<RecommendedTokenRelationship> relationships){
 		for(int i =0;i<relationships.size();i++){
 			RecommendedTokenRelationship recommandedTokenRelationship = relationships.get(i);
-			 if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.firstVerb))
+			 if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.verbPlus))
 			{
 				setSubjectComplement(recommandedTokenRelationship);
 				return;
@@ -100,7 +100,7 @@ public class RecommandedSubjectAnnotatorImpl implements RecommandedSubjectAnnota
 			
 			RecommendedTokenRelationship nextRecommandedTokenRelationship = relationships.get(i+1);
 			
-			if(nextRecommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.secondPrep)){
+			if(nextRecommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.prepMinus)){
 				setSubjectComplement(recommandedTokenRelationship);
 				return true;
 			}

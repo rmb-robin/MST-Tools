@@ -30,15 +30,15 @@ public class RecommendedNounPhraseProcessorImpl extends RelationshipProcessorBas
         setRelationshipMaps(input.getRelationshipMappings());
         this.input = input;
         List<RecommendedTokenRelationship> additionalEdges = new ArrayList<>();
-        for (RecommendedTokenRelationship recommandedTokenRelationship : edges) {
-            additionalEdges.addAll(processSingleEdge(recommandedTokenRelationship));
+        for (RecommendedTokenRelationship recommendedTokenRelationship : edges) {
+            additionalEdges.addAll(processSingleEdge(recommendedTokenRelationship));
         }
         edges.addAll(additionalEdges);
         return edges;
     }
 
-    public RecommandedNounPhraseResult process(List<RecommendedTokenRelationship> embeddedWords) {
-        Map<Integer, RecommendedTokenRelationship> wordEmbeddingsByIndex = getFilteredWordEmbeddings(embeddedWords);
+    public RecommandedNounPhraseResult process(List<RecommendedTokenRelationship> embeddedwords) {
+        Map<Integer, RecommendedTokenRelationship> wordEmbeddingsByIndex = getFilteredWordEmbeddings(embeddedwords);
         int iterator = 0;
         int prevIndex = 0;
         int beginNounPhraseIndex = 0;
@@ -63,15 +63,14 @@ public class RecommendedNounPhraseProcessorImpl extends RelationshipProcessorBas
             iterator += 1;
         }
         RecommandedNounPhraseResult nounPhraseResult = new RecommandedNounPhraseResult();
-        nounPhraseResult.setRecommandedTokenRelationships(embeddedWords);
+        nounPhraseResult.setRecommandedTokenRelationships(embeddedwords);
         nounPhraseResult.setNounPhraseIndexes(nounPhraseIndexes);
         return nounPhraseResult;
     }
 
     private RecommendedTokenRelationship create(RecommendedTokenRelationship from, RecommendedTokenRelationship to) {
-        return factory.createRecommendedRelationship(WordEmbeddingTypes.defaultEdge, EdgeTypes.related, from.getTokenRelationship().getFromToken(), to.getTokenRelationship().getToToken(), this.getClass().getName());
+        return factory.createRecommendedRelationship(WordEmbeddingTypes.tokenToken, EdgeTypes.related, from.getTokenRelationship().getFromToken(), to.getTokenRelationship().getToToken(), this.getClass().getName());
     }
-
 
     public List<RecommendedTokenRelationship> addEdges(List<RecommendedTokenRelationship> edges, RelationshipInput input) {
         Map<String, RecommendedTokenRelationship> edgesByKey = RecommandedTokenRelationshipUtil.getByUniqueKey(edges);
@@ -79,7 +78,7 @@ public class RecommendedNounPhraseProcessorImpl extends RelationshipProcessorBas
         this.input = input;
         for (int i = 0; i < edges.size(); i++) {
             RecommendedTokenRelationship recommandedTokenRelationship = edges.get(i);
-            if (!recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge))
+            if (!recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.tokenToken))
                 continue;
             RelationshipMapping mapping = findMapping(recommandedTokenRelationship);
             if (mapping != null)
@@ -93,7 +92,7 @@ public class RecommendedNounPhraseProcessorImpl extends RelationshipProcessorBas
         List<RecommendedTokenRelationship> result = new ArrayList<>();
         for (int i = fromIndex + 1; i < edges.size(); i++) {
             RecommendedTokenRelationship iterating = edges.get(i);
-            if (!iterating.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge))
+            if (!iterating.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.tokenToken))
                 return result;
             RecommendedTokenRelationship newRelationship = create(recommandedTokenRelationship, iterating);
             RelationshipMapping mapping = findMapping(newRelationship);
@@ -113,8 +112,7 @@ public class RecommendedNounPhraseProcessorImpl extends RelationshipProcessorBas
             RecommendedTokenRelationship recommandedTokenRelationship = wordEmbeddings.get(i);
             TokenRelationship tokenRelationship = recommandedTokenRelationship.getTokenRelationship();
             String type = tokenRelationship.getEdgeName();
-            if (type.equals(WordEmbeddingTypes.defaultEdge) || type.equals(WordEmbeddingTypes.secondPrep) ||
-                    type.equals(WordEmbeddingTypes.secondVerb))
+            if (type.equals(WordEmbeddingTypes.tokenToken) || type.equals(WordEmbeddingTypes.prepMinus) || type.equals(WordEmbeddingTypes.verbMinus))
                 result.put(i, recommandedTokenRelationship);
         }
         return result;
@@ -126,7 +124,6 @@ public class RecommendedNounPhraseProcessorImpl extends RelationshipProcessorBas
                 continue;
             if (isWordTokenMatchToRelationship(mapping.getIsToSemanticType(), false, mapping.getToToken(), recommandedTokenRelationship.getTokenRelationship().getToToken())) {
                 return mapping;
-
             }
         }
         return null;
@@ -139,7 +136,6 @@ public class RecommendedNounPhraseProcessorImpl extends RelationshipProcessorBas
                 continue;
             if (isWordTokenMatchToRelationship(mapping.getIsToSemanticType(), false, mapping.getToToken(), recommandedTokenRelationship.getTokenRelationship().getToToken())) {
                 mappings.add(mapping);
-
             }
         }
         return mappings;

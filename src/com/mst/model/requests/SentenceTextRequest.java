@@ -17,6 +17,10 @@ public class SentenceTextRequest extends SentenceRequestBase {
         return id;
     }
 
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
     public String getText() {
         return text;
     }

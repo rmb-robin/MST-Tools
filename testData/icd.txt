@@ -1,10 +1,7 @@
-Ventricular tachycardia,I472
-Paroxysmal tachycardia unspecified,I479
-Paroxysmal atrial fibrillation,I480
-Persistent atrial fibrillation,I481
-Chronic atrial fibrillation,I482
-Typical atrial flutter,I483
-Atypical atrial flutter,I484
-Unspecified atrial fibrillation,I4891
-Unspecified atrial flutter,I4892
-Junctional premature depolarization,I492
+Code,Description
+A00,Cholera
+A00.0,Cholera due to Vibrio cholerae 01, biovar cholerae
+A00.0,Classical cholera
+A00.1,Cholera due to Vibrio cholerae 01, biovar eltor
+A00.1,Cholera eltor
+A00.9,Cholera, unspecified

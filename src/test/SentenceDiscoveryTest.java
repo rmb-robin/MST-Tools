@@ -86,11 +86,11 @@ public class SentenceDiscoveryTest {
     private IterationRuleProcesserInput getIterationInput() {
         IterationRuleProcesserInput input = new IterationRuleProcesserInput();
         ArrayList<IterationDataRule> leftRules = new ArrayList<>();
-        IterationDataRule rule = getIterationDataRule(WordEmbeddingTypes.firstVerb, 20, WordEmbeddingTypes.secondVerb);
+        IterationDataRule rule = getIterationDataRule(WordEmbeddingTypes.verbPlus, 20, WordEmbeddingTypes.verbMinus);
         leftRules.add(rule);
-        rule = getIterationDataRule(WordEmbeddingTypes.secondPrep, 30, WordEmbeddingTypes.secondVerb);
+        rule = getIterationDataRule(WordEmbeddingTypes.verbMinus, 30, WordEmbeddingTypes.verbMinus);
         leftRules.add(rule);
-        rule = getIterationDataRule(WordEmbeddingTypes.secondVerb, 10, WordEmbeddingTypes.secondVerb);
+        rule = getIterationDataRule(WordEmbeddingTypes.verbMinus, 10, WordEmbeddingTypes.verbMinus);
         leftRules.add(rule);
         input.setLeftRules(leftRules);
         return input;
