@@ -29,11 +29,11 @@ public class RecommendationEdgesVerificationProcessor {
 		return sentenceDiscovery.getWordEmbeddings();
 	}
 
-	void setTokenRankings(List<RecommendedTokenRelationship> embeddedWords, List<WordToken> modifiedWordList){
+	private void setTokenRankings(List<RecommendedTokenRelationship> embeddedWords, List<WordToken> modifiedWordList){
 		//WordToken wordtoken = new WordToken();
 		for(int i =0; i<embeddedWords.size();i++) {
-			RecommendedTokenRelationship recommandedTokenRelationship = embeddedWords.get(i);
-			TokenRelationship relationship = recommandedTokenRelationship.getTokenRelationship();
+			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
+			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
 			String edgeName = relationship.getEdgeName();
 			WordToken wordToken = modifiedWordList.get(i);
 			int tokenRanking;
