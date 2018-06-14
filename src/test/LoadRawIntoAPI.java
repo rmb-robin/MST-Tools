@@ -19,8 +19,8 @@ public class LoadRawIntoAPI {
 
 	@Test
 	public void loadRawHl7IntoAPI(){
-		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save"; 
-				
+		String endPoint = "http://10.0.129.218:8080/mst-sentence-service/webapi/rawreport/save"; 
+				//http://10.0.129.218:8080
 				//"localhost:8080/mst-sentence-service/webapi/rawreport/save";
 		String body = new TestHl7Provider().getInput();
 		callPOSTService(endPoint, body);

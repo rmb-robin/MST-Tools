@@ -61,12 +61,12 @@ public class RecommendationEdgesVerificationProcesser {
 			if(edgeName.equals(EdgeNames.existence))
 				recommandedTokenRelationship.setIsVerified(true);
 	
-			if(edgeName.equals(WordEmbeddingTypes.firstPrep) || edgeName.equals(WordEmbeddingTypes.secondPrep)) {
+			if(edgeName.equals(WordEmbeddingTypes.prepMinus) || edgeName.equals(WordEmbeddingTypes.prepPlus)) {
 				recommandedTokenRelationship.setIsVerified(true);
 				continue;
 			}
 			
-			if(edgeName.equals(WordEmbeddingTypes.firstVerb) || edgeName.equals(WordEmbeddingTypes.secondVerb)){
+			if(edgeName.equals(WordEmbeddingTypes.verbMinus) || edgeName.equals(WordEmbeddingTypes.verbPlus)){
 				if(i+1 >=embeddedwords.size()){
 					recommandedTokenRelationship.setIsVerified(true);
 					return; 
@@ -82,7 +82,7 @@ public class RecommendationEdgesVerificationProcesser {
 	private RecommendedTokenRelationship findNextTokenToken(int index,List<RecommendedTokenRelationship> embeddedwords){
 		for(int i = index; i<embeddedwords.size();i++){
 			RecommendedTokenRelationship recommandedTokenRelationship = embeddedwords.get(i);
-			if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge))return recommandedTokenRelationship;
+			if(recommandedTokenRelationship.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.tokenToken))return recommandedTokenRelationship;
 		}
 		return null;
 	}
@@ -147,7 +147,7 @@ public class RecommendationEdgesVerificationProcesser {
 		List<Integer> consecutiveTokensToken = new ArrayList<>();
 		for(int i = beginIndex;i<=endIndex;i++){
 			RecommendedTokenRelationship current = embeddedwords.get(i);
-			if(current.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.defaultEdge)){
+			if(current.getTokenRelationship().getEdgeName().equals(WordEmbeddingTypes.tokenToken)){
 				consecutiveTokensToken.add(i);
 				if(i==endIndex) {
 					List<RecommendedTokenRelationship> existingMatches =  findMatchesFromExistingOnConsequtives(consecutiveTokensToken,embeddedwords,existingMap);		
