@@ -11,7 +11,7 @@ public class RemoveEdgeFromResult extends BusinessRule {
     private boolean removeIfNull;
 
     public RemoveEdgeFromResult() {
-        super(RemoveEdgeFromResult.class.getSimpleName());
+        super(RemoveEdgeFromResult.class.getName());
     }
 
     public String getRuleName() {

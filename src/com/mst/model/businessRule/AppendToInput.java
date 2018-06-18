@@ -13,7 +13,7 @@ public class AppendToInput extends BusinessRule {
     private LogicalOperator logicalOperator;
 
     public AppendToInput() {
-        super(AppendToInput.class.getSimpleName());
+        super(AppendToInput.class.getName());
     }
 
     public String getRuleName() {

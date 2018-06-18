@@ -12,7 +12,7 @@ public class SecondLargestMeasurementProcessing extends BusinessRule {
     private List<String> largestBetweenAnnotations;
 
     public SecondLargestMeasurementProcessing() {
-        super(SecondLargestMeasurementProcessing.class.getSimpleName());
+        super(SecondLargestMeasurementProcessing.class.getName());
     }
 
     public String getRuleName() {

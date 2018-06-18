@@ -12,7 +12,7 @@ public class AddEdgeToResult extends BusinessRule {
     private List<EdgeToAddValue> edgeToAddValues;
 
     public AddEdgeToResult() {
-        super(AddEdgeToResult.class.getSimpleName());
+        super(AddEdgeToResult.class.getName());
     }
 
     public static class Edge {
