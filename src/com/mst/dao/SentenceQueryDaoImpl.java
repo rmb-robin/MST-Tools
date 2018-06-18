@@ -64,11 +64,7 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
     }
 
     public List<SentenceQueryResult> getSentences(SentenceQueryInput input, List<SentenceDb> sentences) {
-        //TODO pass business rules to sentenceFilterController
         businessRules = businessRuleDao.get(input.getOrganizationId(), SENTENCE_PROCESSING);
-
-
-
         sentenceFilterController = new SentenceFilterControllerImpl();
         Datastore datastore = datastoreProvider.getDefaultDb();
         boolean filterOnDiscreteData = false;
