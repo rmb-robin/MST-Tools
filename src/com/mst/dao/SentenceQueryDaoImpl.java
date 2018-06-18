@@ -46,11 +46,11 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
     @Override
     public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
         datastoreProvider = provider;
+        init();
     }
 
     public List<SentenceQueryResult> getSentences(SentenceQueryInput input) {
         List<SentenceQueryResult> result = getSentences(input, null);
-        businessRules = businessRuleDao.get(input.getOrganizationId(), SENTENCE_PROCESSING);
         if (input.isFilterByTokenSequence()) {
             QueryBusinessRuleDaoImpl queryBusinessRuleDao = new QueryBusinessRuleDaoImpl();
             queryBusinessRuleDao.setMongoDatastoreProvider(datastoreProvider);
@@ -65,6 +65,10 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
 
     public List<SentenceQueryResult> getSentences(SentenceQueryInput input, List<SentenceDb> sentences) {
         //TODO pass business rules to sentenceFilterController
+        businessRules = businessRuleDao.get(input.getOrganizationId(), SENTENCE_PROCESSING);
+
+
+
         sentenceFilterController = new SentenceFilterControllerImpl();
         Datastore datastore = datastoreProvider.getDefaultDb();
         boolean filterOnDiscreteData = false;
