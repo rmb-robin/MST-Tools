@@ -21,13 +21,37 @@ public class RecommendationEdgesVerificationProcessor {
 		Map<String, RecommendedTokenRelationship> existingMap =  convertExistingToMap(existing); 
 		for(Entry<Integer, Integer> entry: sentenceDiscovery.getNounPhraseIndexes().entrySet()){
 			List<RecommendedTokenRelationship> matched = setVerifiedAndFindExistingMatches(entry.getKey(), entry.getValue(), sentenceDiscovery.getWordEmbeddings(),existingMap);
-			if(matched!=null)
+			if(matched!=null){
+				
+				updateIndexesOnExisting(matched, sentenceDiscovery);
 				sentenceDiscovery.getWordEmbeddings().addAll(matched); // the list matched is added into the list returned by getWordEmbeddings
+		
+			}
 		}
 		setVerifiedOnEdgeValue(sentenceDiscovery.getWordEmbeddings());
 		setTokenRankings(sentenceDiscovery.getWordEmbeddings(), sentenceDiscovery.getModifiedWordList());
 		return sentenceDiscovery.getWordEmbeddings();
 	}
+	
+	public static void updateIndexesOnExisting(List<RecommendedTokenRelationship> matched, SentenceDiscovery discovery){
+		Map<String, Integer> tokensByIndex = new HashMap<>();
+		
+		for(WordToken token: discovery.getModifiedWordList()){
+			tokensByIndex.put(token.getToken(), token.getPosition());
+		}
+		
+		for(RecommendedTokenRelationship r: matched){
+			TokenRelationship relationship = r.getTokenRelationship();
+			if(tokensByIndex.containsKey(relationship.getFromToken().getToken())){
+				relationship.getFromToken().setPosition(tokensByIndex.get(relationship.getFromToken().getToken()));
+			}
+			
+			if(tokensByIndex.containsKey(relationship.getToToken().getToken())){
+				relationship.getToToken().setPosition(tokensByIndex.get(relationship.getToToken().getToken()));
+			}
+		}
+	}
+
 
 	private void setTokenRankings(List<RecommendedTokenRelationship> embeddedWords, List<WordToken> modifiedWordList){
 		//WordToken wordtoken = new WordToken();
@@ -226,11 +250,9 @@ public class RecommendationEdgesVerificationProcessor {
             RecommendedTokenRelationship recommandedTokenRelationship = embeddedwords.get(i);
             TokenRelationship relationship = recommandedTokenRelationship.getTokenRelationship();
             String edgeName = relationship.getEdgeName();
-
             if (edgeName.equals(WordEmbeddingTypes.prepMinus)) {
                 relationship.setTokenValue(2);
             }
-
             if (edgeName.equals(WordEmbeddingTypes.tokenToken)) {
                 if (i + 1 >= embeddedwords.size()) {
                     relationship.setTokenValue(2);
@@ -238,9 +260,7 @@ public class RecommendationEdgesVerificationProcessor {
                     relationship.setTokenValue(1);
                 }
             }
-
         }
     }
     */
 }
-	

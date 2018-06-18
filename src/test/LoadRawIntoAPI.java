@@ -7,6 +7,8 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.junit.Test;
+
 //import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -15,10 +17,10 @@ import com.mst.model.raw.RawReportFile;
 
 public class LoadRawIntoAPI {
 
-//	@Test
+	@Test
 	public void loadRawHl7IntoAPI(){
-		String endPoint = "http://localhost:8080/mst-sentence-service/webapi/rawreport/save"; 
-				
+		String endPoint = "http://10.0.129.218:8080/mst-sentence-service/webapi/rawreport/save"; 
+				//http://10.0.129.218:8080
 				//"localhost:8080/mst-sentence-service/webapi/rawreport/save";
 		String body = new TestHl7Provider().getInput();
 		callPOSTService(endPoint, body);
