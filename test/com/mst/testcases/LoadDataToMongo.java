@@ -78,7 +78,7 @@ public class LoadDataToMongo {
 	}
 	
 	private void write(Sentence sentence){
-		SentenceDb dbObj = SentenceConverter.convertToDocument(sentence);
+		SentenceDb dbObj = SentenceConverter.convertToSentenceDb(sentence, false);
 		List<SentenceDb> sentences = new ArrayList<>();
 		sentences.add(dbObj);
 		
