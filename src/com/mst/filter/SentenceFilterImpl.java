@@ -200,7 +200,7 @@ public class SentenceFilterImpl implements SentenceFilter {
                                 if (identifierType.equals(MEASUREMENT_ANNOTATION)) {
                                     for (TokenRelationship measurement : measurements) {
                                         String descriptor = measurement.getDescriptor();
-                                        if (measurement.getEdgeName().equals(EdgeNames.measurement) && descriptor.equals(identifier)) {
+                                        if (measurement.getEdgeName().equals(EdgeNames.measurement) && descriptor != null && descriptor.equals(identifier)) {
                                             measurement.setDescriptor(SECOND_LARGEST);
                                             WordToken secondLargest = measurement.getFromToken();
                                             secondLargest.setToken(String.valueOf(result.measurementValue));
@@ -244,7 +244,7 @@ public class SentenceFilterImpl implements SentenceFilter {
         Map<String, TokenRelationship> axisAnnotations = new HashMap<>();
         for (TokenRelationship measurement : measurements) {
             String descriptor = measurement.getDescriptor();
-            if (descriptor.equals(LENGTH) || descriptor.equals(TRANSVERSE) || descriptor.equals(AP))
+            if (descriptor != null && (descriptor.equals(LENGTH) || descriptor.equals(TRANSVERSE) || descriptor.equals(AP)))
                 axisAnnotations.put(descriptor, measurement);
         }
         List<BusinessRule> rules = secondLargestMeasurementProcessing.getRules();
