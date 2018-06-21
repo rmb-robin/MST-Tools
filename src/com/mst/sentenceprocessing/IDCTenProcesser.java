@@ -42,6 +42,15 @@ public class IDCTenProcesser {
 		dao.saveCollection(discoveries);
 	}
 	
+	/**
+	 * Has a section added to the method appendIcdEdge to implement the highestValueEdge instead of the existance in order to implement the has-Icd edge.
+	 * The code acquires the token relationship from the discovery word embeddings and utilizes a for loop to iterate and check through the entire size of 
+	 * embeddedWords to determine the token with highest token rank. Once this is determined, it passes the highest value edge associated
+	 * to the RecommandedTokenRelationshipUtil.getByEdgeName() method to set the has-Icd
+	 * @param icdEdge
+	 * @param discovery
+	 */
+	
 	private void appendIcdEdge(String icdEdge, SentenceDiscovery discovery){
 		
 		//Rabhu added the following code to use the highestValueEdge instead of the existance in order to implement the has-Icd edge
@@ -69,7 +78,7 @@ public class IDCTenProcesser {
 		//	 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),EdgeNames.existence);
 		
 		RecommendedTokenRelationship relationship = 
-				 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),highestValueEdge );
+				 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),highestValueEdge );	//here highestValueEdge is used instead of existance
 		
 		if(relationship==null) return; 
 		

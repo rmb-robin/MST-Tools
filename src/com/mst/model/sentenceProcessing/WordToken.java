@@ -14,7 +14,7 @@ public class WordToken extends GenericToken implements Serializable {
     private Verb verb;
     private PropertyValueTypes propertyValueType;
     private boolean isSubjectSetFromWildCard;
-    private int tokenRanking;
+    private int tokenRanking;	//variable used to store the token ranks
 
     public WordToken() {
         super();
@@ -86,11 +86,19 @@ public class WordToken extends GenericToken implements Serializable {
         if (this.getSemanticType() == null) return false;
         return this.getSemanticType().equals(SemanticTypes.CARDINAL_NUMBER);
     }
-
+    
+    /**
+     * getTokenRanking() is used to get the tokenRanking set for the token
+     * @return tokenRanking
+     */
     public int getTokenRanking() {
         return tokenRanking;
     }
-
+    
+    /**
+     * setTokenRanking sets the ranks on the tokens after getting it from RecommendationEdgesVerificationProcesser
+     * @param tokenRanking
+     */
     public void setTokenRanking(int tokenRanking) {
         this.tokenRanking = tokenRanking;
     }
