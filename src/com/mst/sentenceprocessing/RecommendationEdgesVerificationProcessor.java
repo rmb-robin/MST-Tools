@@ -51,7 +51,14 @@ public class RecommendationEdgesVerificationProcessor {
 			}
 		}
 	}
-
+	
+	/**
+	 * Method setTokenRankings is used to check various conditions and assign token ranking when the conditions meet. 
+	 * Method get's the edgeName from the embeddedWords and compares it with WordEmbeddingTypes. When the required condition is matched
+	 * the statements inside the if condition assigns the tokenRanking as required.
+	 * @param embeddedWords
+	 * @param modifiedWordList
+	 */
 
 	private void setTokenRankings(List<RecommendedTokenRelationship> embeddedWords, List<WordToken> modifiedWordList){
 		//WordToken wordtoken = new WordToken();
@@ -114,9 +121,13 @@ public class RecommendationEdgesVerificationProcessor {
 		return result;
 	}
 	
-	/*
-	 * This part creates begin and end index, checks the existing matches on it and avoids duplication.
-	 * 
+	/**
+	 * setVerifiedAndFindExistingMatches creates begin and end index, checks the existing matches on it and avoids duplication.
+	 * @param beginIndex
+	 * @param endIndex
+	 * @param embeddedwords
+	 * @param existingMap
+	 * @return result (existing Matches)
 	 */
 	private List<RecommendedTokenRelationship> setVerifiedAndFindExistingMatches(int beginIndex,int endIndex, List<RecommendedTokenRelationship> embeddedwords, Map<String, RecommendedTokenRelationship> existingMap){
 		if(beginIndex>endIndex)

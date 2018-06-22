@@ -100,6 +100,9 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             RecommendedTokenRelationship relationship = additionalExistenceEdgeProcessor.processDiscovery(discovery);
             if (relationship != null)
                 discovery.getWordEmbeddings().add(relationship);
+            /**
+             * calls recommendationEdgesVerificationProcesser and passes the discovery and wordEmbeddings to set the tokenRankings
+             */
             recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
             discoveries.add(discovery);
         }
