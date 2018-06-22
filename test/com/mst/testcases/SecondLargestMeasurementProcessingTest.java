@@ -21,8 +21,6 @@ import test.SaveSentenceTextRequest;
 import java.util.*;
 
 import static com.mst.model.metadataTypes.EdgeNames.*;
-import static com.mst.model.metadataTypes.MeasurementAnnotations.AP;
-import static com.mst.model.metadataTypes.MeasurementAnnotations.TRANSVERSE;
 import static com.mst.model.metadataTypes.MeasurementClassification.*;
 import static org.junit.Assert.*;
 
@@ -31,7 +29,7 @@ public class SecondLargestMeasurementProcessingTest {
     private SentenceQueryDao sentenceQueryDao;
     private SentenceProcessingController controller;
     private SentenceQueryInput input;
-    List<SentenceQueryResult> results;
+    private List<SentenceQueryResult> results;
 
     public SecondLargestMeasurementProcessingTest() {
         final String SERVER = "10.0.129.218";
@@ -45,65 +43,65 @@ public class SecondLargestMeasurementProcessingTest {
 
     @Test
     public void testRule0() {        // rule 0 two measurements (AP and Transverse)
-        input = getInput("1", "9", MEDIAN);
+        input = getInput("1", "9");
         assertNotNull(input);
         results = getResults(input, getSentenceTextRequest("cyst in ovary measures 1.1 cm transverse and 3.2 cm ap."));
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertTrue(testResults(SECOND_LARGEST, "3.2"));
+        assertTrue(testResults("3.2"));
     }
 
     @Test
     public void testRule1() {        // rule 1 two measurements (AP and Length)
-        input = getInput("1", "9", MEDIAN);
+        input = getInput("1", "9");
         assertNotNull(input);
         results = getResults(input, getSentenceTextRequest("cyst in ovary measures 1.1 cm ap and 3.2 cm in length."));
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertTrue(testResults(AP, "1.1"));
+        assertTrue(testResults("1.1"));
     }
 
     @Test
     public void testRule2() {        // rule 2 two measurements (Transverse and Length)
-        input = getInput("1", "9", MEDIAN);
+        input = getInput("1", "9");
         assertNotNull(input);
         results = getResults(input, getSentenceTextRequest("cyst in ovary measures 1.1 cm transverse and 3.2 cm in length."));
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertTrue(testResults(TRANSVERSE, "1.1"));
+        assertTrue(testResults("1.1"));
     }
 
     @Test
     public void testRule3() {        // rule 3 three measurements (AP, Transverse, and Length)
-        input = getInput("1", "9", MEDIAN);
+        input = getInput("1", "9");
         assertNotNull(input);
         results = getResults(input, getSentenceTextRequest("cyst in ovary measures 1.1 cm ap, 5.3 cm transverse and 3.2 cm in length."));
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertTrue(testResults(LARGEST, "5.3"));
+        assertTrue(testResults("5.3"));
     }
 
     @Test
     public void testRule4() {        // rule 4 two measurements (x and y)
-        input = getInput("1", "9", MEDIAN);
+        input = getInput("1", "9");
         assertNotNull(input);
         results = getResults(input, getSentenceTextRequest("cyst in ovary measures 1.1 cm x 3.2 cm."));
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertTrue(testResults(LARGEST, "3.2"));
+        assertTrue(testResults("3.2"));
     }
 
     @Test
     public void testRule5() {        // rule 5 three measurements (x, y, z)
-        input = getInput("1", "9", MEDIAN);
+        input = getInput("1", "9");
         assertNotNull(input);
         results = getResults(input, getSentenceTextRequest("cyst in ovary measures 1.1 cm x 5.3 cm x and 3.2 cm."));
         assertNotNull(results);
         assertEquals(1, results.size());
-        assertTrue(testResults(MEDIAN, "3.2"));
+        assertTrue(testResults("3.2"));
     }
 
-    private boolean testResults(String descriptor, String value) {
+    private boolean testResults(String value) {
         List<SentenceQueryEdgeResult> edges = results.get(0).getSentenceQueryEdgeResults();
         for (SentenceQueryEdgeResult edge : edges) {
             String edgeName = edge.getEdgeName();
@@ -111,7 +109,7 @@ public class SecondLargestMeasurementProcessingTest {
             String edgeDescriptor = edge.getDescriptor();
             String edgeValue = edge.getMatchedValue();
             assertNotNull(value);
-            if (edgeName.equals(measurement) && edgeDescriptor != null && edgeDescriptor.equals(descriptor) && edgeValue.equals(value))
+            if (edgeName.equals(measurement) && edgeDescriptor != null && edgeDescriptor.equals(SECOND_LARGEST) && edgeValue.equals(value))
                 return true;
         }
         return false;
@@ -148,7 +146,7 @@ public class SecondLargestMeasurementProcessingTest {
         return sentence;
     }
 
-    private SentenceQueryInput getInput(String minRange, String maxRange, String measurementClassification) {
+    private SentenceQueryInput getInput(String minRange, String maxRange) {
         SentenceQueryInput input = new SentenceQueryInput();
         input.setNotAndAll(false);
         List<SentenceQueryInstance> instances = new ArrayList<>();
@@ -173,7 +171,7 @@ public class SecondLargestMeasurementProcessingTest {
         edge.setIsNamedEdge(false);
         edges.add(edge);
         instance.setEdges(edges);
-        instance.setMeasurementClassification(measurementClassification);
+        instance.setMeasurementClassification(MEDIAN);
         instance.setIsSt(false);
         instance.setExcludeTokenSequence(false);
         instances.add(instance);
