@@ -52,11 +52,11 @@ public class MeasurementProcessorImpl implements MeasurementProcessor {
             else if (semanticType != null && semanticType.equals(UNIT_OF_MEASURE))
                 uom = word;
         }
-        if (xAxis != null && uom != null)
+        if (xAxis != null)
             addRelationships(xAxis, uom, newRelationships);
-        if (yAxis != null && uom != null)
+        if (yAxis != null)
             addRelationships(yAxis, uom, newRelationships);
-        if (zAxis != null && uom != null)
+        if (zAxis != null)
             addRelationships(zAxis, uom, newRelationships);
         return newRelationships;
     }
@@ -117,13 +117,15 @@ public class MeasurementProcessorImpl implements MeasurementProcessor {
         relationship.setFromToken(axis);
         relationship.setToToken(uom);
         relationships.add(relationship);
-        relationship = new TokenRelationship();
-        relationship.setEdgeName(unitOfMeasure);
-        relationship.setDescriptor(axis.getDescriptor());
-        relationship.setSource(MeasurementProcessor.class.getName());
-        relationship.setFromToken(axis);
-        relationship.setToToken(uom);
-        relationships.add(relationship);
+        if (uom != null) {
+            relationship = new TokenRelationship();
+            relationship.setEdgeName(unitOfMeasure);
+            relationship.setDescriptor(axis.getDescriptor());
+            relationship.setSource(MeasurementProcessor.class.getName());
+            relationship.setFromToken(axis);
+            relationship.setToToken(uom);
+            relationships.add(relationship);
+        }
     }
 
     private void addMeasurements(List<WordToken> words) {
