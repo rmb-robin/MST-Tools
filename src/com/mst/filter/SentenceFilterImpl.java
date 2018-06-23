@@ -152,7 +152,6 @@ public class SentenceFilterImpl implements SentenceFilter {
     }
 
     private boolean areMeasurementsInRange(List<TokenRelationship> tokenRelationships, List<String> rangeValues, String measurementClassification, SecondLargestMeasurementProcessing secondLargestMeasurementProcessing) {
-        final String SECOND_LARGEST = "2nd largest";
         if (!measurementClassification.equals(LARGEST) && !measurementClassification.equals(SMALLEST) && !measurementClassification.equals(MEDIAN) && !measurementClassification.equals(MEAN))
             return false;
         if (rangeValues.size() != 2)
@@ -183,15 +182,21 @@ public class SentenceFilterImpl implements SentenceFilter {
             } else {
                 switch (measurementClassification) {
                     case LARGEST:
-                        double largest = Double.parseDouble(measurements.get(measurements.size() - 1).getFromToken().getToken());
-                        return largest >= min && largest <= max;
+                        TokenRelationship largest = measurements.get(measurements.size() - 1);
+                        largest.setDescriptor(LARGEST);
+                        double value = Double.parseDouble(largest.getFromToken().getToken());
+                        return value >= min && value <= max;
                     case SMALLEST:
-                        double smallest = Double.parseDouble(measurements.get(0).getFromToken().getToken());
-                        return smallest >= min && smallest <= max;
+                        TokenRelationship smallest = measurements.get(0);
+                        smallest.setDescriptor(SMALLEST);
+                        value = Double.parseDouble(smallest.getFromToken().getToken());
+                        return value >= min && value <= max;
                     case MEDIAN:
                         if (secondLargestMeasurementProcessing == null) {
-                            double median = Double.parseDouble(measurements.get(1).getFromToken().getToken());
-                            return median >= min && median <= max;
+                            TokenRelationship median = measurements.get(1);
+                            median.setDescriptor(MEDIAN);
+                            value = Double.parseDouble(median.getFromToken().getToken());
+                            return value >= min && value <= max;
                         } else {
                             SecondLargestProcessingResult result = processSecondLargestMeasurement(min, max, measurements, secondLargestMeasurementProcessing);
                             if (result.measurementsInRange) {
