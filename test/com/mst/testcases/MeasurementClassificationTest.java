@@ -14,10 +14,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-public class MeasurementAnnotationTest {
+public class MeasurementClassificationTest {
     private BaseUtility baseUtility;
 
-    public MeasurementAnnotationTest() {
+    public MeasurementClassificationTest() {
         baseUtility = new BaseUtility();
     }
 
