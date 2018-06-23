@@ -6,23 +6,16 @@ import com.mst.model.sentenceProcessing.Sentence;
 import com.mst.model.sentenceProcessing.SentenceProcessingResult;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
-import com.mst.util.MongoDatastoreProviderDefault;
 import org.junit.Test;
-import test.SentenceTextRequestDao;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
 public class SentenceProcessingTest {
-    private SentenceTextRequestDao dao;
     private SentenceProcessingController controller;
 
     public SentenceProcessingTest() {
-        String SERVER = "10.0.129.218";
-        String DATABASE = "test";
-        dao = new SentenceTextRequestDao(SentenceTextRequest.class);
-        dao.setMongoDatastoreProvider(new MongoDatastoreProviderDefault(SERVER, DATABASE));
         controller = new SentenceProcessingControllerImpl();
         controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
     }
@@ -32,7 +25,7 @@ public class SentenceProcessingTest {
         final String SOURCE = "SENTENCE_PROCESSING_TEST";
         final String SENTENCE1 = "cyst in left ovary measures 3cm";
         final String SENTENCE2 = "cyst in right ovary measures 4x5x3cm";
-        List<SentenceTextRequest> requests = dao.getRequest(SOURCE);
+        List<SentenceTextRequest> requests = null; //TODO use BaseUtility
         assertNotNull(requests);
         assertEquals(2, requests.size());
 

@@ -8,7 +8,6 @@ import com.mst.model.SentenceQuery.SentenceQueryInstance;
 import com.mst.model.SentenceQuery.SentenceQueryResult;
 import com.mst.util.MongoDatastoreProviderDefault;
 import org.junit.Test;
-import test.SentenceQueryInputDao;
 
 import java.util.List;
 
@@ -18,7 +17,6 @@ import static com.mst.model.metadataTypes.MeasurementClassification.LARGEST;
 import static org.junit.Assert.*;
 
 public class SentenceQueryResultTest {
-    private SentenceQueryInputDao sentenceQueryInputDao;
     private SentenceQueryDao sentenceQueryDao;
     private final String AUTOMATED_TEST_ID = "5b072a6a18b65e3ace2edcdf";
 
@@ -26,15 +24,13 @@ public class SentenceQueryResultTest {
         String SERVER = "10.0.129.218";
         String DATABASE = "test";
         MongoDatastoreProviderDefault mongoProvider = new MongoDatastoreProviderDefault(SERVER, DATABASE);
-        sentenceQueryInputDao = new SentenceQueryInputDao(SentenceQueryInput.class);
-        sentenceQueryInputDao.setMongoDatastoreProvider(mongoProvider);
         sentenceQueryDao = new SentenceQueryDaoImpl();
         sentenceQueryDao.setMongoDatastoreProvider(mongoProvider);
     }
 
     @Test
     public void testQueryNoMeasurement() {
-        List<SentenceQueryInput> inputs = sentenceQueryInputDao.getInput(AUTOMATED_TEST_ID);
+        List<SentenceQueryInput> inputs = null; //TODO use BaseUtility
         assertNotNull(inputs);
         assertEquals(2, inputs.size());
         SentenceQueryInput input = inputs.get(0);
@@ -92,7 +88,7 @@ public class SentenceQueryResultTest {
 
     @Test
     public void testQueryLargestMeasurement() {
-        List<SentenceQueryInput> inputs = sentenceQueryInputDao.getInput(AUTOMATED_TEST_ID);
+        List<SentenceQueryInput> inputs = null; //TODO use BaseUtility
         assertNotNull(inputs);
         assertEquals(2, inputs.size());
         SentenceQueryInput input = inputs.get(1);
