@@ -47,12 +47,10 @@ public class DistinctTokenRelationshipDeterminerImpl implements DistinctTokenRel
     private List<TokenRelationship> getDistinctRelationships(List<TokenRelationship> tokenRelationships) {
         Map<String, TokenRelationship> distinctFromTo = new HashMap<>();
         for (TokenRelationship tokenRelationship : tokenRelationships) {
-            String key = getToken(tokenRelationship.getFromToken()) + getToken(tokenRelationship.getToToken());
-            if (distinctFromTo.containsKey(key)) {
-                if (tokenRelationship.getDescriptor() != null && !distinctFromTo.containsKey(key + tokenRelationship.getDescriptor()))
-                    distinctFromTo.replace(key, tokenRelationship);
+            String descriptor = (tokenRelationship.getDescriptor() != null) ? tokenRelationship.getDescriptor() : "";
+            String key = getToken(tokenRelationship.getFromToken()) + getToken(tokenRelationship.getToToken()) + descriptor;
+            if (distinctFromTo.containsKey(key))
                 continue;
-            }
             distinctFromTo.put(key, tokenRelationship);
         }
         return new ArrayList<>(distinctFromTo.values());
