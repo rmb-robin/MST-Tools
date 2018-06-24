@@ -70,11 +70,13 @@ public class MeasurementClassificationTest {
     public void testMean() {
         baseUtility.setOrgId("5972aedebde4270bc53b23e3");
         SentenceQueryInput input = baseUtility.getSentenceQueryInput("cyst", "ovary", "1", "9", MEAN);
-        SentenceTextRequest request = baseUtility.getSentenceTextRequest("cyst in ovary measures 1.1 cm x 5.3 cm x 3.2 cm.", 33, "F");
-        List<SentenceQueryResult> results = baseUtility.getResults(input, request);
+        SentenceTextRequest request = baseUtility.getSentenceTextRequest("cyst in ovary measures 5 cm x 2 cm x 2 cm.", 33, "F");
+        List<SentenceQueryResult> results = baseUtility.getResults(input, request);  List<SentenceQueryEdgeResult> edges = results.get(0).getSentenceQueryEdgeResults();
+        boolean testResult = baseUtility.testResults(edges, measurement, MEAN,"3.0");
         assertNotNull(input);
         assertNotNull(request);
         assertNotNull(results);
         assertEquals(1, results.size());
+        assertTrue(testResult);
     }
 }
