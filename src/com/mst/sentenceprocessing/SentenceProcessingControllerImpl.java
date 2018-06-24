@@ -2,7 +2,6 @@ package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcessor;
