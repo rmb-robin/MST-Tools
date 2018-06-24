@@ -166,20 +166,17 @@ public class SentenceFilterImpl implements SentenceFilter {
         TokenRelationship measurementTokenRelationship;
         if (measurements.size() == 1) {
             measurementTokenRelationship = measurements.get(0);
-System.out.println("setFromToken 1");
             fromToken = measurementTokenRelationship.getFromToken();
             toToken = measurementTokenRelationship.getToToken();
             rangeMeasurement = Double.parseDouble(measurementTokenRelationship.getFromToken().getToken());
         } else {
             if (measurementClassification.equals(MEAN)) {
                 rangeMeasurement = total / measurements.size();
-                System.out.println("setFromToken 2");
                 fromToken = new WordToken();
                 fromToken.setToken(String.valueOf(rangeMeasurement));
                 toToken = new WordToken();
             } else if (secondLargestMeasurementProcessing == null && measurements.size() == 2 && measurementClassification.equals(MEDIAN)) {
                 rangeMeasurement = total / measurements.size();
-                System.out.println("setFromToken 3");
                 fromToken = new WordToken();
                 fromToken.setToken(String.valueOf(rangeMeasurement));
                 toToken = new WordToken();
@@ -187,14 +184,12 @@ System.out.println("setFromToken 1");
                 switch (measurementClassification) {
                     case LARGEST:
                         measurementTokenRelationship = measurements.get(measurements.size() - 1);
-                        System.out.println("setFromToken 4");
                         fromToken = measurementTokenRelationship.getFromToken();
                         toToken = measurementTokenRelationship.getToToken();
                         rangeMeasurement = Double.parseDouble(measurementTokenRelationship.getFromToken().getToken());
                         break;
                     case SMALLEST:
                         measurementTokenRelationship = measurements.get(0);
-                        System.out.println("setFromToken 5");
                         fromToken = measurementTokenRelationship.getFromToken();
                         toToken = measurementTokenRelationship.getToToken();
                         rangeMeasurement = Double.parseDouble(measurementTokenRelationship.getFromToken().getToken());
@@ -205,7 +200,6 @@ System.out.println("setFromToken 1");
                             this.measurementClassification = SECOND_LARGEST;
                         } else {
                             measurementTokenRelationship = measurements.get(1);
-                            System.out.println("setFromToken 6");
                             fromToken = measurementTokenRelationship.getFromToken();
                             toToken = measurementTokenRelationship.getToToken();
                             rangeMeasurement = Double.parseDouble(measurementTokenRelationship.getFromToken().getToken());
