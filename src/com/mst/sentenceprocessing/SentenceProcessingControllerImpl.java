@@ -2,6 +2,7 @@ package com.mst.sentenceprocessing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcessor;
@@ -30,6 +31,8 @@ import com.mst.model.sentenceProcessing.SentenceProcessingMetaDataInput;
 import com.mst.model.sentenceProcessing.SentenceProcessingResult;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
+
+import static com.mst.model.metadataTypes.EdgeNames.measurement;
 
 public class SentenceProcessingControllerImpl implements SentenceProcessingController {
     private NgramsSentenceProcessor ngramProcessor;
@@ -131,11 +134,16 @@ public class SentenceProcessingControllerImpl implements SentenceProcessingContr
         List<WordToken> modified = sentence.getModifiedWordList();
         Map<String, List<TokenRelationship>> map = sentence.getTokenRelationsByNameMap();
         sentence.getTokenRelationships().addAll(dynamicEdgeCreationProcessor.process(sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), map, modified));
+        removeMeasurementTokenRelationshipsNotCreatedByMeasurementProcessor(sentence.getTokenRelationships());
         List<TokenRelationship> measurementRelationships = measurementProcessor.process(tokens, isConvertMeasurements);
         sentence.getTokenRelationships().addAll(measurementRelationships);
         sentence.setModifiedWordList(tokens);
         List<TokenRelationship> distinctTokenRelations = distinctTokenRelationshipDeterminer.getDistinctTokenRelationships(sentence);
         sentence.setTokenRelationships(distinctTokenRelations);
         return sentence;
+    }
+
+    private void removeMeasurementTokenRelationshipsNotCreatedByMeasurementProcessor(List<TokenRelationship> tokenRelationships) {
+        tokenRelationships.removeIf(tokenRelationship -> tokenRelationship.getEdgeName().equals(measurement) && tokenRelationship.getDescriptor() == null);
     }
 }
