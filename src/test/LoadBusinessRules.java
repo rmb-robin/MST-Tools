@@ -47,7 +47,7 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         businessRule.setRules(rules);
-        dao.delete(ORG_ID, AppendToInput.class.getSimpleName());
+        dao.delete(ORG_ID, AppendToInput.class.getName());
         dao.save(businessRule);
     }
 
@@ -244,7 +244,7 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         businessRule.setRules(rules);
-        dao.delete(ORG_ID, AddEdgeToResult.class.getSimpleName());
+        dao.delete(ORG_ID, AddEdgeToResult.class.getName());
         dao.save(businessRule);
     }
 
@@ -309,26 +309,7 @@ public class LoadBusinessRules {
         rules.add(rule);
 
         businessRule.setRules(rules);
-        dao.delete(ORG_ID, SecondLargestMeasurementProcessing.class.getSimpleName());
-        dao.save(businessRule);
-    }
-
-    @Test
-    public void saveRemoveEdgeFromQueryResults() {
-        BusinessRule businessRule = new RemoveEdgeFromResult();
-        businessRule.setOrganizationId(ORG_ID);
-        businessRule.setRuleType(MODIFY_SENTENCE_QUERY_RESULT);
-        List<BusinessRule> rules = new ArrayList<>();
-
-        // rule 0 remove measurement if null
-        RemoveEdgeFromResult rule = new RemoveEdgeFromResult();
-        rule.setRuleName("Remove measurement if null");
-        rule.setEdgeToRemove("measurement");
-        rule.setRemoveIfNull(true);
-        rules.add(rule);
-
-        businessRule.setRules(rules);
-        dao.delete(ORG_ID, RemoveEdgeFromResult.class.getSimpleName());
+        dao.delete(ORG_ID, SecondLargestMeasurementProcessing.class.getName());
         dao.save(businessRule);
     }
 
@@ -362,11 +343,6 @@ public class LoadBusinessRules {
                 List<BusinessRule> rules = rule.getRules();
                 assertNotNull(rules);
                 assertEquals(6, rules.size());
-            }
-            else if (rule instanceof RemoveEdgeFromResult) {
-                List<BusinessRule> rules = rule.getRules();
-                assertNotNull(rules);
-                assertEquals(1, rules.size());
             }
         }
     }
