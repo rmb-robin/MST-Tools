@@ -9,8 +9,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mst.model.ICDQueryOutput;
 
-import test.QueryICD10CodesByToken;
-
 public class JSONHelper {
 
 	public static void main(String[] args) {
