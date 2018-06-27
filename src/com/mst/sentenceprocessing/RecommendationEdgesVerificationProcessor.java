@@ -66,7 +66,7 @@ public class RecommendationEdgesVerificationProcessor {
 			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
 			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
 			String edgeName = relationship.getEdgeName();
-			WordToken wordToken = modifiedWordList.get(i);
+			WordToken wordToken = relationship.getFromToken();
 			int tokenRanking;
 			//checking the condition for a single word sentence
 			if(edgeName==null) {
@@ -81,29 +81,23 @@ public class RecommendationEdgesVerificationProcessor {
 			    tokenRanking = 0;
 			    wordToken.setTokenRanking(tokenRanking);
 			}
-			else if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
-				tokenRanking = 2;
-				relationship.getFromToken().setTokenRanking(tokenRanking);
+			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
+				tokenRanking = relationship.getFromToken().getTokenRanking()+2;
 				wordToken.setTokenRanking(tokenRanking);
 			}
-			else if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
+			if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
 				RecommendedTokenRelationship nextTokenToken = findNextTokenToken(i+1, embeddedWords);
-				if(nextTokenToken==null)
-					continue;
-				if(relationship.getToToken().equals(nextTokenToken.getTokenRelationship().getFromToken())){
-					if (i + 1 >= embeddedWords.size()) {
-						tokenRanking = 2;
-						relationship.getToToken().setTokenRanking(tokenRanking);
-						wordToken.setTokenRanking(tokenRanking);
-					} else {
-						tokenRanking = 1;
-						relationship.getToToken().setTokenRanking(tokenRanking);
-						wordToken.setTokenRanking(tokenRanking);
-					}
+				if(nextTokenToken==null) {
+					relationship.getToToken().setTokenRanking(relationship.getToToken().getTokenRanking()+2);
+						continue;
+			}
+			else {
+				nextTokenToken.getTokenRelationship().getToToken().setTokenRanking(nextTokenToken.getTokenRelationship().getToToken().getTokenRanking()+2);
+				
 				}
 			}
-			else if(edgeName.equals(WordEmbeddingTypes.commaMinus)) {
-				tokenRanking = 1;
+			if(edgeName.equals(WordEmbeddingTypes.commaMinus)) {
+				tokenRanking = relationship.getFromToken().getTokenRanking()+1;
 				relationship.getToToken().setTokenRanking(tokenRanking);
 				wordToken.setTokenRanking(tokenRanking);
 			}
