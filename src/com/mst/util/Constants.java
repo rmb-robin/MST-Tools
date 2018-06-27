@@ -282,4 +282,18 @@ public class Constants {
 		} catch(IndexOutOfBoundsException oob) { }
 		return token;
 	}
+	
+	// ICD Query Constants used to read configuration from the config.properties
+	// file.
+	public static final String QUERY_OUTPUT_DIRECTORY_PATH = "query.output.directory.path";
+	public static final String QUERY_OUTPUT_FILENAME_PREFIX = "query.output.filename.prefix";
+	public static final String QUERY_NO_OF_OBJECTS_PER_JSON_OUTPUT_FILE = "query.no.of.objects.per.json.output.file";
+	public static final String QUERY_INPUT_FILE_PATH = "query.input.file.path";
+	public static final String QUERY_ICD_CODE_ONLY_FILE_PATH = "query.icd.code.only.file.path";
+	public static final String QUERY_SINGLE_WORD_ICD_CODES_FILE_PATH = "query.single.word.icd.codes.file.path";
+	public static final String QUERY_NEGATION_SPECIAL_CHAR_SET= "query.negation.special.char.set";
+	public static final String QUERY_INPUT_ORG_ID = "query.input.org.id";
+	public static final String QUERY_EXECUTION_ALGORITHMS = "query.execute.algorithms";
+	public static final String MONGO_DB_IP = "mongo.db.ip";
+	public static final String MONGO_DB_NAME = "mongo.db.name";
 }
