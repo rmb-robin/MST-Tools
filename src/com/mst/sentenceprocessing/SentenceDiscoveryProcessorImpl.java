@@ -95,13 +95,19 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             List<RecommendedTokenRelationship> wordEmbeddings = wordEmbeddingProcessor.process(tokens);
             RecommandedNounPhraseResult nounPhraseResult = recommendedNounPhraseProcessor.process(wordEmbeddings);
             sentence.setModifiedWordList(tokens);
-            SentenceDiscovery discovery = convert(sentence, nounPhraseResult);
+            SentenceDiscovery discovery = convert(sentence, nounPhraseResult);       
+           
             List<RecommendedTokenRelationship> negationRelationships = negationTokenRelationshipProcessor.processDiscovery(tokens);
             discovery.getWordEmbeddings().addAll(negationRelationships);
             discovery.getWordEmbeddings().addAll(recommendedNounPhraseProcessor.addEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()));
             discovery.getWordEmbeddings().addAll(negativeRelationshipFactory.create(discovery.getModifiedWordList()));
             discovery.getWordEmbeddings().addAll(iterationRuleProcesser.process(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getIterationRuleProcesserInput()));
             discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
+            /**
+             * calls recommendationEdgesVerificationProcesser and passes the discovery and wordEmbeddings to set the tokenRankings
+             */
+            recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
+           
             List<RecommendedTokenRelationship> edges = recommendedNounPhraseProcessor.setNamedEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()); //should always be last
             dynamicEdgeCreationProcessor.processDiscovery(sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), discovery);
             measurementProcessor.process(tokens, request.isConvertMeasurements());
@@ -113,7 +119,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             /**
              * calls recommendationEdgesVerificationProcesser and passes the discovery and wordEmbeddings to set the tokenRankings
              */
-            recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
+           // recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
             discoveries.add(discovery);
         }
         return discoveries;

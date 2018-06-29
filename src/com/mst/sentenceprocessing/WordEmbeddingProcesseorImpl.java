@@ -24,12 +24,22 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 	@Override
 	public List<RecommendedTokenRelationship> process(List<WordToken> tokens) {
 		List<RecommendedTokenRelationship> result = new ArrayList<>();
-		
-		for(int i =0;i<tokens.size();i++){
-			if(i+1<tokens.size())
-				result.add(getWordEmbedding(tokens.get(i), tokens.get(i+1)));
+		if (tokens.size() == 1) {
+			result.add(getWordEmbedding(tokens.get(0)));
+		} else {
+			for(int i =0;i<tokens.size();i++){
+				if(i+1<tokens.size())
+					result.add(getWordEmbedding(tokens.get(i), tokens.get(i+1)));
+			}
 		}
+
 		return result;
+	}
+
+	private RecommendedTokenRelationship getWordEmbedding(WordToken single){
+		WordToken singleCloned = (WordToken) DeepCloner.deepClone(single);
+		singleCloned.setPosition(single.getPosition());
+		return factory.createRecommendedRelationshipFromTokenRelationship(getTokenRelationship(single));
 	}
 	
 	private RecommendedTokenRelationship getWordEmbedding(WordToken first, WordToken second){
@@ -38,6 +48,14 @@ public class WordEmbeddingProcesseorImpl implements WordEmbeddingProcessor {
 		WordToken secondCloned = (WordToken) DeepCloner.deepClone(second);
 		secondCloned.setPosition(second.getPosition());
 		return factory.createRecommendedRelationship(getEdgeName(first, second), EdgeTypes.related, firstCloned, secondCloned,this.getClass().getName());
+	}
+
+	private TokenRelationship getTokenRelationship(WordToken single) {
+		TokenRelationship tokenRelationship = new TokenRelationship();
+		tokenRelationship.setFromToken(single);
+		tokenRelationship.setToToken(single);
+		tokenRelationship.setEdgeName(WordEmbeddingTypes.tokenToken);
+		return tokenRelationship;
 	}
 
 	private String getEdgeName(WordToken first, WordToken second){

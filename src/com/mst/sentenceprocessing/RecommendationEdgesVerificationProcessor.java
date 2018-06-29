@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.junit.Test;
+
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
@@ -15,8 +17,17 @@ import com.mst.model.sentenceProcessing.WordToken;
 
 
 
-public class RecommendationEdgesVerificationProcessor {
 
+public class RecommendationEdgesVerificationProcessor {
+	/*
+	@Test
+	public void testClass{
+		SentenceDiscovery discovery;
+		setTokenRankings(discovery.getWordEmbeddings(), discovery.getModifiedWordList());
+	     
+	}
+	
+	*/
 	public List<RecommendedTokenRelationship> process(SentenceDiscovery sentenceDiscovery, List<RecommendedTokenRelationship> existing){
 		Map<String, RecommendedTokenRelationship> existingMap =  convertExistingToMap(existing); 
 		for(Entry<Integer, Integer> entry: sentenceDiscovery.getNounPhraseIndexes().entrySet()){
@@ -28,8 +39,10 @@ public class RecommendationEdgesVerificationProcessor {
 		
 			}
 		}
+		//setTokenRankings(sentenceDiscovery.getWordEmbeddings(), sentenceDiscovery.getModifiedWordList());
+		setTokenRankings(existing, sentenceDiscovery.getModifiedWordList());
+		
 		setVerifiedOnEdgeValue(sentenceDiscovery.getWordEmbeddings());
-		setTokenRankings(sentenceDiscovery.getWordEmbeddings(), sentenceDiscovery.getModifiedWordList());
 		return sentenceDiscovery.getWordEmbeddings();
 	}
 	
@@ -65,11 +78,11 @@ public class RecommendationEdgesVerificationProcessor {
 		for(int i =0; i<embeddedWords.size();i++) {
 			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
 			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
-			String edgeName = relationship.getEdgeName();
+			String edgeName = relationship.getEdgeName(); //Is this returning measurement, existence, etc;
 			WordToken wordToken = relationship.getFromToken();
 			int tokenRanking;
 			//checking the condition for a single word sentence
-			if(edgeName==null) {
+			//if(edgeName==null) {
 			    /*
 				//if(embeddedWords.size()==1) {
 				relationship.setEdgeName(WordEmbeddingTypes.tokenToken);
@@ -78,9 +91,9 @@ public class RecommendationEdgesVerificationProcessor {
 				relationship.setFromToken(wordToken);
 				//}
 				*/
-			    tokenRanking = 0;
-			    wordToken.setTokenRanking(tokenRanking);
-			}
+			  //  tokenRanking = 0;
+			  //  wordToken.setTokenRanking(tokenRanking);
+			//}
 			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
 				tokenRanking = relationship.getFromToken().getTokenRanking()+2;
 				wordToken.setTokenRanking(tokenRanking);
@@ -90,9 +103,9 @@ public class RecommendationEdgesVerificationProcessor {
 				if(nextTokenToken==null) {
 					relationship.getToToken().setTokenRanking(relationship.getToToken().getTokenRanking()+2);
 						continue;
-			}
-			else {
-				nextTokenToken.getTokenRelationship().getToToken().setTokenRanking(nextTokenToken.getTokenRelationship().getToToken().getTokenRanking()+2);
+				}
+				else {
+					nextTokenToken.getTokenRelationship().getToToken().setTokenRanking(nextTokenToken.getTokenRelationship().getToToken().getTokenRanking()+1);
 				
 				}
 			}
