@@ -62,8 +62,13 @@ class BaseUtility {
         request.setConvertMeasurements(true);
         SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
         controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
-        SentenceProcessingResult result = controller.processText(request);
-        return result.getSentences().get(0).getTokenRelationships();
+        SentenceProcessingResult sentenceProcessingResult = controller.processText(request);
+        List<TokenRelationship> tokenRelationships = sentenceProcessingResult.getSentences().get(0).getTokenRelationships();
+        List<TokenRelationship> results = new ArrayList<>();
+        for (TokenRelationship tokenRelationship : tokenRelationships)
+            if (!tokenRelationship.getEdgeName().equals(""))
+                results.add(tokenRelationship);
+        return results;
     }
 
     SentenceQueryInput getSentenceQueryInput(String token, String diseaseLocation, String minRange, String maxRange, String measurementClassification) {
