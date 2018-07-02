@@ -6,10 +6,9 @@ import com.mst.interfaces.sentenceprocessing.SentenceProcessingController;
 import com.mst.model.SentenceQuery.*;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.metadataTypes.EdgeNames;
+import com.mst.model.requests.SentenceRequest;
 import com.mst.model.requests.SentenceTextRequest;
-import com.mst.model.sentenceProcessing.Sentence;
-import com.mst.model.sentenceProcessing.SentenceDb;
-import com.mst.model.sentenceProcessing.SentenceProcessingResult;
+import com.mst.model.sentenceProcessing.*;
 import com.mst.sentenceprocessing.SentenceConverter;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
 import com.mst.sentenceprocessing.SentenceProcessingHardcodedMetaDataInputFactory;
@@ -37,6 +36,34 @@ class BaseUtility {
 
     void setOrgId(String orgId) {
         this.orgId = orgId;
+    }
+
+    List<WordToken> getWordTokens(String text, boolean convertMeasurements) {
+        List<WordToken> wordTokens = new ArrayList<>();
+        try {
+            SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
+            controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
+            SentenceRequest request = new SentenceRequest();
+            request.setConvertMeasurements(convertMeasurements);
+            List<String> input = new ArrayList<>(Collections.singletonList(text));
+            request.setSentenceTexts(input);
+            List<Sentence> sentences = controller.processSentences(request);
+            wordTokens = sentences.get(0).getModifiedWordList();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return wordTokens;
+    }
+
+    List<TokenRelationship> getTokenRelationships(String text, boolean convertMeasurements) {
+        SentenceTextRequest request = new SentenceTextRequest();
+        request.setText(text);
+        request.setSource(this.getClass().getSimpleName());
+        request.setConvertMeasurements(true);
+        SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
+        controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
+        SentenceProcessingResult result = controller.processText(request);
+        return result.getSentences().get(0).getTokenRelationships();
     }
 
     SentenceQueryInput getSentenceQueryInput(String token, String diseaseLocation, String minRange, String maxRange, String measurementClassification) {
@@ -91,7 +118,6 @@ class BaseUtility {
         discreteData.setOrganizationId(orgId);
         sentence.setDiscreteData(discreteData);
         sentence.setConvertMeasurements(true);
-        sentence.setNeedResult(false);
         return sentence;
     }
 
