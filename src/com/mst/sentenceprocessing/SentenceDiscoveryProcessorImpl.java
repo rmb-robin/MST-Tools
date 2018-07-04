@@ -47,6 +47,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
     private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor;
     private DynamicEdgeCreationProcessor dynamicEdgeCreationProcessor;
     private RecommendationEdgesVerificationProcessor recommendationEdgesVerificationProcessor;
+    private TokenRankImpl tokenRankImpl;
 
     public SentenceDiscoveryProcessorImpl() {
         sentenceFactory = new SentenceFactory();
@@ -92,6 +93,11 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             discovery.getWordEmbeddings().addAll(negativeRelationshipFactory.create(discovery.getModifiedWordList()));
             discovery.getWordEmbeddings().addAll(iterationRuleProcesser.process(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getIterationRuleProcesserInput()));
             discovery.getWordEmbeddings().addAll(verbExistanceProcessor.processDiscovery(discovery));
+            /**
+             * calls recommendationEdgesVerificationProcesser and passes the discovery and wordEmbeddings to set the tokenRankings
+             */
+           // recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
+            discoveries.add(discovery);
             List<RecommendedTokenRelationship> edges = recommendedNounPhraseProcessor.setNamedEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()); //should always be last
             dynamicEdgeCreationProcessor.processDiscovery(sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), discovery);
             measurementProcessor.process(tokens, request.isConvertMeasurements());
@@ -103,8 +109,9 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             /**
              * calls recommendationEdgesVerificationProcesser and passes the discovery and wordEmbeddings to set the tokenRankings
              */
-            recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
-            discoveries.add(discovery);
+            tokenRankImpl.setTokenRankings(discovery);
+            //recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
+            //discoveries.add(discovery);
         }
         return discoveries;
     }

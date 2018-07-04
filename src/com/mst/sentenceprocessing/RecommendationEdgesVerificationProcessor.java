@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.junit.Test;
+
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
@@ -15,8 +17,9 @@ import com.mst.model.sentenceProcessing.WordToken;
 
 
 
-public class RecommendationEdgesVerificationProcessor {
 
+public class RecommendationEdgesVerificationProcessor {
+	
 	public List<RecommendedTokenRelationship> process(SentenceDiscovery sentenceDiscovery, List<RecommendedTokenRelationship> existing){
 		Map<String, RecommendedTokenRelationship> existingMap =  convertExistingToMap(existing); 
 		for(Entry<Integer, Integer> entry: sentenceDiscovery.getNounPhraseIndexes().entrySet()){
@@ -28,8 +31,9 @@ public class RecommendationEdgesVerificationProcessor {
 		
 			}
 		}
+		//setTokenRankings(sentenceDiscovery);
+		
 		setVerifiedOnEdgeValue(sentenceDiscovery.getWordEmbeddings());
-		setTokenRankings(sentenceDiscovery.getWordEmbeddings(), sentenceDiscovery.getModifiedWordList());
 		return sentenceDiscovery.getWordEmbeddings();
 	}
 	
@@ -51,7 +55,7 @@ public class RecommendationEdgesVerificationProcessor {
 			}
 		}
 	}
-	
+
 	/**
 	 * Method setTokenRankings is used to check various conditions and assign token ranking when the conditions meet. 
 	 * Method get's the edgeName from the embeddedWords and compares it with WordEmbeddingTypes. When the required condition is matched
@@ -59,57 +63,73 @@ public class RecommendationEdgesVerificationProcessor {
 	 * @param embeddedWords
 	 * @param modifiedWordList
 	 */
-
-	private void setTokenRankings(List<RecommendedTokenRelationship> embeddedWords, List<WordToken> modifiedWordList){
+	/*	
+	private void setTokenRankings(SentenceDiscovery sentenceDiscovery){
 		//WordToken wordtoken = new WordToken();
+		List<RecommendedTokenRelationship> embeddedWords = sentenceDiscovery.getWordEmbeddings();
 		for(int i =0; i<embeddedWords.size();i++) {
 			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
 			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
-			String edgeName = relationship.getEdgeName();
-			WordToken wordToken = modifiedWordList.get(i);
-			int tokenRanking;
-			//checking the condition for a single word sentence
-			if(edgeName==null) {
-			    /*
-				//if(embeddedWords.size()==1) {
-				relationship.setEdgeName(WordEmbeddingTypes.tokenToken);
-				//wordToken word=modifiedWord
-				relationship.setToToken(wordToken);
-				relationship.setFromToken(wordToken);
-				//}
-				*/
-			    tokenRanking = 0;
-			    wordToken.setTokenRanking(tokenRanking);
+			String edgeName = relationship.getEdgeName(); //Is this returning measurement, existence, etc;
+			WordToken toToken = relationship.getToToken();
+			WordToken fromToken = relationship.getFromToken();
+	
+			int tokenRanking=0;
+			
+			/*
+			 * Tasks:
+
+a) Add tokenValue to modifiedWordList tokens. 
+b) Add logic to verification processor:
+
+1) If wordEmbedding == prepMinus, increment fromToken tokenValue by 2
+2) If wordEmbedding == tokentoken, increment toToken tokenValue by 1
+3) If wordEmbedding == tokentoken and tokentoken == highest index tokentoken, increment toToken tokenValue by 2
+4) If wordEmbedding == commaMinus, increment toToken tokenValue by 1 **
+			 */
+	/*
+			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
+				tokenRanking =fromToken.getTokenRanking()+2;
+				fromToken.setTokenRanking(tokenRanking);
+				updateModifiedWordList(sentenceDiscovery, fromToken.getToken(), tokenRanking);
+				continue;
 			}
-			else if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
-				tokenRanking = 2;
-				relationship.getFromToken().setTokenRanking(tokenRanking);
-				wordToken.setTokenRanking(tokenRanking);
-			}
-			else if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
-				RecommendedTokenRelationship nextTokenToken = findNextTokenToken(i+1, embeddedWords);
-				if(nextTokenToken==null)
-					continue;
-				if(relationship.getToToken().equals(nextTokenToken.getTokenRelationship().getFromToken())){
-					if (i + 1 >= embeddedWords.size()) {
-						tokenRanking = 2;
-						relationship.getToToken().setTokenRanking(tokenRanking);
-						wordToken.setTokenRanking(tokenRanking);
-					} else {
-						tokenRanking = 1;
-						relationship.getToToken().setTokenRanking(tokenRanking);
-						wordToken.setTokenRanking(tokenRanking);
+			if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
+				if (i+1 < embeddedWords.size()) {
+					RecommendedTokenRelationship nextRecommendedTokenRelationship = embeddedWords.get(i+1);
+					TokenRelationship nextRelationship = nextRecommendedTokenRelationship.getTokenRelationship();
+					String nextEdgeName = nextRelationship.getEdgeName();
+					if(nextEdgeName.equals(WordEmbeddingTypes.tokenToken)) {
+						tokenRanking =toToken.getTokenRanking()+2;
+						toToken.setTokenRanking(tokenRanking);
+						updateModifiedWordList(sentenceDiscovery, toToken.getToken(), tokenRanking);
+						continue;
 					}
 				}
+				tokenRanking = toToken.getTokenRanking()+1;
+				toToken.setTokenRanking(tokenRanking);
+				updateModifiedWordList(sentenceDiscovery, toToken.getToken(), tokenRanking);
+				
 			}
-			else if(edgeName.equals(WordEmbeddingTypes.commaMinus)) {
-				tokenRanking = 1;
+				
+			if(edgeName.equals(WordEmbeddingTypes.commaMinus)) {
+				tokenRanking = relationship.getFromToken().getTokenRanking()+1;
 				relationship.getToToken().setTokenRanking(tokenRanking);
-				wordToken.setTokenRanking(tokenRanking);
+				toToken.setTokenRanking(tokenRanking);
 			}
 
 		}
 	}
+	
+	private void updateModifiedWordList(SentenceDiscovery sentenceDiscovery, String word, int tokenRanking) {
+		
+		for (WordToken wordToken : sentenceDiscovery.getModifiedWordList()) {
+			if(wordToken.getToken().equals(word)) {
+				wordToken.setTokenRanking(tokenRanking);
+			}
+		}
+	}
+	*/
 
 	private Map<String, RecommendedTokenRelationship> convertExistingToMap(List<RecommendedTokenRelationship> existing){
 		Map<String, RecommendedTokenRelationship> result = new HashMap<>();
@@ -192,6 +212,7 @@ public class RecommendationEdgesVerificationProcessor {
 				if(nextTokenToken==null)
 					continue;
 				if(!relationship.getFromToken().getToken().equals(nextTokenToken.getTokenRelationship().getToToken().getToken()))
+					
 					recommandedTokenRelationship.setIsVerified(true);
 			}		
 		}
@@ -255,23 +276,4 @@ public class RecommendationEdgesVerificationProcessor {
 		return matchedRecommandedTokenRelationship;
 	}
 	
-	/*
-	private void setScoreOnTokenValue(List<RecommendedTokenRelationship> embeddedwords) {
-        for (int i = 0; i < embeddedwords.size(); i++) {
-            RecommendedTokenRelationship recommandedTokenRelationship = embeddedwords.get(i);
-            TokenRelationship relationship = recommandedTokenRelationship.getTokenRelationship();
-            String edgeName = relationship.getEdgeName();
-            if (edgeName.equals(WordEmbeddingTypes.prepMinus)) {
-                relationship.setTokenValue(2);
-            }
-            if (edgeName.equals(WordEmbeddingTypes.tokenToken)) {
-                if (i + 1 >= embeddedwords.size()) {
-                    relationship.setTokenValue(2);
-                } else {
-                    relationship.setTokenValue(1);
-                }
-            }
-        }
-    }
-    */
 }
