@@ -1,14 +1,16 @@
 package com.mst.sentenceprocessing;
 
+import java.util.Collections;
 import java.util.List;
 
+//import com.mst.model.GenericToken;
 import com.mst.model.metadataTypes.WordEmbeddingTypes;
 import com.mst.model.recommandation.RecommendedTokenRelationship;
 import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
-public class TokenRankImpl {
+public class TokenRankProcessorImpl  implements TokenRankProcessor{
 	
 	/*
 	 * Tasks:
@@ -30,13 +32,14 @@ b) Add logic to verification processor:
 	 * 
 	 */
 		
-	void setTokenRankings(SentenceDiscovery sentenceDiscovery){
+	public void setTokenRankings(SentenceDiscovery sentenceDiscovery){
 		//WordToken wordtoken = new WordToken();
 		List<RecommendedTokenRelationship> embeddedWords = sentenceDiscovery.getWordEmbeddings();
+		//Collections.reverse(embeddedWords);
 		for(int i =0; i<embeddedWords.size();i++) {
 			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
 			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
-			String edgeName = relationship.getEdgeName(); //Is this returning measurement, existence, etc;
+			String edgeName = relationship.getEdgeName(); 
 			WordToken toToken = relationship.getToToken();
 			WordToken fromToken = relationship.getFromToken();
 	
@@ -46,25 +49,33 @@ b) Add logic to verification processor:
 			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
 				tokenRanking =fromToken.getTokenRanking()+2;
 				fromToken.setTokenRanking(tokenRanking);
-				//updateModifiedWordList(sentenceDiscovery, fromToken.getToken(), tokenRanking);
-				updateModifiedWordList(sentenceDiscovery, fromToken.getToken(), "prepMinus");
+				updateModifiedWordList(sentenceDiscovery, fromToken.getToken(), tokenRanking);
 				continue;
 			}
+			//Amebic lung abscess
 			if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
 				if (i+1 < embeddedWords.size()) {
 					RecommendedTokenRelationship nextRecommendedTokenRelationship = embeddedWords.get(i+1);
 					TokenRelationship nextRelationship = nextRecommendedTokenRelationship.getTokenRelationship();
 					String nextEdgeName = nextRelationship.getEdgeName();
 					if(nextEdgeName.equals(WordEmbeddingTypes.tokenToken)) {
-						//tokenRanking =toToken.getTokenRanking()+2;
-						//toToken.setTokenRanking(tokenRanking);
-						updateModifiedWordList(sentenceDiscovery, toToken.getToken(), "consecutiveTokenToken");
+						WordToken nextToToken = nextRelationship.getToToken();	//this is returning "abscess" which is correct
+						tokenRanking =nextToToken.getTokenRanking()+2;
+						nextToToken.setTokenRanking(tokenRanking);
+						
+						/*
+						 * This getToken() is returning "lung" so word=lung which is incorrect. 
+						 * Tracing back to getToken(), I figured out that the toToken for nextToToken has never been set 
+						 */
+						String word = nextToToken.getToken();	
+						updateModifiedWordList(sentenceDiscovery, word, tokenRanking);
+						//updateModifiedWordListNew(sentenceDiscovery, nextRelationship.getToToken(), tokenRanking);
 						continue;
 					}
 				}
-				//tokenRanking = toToken.getTokenRanking()+1;
-				//toToken.setTokenRanking(tokenRanking);
-				updateModifiedWordList(sentenceDiscovery, toToken.getToken(), "tokenToken");
+				tokenRanking = toToken.getTokenRanking()+1;
+				toToken.setTokenRanking(tokenRanking);
+				updateModifiedWordList(sentenceDiscovery, toToken.getToken(), tokenRanking);
 				
 			}
 				
@@ -77,30 +88,24 @@ b) Add logic to verification processor:
 		}
 	}
 	
-	private void updateModifiedWordList(SentenceDiscovery sentenceDiscovery, String word, String edgeName) {
+	private void updateModifiedWordList(SentenceDiscovery sentenceDiscovery, String word, int tokenRanking) {
+			
+			for (WordToken wordToken : sentenceDiscovery.getModifiedWordList()) {
+				if(wordToken.getToken().equals(word)) {
+					wordToken.setTokenRanking(tokenRanking);
+				}
+			}
+	}
+	/*
+	private void updateModifiedWordListNew(SentenceDiscovery sentenceDiscovery, WordToken nextToToken, int tokenRanking) {
 		
 		for (WordToken wordToken : sentenceDiscovery.getModifiedWordList()) {
-			if(wordToken.getToken().equals(word)) {
-				switch (edgeName) {
-					case "prepMinus":
-						wordToken.setTokenRanking(+2);
-						break;
-					
-					case "tokenToken":
-						wordToken.setTokenRanking(+1);
-						break;
-						
-					case "consecutiveTokenToken":
-						wordToken.setTokenRanking(+2);
-						break;
-
-
-					
-				}
-				//wordToken.setTokenRanking(tokenRanking);
+			if(wordToken.equals(nextToToken)) {
+				wordToken.setTokenRanking(tokenRanking);
 			}
 		}
 	}
+	*/
 }
 
 

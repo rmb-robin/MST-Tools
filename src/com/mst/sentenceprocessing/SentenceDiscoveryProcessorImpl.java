@@ -47,7 +47,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
     private NegationTokenRelationshipProcessor negationTokenRelationshipProcessor;
     private DynamicEdgeCreationProcessor dynamicEdgeCreationProcessor;
     private RecommendationEdgesVerificationProcessor recommendationEdgesVerificationProcessor;
-    private TokenRankImpl tokenRankImpl;
+    private TokenRankProcessor tokenRankProcessor;
 
     public SentenceDiscoveryProcessorImpl() {
         sentenceFactory = new SentenceFactory();
@@ -67,6 +67,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
         negationTokenRelationshipProcessor = new NegationTokenRelationshipProcessorImpl();
         dynamicEdgeCreationProcessor = new DynamicEdgeCreationProcessorImpl();
         recommendationEdgesVerificationProcessor = new RecommendationEdgesVerificationProcessor();
+        tokenRankProcessor = new TokenRankProcessorImpl();
     }
 
     public void setMetadata(SentenceProcessingMetaDataInput sentenceProcessingMetaDataInput) {
@@ -109,7 +110,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             /**
              * calls recommendationEdgesVerificationProcesser and passes the discovery and wordEmbeddings to set the tokenRankings
              */
-            tokenRankImpl.setTokenRankings(discovery);
+            tokenRankProcessor.setTokenRankings(discovery);
             //recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
             //discoveries.add(discovery);
         }
