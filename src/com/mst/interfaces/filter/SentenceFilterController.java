@@ -11,11 +11,12 @@ import com.mst.model.businessRule.BusinessRule;
 import com.mst.model.sentenceProcessing.SentenceDb;
 
 public interface SentenceFilterController {
-	List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, String measurementClassification, List<BusinessRule> businessRules);
-	void filterForAndNot(SentenceQueryInstance sentenceQueryInstance, List<BusinessRule> businessRules);
-	void filterForAnd(SentenceQueryInstance sentenceQueryInstance, List<BusinessRule> businessRules);
-	void filterForAndNotAll(SentenceQueryInstance sentenceQueryInstance);
-	Map<String,SentenceQueryResult>  getQueryResults();
-	void addSentencesToResult(SentenceQueryInstanceResult result);
-	Map<String, EdgeQuery> convertEdgeQueryToDictionary(SentenceQueryInstance input);
+    List<SentenceQueryResult> getSentenceQueryResults(List<SentenceDb> sentences, String token, List<EdgeQuery> edgeQuery, String measurementClassification, List<BusinessRule> businessRules);
+    void filterForAndNot(SentenceQueryInstance sentenceQueryInstance, List<BusinessRule> businessRules);
+    void filterForAnd(SentenceQueryInstance sentenceQueryInstance, List<BusinessRule> businessRules);
+    void filterForAndNotAll(SentenceQueryInstance sentenceQueryInstance);
+    Map<String, SentenceQueryResult> getQueryResults();
+    void addSentencesToResult(SentenceQueryInstanceResult result);
+    Map<String, EdgeQuery> convertEdgeQueryToDictionary(SentenceQueryInstance input);
+    void processCompliance(List<SentenceDb> sentences, List<BusinessRule> businessRules, boolean setFollowupRecommendation);
 }

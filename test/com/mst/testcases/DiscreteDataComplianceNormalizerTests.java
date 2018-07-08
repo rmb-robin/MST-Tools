@@ -3,14 +3,14 @@ package com.mst.testcases;
 import org.junit.Test;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.discrete.DiscreteDataCustomField;
-import com.mst.sentenceprocessing.DiscreteDataNormalizerImpl;
+import com.mst.sentenceprocessing.DiscreteDataMenopausalStatus;
 
 import static org.junit.Assert.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class DiscreteDataNormalizerTests {
+public class DiscreteDataComplianceNormalizerTests {
 	
 	private final String STATUS = "MenopausalStatus";
 	
@@ -71,8 +71,8 @@ public class DiscreteDataNormalizerTests {
 		discrete.setPatientAge(age);
 		discrete.setSex("F");
 		
-		DiscreteDataNormalizerImpl normalizer = new DiscreteDataNormalizerImpl();
-		normalizer.process(discrete);
+		DiscreteDataMenopausalStatus normalizer = new DiscreteDataMenopausalStatus();
+		normalizer.setStatus(discrete);
 		
 		return discrete;
 	}
@@ -83,8 +83,8 @@ public class DiscreteDataNormalizerTests {
 		discrete.setPatientDob(dob);
 		discrete.setReportFinalizedDate(finalized);
 		
-		DiscreteDataNormalizerImpl normalizer = new DiscreteDataNormalizerImpl();
-		normalizer.process(discrete);
+		DiscreteDataMenopausalStatus normalizer = new DiscreteDataMenopausalStatus();
+		normalizer.setStatus(discrete);
 		
 		return discrete;
 	}

@@ -28,7 +28,26 @@ public class SentenceConverter {
         return sentenceDb;
     }
 
-    public static List<Sentence> convertToSentence(List<SentenceDb> sentenceDbs, boolean addRelationships, boolean addModifiedList, boolean addFailure) {
+    public static Sentence convertToSentence(SentenceDb sentenceDb, boolean createObjectId) {
+        Sentence sentence = new Sentence();
+        if (createObjectId)
+            sentenceDb.setId(new ObjectId());
+        sentence.setModifiedWordList(sentenceDb.getModifiedWordList());
+        sentence.setOriginalWords(sentenceDb.getOriginalWords());
+        sentence.setOrigSentence(sentenceDb.getOrigSentence());
+        sentence.setTokenRelationships(sentenceDb.getTokenRelationships());
+        sentence.setPractice(sentenceDb.getPractice());
+        sentence.setProcessingDate(sentenceDb.getProcessingDate());
+        sentence.setSource(sentenceDb.getSource());
+        sentence.setStudy(sentenceDb.getStudy());
+        sentence.setNormalizedSentence(sentenceDb.getNormalizedSentence());
+        sentence.setDiscreteData(sentenceDb.getDiscreteData());
+        sentence.setOrganizationId(sentenceDb.getOrganizationId());
+        sentence.setDidFail(sentenceDb.isDidFail());
+        return sentence;
+    }
+
+    public static List<Sentence> convertToSentences(List<SentenceDb> sentenceDbs, boolean addRelationships, boolean addModifiedList, boolean addFailure) {
         List<Sentence> sentences = new ArrayList<>();
         for (SentenceDb sentenceDb : sentenceDbs) {
             Sentence sentence = new Sentence();

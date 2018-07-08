@@ -77,7 +77,9 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
         for (int i = 0; i < input.getSentenceQueryInstances().size(); i++) {
             SentenceQueryInstance sentenceQueryInstance = input.getSentenceQueryInstances().get(i);
             if (i == 0) {
-                sentenceFilterController.addSentencesToResult(processQueryInstance(sentenceQueryInstance, datastore, input.getOrganizationId(), discreteDataIds, filterOnDiscreteData, sentences));
+                SentenceQueryInstanceResult sentenceQueryInstanceResult = processQueryInstance(sentenceQueryInstance, datastore, input.getOrganizationId(), discreteDataIds, filterOnDiscreteData, sentences);
+                sentenceFilterController.processCompliance(sentenceQueryInstanceResult.getSentences(), businessRules, false);
+                sentenceFilterController.addSentencesToResult(sentenceQueryInstanceResult);
                 continue;
             }
             if (sentenceQueryInstance.getAppender() == null)
@@ -149,7 +151,6 @@ public class SentenceQueryDaoImpl implements SentenceQueryDao {
     }
 
     private SentenceQueryInstanceResult processQueryInstance(SentenceQueryInstance sentenceQueryInstance, Datastore datastore, String organizationId, List<DiscreteData> discreteDataIds, boolean filterForDiscrete, List<SentenceDb> passedSentences) {
-        //TODO send business rules to sentenceFilterController
         Map<String, EdgeQuery> edgeQueriesByName = sentenceFilterController.convertEdgeQueryToDictionary(sentenceQueryInstance);
         edgeQueriesByName.remove(measurement); //NOTE dysn tokens no longer have a measurement edge
         SentenceQueryInstanceResult result = new SentenceQueryInstanceResult();

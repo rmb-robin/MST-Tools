@@ -4,20 +4,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bson.types.ObjectId;
-import org.mongodb.morphia.annotations.Converters;
-import org.mongodb.morphia.annotations.Entity;
-import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.annotations.*;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.mst.util.LocalDateConverter;
-import com.mst.jsonSerializers.ObjectIdJsonSerializer;;
+import com.mst.jsonSerializers.ObjectIdJsonSerializer;
 
 @Entity("discreteData")
-//@Indexes({
-//    @Index(fields = @Field("id"))
-//})
 @Converters(LocalDateConverter.class)
 public class DiscreteData {
     @Id
@@ -38,11 +34,11 @@ public class DiscreteData {
     private String reportFinalizedById;
     private LocalDate reportFinalizedDate;
     private int patientAge;
-    private Followup expectedFollowup;
+    private FollowupRecommendation followupRecommendation;
     private LocalDate processingDate;
     private String organizationId;
     private String bucketName;
-    private boolean isCompliant;
+    private String isCompliant;
     private List<DiscreteDataCustomField> customFields;
     private String orderControl;
     private Boolean isDuplicate;
@@ -58,7 +54,7 @@ public class DiscreteData {
     private Map<String, String> allAvailableFields;
 
     public DiscreteData() {
-        customFields = new ArrayList<DiscreteDataCustomField>();
+        customFields = new ArrayList<>();
     }
 
     public String getReportFinalizedById() {
@@ -233,11 +229,11 @@ public class DiscreteData {
         this.bucketName = bucketName;
     }
 
-    public boolean getIsCompliant() {
+    public String getIsCompliant() {
         return isCompliant;
     }
 
-    public void setIsCompliant(boolean isCompliant) {
+    public void setIsCompliant(String isCompliant) {
         this.isCompliant = isCompliant;
     }
 
@@ -249,12 +245,12 @@ public class DiscreteData {
         this.isDuplicate = isDuplicate;
     }
 
-    public Followup getExpectedFollowup() {
-        return expectedFollowup;
+    public FollowupRecommendation getFollowupRecommendation() {
+        return followupRecommendation;
     }
 
-    public void setExpectedFollowup(Followup expectedFollowup) {
-        this.expectedFollowup = expectedFollowup;
+    public void setFollowupRecommendation(FollowupRecommendation followupRecommendation) {
+        this.followupRecommendation = followupRecommendation;
     }
 
     public String getRawFileId() {
@@ -313,7 +309,7 @@ public class DiscreteData {
         this.orderingProviderId = orderingProviderId;
     }
 
-    public void setCompliant(boolean isCompliant) {
+    public void setCompliant(String isCompliant) {
         this.isCompliant = isCompliant;
     }
 
@@ -339,5 +335,19 @@ public class DiscreteData {
 
     public void setOrderingProviderName(String orderingProviderName) {
         this.orderingProviderName = orderingProviderName;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DiscreteData) {
+            DiscreteData that = (DiscreteData) obj;
+            return Objects.equals(id, that.id);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }
