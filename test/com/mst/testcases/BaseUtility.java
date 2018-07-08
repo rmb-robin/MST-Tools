@@ -1,13 +1,17 @@
 package com.mst.testcases;
 
+import com.mst.dao.BusinessRuleDaoImpl;
 import com.mst.dao.SentenceQueryDaoImpl;
+import com.mst.filter.SentenceFilterControllerImpl;
+import com.mst.interfaces.dao.BusinessRuleDao;
 import com.mst.interfaces.dao.SentenceQueryDao;
 import com.mst.interfaces.sentenceprocessing.SentenceProcessingController;
 import com.mst.model.SentenceQuery.*;
+import com.mst.model.businessRule.BusinessRule;
+import com.mst.model.discrete.ComplianceResult;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.requests.SentenceRequest;
-import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.*;
 import com.mst.sentenceprocessing.SentenceConverter;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
@@ -16,13 +20,18 @@ import com.mst.util.MongoDatastoreProviderDefault;
 import org.bson.types.ObjectId;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
+import static com.mst.model.businessRule.BusinessRule.RuleType.SENTENCE_PROCESSING;
 import static com.mst.model.metadataTypes.EdgeNames.*;
 
 class BaseUtility {
     private String orgId;
     private SentenceQueryDao sentenceQueryDao;
-    private SentenceProcessingController controller;
+    private BusinessRuleDao businessRuleDao;
+    private SentenceProcessingController sentenceProcessingController;
+    private SentenceFilterControllerImpl sentenceFilterController;
+    private List<BusinessRule> sentenceProcessingRules;
 
     BaseUtility() {
         final String SERVER = "10.0.129.218";
@@ -30,25 +39,28 @@ class BaseUtility {
         MongoDatastoreProviderDefault provider = new MongoDatastoreProviderDefault(SERVER, DATABASE);
         sentenceQueryDao = new SentenceQueryDaoImpl();
         sentenceQueryDao.setMongoDatastoreProvider(provider);
-        controller = new SentenceProcessingControllerImpl();
-        controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
+        businessRuleDao = new BusinessRuleDaoImpl(BusinessRule.class);
+        businessRuleDao.setMongoDatastoreProvider(provider);
+        sentenceProcessingController = new SentenceProcessingControllerImpl();
+        sentenceProcessingController.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
+        sentenceFilterController = new SentenceFilterControllerImpl();
     }
 
     void setOrgId(String orgId) {
         this.orgId = orgId;
+        sentenceProcessingRules = businessRuleDao.get(orgId, SENTENCE_PROCESSING);
     }
 
     List<WordToken> getWordTokens(String text, boolean convertMeasurements) {
         List<WordToken> wordTokens = new ArrayList<>();
         try {
-            SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
-            controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
             SentenceRequest request = new SentenceRequest();
             request.setConvertMeasurements(convertMeasurements);
-            List<String> input = new ArrayList<>(Collections.singletonList(text));
+            List<String> input = Arrays.asList(text.split(Pattern.quote(".")));
             request.setSentenceTexts(input);
-            List<Sentence> sentences = controller.processSentences(request);
-            wordTokens = sentences.get(0).getModifiedWordList();
+            List<Sentence> sentences = sentenceProcessingController.processSentences(request);
+            for (Sentence sentence : sentences)
+                wordTokens.addAll(sentence.getModifiedWordList());
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -56,18 +68,22 @@ class BaseUtility {
     }
 
     List<TokenRelationship> getTokenRelationships(String text, boolean convertMeasurements) {
-        SentenceTextRequest request = new SentenceTextRequest();
-        request.setText(text);
-        request.setSource(this.getClass().getSimpleName());
-        request.setConvertMeasurements(true);
-        SentenceProcessingControllerImpl controller = new  SentenceProcessingControllerImpl();
-        controller.setMetadata(new SentenceProcessingHardcodedMetaDataInputFactory().create());
-        SentenceProcessingResult sentenceProcessingResult = controller.processText(request);
-        List<TokenRelationship> tokenRelationships = sentenceProcessingResult.getSentences().get(0).getTokenRelationships();
         List<TokenRelationship> results = new ArrayList<>();
-        for (TokenRelationship tokenRelationship : tokenRelationships)
-            if (!tokenRelationship.getEdgeName().equals(""))
-                results.add(tokenRelationship);
+        try {
+            SentenceRequest request = new SentenceRequest();
+            request.setConvertMeasurements(convertMeasurements);
+            List<String> input = Arrays.asList(text.split(Pattern.quote(".")));
+            request.setSentenceTexts(input);
+            List<Sentence> sentences = sentenceProcessingController.processSentences(request);
+            for (Sentence sentence : sentences) {
+                List<TokenRelationship> tokenRelationships = sentence.getTokenRelationships();
+                for (TokenRelationship tokenRelationship : tokenRelationships)
+                    if (!tokenRelationship.getEdgeName().equals(""))
+                        results.add(tokenRelationship);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
         return results;
     }
 
@@ -112,33 +128,42 @@ class BaseUtility {
         return input;
     }
 
-    SentenceTextRequest getSentenceTextRequest(String text, int age, String sex) {
-        SentenceTextRequest sentence = new SentenceTextRequest();
-        sentence.setText(text);
-        sentence.setSource(this.getClass().getSimpleName());
+    SentenceRequest getSentenceRequest(String text, boolean convertMeasurements, int age, String sex) {
+        SentenceRequest sentenceRequest = new SentenceRequest();
+        sentenceRequest.setConvertMeasurements(convertMeasurements);
+        List<String> input = Arrays.asList(text.split(Pattern.quote(".")));
+        sentenceRequest.setSentenceTexts(input);
+        sentenceRequest.setSource(this.getClass().getSimpleName());
         DiscreteData discreteData = new DiscreteData();
         discreteData.setId(new ObjectId());
         discreteData.setPatientAge(age);
         discreteData.setSex(sex);
         discreteData.setOrganizationId(orgId);
-        sentence.setDiscreteData(discreteData);
-        sentence.setConvertMeasurements(true);
-        return sentence;
+        sentenceRequest.setDiscreteData(discreteData);
+        return sentenceRequest;
     }
 
-    List<SentenceQueryResult> getResults(SentenceQueryInput input, SentenceTextRequest request) {
-        List<SentenceDb> sentenceDbs = new ArrayList<>();
-        try {
-            SentenceProcessingResult result = controller.processText(request);
-            List<Sentence> sentences = result.getSentences();
-            for (Sentence sentence : sentences) {
-                SentenceDb sentenceDb = SentenceConverter.convertToSentenceDb(sentence, true);
-                sentenceDbs.add(sentenceDb);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    List<SentenceQueryResult> getQueryResults(SentenceQueryInput input, SentenceRequest request) {
+        List<Sentence> sentences = getSentences(request);
+        List<SentenceDb> convertedToSentenceDb = new ArrayList<>();
+        for (Sentence sentence : sentences)
+            convertedToSentenceDb.add(SentenceConverter.convertToSentenceDb(sentence, true));
+        return sentenceQueryDao.getSentences(input, convertedToSentenceDb);
+    }
+
+    boolean isCompliant(SentenceRequest request, String bucketName) {
+        DiscreteData discreteData = request.getDiscreteData();
+        List<Sentence> sentences = getSentences(request);
+        List<SentenceDb> convertedToSentenceDb = new ArrayList<>();
+        for (Sentence sentence : sentences) {
+            sentence.setDiscreteData(discreteData);
+            convertedToSentenceDb.add(SentenceConverter.convertToSentenceDb(sentence, true));
         }
-        return sentenceQueryDao.getSentences(input, sentenceDbs);
+        sentenceFilterController.processCompliance(convertedToSentenceDb, sentenceProcessingRules, false);
+        Map<DiscreteData, ComplianceResult> complianceResults = sentenceFilterController.getComplianceResults();
+        Map.Entry<DiscreteData, ComplianceResult> entry = complianceResults.entrySet().iterator().next();
+        Map<String, Boolean> bucketCompliance = entry.getValue().getBucketCompliance();
+        return bucketCompliance.getOrDefault(bucketName, false);
     }
 
     boolean testResults(List<SentenceQueryEdgeResult> edges, String edgeName, String descriptor, String value) {
@@ -150,5 +175,15 @@ class BaseUtility {
                 return true;
         }
         return false;
+    }
+
+    private List<Sentence> getSentences(SentenceRequest request) {
+        List<Sentence> sentences = new ArrayList<>();
+        try {
+            sentences = sentenceProcessingController.processSentences(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sentences;
     }
 }
