@@ -129,7 +129,7 @@ class BaseUtility {
     SentenceRequest getSentenceRequest(String text, boolean convertMeasurements, int age, String sex) {
         SentenceRequest sentenceRequest = new SentenceRequest();
         sentenceRequest.setConvertMeasurements(convertMeasurements);
-        List<String> input = Arrays.asList(text.split(Pattern.quote(".")));
+        List<String> input = Arrays.asList(text.split(Pattern.quote(". ")));
         sentenceRequest.setSentenceTexts(input);
         sentenceRequest.setSource(this.getClass().getSimpleName());
         DiscreteData discreteData = new DiscreteData();
