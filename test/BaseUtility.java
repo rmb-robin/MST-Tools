@@ -54,7 +54,7 @@ class BaseUtility {
         try {
             SentenceRequest request = new SentenceRequest();
             request.setConvertMeasurements(convertMeasurements);
-            List<String> input = Arrays.asList(text.split(Pattern.quote(".")));
+            List<String> input = Arrays.asList(text.split(Pattern.quote(". ")));
             request.setSentenceTexts(input);
             List<Sentence> sentences = sentenceProcessingController.processSentences(request);
             for (Sentence sentence : sentences)
@@ -70,7 +70,7 @@ class BaseUtility {
         try {
             SentenceRequest request = new SentenceRequest();
             request.setConvertMeasurements(convertMeasurements);
-            List<String> input = Arrays.asList(text.split(Pattern.quote(".")));
+            List<String> input = Arrays.asList(text.split(Pattern.quote(". ")));
             request.setSentenceTexts(input);
             List<Sentence> sentences = sentenceProcessingController.processSentences(request);
             for (Sentence sentence : sentences) {
