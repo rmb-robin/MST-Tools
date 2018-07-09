@@ -2,7 +2,7 @@ import com.mst.model.discrete.DiscreteData;
 import com.mst.model.requests.SentenceRequest;
 import org.junit.Test;
 
-import static com.mst.model.metadataTypes.ComplianceBucketName.*;
+import static com.mst.model.metadataTypes.ComplianceBucket.*;
 import static org.junit.Assert.*;
 
 
@@ -57,7 +57,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_5));
         assertEquals(BUCKET_5 + ", " + BUCKET_8, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(true) + ", " + String.valueOf(false), discreteData.getIsCompliant());
     }
 
     @Test
@@ -65,9 +65,8 @@ public class ComplianceProcessing {
         SentenceRequest request = baseUtility.getSentenceRequest("Cyst in thyroid measures .1 cm. Recommend ultrasound.",true,19, "F");
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_7));
-        assertTrue(baseUtility.isCompliant(request, BUCKET_4));
         assertEquals(BUCKET_4 + ", " + BUCKET_7, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(false) + ", " + String.valueOf(true), discreteData.getIsCompliant());
     }
 
     @Test
@@ -76,7 +75,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_8));
         assertEquals(BUCKET_5 + ", " + BUCKET_8, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(false) + ", " + String.valueOf(true), discreteData.getIsCompliant());
     }
 
     @Test
@@ -94,7 +93,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_1));
         assertEquals(BUCKET_1 + ", " + BUCKET_9, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(true) + ", " + String.valueOf(false), discreteData.getIsCompliant());
     }
 
     @Test
@@ -103,7 +102,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_2));
         assertEquals(BUCKET_2 + ", " + BUCKET_10, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(true) + ", " + String.valueOf(false), discreteData.getIsCompliant());
     }
 
     @Test
@@ -130,7 +129,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_5));
         assertEquals(BUCKET_5 + ", " + BUCKET_11, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(true) + ", " + String.valueOf(false), discreteData.getIsCompliant());
     }
 
     @Test
@@ -139,7 +138,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_6));
         assertEquals(BUCKET_6 + ", " + BUCKET_12, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(true) + ", " + String.valueOf(false), discreteData.getIsCompliant());
     }
 
     @Test
@@ -166,7 +165,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_9));
         assertEquals(BUCKET_1 + ", " + BUCKET_9, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(false) + ", " + String.valueOf(true), discreteData.getIsCompliant());
     }
 
     @Test
@@ -175,7 +174,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_10));
         assertEquals(BUCKET_2 + ", " + BUCKET_10, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(false) + ", " + String.valueOf(true), discreteData.getIsCompliant());
     }
 
     @Test
@@ -184,7 +183,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_11));
         assertEquals(BUCKET_5 + ", " + BUCKET_11, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(false) + ", " + String.valueOf(true), discreteData.getIsCompliant());
     }
 
     @Test
@@ -193,7 +192,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_12));
         assertEquals(BUCKET_6 + ", " + BUCKET_12, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(false) + ", " + String.valueOf(true), discreteData.getIsCompliant());
     }
 
     @Test
@@ -229,12 +228,21 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_4));
         assertEquals(BUCKET_4 + ", " + BUCKET_5, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(true) + ", " + String.valueOf(false), discreteData.getIsCompliant());
     }
 
     @Test
     public void Aaa5() {
         SentenceRequest request = baseUtility.getSentenceRequest("Abdominal aneurysm measuring 4 cm. Recommend vascular consultation.",true,50, "M");
+        DiscreteData discreteData = request.getDiscreteData();
+        assertTrue(baseUtility.isCompliant(request, BUCKET_5));
+        assertEquals(BUCKET_4 + ", " + BUCKET_5, discreteData.getBucketName());
+        assertEquals(String.valueOf(false) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+    }
+
+    @Test
+    public void Aaa4and5() {
+        SentenceRequest request = baseUtility.getSentenceRequest("Abdominal aneurysm measuring 4 cm. Recommend vascular consultation and followup every 12 months.",true,50, "M");
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_5));
         assertEquals(BUCKET_4 + ", " + BUCKET_5, discreteData.getBucketName());
@@ -247,12 +255,21 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_6));
         assertEquals(BUCKET_6 + ", " + BUCKET_7, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(true) + ", " + String.valueOf(false), discreteData.getIsCompliant());
     }
 
     @Test
     public void Aaa7() {
         SentenceRequest request = baseUtility.getSentenceRequest("Abdominal aneurysm measuring 5 cm. Recommend vascular consultation.",true,50, "M");
+        DiscreteData discreteData = request.getDiscreteData();
+        assertTrue(baseUtility.isCompliant(request, BUCKET_7));
+        assertEquals(BUCKET_6 + ", " + BUCKET_7, discreteData.getBucketName());
+        assertEquals(String.valueOf(false) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+    }
+
+    @Test
+    public void Aaa6and7() {
+        SentenceRequest request = baseUtility.getSentenceRequest("Abdominal aneurysm measuring 5 cm. Recommend vascular consultation and followup every 6 months.",true,50, "M");
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_7));
         assertEquals(BUCKET_6 + ", " + BUCKET_7, discreteData.getBucketName());
