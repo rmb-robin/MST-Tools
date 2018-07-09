@@ -1,6 +1,8 @@
 package com.mst.model.metadataTypes;
 
-public class ComplianceBucketName {
+public class ComplianceBucket {
+    public enum BucketType {COMPLIANCE, NONCOMPLIANCE}
+
     public static final String BUCKET_1 = "Bucket 1";
     public static final String BUCKET_2 = "Bucket 2";
     public static final String BUCKET_3 = "Bucket 3";

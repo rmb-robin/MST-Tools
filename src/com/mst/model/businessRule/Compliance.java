@@ -5,6 +5,8 @@ import com.mst.model.discrete.FollowupRecommendation;
 import java.util.List;
 import java.util.Map;
 
+import static com.mst.model.metadataTypes.ComplianceBucket.*;
+
 public class Compliance extends BusinessRule  {
     private String ruleName;
     private Map<String, List<String>> edgesToMatch;
@@ -15,6 +17,7 @@ public class Compliance extends BusinessRule  {
     }
 
     public static class Bucket {
+        private BucketType bucketType;
         private String bucketName;
         private double minSize;
         private double maxSize;
@@ -22,6 +25,14 @@ public class Compliance extends BusinessRule  {
         private int maxAge;
         private String menopausalStatus;
         private FollowupRecommendation followupRecommendation;
+
+        public BucketType getBucketType() {
+            return bucketType;
+        }
+
+        public void setBucketType(BucketType bucketType) {
+            this.bucketType = bucketType;
+        }
 
         public String getBucketName() {
             return bucketName;

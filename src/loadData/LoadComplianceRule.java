@@ -14,7 +14,8 @@ import java.util.*;
 import static com.mst.model.businessRule.BusinessRule.LogicalOperator.OR;
 import static com.mst.model.businessRule.BusinessRule.RuleType.MODIFY_SENTENCE_QUERY_INPUT;
 import static com.mst.model.businessRule.BusinessRule.RuleType.SENTENCE_PROCESSING;
-import static com.mst.model.metadataTypes.ComplianceBucketName.*;
+import static com.mst.model.metadataTypes.ComplianceBucket.*;
+import static com.mst.model.metadataTypes.ComplianceBucket.BucketType.*;
 import static com.mst.model.metadataTypes.EdgeNames.*;
 import static com.mst.model.metadataTypes.EdgeNames.diseaseLocation;
 import static com.mst.model.metadataTypes.EdgeNames.existence;
@@ -62,6 +63,7 @@ public class LoadComplianceRule {
         rule.setEdgesToMatch(edgesToMatch);
         buckets = new ArrayList<>();
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_1);
         bucket.setMinSize(2.6);
         bucket.setMaxSize(2.9);
@@ -72,6 +74,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_2);
         bucket.setMinSize(3.0);
         bucket.setMaxSize(3.4);
@@ -82,6 +85,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_3);
         bucket.setMinSize(3.5);
         bucket.setMaxSize(3.9);
@@ -92,6 +96,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_4);
         bucket.setMinSize(4.0);
         bucket.setMaxSize(4.4);
@@ -102,6 +107,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_5);
         bucket.setMinSize(4.0);
         bucket.setMaxSize(4.4);
@@ -113,6 +119,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_6);
         bucket.setMinSize(4.5);
         bucket.setMaxSize(5.4);
@@ -123,6 +130,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_7);
         bucket.setMinSize(4.5);
         bucket.setMaxSize(5.4);
@@ -134,6 +142,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_8);
         bucket.setMinSize(5.5);
         bucket.setMaxSize(100);
@@ -156,6 +165,7 @@ public class LoadComplianceRule {
         rule.setEdgesToMatch(edgesToMatch);
         buckets = new ArrayList<>();
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_1);
         bucket.setMinAge(0);
         bucket.setMaxAge(18);
@@ -175,6 +185,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_2);
         bucket.setMinAge(19);
         bucket.setMaxAge(34);
@@ -194,6 +205,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_3);
         bucket.setMinAge(35);
         bucket.setMaxAge(100);
@@ -213,6 +225,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_4);
         bucket.setMinAge(19);
         bucket.setMaxAge(34);
@@ -225,6 +238,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_5);
         bucket.setMinAge(35);
         bucket.setMaxAge(100);
@@ -237,6 +251,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(NONCOMPLIANCE);
         bucket.setBucketName(BUCKET_7);
         bucket.setMinAge(19);
         bucket.setMaxAge(24);
@@ -256,6 +271,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(NONCOMPLIANCE);
         bucket.setBucketName(BUCKET_8);
         bucket.setMinAge(35);
         bucket.setMaxAge(100);
@@ -287,6 +303,7 @@ public class LoadComplianceRule {
         rule.setEdgesToMatch(edgesToMatch);
         buckets = new ArrayList<>();
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_6);
         bucket.setMinAge(0);
         bucket.setMaxAge(100);
@@ -315,6 +332,7 @@ public class LoadComplianceRule {
         rule.setEdgesToMatch(edgesToMatch);
         buckets = new ArrayList<>();
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_1);
         bucket.setMenopausalStatus(PREMENOPAUSAL);
         bucket.setMinSize(0);
@@ -328,6 +346,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_2);
         bucket.setMenopausalStatus(PREMENOPAUSAL);
         bucket.setMinSize(3.1);
@@ -341,6 +360,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_3);
         bucket.setMenopausalStatus(PREMENOPAUSAL);
         bucket.setMinSize(5.1);
@@ -357,6 +377,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_4);
         bucket.setMenopausalStatus(PREMENOPAUSAL);
         bucket.setMinSize(7.1);
@@ -374,6 +395,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_5);
         bucket.setMenopausalStatus(POSTMENOPAUSAL);
         bucket.setMinSize(0);
@@ -387,6 +409,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_6);
         bucket.setMenopausalStatus(POSTMENOPAUSAL);
         bucket.setMinSize(1.1);
@@ -400,6 +423,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_7);
         bucket.setMenopausalStatus(POSTMENOPAUSAL);
         bucket.setMinSize(3.1);
@@ -416,6 +440,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(COMPLIANCE);
         bucket.setBucketName(BUCKET_8);
         bucket.setMenopausalStatus(POSTMENOPAUSAL);
         bucket.setMinSize(7.1);
@@ -433,6 +458,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(NONCOMPLIANCE);
         bucket.setBucketName(BUCKET_9);
         bucket.setMenopausalStatus(PREMENOPAUSAL);
         bucket.setMinSize(0);
@@ -449,6 +475,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(NONCOMPLIANCE);
         bucket.setBucketName(BUCKET_10);
         bucket.setMenopausalStatus(PREMENOPAUSAL);
         bucket.setMinSize(3.1);
@@ -465,6 +492,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(NONCOMPLIANCE);
         bucket.setBucketName(BUCKET_11);
         bucket.setMenopausalStatus(POSTMENOPAUSAL);
         bucket.setMinSize(0);
@@ -481,6 +509,7 @@ public class LoadComplianceRule {
         bucket.setFollowupRecommendation(followup);
         buckets.add(bucket);
         bucket = new Compliance.Bucket();
+        bucket.setBucketType(NONCOMPLIANCE);
         bucket.setBucketName(BUCKET_12);
         bucket.setMenopausalStatus(POSTMENOPAUSAL);
         bucket.setMinSize(1.1);
