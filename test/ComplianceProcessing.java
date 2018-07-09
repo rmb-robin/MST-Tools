@@ -48,7 +48,7 @@ public class ComplianceProcessing {
         DiscreteData discreteData = request.getDiscreteData();
         assertTrue(baseUtility.isCompliant(request, BUCKET_4));
         assertEquals(BUCKET_4 + ", " + BUCKET_7, discreteData.getBucketName());
-        assertEquals(String.valueOf(true) + ", " + String.valueOf(true), discreteData.getIsCompliant());
+        assertEquals(String.valueOf(true) + ", " + String.valueOf(false), discreteData.getIsCompliant());
     }
 
     @Test
