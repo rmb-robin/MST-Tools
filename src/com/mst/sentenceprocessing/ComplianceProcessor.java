@@ -60,9 +60,8 @@ public class ComplianceProcessor {
             String descriptor = followupDescriptor.getDescriptor();
             if (doTokenRelationshipsContainDescriptor(tokenRelationships, descriptor) && OR.equals(logicalOperator))
                 foundOr = true;
-            if (!doTokenRelationshipsContainDescriptor(tokenRelationships, descriptor) && !OR.equals(logicalOperator) && processingOr && !foundOr) {
+            if (!doTokenRelationshipsContainDescriptor(tokenRelationships, descriptor) && ((logicalOperator == null && !processingOr) || (!OR.equals(logicalOperator) && processingOr && !foundOr)))
                 return false;
-            }
             processingOr = logicalOperator == OR;
             if (!processingOr)
                 foundOr = false;
