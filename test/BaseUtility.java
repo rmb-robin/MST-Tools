@@ -10,6 +10,7 @@ import com.mst.model.discrete.ComplianceResult;
 import com.mst.model.discrete.DiscreteData;
 import com.mst.model.metadataTypes.EdgeNames;
 import com.mst.model.requests.SentenceRequest;
+import com.mst.model.requests.SentenceTextRequest;
 import com.mst.model.sentenceProcessing.*;
 import com.mst.sentenceprocessing.SentenceConverter;
 import com.mst.sentenceprocessing.SentenceProcessingControllerImpl;
@@ -139,6 +140,20 @@ class BaseUtility {
         discreteData.setOrganizationId(orgId);
         sentenceRequest.setDiscreteData(discreteData);
         return sentenceRequest;
+    }
+
+    SentenceTextRequest getSentenceTextRequest(String text, int age, String sex) {
+        SentenceTextRequest sentence = new SentenceTextRequest();
+        sentence.setText(text);
+        sentence.setSource(this.getClass().getSimpleName());
+        DiscreteData discreteData = new DiscreteData();
+        discreteData.setId(new ObjectId());
+        discreteData.setPatientAge(age);
+        discreteData.setSex(sex);
+        discreteData.setOrganizationId(orgId);
+        sentence.setDiscreteData(discreteData);
+        sentence.setConvertMeasurements(true);
+        return sentence;
     }
 
     List<SentenceQueryResult> getQueryResults(SentenceQueryInput input, SentenceRequest request) {
