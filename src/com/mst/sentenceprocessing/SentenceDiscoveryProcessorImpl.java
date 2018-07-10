@@ -101,7 +101,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             discoveries.add(discovery);
             List<RecommendedTokenRelationship> edges = recommendedNounPhraseProcessor.setNamedEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()); //should always be last
             dynamicEdgeCreationProcessor.processDiscovery(sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), discovery);
-            measurementProcessor.process(tokens, request.isConvertMeasurements());
+           // measurementProcessor.process(tokens, request.isConvertMeasurements());
             edges = distinctTokenRelationshipDeterminer.getDistinctRecommendedRelationships(edges);
             discovery.setWordEmbeddings(edges);
             RecommendedTokenRelationship relationship = additionalExistenceEdgeProcessor.processDiscovery(discovery);
@@ -139,7 +139,8 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
         sentenceDiscovery.setWordEmbeddings(nounPhraseResult.getRecommandedTokenRelationships());
         sentenceDiscovery.setNounPhraseIndexes(nounPhraseResult.getNounPhraseIndexes());
         sentenceDiscovery.setModifiedWordList(sentence.getModifiedWordList());
-        sentenceDiscovery.setNormalizedSentence(getNormalizeSentenceFromTokens(sentence.getModifiedWordList()));
+//        sentenceDiscovery.setNormalizedSentence(getNormalizeSentenceFromTokens(sentence.getModifiedWordList()));
+        sentenceDiscovery.setNormalizedSentence(sentence.getNormalizedSentence());
         sentenceDiscovery.setOriginalWords(sentence.getOriginalWords());
         sentenceDiscovery.setOrigSentence(sentence.getOrigSentence());
         sentenceDiscovery.setProcessingDate(sentence.getProcessDate());

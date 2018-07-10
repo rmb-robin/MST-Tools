@@ -1,6 +1,7 @@
 package com.mst.sentenceprocessing;
 
 import java.util.Collections;
+
 import java.util.List;
 
 //import com.mst.model.GenericToken;
@@ -10,7 +11,18 @@ import com.mst.model.recommandation.SentenceDiscovery;
 import com.mst.model.sentenceProcessing.TokenRelationship;
 import com.mst.model.sentenceProcessing.WordToken;
 
+/**
+ * 
+ * @author Rabhu
+ * Class created to calculate the tokenRanking on 07/03/2018
+ *
+ */
+
 public class TokenRankProcessorImpl  implements TokenRankProcessor{
+	private static final String COMMA = ",";
+	private static final String HYPHEN = "-";
+	private static final String SEMICOLON = ";";
+	
 	
 	/*
 	 * Tasks:
@@ -18,10 +30,13 @@ public class TokenRankProcessorImpl  implements TokenRankProcessor{
 a) Add tokenValue to modifiedWordList tokens. 
 b) Add logic to verification processor:
 
-1) If wordEmbedding == prepMinus, increment fromToken tokenValue by 2
+1) If wordEmbedding == prepMinus, increment fromToken tokenValue by 4
 2) If wordEmbedding == tokentoken, increment toToken tokenValue by 1
 3) If wordEmbedding == tokentoken and tokentoken == highest index tokentoken, increment toToken tokenValue by 2
-4) If wordEmbedding == commaMinus, increment toToken tokenValue by 1 **
+4) If wordEmbedding == token-token and toToken==, increment fromToken tokenValue by 2 
+5) If wordEmbedding == token-token and toToken== ; increment fromToken tokenValue by 2
+6) If wordEmbedding == token-token and toToken == -, increment fromToken tokenValue by 2
+7) If wordEmbedding == prepMinus and toToken == fromToken in token-token and toToken in token-token == fromToken == prep-1, then increment tokenValue by 1
 	 */
 	
 	/**
@@ -35,31 +50,98 @@ b) Add logic to verification processor:
 	public void setTokenRankings(SentenceDiscovery sentenceDiscovery){
 		//WordToken wordtoken = new WordToken();
 		List<RecommendedTokenRelationship> embeddedWords = sentenceDiscovery.getWordEmbeddings();
-		//Collections.reverse(embeddedWords);
+		Collections.reverse(embeddedWords);
+		
+		//String prevToToken = "";
+		int incrementValue=4;
+		Boolean flag = false;
+		//String tokenTokenToToken=null;
+		
 		for(int i =0; i<embeddedWords.size();i++) {
 			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
 			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
 			String edgeName = relationship.getEdgeName(); 
 			WordToken toToken = relationship.getToToken();
 			WordToken fromToken = relationship.getFromToken();
-	
+			//String prevToToken = null;
+				
 			int tokenRanking=0;
 			
 			
 			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
-				tokenRanking =fromToken.getTokenRanking()+2;
+				
+				if(flag) {
+					tokenRanking =fromToken.getTokenRanking()+incrementValue;
+					incrementValue--;
+				}
+				else {
+					tokenRanking =fromToken.getTokenRanking()+4;	
+				}
+				
+				
+				//tokenRanking =fromToken.getTokenRanking()+incrementValue;
 				fromToken.setTokenRanking(tokenRanking);
-				updateModifiedWordList(sentenceDiscovery, fromToken.getToken(), tokenRanking);
 				continue;
 			}
-			//Amebic lung abscess
-			if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
+			
+			if(edgeName.equals(WordEmbeddingTypes.prepPlus)) {
+				if (flag) {
+					tokenRanking=toToken.getTokenRanking()+incrementValue;
+					toToken.setTokenRanking(tokenRanking);
+					incrementValue--;
+				}
 				if (i+1 < embeddedWords.size()) {
 					RecommendedTokenRelationship nextRecommendedTokenRelationship = embeddedWords.get(i+1);
 					TokenRelationship nextRelationship = nextRecommendedTokenRelationship.getTokenRelationship();
 					String nextEdgeName = nextRelationship.getEdgeName();
 					if(nextEdgeName.equals(WordEmbeddingTypes.tokenToken)) {
-						WordToken nextToToken = nextRelationship.getToToken();	//this is returning "abscess" which is correct
+						WordToken nextToToken = nextRelationship.getToToken();	
+						WordToken nextFromToken = nextRelationship.getFromToken();	
+						if(toToken.getToken().equals(nextFromToken.getToken())) {
+							
+							tokenRanking=toToken.getTokenRanking()+incrementValue;
+							toToken.setTokenRanking(tokenRanking);
+							incrementValue--;
+							flag=true;
+						}
+					}
+				
+				}
+				continue;
+			}
+			
+			
+			if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
+				if(SEMICOLON.equals(toToken.getToken())||HYPHEN.equals(toToken.getToken())||COMMA.equals(toToken.getToken())) {
+					tokenRanking = fromToken.getTokenRanking()+2;
+					fromToken.setTokenRanking(tokenRanking);
+					flag=false;
+					continue;
+				}
+				if (i+1 < embeddedWords.size()) {
+					RecommendedTokenRelationship nextRecommendedTokenRelationship = embeddedWords.get(i+1);
+					TokenRelationship nextRelationship = nextRecommendedTokenRelationship.getTokenRelationship();
+					String nextEdgeName = nextRelationship.getEdgeName();
+					if(nextEdgeName.equals(WordEmbeddingTypes.tokenToken)) {
+						WordToken nextToToken = nextRelationship.getToToken();	
+						WordToken nextFromToken = nextRelationship.getFromToken();	
+						/*
+						 * In the following if statement, we check whether the nextToToken is a ;,-.
+						 * If yes, then we don't do anything and continue for next iteration.
+						 */
+						
+						if(SEMICOLON.equals(nextToToken.getToken())||HYPHEN.equals(nextToToken.getToken())||COMMA.equals(nextToToken.getToken())){
+							flag=false;
+							continue;
+						}
+						
+						if(flag) {
+							tokenRanking =nextToToken.getTokenRanking()+incrementValue;
+							nextToToken.setTokenRanking(tokenRanking);
+							incrementValue--;
+							continue;
+						}
+						
 						tokenRanking =nextToToken.getTokenRanking()+2;
 						nextToToken.setTokenRanking(tokenRanking);
 						
@@ -67,27 +149,40 @@ b) Add logic to verification processor:
 						 * This getToken() is returning "lung" so word=lung which is incorrect. 
 						 * Tracing back to getToken(), I figured out that the toToken for nextToToken has never been set 
 						 */
-						String word = nextToToken.getToken();	
-						updateModifiedWordList(sentenceDiscovery, word, tokenRanking);
+						//String word = nextToToken.getToken();	
+						//updateModifiedWordList(sentenceDiscovery, word, tokenRanking);
 						//updateModifiedWordListNew(sentenceDiscovery, nextRelationship.getToToken(), tokenRanking);
+						
 						continue;
 					}
 				}
+				
+				if(flag) {
+					if (i+1 < embeddedWords.size()) {
+						RecommendedTokenRelationship nextRecommendedTokenRelationship = embeddedWords.get(i+1);
+						TokenRelationship nextRelationship = nextRecommendedTokenRelationship.getTokenRelationship();
+						String nextEdgeName = nextRelationship.getEdgeName();
+						if(nextEdgeName.equals(WordEmbeddingTypes.prepMinus)) {
+							//WordToken nextToToken = nextRelationship.getToToken();	
+							WordToken nextFromToken = nextRelationship.getFromToken();						
+							if(toToken.getToken().equals(nextFromToken.getToken())) {								
+								tokenRanking = toToken.getTokenRanking()+incrementValue;
+								toToken.setTokenRanking(tokenRanking);
+								incrementValue--;
+								continue;
+							}
+						}
+					}
+				}
+				
 				tokenRanking = toToken.getTokenRanking()+1;
 				toToken.setTokenRanking(tokenRanking);
 				updateModifiedWordList(sentenceDiscovery, toToken.getToken(), tokenRanking);
 				
 			}
 				
-			if(edgeName.equals(WordEmbeddingTypes.commaMinus)) {
-				tokenRanking = relationship.getFromToken().getTokenRanking()+1;
-				relationship.getToToken().setTokenRanking(tokenRanking);
-				toToken.setTokenRanking(tokenRanking);
-			}
-
 		}
-	}
-	
+	}	
 	private void updateModifiedWordList(SentenceDiscovery sentenceDiscovery, String word, int tokenRanking) {
 			
 			for (WordToken wordToken : sentenceDiscovery.getModifiedWordList()) {
@@ -96,16 +191,7 @@ b) Add logic to verification processor:
 				}
 			}
 	}
-	/*
-	private void updateModifiedWordListNew(SentenceDiscovery sentenceDiscovery, WordToken nextToToken, int tokenRanking) {
-		
-		for (WordToken wordToken : sentenceDiscovery.getModifiedWordList()) {
-			if(wordToken.equals(nextToToken)) {
-				wordToken.setTokenRanking(tokenRanking);
-			}
-		}
-	}
-	*/
+	
 }
 
 

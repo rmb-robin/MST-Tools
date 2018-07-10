@@ -24,11 +24,11 @@ public class TokenBypassTypes {
 		List<String> result = new ArrayList<>();
 		result.add(")");
 		result.add("(");
-		result.add("-");
+//		result.add("-");
 		result.add(".");
 		result.add("*");
 		result.add("+");
-		result.add(",");
+//		result.add(",");
 		result.add("?");
 		result.add("/");
 		result.add("'\'");
