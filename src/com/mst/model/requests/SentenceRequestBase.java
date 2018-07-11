@@ -8,6 +8,7 @@ public abstract class SentenceRequestBase {
     private String study;
     private DiscreteData discreteData;
     private boolean convertMeasurements;
+    private boolean needResult;
 
     public String getSource() {
         return source;
@@ -47,5 +48,9 @@ public abstract class SentenceRequestBase {
 
     public void setConvertMeasurements(boolean convertMeasurements) {
         this.convertMeasurements = convertMeasurements;
+    }
+
+    public void setNeedResult(boolean needResult) {
+        this.needResult = needResult;
     }
 }
