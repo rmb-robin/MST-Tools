@@ -190,10 +190,21 @@ class BaseUtility {
         return false;
     }
 
-    private List<Sentence> getSentences(SentenceRequest request) {
+    List<Sentence> getSentences(SentenceRequest request) {
         List<Sentence> sentences = new ArrayList<>();
         try {
             sentences = sentenceProcessingController.processSentences(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sentences;
+    }
+
+    List<Sentence> getSentences(SentenceTextRequest request) {
+        List<Sentence> sentences = new ArrayList<>();
+        try {
+            SentenceProcessingResult sentenceProcessingResult = sentenceProcessingController.processText(request);
+            sentences = sentenceProcessingResult.getSentences();
         } catch (Exception e) {
             e.printStackTrace();
         }
