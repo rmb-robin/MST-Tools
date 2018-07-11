@@ -1,30 +1,37 @@
 package com.mst.filter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.mst.interfaces.filter.FriendOfFriendService;
 import com.mst.interfaces.filter.SentenceFilter;
 import com.mst.interfaces.filter.SentenceFilterController;
 import com.mst.model.SentenceQuery.*;
 import com.mst.model.businessRule.BusinessRule;
+import com.mst.model.businessRule.Compliance;
+import com.mst.model.discrete.ComplianceResult;
+import com.mst.model.discrete.DiscreteData;
+import com.mst.model.discrete.FollowupRecommendation;
 import com.mst.model.metadataTypes.EdgeResultTypes;
 import com.mst.model.sentenceProcessing.SentenceDb;
 import com.mst.model.sentenceProcessing.TokenRelationship;
+import com.mst.sentenceprocessing.ComplianceProcessor;
+import com.mst.sentenceprocessing.DiscreteDataMenopausalStatus;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import static com.mst.model.metadataTypes.EdgeNames.measurement;
 
 
 public class SentenceFilterControllerImpl implements SentenceFilterController {
+    private static final Logger LOGGER = LogManager.getLogger(SentenceFilterControllerImpl.class);
     private HashSet<String> processedSentences;
     private SentenceFilter sentenceFilter;
     private Map<String, SentenceQueryResult> queryResults;
     private Map<String, SentenceDb> cumulativeSentenceResults;
     private FriendOfFriendService friendOfFriendService;
     private Map<String, MatchInfo> matches;
+    private ComplianceProcessor complianceProcessor;
+    private Map<DiscreteData, ComplianceResult> complianceResults;
 
     public SentenceFilterControllerImpl() {
         processedSentences = new HashSet<>();
@@ -32,6 +39,7 @@ public class SentenceFilterControllerImpl implements SentenceFilterController {
         cumulativeSentenceResults = new HashMap<>();
         sentenceFilter = new SentenceFilterImpl();
         friendOfFriendService = new FriendOfFriendServiceImpl();
+        complianceProcessor = new ComplianceProcessor();
     }
 
     public Map<String, SentenceQueryResult> getQueryResults() {
@@ -54,7 +62,7 @@ public class SentenceFilterControllerImpl implements SentenceFilterController {
                     if (relationship.getEdgeName() == null)
                         continue;
                     ShouldMatchOnSentenceEdgesResult edgesResult = sentenceFilter.shouldAddTokenFromRelationship(relationship, token);
-                    if (edgesResult.isMatch() || relationship.getEdgeName().equals(measurement) ) {
+                    if (edgesResult.isMatch() || relationship.getEdgeName().equals(measurement)) {
                         queryResult = (queryResult == null) ? SentenceQueryResultFactory.createSentenceQueryResult(sentenceDb) : queryResult;
                         boolean isEdgeInSearchQuery = edgeNameHash.contains(relationship.getEdgeName());
                         if (isEdgeInSearchQuery)
@@ -182,6 +190,64 @@ public class SentenceFilterControllerImpl implements SentenceFilterController {
 
     public Map<String, SentenceDb> getCumulativeSentenceResults() {
         return cumulativeSentenceResults;
+    }
+
+    public void processCompliance(List<SentenceDb> sentences, List<BusinessRule> businessRules, boolean setFollowupRecommendation) {
+        if (businessRules == null) {
+            LOGGER.debug("businessRules is null");
+            return;
+        }
+        Compliance compliance = null;
+        for (BusinessRule businessRule : businessRules) {
+            if (businessRule instanceof Compliance) {
+                compliance = (Compliance) businessRule;
+                break;
+            }
+        }
+        if (compliance == null) {
+            LOGGER.debug("instanceof Compliance not found in businessRules");
+            return;
+        }
+        Map<DiscreteData, List<SentenceDb>> sentencesByDiscreteData = new HashMap<>();
+        for (SentenceDb sentence : sentences) {
+            DiscreteData discreteData = sentence.getDiscreteData();
+            if (sentencesByDiscreteData.containsKey(discreteData)) {
+                sentencesByDiscreteData.get(discreteData).add(sentence);
+            } else {
+                DiscreteDataMenopausalStatus.setStatus(sentence.getDiscreteData());
+                sentencesByDiscreteData.put(discreteData, new ArrayList<>(Collections.singletonList(sentence)));
+            }
+        }
+        complianceResults = new HashMap<>();
+        for (Map.Entry<DiscreteData, List<SentenceDb>> entry : sentencesByDiscreteData.entrySet()) {
+            DiscreteData discreteData = entry.getKey();
+            ComplianceResult complianceResult = complianceProcessor.process(discreteData, entry.getValue(), compliance, setFollowupRecommendation);
+            complianceResults.put(discreteData, complianceResult);
+            Map<String, Boolean> bucketCompliance = complianceResult.getBucketCompliance();
+            StringBuilder bucketName = new StringBuilder();
+            String isCompliant = "";
+            Iterator<Map.Entry<String, Boolean>> itr = bucketCompliance.entrySet().iterator();
+            while(itr.hasNext()) {
+                Map.Entry<String, Boolean> mapEntry = itr.next();
+                bucketName.append(mapEntry.getKey());
+                isCompliant += String.valueOf(mapEntry.getValue());
+                if (itr.hasNext()) {
+                    bucketName.append(", ");
+                    isCompliant += ", ";
+                }
+            }
+            if (discreteData != null) {
+                discreteData.setBucketName(bucketName.toString());
+                discreteData.setIsCompliant(isCompliant);
+            }
+            FollowupRecommendation followup = complianceResult.getFollowupRecommendation();
+            if (discreteData != null && followup != null)
+                discreteData.setFollowupRecommendation(followup);
+        }
+    }
+
+    public Map<DiscreteData, ComplianceResult> getComplianceResults() {
+        return complianceResults;
     }
 
     private void updateExistingResults(HashSet<String> matchedIds) {

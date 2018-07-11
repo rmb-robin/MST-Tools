@@ -24,6 +24,9 @@ import static com.mst.model.metadataTypes.MeasurementClassification.*;
 import static com.mst.model.businessRule.SecondLargestMeasurementProcessing.IdentifierType;
 
 public class SentenceFilterImpl implements SentenceFilter {
+    private WordToken fromToken;
+    private WordToken toToken;
+    private String measurementClassification;
 
     public ShouldMatchOnSentenceEdgesResult shouldAddTokenFromRelationship(TokenRelationship relation, String token) {
         ShouldMatchOnSentenceEdgesResult result = new ShouldMatchOnSentenceEdgesResult();
@@ -48,6 +51,7 @@ public class SentenceFilterImpl implements SentenceFilter {
     }
 
     public EdgeMatchOnQueryResult matchEdgesOnQuery(List<TokenRelationship> existingTokenRelationships, List<EdgeQuery> edgeQueries, String searchToken, String measurementClassification, List<BusinessRule> businessRules) {
+        this.measurementClassification = measurementClassification;
         SecondLargestMeasurementProcessing secondLargestMeasurementProcessingRule = null;
         if (businessRules != null)
             for (BusinessRule businessRule : businessRules) {
@@ -85,9 +89,11 @@ public class SentenceFilterImpl implements SentenceFilter {
                 edgeQuery.setIsNumeric(isEdgeQueryNumeric(edgeValuesList));
             boolean isEdgeNumeric = edgeQuery.getIsNumeric();
             boolean isEdgeMeasurement = edgeQuery.getName().equals(measurement);
-            if (isEdgeMeasurement && !areMeasurementsInRange(tokenRelationships, edgeValuesList, measurementClassification, secondLargestMeasurementProcessingRule)) {
+            if (isEdgeMeasurement && !isRangeMeasurementInRange(tokenRelationships, edgeValuesList, measurementClassification, secondLargestMeasurementProcessingRule)) {
                 result.setMatch(false);
                 return result;
+            } else {
+                replaceMeasurementTokenRelationshipsWithMeasurementClassificationTokenRelationship(existingTokenRelationships, this.measurementClassification);
             }
             boolean isEdgeInRange = false;
             int matchCount = 0;
@@ -140,19 +146,7 @@ public class SentenceFilterImpl implements SentenceFilter {
         return result;
     }
 
-    private class SecondLargestProcessingResult {
-        boolean measurementsInRange;
-        double measurementValue;
-        String identifier;
-        IdentifierType identifierType;
-
-        SecondLargestProcessingResult(boolean measurementsInRange) {
-            this.measurementsInRange = measurementsInRange;
-        }
-    }
-
-    private boolean areMeasurementsInRange(List<TokenRelationship> tokenRelationships, List<String> rangeValues, String measurementClassification, SecondLargestMeasurementProcessing secondLargestMeasurementProcessing) {
-        final String SECOND_LARGEST = "2nd largest";
+    private boolean isRangeMeasurementInRange(List<TokenRelationship> tokenRelationships, List<String> rangeValues, String measurementClassification, SecondLargestMeasurementProcessing secondLargestMeasurementProcessing) {
         if (!measurementClassification.equals(LARGEST) && !measurementClassification.equals(SMALLEST) && !measurementClassification.equals(MEDIAN) && !measurementClassification.equals(MEAN))
             return false;
         if (rangeValues.size() != 2)
@@ -168,78 +162,58 @@ public class SentenceFilterImpl implements SentenceFilter {
         Collections.sort(measurements);
         if (measurements.size() < 1 || measurements.size() > 3)
             return false;
-        double min = Math.min(Double.parseDouble(rangeValues.get(0)), Double.parseDouble(rangeValues.get(1)));
-        double max = Math.max(Double.parseDouble(rangeValues.get(0)), Double.parseDouble(rangeValues.get(1)));
+        double rangeMeasurement = 0;
+        TokenRelationship measurementTokenRelationship;
         if (measurements.size() == 1) {
-            double measurement = Double.parseDouble(measurements.get(0).getFromToken().getToken());
-            return measurement >= min && measurement <= max;
+            measurementTokenRelationship = measurements.get(0);
+            fromToken = measurementTokenRelationship.getFromToken();
+            toToken = measurementTokenRelationship.getToToken();
+            rangeMeasurement = Double.parseDouble(measurementTokenRelationship.getFromToken().getToken());
         } else {
             if (measurementClassification.equals(MEAN)) {
-                double measurement = total / measurements.size();
-                return measurement >= min && measurement <= max;
+                rangeMeasurement = total / measurements.size();
+                fromToken = new WordToken();
+                fromToken.setToken(String.valueOf(rangeMeasurement));
+                toToken = new WordToken();
             } else if (secondLargestMeasurementProcessing == null && measurements.size() == 2 && measurementClassification.equals(MEDIAN)) {
-                double measurement = total / measurements.size();
-                return measurement >= min && measurement <= max;
+                rangeMeasurement = total / measurements.size();
+                fromToken = new WordToken();
+                fromToken.setToken(String.valueOf(rangeMeasurement));
+                toToken = new WordToken();
             } else {
                 switch (measurementClassification) {
                     case LARGEST:
-                        double largest = Double.parseDouble(measurements.get(measurements.size() - 1).getFromToken().getToken());
-                        return largest >= min && largest <= max;
+                        measurementTokenRelationship = measurements.get(measurements.size() - 1);
+                        fromToken = measurementTokenRelationship.getFromToken();
+                        toToken = measurementTokenRelationship.getToToken();
+                        rangeMeasurement = Double.parseDouble(measurementTokenRelationship.getFromToken().getToken());
+                        break;
                     case SMALLEST:
-                        double smallest = Double.parseDouble(measurements.get(0).getFromToken().getToken());
-                        return smallest >= min && smallest <= max;
+                        measurementTokenRelationship = measurements.get(0);
+                        fromToken = measurementTokenRelationship.getFromToken();
+                        toToken = measurementTokenRelationship.getToToken();
+                        rangeMeasurement = Double.parseDouble(measurementTokenRelationship.getFromToken().getToken());
+                        break;
                     case MEDIAN:
-                        if (secondLargestMeasurementProcessing == null) {
-                            double median = Double.parseDouble(measurements.get(1).getFromToken().getToken());
-                            return median >= min && median <= max;
+                        if (secondLargestMeasurementProcessing != null) {
+                            rangeMeasurement = getSecondLargestMeasurement(measurements, secondLargestMeasurementProcessing);
+                            this.measurementClassification = SECOND_LARGEST;
                         } else {
-                            SecondLargestProcessingResult result = processSecondLargestMeasurement(min, max, measurements, secondLargestMeasurementProcessing);
-                            if (result.measurementsInRange) {
-                                String identifier = result.identifier;
-                                IdentifierType identifierType = result.identifierType;
-                                if (identifierType.equals(MEASUREMENT_ANNOTATION)) {
-                                    for (TokenRelationship measurement : measurements) {
-                                        String descriptor = measurement.getDescriptor();
-                                        if (measurement.getEdgeName().equals(EdgeNames.measurement) && descriptor != null && descriptor.equals(identifier)) {
-                                            measurement.setDescriptor(SECOND_LARGEST);
-                                            WordToken secondLargest = measurement.getFromToken();
-                                            secondLargest.setToken(String.valueOf(result.measurementValue));
-                                            secondLargest.setDescriptor(SECOND_LARGEST);
-                                            measurement.setFromToken(secondLargest);
-                                        }
-                                    }
-                                } else if (identifierType.equals(MEASUREMENT_CLASSIFICATION)) {
-                                    TokenRelationship measurement;
-                                    switch (identifier) {
-                                        case LARGEST:
-                                            measurement = measurements.get(measurements.size() - 1);
-                                            measurement.setDescriptor(SECOND_LARGEST);
-                                            WordToken secondLargest = measurement.getFromToken();
-                                            secondLargest.setToken(String.valueOf(result.measurementValue));
-                                            secondLargest.setDescriptor(SECOND_LARGEST);
-                                            measurement.setFromToken(secondLargest);
-                                            break;
-                                        case MEDIAN:
-                                            if (measurements.size() == 3) {
-                                                measurement = measurements.get(1);
-                                                measurement.setDescriptor(SECOND_LARGEST);
-                                                secondLargest = measurement.getFromToken();
-                                                secondLargest.setToken(String.valueOf(result.measurementValue));
-                                                secondLargest.setDescriptor(SECOND_LARGEST);
-                                                measurement.setFromToken(secondLargest);
-                                            }
-                                    }
-                                }
-                            }
-                            return result.measurementsInRange;
+                            measurementTokenRelationship = measurements.get(1);
+                            fromToken = measurementTokenRelationship.getFromToken();
+                            toToken = measurementTokenRelationship.getToToken();
+                            rangeMeasurement = Double.parseDouble(measurementTokenRelationship.getFromToken().getToken());
                         }
                 }
             }
         }
-        return false;
+        double min = Math.min(Double.parseDouble(rangeValues.get(0)), Double.parseDouble(rangeValues.get(1)));
+        double max = Math.max(Double.parseDouble(rangeValues.get(0)), Double.parseDouble(rangeValues.get(1)));
+        return rangeMeasurement >= min && rangeMeasurement <= max;
     }
 
-    private SecondLargestProcessingResult processSecondLargestMeasurement(double min, double max, List<TokenRelationship> measurements, SecondLargestMeasurementProcessing secondLargestMeasurementProcessing) {
+    private double getSecondLargestMeasurement(List<TokenRelationship> measurements, SecondLargestMeasurementProcessing secondLargestMeasurementProcessing) {
+        double secondLargestMeasurement = 0;
         int numberDimensions = measurements.size();
         Map<String, TokenRelationship> axisAnnotations = new HashMap<>();
         for (TokenRelationship measurement : measurements) {
@@ -263,46 +237,58 @@ public class SentenceFilterImpl implements SentenceFilter {
                 continue;
             String secondLargestIdentifier = rule.getSecondLargestIdentifier();
             IdentifierType identifierType = rule.getIdentifierType();
-            SecondLargestProcessingResult result = new SecondLargestProcessingResult(true);
-            result.identifier = secondLargestIdentifier;
-            result.identifierType = identifierType;
             List<String> largestBetweenAnnotations = rule.getLargestBetweenAnnotations();
             if (identifierType.equals(MEASUREMENT_ANNOTATION)) {
                 TokenRelationship measurement = axisAnnotations.get(secondLargestIdentifier);
-                result.measurementValue = Double.parseDouble(measurement.getFromToken().getToken());
-                result.measurementsInRange = result.measurementValue >= min && result.measurementValue <= max;
-                return result;
+                fromToken = measurement.getFromToken();
+                toToken = measurement.getToToken();
+                return Double.parseDouble(measurement.getFromToken().getToken());
             } else if (identifierType.equals(MEASUREMENT_CLASSIFICATION)) {
                 switch (secondLargestIdentifier) {
                     case LARGEST:
                         if (largestBetweenAnnotations != null && !largestBetweenAnnotations.isEmpty()) {
-                            double largest = 0;
                             for (String annotation : largestBetweenAnnotations) {
                                 TokenRelationship measurement = axisAnnotations.get(annotation);
                                 double annotationValue = Double.parseDouble(measurement.getFromToken().getToken());
-                                if (annotationValue > largest)
-                                    largest = annotationValue;
+                                if (annotationValue > secondLargestMeasurement) {
+                                    fromToken = measurement.getFromToken();
+                                    toToken = measurement.getToToken();
+                                    secondLargestMeasurement = annotationValue;
+                                }
                             }
-                            result.measurementValue = largest;
-                            result.measurementsInRange = largest >= min && largest <= max;
-                            return result;
+                            return secondLargestMeasurement;
                         } else {
                             TokenRelationship measurement = measurements.get(measurements.size() - 1);
-                            result.measurementValue = Double.parseDouble(measurement.getFromToken().getToken());
-                            result.measurementsInRange = result.measurementValue >= min && result.measurementValue <= max;
-                            return result;
+                            fromToken = measurement.getFromToken();
+                            toToken = measurement.getToToken();
+                            return Double.parseDouble(measurement.getFromToken().getToken());
                         }
                     case MEDIAN:
                         if (numberDimensions == 3) {
                             TokenRelationship measurement = measurements.get(1);
-                            result.measurementValue = Double.parseDouble(measurement.getFromToken().getToken());
-                            result.measurementsInRange = result.measurementValue >= min && result.measurementValue <= max;
-                            return result;
+                            fromToken = measurement.getFromToken();
+                            toToken = measurement.getToToken();
+                            return Double.parseDouble(measurement.getFromToken().getToken());
                         }
                 }
             }
         }
-        return new SecondLargestProcessingResult(false);
+        return secondLargestMeasurement;
+    }
+
+    private void replaceMeasurementTokenRelationshipsWithMeasurementClassificationTokenRelationship(List<TokenRelationship> tokenRelationships, String measurementClassification) {
+        ListIterator<TokenRelationship> itr = tokenRelationships.listIterator();
+        while (itr.hasNext())
+            if (itr.next().getEdgeName().equals(measurement)) {
+                itr.remove();
+            }
+        TokenRelationship tokenRelationship = new TokenRelationship();
+        tokenRelationship.setEdgeName(measurement);
+        tokenRelationship.setDescriptor(measurementClassification);
+        tokenRelationship.setSource(this.getClass().getSimpleName());
+        tokenRelationship.setFromToken(fromToken);
+        tokenRelationship.setToToken(toToken);
+        tokenRelationships.add(tokenRelationship);
     }
 
     private boolean isMatchOnExistence(Map<String, List<TokenRelationship>> relationshipsByEdgeName, String searchToken) {

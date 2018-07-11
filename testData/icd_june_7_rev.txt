@@ -1,0 +1,7 @@
+M10.0,small mass
+N27.0,Small cyst, kidney
+J01,ovarian cyst
+N28.0,simple ovarian cyst,unilateral
+J01.0,simple ovarian cyst
+N20.1,small simple ovarian cyst
+J01.0,simple cyst of ovary

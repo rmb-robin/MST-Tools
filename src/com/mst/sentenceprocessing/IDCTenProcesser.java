@@ -57,6 +57,7 @@ public class IDCTenProcesser {
 		//******************************************************************************************************************************************************
 		String highestValueEdge=null;
 		int TokVal =0;
+		String token = null;
 		List<RecommendedTokenRelationship> embeddedWords = discovery.getWordEmbeddings();
 		for (int i =0; i<embeddedWords.size(); i++) {
 			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
@@ -64,21 +65,23 @@ public class IDCTenProcesser {
 			if(relationship.getFromToken().getTokenRanking()>relationship.getToToken().getTokenRanking() && relationship.getFromToken().getTokenRanking()>TokVal){
 				highestValueEdge = relationship.getEdgeName(); 	//Tried but this caused typeMisMatch: highestValueToken = relationship.getFromToken();
 				TokVal = relationship.getFromToken().getTokenRanking();
+				token = relationship.getFromToken().getToken();
 			}
 			else if(relationship.getToToken().getTokenRanking()>relationship.getFromToken().getTokenRanking() && relationship.getToToken().getTokenRanking()>TokVal){
 				highestValueEdge = relationship.getEdgeName(); 	//Tried but this caused typeMisMatch: highestValueToken = relationship.getFromToken();
 				TokVal = relationship.getToToken().getTokenRanking();
+				token = relationship.getToToken().getToken();
 			}
 						
 		}
-		
-		
+//		System.out.println();
+//		System.out.println(highestValueEdge +" | " + token + " | " + TokVal);
 		//*****************************************************************************************************************************************************
 		//RecommendedTokenRelationship relationship = 
 		//	 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),EdgeNames.existence);
 		
 		RecommendedTokenRelationship relationship = 
-				 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),highestValueEdge );	//here highestValueEdge is used instead of existance
+				 RecommandedTokenRelationshipUtil.getByEdgeName(discovery.getWordEmbeddings(),highestValueEdge );
 		
 		if(relationship==null) return; 
 		
@@ -86,7 +89,9 @@ public class IDCTenProcesser {
         //was: token.setToken(icdEdge);
 		toToken.setToken(icdEdge);
 		
-		WordToken fromToken = relationship.getTokenRelationship().getToToken();
+		WordToken fromToken = relationship.getTokenRelationship().getFromToken();//was getToToken();
+		
+//		System.out.println(fromToken.getToken() + " | "+fromToken.getTokenRanking() +" | " + toToken.getToken() + " | " + toToken.getTokenRanking());
 		
 
 		RecommendedTokenRelationship newEdge = 

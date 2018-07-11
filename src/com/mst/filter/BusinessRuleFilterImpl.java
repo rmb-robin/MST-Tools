@@ -5,7 +5,6 @@ import com.mst.model.SentenceQuery.*;
 import com.mst.model.businessRule.AddEdgeToResult;
 import com.mst.model.businessRule.AppendToInput;
 import com.mst.model.businessRule.BusinessRule;
-import com.mst.model.businessRule.RemoveEdgeFromResult;
 import com.mst.model.discrete.DiscreteData;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -34,8 +33,6 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
         for (BusinessRule businessRule : businessRules) {
             if (businessRule instanceof AddEdgeToResult)
                 processAddEdgeToResult(results, (AddEdgeToResult) businessRule);
-            else if (businessRule instanceof RemoveEdgeFromResult)
-                processRemoveEdgeFromResult(results, (RemoveEdgeFromResult) businessRule);
         }
     }
 
@@ -126,32 +123,6 @@ public class BusinessRuleFilterImpl implements BusinessRuleFilter {
                     } else {
                         addEdgeToResults(edgeResults, rule, discreteData);
                         newEdgeAdded = true;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            printException(e);
-        }
-    }
-
-    private void processRemoveEdgeFromResult(List<SentenceQueryResult> sentenceQueryResults, RemoveEdgeFromResult businessRule) {
-        try {
-            List<BusinessRule> rules = businessRule.getRules();
-            for (SentenceQueryResult sentenceQueryResult : sentenceQueryResults) {
-                List<SentenceQueryEdgeResult> edgeResults = sentenceQueryResult.getSentenceQueryEdgeResults();
-
-                for (BusinessRule baseRule : rules) {
-                    RemoveEdgeFromResult rule = (RemoveEdgeFromResult) baseRule;
-                    String edgeToRemove = rule.getEdgeToRemove();
-                    boolean removeIfNull = rule.isRemoveIfNull();
-                    List<String> values = rule.getEdgeToRemoveValues();
-                    ListIterator<SentenceQueryEdgeResult> itr = edgeResults.listIterator();
-
-                    while (itr.hasNext()) {
-                        SentenceQueryEdgeResult edgeResult = itr.next();
-                        boolean nullMatch = edgeResult.getMatchedValue() == null && removeIfNull;
-                        if (edgeResult.getEdgeName().equals(edgeToRemove) && (nullMatch || (values != null && values.contains(edgeResult.getMatchedValue()))))
-                            itr.remove();
                     }
                 }
             }

@@ -4,6 +4,16 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Query;
+import com.mst.model.SentenceQuery.EdgeQuery;
+import com.mst.model.recommandation.ICD;
+import com.mst.interfaces.MongoDatastoreProvider;
+import com.mst.model.recommandation.RecommendedTokenRelationship;
+import com.mst.model.recommandation.SentenceDiscoveries;
+import com.mst.model.recommandation.SentenceDiscovery;
+import com.mst.model.SentenceQuery.*;
+
 import com.mst.interfaces.sentenceprocessing.AdditionalExistenceEdgeProcessor;
 import com.mst.interfaces.sentenceprocessing.DistinctTokenRelationshipDeterminer;
 import com.mst.interfaces.sentenceprocessing.DynamicEdgeCreationProcessor;
@@ -101,7 +111,7 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             discoveries.add(discovery);
             List<RecommendedTokenRelationship> edges = recommendedNounPhraseProcessor.setNamedEdges(discovery.getWordEmbeddings(), sentenceProcessingMetaDataInput.getNounRelationshipsInput()); //should always be last
             dynamicEdgeCreationProcessor.processDiscovery(sentenceProcessingMetaDataInput.getDynamicEdgeCreationRules(), discovery);
-           // measurementProcessor.process(tokens, request.isConvertMeasurements());
+            measurementProcessor.process(tokens, request.isConvertMeasurements());
             edges = distinctTokenRelationshipDeterminer.getDistinctRecommendedRelationships(edges);
             discovery.setWordEmbeddings(edges);
             RecommendedTokenRelationship relationship = additionalExistenceEdgeProcessor.processDiscovery(discovery);
@@ -110,9 +120,10 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
             /**
              * calls recommendationEdgesVerificationProcesser and passes the discovery and wordEmbeddings to set the tokenRankings
              */
+
             tokenRankProcessor.setTokenRankings(discovery);
             //recommendationEdgesVerificationProcessor.process(discovery, discovery.getWordEmbeddings());
-            //discoveries.add(discovery);
+            discoveries.add(discovery);
         }
         return discoveries;
     }
@@ -157,4 +168,80 @@ public class SentenceDiscoveryProcessorImpl implements SentenceDiscoveryProcesso
         }
         return result.toString();
     }
+
+	///////////////////////// code added by Sandeep for ticket# 381
+	private MongoDatastoreProvider datastoreProvider;
+
+	public void setMongoDatastoreProvider(MongoDatastoreProvider provider) {
+		datastoreProvider = provider;
+	}
+
+	private HashSet<String> getEdgeNamesForSentences(List<EdgeQuery> edges) {
+		HashSet<String> result = new HashSet<>();
+		edges.forEach(a -> result.add(a.getName()));
+		return result;
+	}
+
+	public List<SentenceDiscoveries> getSentences(SentenceQueryInput input) {
+		Datastore datastore = datastoreProvider.getDefaultDb();
+		List<SentenceDiscoveries> resultSentences = new ArrayList<>();
+		Query<SentenceDiscoveries> query = datastore.createQuery(SentenceDiscoveries.class);
+		for (SentenceQueryInstance sentenceQueryInstance : input.getSentenceQueryInstances()) {
+
+
+			query.and(query.and(query.criteria("organizationId").equal(input.getOrganizationId()),
+					query.criteria("wordEmbeddings.tokenRelationship.edgeName")
+							.hasAllOf(getEdgeNamesForSentences(sentenceQueryInstance.getEdges())),
+					query.criteria("wordEmbeddings.tokenRelationship.toToken.token")
+							.hasAnyOf(new HashSet<String>(sentenceQueryInstance.getTokens()))));
+
+			//last running on 6/19 when jan was in chicago
+//			query.and(
+//					query.criteria("wordEmbeddings.tokenRelationship.edgeName")
+//							.hasAllOf(getEdgeNamesForSentences(sentenceQueryInstance.getEdges())),
+//					query.criteria("wordEmbeddings.tokenRelationship.toToken.token")
+//							.hasAnyOf(new HashSet<String>(sentenceQueryInstance.getTokens())));
+
+			// query.and(query.criteria("organizationId").equal(input.getOrganizationId()),
+			// query.criteria("wordEmbeddings.tokenRelationship.edgeName")
+			// .hasAllOf(getEdgeNamesForSentences(sentenceQueryInstance.getEdges())),
+			// query.criteria("wordEmbeddings.tokenRelationship.toToken.token")
+			// .hasAnyOf(new HashSet<String>(sentenceQueryInstance.getTokens())));
+
+			// query.and(query.criteria("organizationId").equal(input.getOrganizationId()),
+			// query.criteria("wordEmbeddings.tokenRelationship.edgeName")
+			// .hasAllOf(getEdgeNamesForSentences(sentenceQueryInstance.getEdges())),
+			// query.or(
+			// query.criteria("wordEmbeddings.tokenRelationship.toToken.token")
+			// .hasAnyOf(new HashSet<String>(sentenceQueryInstance.getTokens())),
+			// query.criteria("wordEmbeddings.tokenRelationship.fromToken.token")
+			// .hasAnyOf(new HashSet<String>(sentenceQueryInstance.getTokens()))));
+
+			resultSentences.addAll(query.asList());
+		}
+		return resultSentences;
+	}
+
+	public List<ICD> getICDSentences(SentenceQueryInput input) {
+		Datastore datastore = datastoreProvider.getDefaultDb();
+		List<ICD> resultSentences = new ArrayList<>();
+		Query<ICD> query = datastore.createQuery(ICD.class);
+		for (SentenceQueryInstance sentenceQueryInstance : input.getSentenceQueryInstances()) {
+			query.or(
+					query.criteria("wordEmbeddings.tokenRelationship.toToken.token")
+							.hasAnyOf(sentenceQueryInstance.getTokens()),
+					query.criteria("wordEmbeddings.tokenRelationship.fromToken.token")
+							.hasAnyOf(sentenceQueryInstance.getTokens()));
+			resultSentences.addAll(query.asList());
+		}
+		return resultSentences;
+	}
+
+	public List<ICD> getAllICDDocuments() {
+		Datastore datastore = datastoreProvider.getDefaultDb();
+		List<ICD> resultSentences = new ArrayList<>();
+		Query<ICD> query = datastore.createQuery(ICD.class);
+		resultSentences.addAll(query.asList());
+		return resultSentences;
+	}
 }

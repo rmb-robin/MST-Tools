@@ -1,0 +1,15 @@
+N28.0,Renal artery obstruction
+N28.0,Renal artery occlusion
+N27.0,Small kidney, unilateral
+N20.1,Ureteric stone
+N18.1,Chronic kidney disease, stage 1
+M75.2,Bicipital tendinitis
+M70.2,Olecranon bursitis
+M61.20,Paralytic calcification and ossification of muscle, unspecified site
+M19.23,Secondary osteoarthritis, wrist
+M10.0,Primary gout
+M10.00,Idiopathic gout, unspecified site
+L89.813,Pressure ulcer of head, stage 3
+J01,Acute sinusitis
+J01.0,Acute maxillary sinusitis
+C78.0,Secondary malignant neoplasm of lung

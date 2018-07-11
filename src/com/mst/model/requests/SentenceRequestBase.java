@@ -50,10 +50,6 @@ public abstract class SentenceRequestBase {
         this.convertMeasurements = convertMeasurements;
     }
 
-    public boolean isNeedResult() {
-        return needResult;
-    }
-
     public void setNeedResult(boolean needResult) {
         this.needResult = needResult;
     }

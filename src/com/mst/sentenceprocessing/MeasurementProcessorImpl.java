@@ -92,14 +92,12 @@ public class MeasurementProcessorImpl implements MeasurementProcessor {
                             if (!annotationWords[index].equals(token)) {
                                 match = false;
                                 break;
-                            }
-                            else if (index == annotationWords.length - 1) {
+                            } else if (index == annotationWords.length - 1) {
                                 annotationsFound.put(entry.getKey(), new Annotation(annotation, word.getPosition()));
                                 break;
                             }
                         }
-                    }
-                    else if (annotation.equals(token)) {
+                    } else if (annotation.equals(token)) {
                         annotationsFound.put(entry.getKey(), new Annotation(annotation, word.getPosition()));
                         match = true;
                         break;
@@ -201,13 +199,12 @@ public class MeasurementProcessorImpl implements MeasurementProcessor {
             }
         else {
             Set<Map.Entry<String, Annotation>> mapSet = annotationsFound.entrySet();
-            @SuppressWarnings (value="unchecked")
+            @SuppressWarnings(value = "unchecked")
             Map.Entry<String, Annotation> element = (Map.Entry<String, Annotation>) mapSet.toArray()[measurementIndex];
             int annotationPosition = element.getValue().position;
             if (annotationPosition < measurementPosition || annotationPosition - measurementPosition <= 2) {
                 return element.getKey();
-            }
-            else if (annotationsFound.size() == 3)
+            } else if (annotationsFound.size() == 3)
                 return element.getKey();
         }
         return null;
