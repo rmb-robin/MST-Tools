@@ -23,7 +23,6 @@ public class TokenRankProcessorImpl  implements TokenRankProcessor{
 	private static final String HYPHEN = "-";
 	private static final String SEMICOLON = ";";
 	
-	
 	/*
 	 * Tasks:
 
@@ -51,12 +50,12 @@ b) Add logic to verification processor:
 		//WordToken wordtoken = new WordToken();
 		List<RecommendedTokenRelationship> embeddedWords = sentenceDiscovery.getWordEmbeddings();
 		Collections.reverse(embeddedWords);
-		
-		//String prevToToken = "";
+		/*
+		String prevToToken = null;
 		int incrementValue=4;
 		Boolean flag = false;
-		//String tokenTokenToToken=null;
-		
+		String tokenTokenToToken=null;
+		*/
 		for(int i =0; i<embeddedWords.size();i++) {
 			RecommendedTokenRelationship recommendedTokenRelationship = embeddedWords.get(i);
 			TokenRelationship relationship = recommendedTokenRelationship.getTokenRelationship();
@@ -69,53 +68,31 @@ b) Add logic to verification processor:
 			
 			
 			if(edgeName.equals(WordEmbeddingTypes.prepMinus)) {
-				
+				/*
 				if(flag) {
 					tokenRanking =fromToken.getTokenRanking()+incrementValue;
-					incrementValue--;
 				}
 				else {
 					tokenRanking =fromToken.getTokenRanking()+4;	
 				}
-				
-				
-				//tokenRanking =fromToken.getTokenRanking()+incrementValue;
+				*/
+				tokenRanking =fromToken.getTokenRanking()+4;
 				fromToken.setTokenRanking(tokenRanking);
+				updateModifiedWordList(sentenceDiscovery, fromToken.getToken(), tokenRanking);
+				//prevToToken = toToken.getToken();
+				//incrementValue--;
 				continue;
 			}
-			
+			/*
 			if(edgeName.equals(WordEmbeddingTypes.prepPlus)) {
-				if (flag) {
-					tokenRanking=toToken.getTokenRanking()+incrementValue;
-					toToken.setTokenRanking(tokenRanking);
-					incrementValue--;
-				}
-				if (i+1 < embeddedWords.size()) {
-					RecommendedTokenRelationship nextRecommendedTokenRelationship = embeddedWords.get(i+1);
-					TokenRelationship nextRelationship = nextRecommendedTokenRelationship.getTokenRelationship();
-					String nextEdgeName = nextRelationship.getEdgeName();
-					if(nextEdgeName.equals(WordEmbeddingTypes.tokenToken)) {
-						WordToken nextToToken = nextRelationship.getToToken();	
-						WordToken nextFromToken = nextRelationship.getFromToken();	
-						if(toToken.getToken().equals(nextFromToken.getToken())) {
-							
-							tokenRanking=toToken.getTokenRanking()+incrementValue;
-							toToken.setTokenRanking(tokenRanking);
-							incrementValue--;
-							flag=true;
-						}
-					}
-				
-				}
-				continue;
+				prevToToken = toToken.getToken();
 			}
-			
+			*/
 			
 			if(edgeName.equals(WordEmbeddingTypes.tokenToken)) {
 				if(SEMICOLON.equals(toToken.getToken())||HYPHEN.equals(toToken.getToken())||COMMA.equals(toToken.getToken())) {
 					tokenRanking = fromToken.getTokenRanking()+2;
 					fromToken.setTokenRanking(tokenRanking);
-					flag=false;
 					continue;
 				}
 				if (i+1 < embeddedWords.size()) {
@@ -131,14 +108,7 @@ b) Add logic to verification processor:
 						 */
 						
 						if(SEMICOLON.equals(nextToToken.getToken())||HYPHEN.equals(nextToToken.getToken())||COMMA.equals(nextToToken.getToken())){
-							flag=false;
-							continue;
-						}
-						
-						if(flag) {
-							tokenRanking =nextToToken.getTokenRanking()+incrementValue;
-							nextToToken.setTokenRanking(tokenRanking);
-							incrementValue--;
+							
 							continue;
 						}
 						
@@ -152,29 +122,17 @@ b) Add logic to verification processor:
 						//String word = nextToToken.getToken();	
 						//updateModifiedWordList(sentenceDiscovery, word, tokenRanking);
 						//updateModifiedWordListNew(sentenceDiscovery, nextRelationship.getToToken(), tokenRanking);
-						
 						continue;
 					}
 				}
-				
-				if(flag) {
-					if (i+1 < embeddedWords.size()) {
-						RecommendedTokenRelationship nextRecommendedTokenRelationship = embeddedWords.get(i+1);
-						TokenRelationship nextRelationship = nextRecommendedTokenRelationship.getTokenRelationship();
-						String nextEdgeName = nextRelationship.getEdgeName();
-						if(nextEdgeName.equals(WordEmbeddingTypes.prepMinus)) {
-							//WordToken nextToToken = nextRelationship.getToToken();	
-							WordToken nextFromToken = nextRelationship.getFromToken();						
-							if(toToken.getToken().equals(nextFromToken.getToken())) {								
-								tokenRanking = toToken.getTokenRanking()+incrementValue;
-								toToken.setTokenRanking(tokenRanking);
-								incrementValue--;
-								continue;
-							}
-						}
-					}
+				/*
+				if(prevToToken.equals(fromToken.getToken())) {
+					tokenRanking = toToken.getTokenRanking()+incrementValue;
+					flag = true;
+					incrementValue--;
+					tokenTokenToToken = toToken.getToken();
 				}
-				
+				*/
 				tokenRanking = toToken.getTokenRanking()+1;
 				toToken.setTokenRanking(tokenRanking);
 				updateModifiedWordList(sentenceDiscovery, toToken.getToken(), tokenRanking);
@@ -193,5 +151,3 @@ b) Add logic to verification processor:
 	}
 	
 }
-
-
