@@ -40,7 +40,7 @@ public class SentenceDiscoveryDaoImpl extends BaseDocumentDaoImpl<SentenceDiscov
             for (SentenceDiscovery sentence : sentenceDiscoveries) {
                 sentence.setDiscreteData(discreteData);
                 sentence.setOrganizationId(discreteData.getOrganizationId());
-                RecommendationEdgesVerificationProcessor.updateIndexesOnExisting(sentence.getWordEmbeddings(), sentence);
+               // RecommendationEdgesVerificationProcessor.updateIndexesOnExisting(sentence.getWordEmbeddings(), sentence);
                 ds.save(sentence);
             }
         }

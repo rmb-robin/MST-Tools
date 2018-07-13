@@ -19,7 +19,6 @@ public class WordEmbeddingTypes {
 
 	public static String subjectVerb = "subj-verb";
 	public static String subjectComplementVerb = "subjComp-Verb";
-	public static String commaMinus = "comma-1";	//Added by Rabhu on 06/03/2018 to implement the tokenRankings based on comma-1
 	
 
 }
